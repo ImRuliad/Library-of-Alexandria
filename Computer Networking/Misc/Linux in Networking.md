@@ -1,0 +1,79 @@
+## Table of Contents
+
+-   [Introduction](#introduction)
+-   [Basics of Linux Networking](#basics-of-linux-networking)
+-   [Packet Processing](#packet-processing)
+-   [Packet Handling](#packet-handling)
+-   [Traffic Control](#traffic-control)
+-   [NAPI](#napi)
+-   [Miscellaneous](#miscellaneous)
+
+---
+
+## Introduction
+
+A collection of Linux networking basics and internals.
+> [C programming resources](https://dev.harshkapadia.me/resources#c)
+
+---
+
+## Basics of Linux Networking
+
+-   [A Beginner's Guide to Linux Networking Fundamentals](https://dev.to/iaadidev/a-beginners-guide-to-linux-networking-fundamentals-dev-ops-prerequisite-7-434o)
+-   [How exactly are NetworkManager, networkd, netplan, ifupdown2, and iproute2 interacting?](https://unix.stackexchange.com/a/752664)
+-   [Ubuntu Networkd vs NetworkManager: Which One Should You Use?](https://hatchjs.com/ubuntu-networkd-vs-networkmanager)
+
+---
+
+## Packet Processing
+
+-   [Queueing in the Linux Network Stack](https://www.coverfire.com/articles/queueing-in-the-linux-network-stack)
+-   [Kernel-bypass techniques for high-speed network packet processing](https://www.youtube.com/watch?v=MpjlWt7fvrw)
+-   [Illustrated Guide to Monitoring and Tuning the Linux Networking Stack: Receiving Data](https://blog.packagecloud.io/illustrated-guide-monitoring-tuning-linux-networking-stack-receiving-data)
+-   [How Linux processes your network packet](https://www.youtube.com/watch?v=3Ij0aZRsw9w)
+-   [SYN packet handling in the wild](https://blog.cloudflare.com/syn-packet-handling-in-the-wild)
+-   [Listening to Networks](https://www.youtube.com/watch?v=NGOD8VdyevM)
+-   [The Network Packet's Diary: A Kernel Journey](https://www.youtube.com/watch?v=T5TvPRQFNoM)
+-   [Path of a Packet in the Linux Kernel Stack](https://www.cs.dartmouth.edu/~sergey/netreads/path-of-packet/Network_stack.pdf)
+-   [New API (NAPI)](#napi)
+
+---
+
+## Packet Handling
+
+- [socket(7)](https://man7.org/linux/man-pages/man7/socket.7.html) describes the Linux networking socket layer user interface
+- [socket(2)](https://man7.org/linux/man-pages/man2/socket.2.html) creates an endpoint for communication and returns a file descriptor that refers to that endpoint.
+- [The Linux man-pages project (check 'intro' pages)](https://man7.org/linux/man-pages/index.html) What the numbers `2` and `7` mean
+- [Socket/Address family (`AF_INET`, `AF_INET6`, etc.)](https://man7.org/linux/man-pages/man7/address_families.7.html)
+- [Socket type (`SOCK_STREAM`, `SOCK_DGRAM`, etc.)](https://man7.org/linux/man-pages/man2/socket.2.html#:~:text=Currently%20defined%20types%20are%3A)
+- [bind(2)](https://man7.org/linux/man-pages/man2/bind.2.html)
+- [recvmsg(2)](https://www.man7.org/linux/man-pages/man2/recvmsg.2.html)
+-  [syscalls(2)](https://man7.org/linux/man-pages/man2/syscalls.2.html) System calls:
+- [sysctl(8)](https://www.man7.org/linux/man-pages/man8/sysctl.8.html) system administration command to configure kernel parameters at runtime.
+- [Linux `sysctl` command](https://linuxize.com/post/sysctl-command-in-linux)
+
+---
+
+## Traffic Control
+
+- [tc(8)](https://man7.org/linux/man-pages/man8/tc.8.html) stands for 'Traffic Control' and it shows and manipulates traffic control settings.
+- [Traffic Control HOWTO](https://tldp.org/HOWTO/html_single/Traffic-Control-HOWTO)
+
+---
+
+## NAPI
+
+-   NAPI: New Application Programming Interface
+-   NAPI is a part of the packet processing framework of Linux and provides interrupt mitigation and packet throttling to improve the performance of high-speed networking.
+-   [New API (NAPI)](https://wiki.linuxfoundation.org/networking/napi)
+-   [What are the advantages NAPI before the IRQ Coalesce?](https://stackoverflow.com/questions/28090086/what-are-the-advantages-napi-before-the-irq-coalesce)
+
+---
+
+## Miscellaneous
+
+-   [Understanding the IP routing table on Linux using `ip route`](https://www.baeldung.com/linux/route-traffic-to-interface)
+    -   [Bridging vs Forwarding](https://stackoverflow.com/a/17599363/11958552)
+-   [Linux networking references](https://linux-kernel-labs.github.io/refs/heads/master/labs/networking.html#further-reading)
+-   [Scaling in the Linux Networking Stack](https://docs.kernel.org/networking/scaling.html) (RSS, RPS, RFS, etc.)
+-   [Networking in a Linux Container in Docker](https://harshkapadia2.github.io/docker/linux-networking)
