@@ -259,8 +259,14 @@ em {
 
 .markdown-preview-view hr + * em,
 .markdown-preview-view .el-hr + * em,
+.markdown-preview-view :has(> hr) + * em,
+.markdown-rendered .el-hr + * em,
+.markdown-rendered :has(> hr) + * em,
+.cm-s-obsidian .cm-line.HyperMD-hr + .cm-line .cm-em,
+.cm-s-obsidian .cm-line.HyperMD-hr + .cm-line + .cm-line .cm-em,
+.cm-s-obsidian .HyperMD-hr + .cm-line .cm-em,
 .cm-s-obsidian pre.HyperMD-hr + pre .cm-em {
-    color: var(--text-normal);
+    color: var(--text-normal) !important;
 }
 
 
