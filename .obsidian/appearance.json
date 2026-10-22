@@ -1,1 +1,7 @@
-{}
+{
+  "cssTheme": "Minimal",
+  "translucency": true,
+  "showViewHeader": false,
+  "showRibbon": false,
+  "enabledCssSnippets": []
+}
