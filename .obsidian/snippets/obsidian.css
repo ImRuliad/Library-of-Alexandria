@@ -257,6 +257,12 @@ em {
     color: inherit;
 }
 
+.markdown-preview-view hr + * em,
+.markdown-preview-view .el-hr + * em,
+.cm-s-obsidian pre.HyperMD-hr + pre .cm-em {
+    color: var(--text-normal);
+}
+
 
 
 /* --------------- */
