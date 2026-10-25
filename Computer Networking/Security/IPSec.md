@@ -1,24 +1,23 @@
-## Table of Contents
+## Table Of Contents
 
--   [Introduction](#introduction)
--   [Features](#features)
--   [IKE](#ike)
-    -   [IKEv1](#ikev1)
-        -   [Negotiation Modes](#negotiation-modes)
-        -   [Negotiation](#negotiation)
-    -   [IKEv2](#ikev2)
-        -   [Negotiation](#negotiation-1)
--   [Security Protocols](#security-protocols)
-    -   [AH](#ah)
-    -   [ESP](#esp)
--   [Operation Modes](#operation-modes)
-    -   [Transport Mode](#transport-mode)
-    -   [Tunnel Mode](#tunnel-mode)
--   [Advantages](#advantages)
--   [Disadvantages](#disadvantages)
--   [Resources](#resources)
-
----
+- [[#Introduction|Introduction]]
+- [[#Features|Features]]
+    - [[#IKE|IKE]]
+    - [[#IKEv1|IKEv1]]
+        - [[#Negotiation Modes|Negotiation Modes]]
+    - [[#IKEv1 Negotiation|IKEv1 Negotiation]]
+    - [[#IKEv2|IKEv2]]
+    - [[#IKEv2 Negotiation|IKEv2 Negotiation]]
+- [[#Security Protocols|Security Protocols]]
+    - [[#AH|AH]]
+    - [[#ESP|ESP]]
+    - [[#Operation Modes|Operation Modes]]
+    - [[#Transport Mode|Transport Mode]]
+    - [[#Tunnel Mode|Tunnel Mode]]
+    - [[#Advantages|Advantages]]
+    - [[#Disadvantages|Disadvantages]]
+    - [[#Resources|Resources]]
+- [[#Related Notes|Related Notes]]
 
 ## Introduction
 
@@ -285,3 +284,9 @@
 - [Understanding VPN IPSec Tunnel Mode and IPSec Transport Mode](http://www.firewall.cx/networking-topics/protocols/870-ipsec-modes.html)
 - [An answer in the Cisco Community](https://community.cisco.com/t5/vpn/how-nat-t-works-with-ipsec/m-p/1528921/highlight/true#M41422)
 - [`cryptography.md`](Cryptography.md) (for Diffie-Hellman, RSA, AES, Hashing, Digital signatures and Digital certificates resources)
+
+## Related Notes
+
+- [[Computer Networking/Security/Cryptography.md|Cryptography]] — IPsec's key exchange and security protocols rely on cryptographic primitives.
+- [[Computer Networking/Misc/A. OSI Layers.md|A. OSI Layers]] — IPsec's AH and ESP are commonly placed at the network layer.
+- [[Computer Networking/Protocols/TCP.md|TCP]] — IPsec can protect IP traffic carrying TCP and other transport protocols.

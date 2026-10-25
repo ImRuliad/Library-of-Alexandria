@@ -1,11 +1,11 @@
-## ***Table of Contents***
+## Table Of Contents
 
-
-
-
-
-
-
+- [[#Introduction|Introduction]]
+- [[#What is the Function of the /dev Directory?|What is the Function of the /dev Directory?]]
+- [[#Character Special Files & Block Special Files|Character Special Files & Block Special Files]]
+- [[#What Are Pseudo-Devices|What Are Pseudo-Devices]]
+- [[#Symbolic Links|Symbolic Links]]
+- [[#Related Notes|Related Notes]]
 
 ## ***Introduction***
 ---
@@ -143,3 +143,7 @@ crw--w----. 1 root tty  136, 0 Sep 17 12:33 0
 c---------. 1 root root   5, 2 Sep 17 09:06 ptmx
 ```
 
+## Related Notes
+
+- [[Linux/File System/dev sda directory.md|dev sda directory]] — The sda note explains a specific block device exposed under /dev.
+- [[Linux/Misc/The Boot Process.md|The Boot Process]] — Boot-time device nodes and storage devices help the system access filesystems.

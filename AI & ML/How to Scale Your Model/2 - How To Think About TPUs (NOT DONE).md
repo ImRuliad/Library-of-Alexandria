@@ -5,16 +5,15 @@ Affiliation: Google Deepmind
 Published: February 4, 2025
 Source: https://jax-ml.github.io/scaling-book/tpus/
 ---
----
+
 ## Table Of Contents
 
-
-
-
-
-
-
-
+- [[#What Is a TPU?|What Is a TPU?]]
+    - [[#Three Components Of a TPU|Three Components Of a TPU]]
+    - [[#TPUs Are Very Very Fast at Matrix Multiplication|TPUs Are Very Very Fast at Matrix Multiplication]]
+- [[#TPU Networking|TPU Networking]]
+- [[#TPU Specs|TPU Specs]]
+- [[#Related Notes|Related Notes]]
 
 ## What Is a TPU?
 ---
@@ -169,3 +168,7 @@ If the load from HBM to VMEM is slower than the FLOPs in the Vector Unit (or MXU
 | TPU v6e | $9.0^{10}$                       | $1.8^{11}$                             |
 | TPU7x   | $9.0^{10}$                       | $1.8^{11}$                             |
 
+## Related Notes
+
+- [[AI & ML/How to Scale Your Model/1 - All About Rooflines (NOT DONE).md|1 - All About Rooflines (NOT DONE)]] — Roofline analysis explains the balance between TPU compute throughput and memory bandwidth.
+- [[AI & ML/How to Scale Your Model/7 - All About Transformer Inference (NOT DONE).md|7 - All About Transformer Inference (NOT DONE)]] — The inference note covers transformer workloads that run on accelerators such as TPUs.

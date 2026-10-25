@@ -1,14 +1,13 @@
-## Table of Contents
+## Table Of Contents
 
--   [Introduction](#introduction)
--   [Basics of Linux Networking](#basics-of-linux-networking)
--   [Packet Processing](#packet-processing)
--   [Packet Handling](#packet-handling)
--   [Traffic Control](#traffic-control)
--   [NAPI](#napi)
--   [Miscellaneous](#miscellaneous)
-
----
+- [[#Introduction|Introduction]]
+- [[#Basics of Linux Networking|Basics of Linux Networking]]
+- [[#Packet Processing|Packet Processing]]
+- [[#Packet Handling|Packet Handling]]
+- [[#Traffic Control|Traffic Control]]
+- [[#NAPI|NAPI]]
+- [[#Miscellaneous|Miscellaneous]]
+- [[#Related Notes|Related Notes]]
 
 ## Introduction
 
@@ -77,3 +76,10 @@ A collection of Linux networking basics and internals.
 -   [Linux networking references](https://linux-kernel-labs.github.io/refs/heads/master/labs/networking.html#further-reading)
 -   [Scaling in the Linux Networking Stack](https://docs.kernel.org/networking/scaling.html) (RSS, RPS, RFS, etc.)
 -   [Networking in a Linux Container in Docker](https://harshkapadia2.github.io/docker/linux-networking)
+
+## Related Notes
+
+- [[Computer Networking/Protocols/TCP.md|TCP]] — TCP is a major transport protocol handled by the Linux networking stack.
+- [[Computer Networking/Protocols/HOMA.md|HOMA]] — HOMA is a Linux transport protocol with kernel-level networking behavior.
+- [[Computer Networking/Misc/A. OSI Layers.md|A. OSI Layers]] — The OSI note helps locate Linux packet-processing stages in the network stack.
+- [[Computer Networking/Protocols/A. Table of Protocols.md|A. Table of Protocols]] — The protocol table is a reference for protocols encountered in Linux networking.

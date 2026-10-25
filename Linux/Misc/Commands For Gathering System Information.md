@@ -1,15 +1,7 @@
+## Table Of Contents
 
-| Domain | Command                                         | Description                                 |
-| ------ | ----------------------------------------------- | ------------------------------------------- |
-| CPU    | `lscpu`                                         | Get No. Cores, sockets, SMT, CPU speed/freq |
-| CPU    | `watch -n 0.1 "grep \"cpu MHz\" /proc/cpuinfo"` | Monitor Frequency                           |
-| CPU    | `lscpu`                                         | Get No. Cores, sockets, SMT, CPU speed/freq |
-| CPU    | `lstopo`                                        | Enable X11 Forwarding for GUI               |
-| CPU    | `numactl`                                       | Get NUMA Config                             |
-| OS     |                                                 |                                             |
-| OS     |                                                 |                                             |
-| Kernel |                                                 |                                             |
-| BIOS   |                                                 |                                             |
-| BIOS   |                                                 |                                             |
-| BIOS   |                                                 |                                             |
-|        |                                                 |                                             |
+- [[#Related Notes|Related Notes]]
+
+## Related Notes
+
+- [[Linux/Misc/The Boot Process.md|The Boot Process]] — The inventory table includes BIOS, OS, and kernel details introduced in the boot-process note.

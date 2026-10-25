@@ -1,6 +1,8 @@
+## Table Of Contents
 
-
-
+- [[#Compilers, Assemblers, and Linkers|Compilers, Assemblers, and Linkers]]
+- [[#Object Files and Executables|Object Files and Executables]]
+- [[#Related Notes|Related Notes]]
 
 ## ***Compilers, Assemblers, and Linkers***
 ---
@@ -62,3 +64,7 @@ Here are examples of sections that are common to all executable formats
 | `.reloc`           | Stores the information required for relocating the image while loading.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | Symbol Table       | A symbol is basically a name and an address.  Symbol table holds information needed to locate and relocate a program’s symbolic definitions and references. <br>A symbol table index is a subscript into this array. Index 0 both designates the first entry in the table and serves as the undefined symbol index.  <br>The symbol table contains an array of symbol entries.                                                                                                                                                                                                                                                 |
 | Relocation Records | Relocation is the process of connecting symbolic references with symbolic definitions. <br>For example, when a program calls a function, the associated call instruction must transfer control to the proper destination address at execution. <br>Re-locatable files must have relocation entries’ which are necessary because they contain information that describes how to modify their section contents, thus allowing executable and shared object files to hold the right information for a process's program image.  <br>Simply said relocation records are information used by the linker to adjust section contents. |
+
+## Related Notes
+
+- [[Linux/Misc/The Boot Process.md|The Boot Process]] — The boot process loads the kernel and other executable components into memory.

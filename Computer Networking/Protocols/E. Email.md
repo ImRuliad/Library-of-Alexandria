@@ -1,17 +1,17 @@
-## Table of Contents
+## Table Of Contents
 
--   [Protocols](#protocols)
-    -   [Transfer Protocols](#transfer-protocols)
-        -   [SMTP](#smtp)
-        -   [POP3](#pop3)
-        -   [IMAP](#imap)
-    -   [Utility Protocols](#utility-protocols)
-        -   [MIME](#mime)
-    -   [Security Protocols](#security-protocols)
-        -   [PGP](#pgp)
-        -   [S/MIME](#smime)
-    -   [Sending an Encrypted and Signed e-mail](#sending-an-encrypted-and-signed-e-mail)
-    -   [Resources](#resources)
+- [[#Protocols|Protocols]]
+  - [[#Transfer Protocols|Transfer Protocols]]
+    - [[#SMTP|SMTP]]
+    - [[#POP3|POP3]]
+    - [[#IMAP|IMAP]]
+  - [[#Utility Protocols|Utility Protocols]]
+    - [[#MIME|MIME]]
+  - [[#Security Protocols|Security Protocols]]
+    - [[#PGP|PGP]]
+    - [[#S/MIME|S/MIME]]
+  - [[#Resources|Resources]]
+- [[#Related Notes|Related Notes]]
 
 ## ***Protocols***
 ---
@@ -111,3 +111,10 @@
 -   Misc
     -   [After self-hosting my email for twenty-three years I have thrown in the towel. The oligopoly has won.](https://cfenollosa.com/blog/after-self-hosting-my-email-for-twenty-three-years-i-have-thrown-in-the-towel-the-oligopoly-has-won.html)
     -   [Self-Hosted email is the hardest it's ever been, but also the easiest.](https://vadosware.io/post/its-never-been-easier-or-harder-to-self-host-email)
+
+## Related Notes
+
+- [[Computer Networking/Protocols/DNS.md|DNS]] — DNS MX and TXT records help route and authenticate email.
+- [[Computer Networking/Protocols/HTTP.md|HTTP]] — HTTP and email are application-layer protocols with different message and delivery models.
+- [[Computer Networking/Security/Cryptography.md|Cryptography]] — PGP and S/MIME use cryptographic techniques to protect email.
+- [[Computer Networking/Protocols/TCP.md|TCP]] — SMTP, POP3, and IMAP commonly use TCP transports.

@@ -4,19 +4,19 @@ Affiliation: Google Deepmind
 Published: February 4, 2025
 Source: https://jax-ml.github.io/scaling-book/tpus/
 ---
----
+
 ## Table Of Contents
-[[#***Where Does The Time Go?***|Where Does The Time Go?]]
-- [[#### **Computation** | Computation]]
-- [[#### **Communication Within A Chip** | Communication Within A Chip]]
-- [[#### **Communication Between Chips** | Communication Between Chips]]
-- [[#### **Compute Bound** | Compute Bound]]
-- [[#### **Communication Bound** | Communication Bound]]
-- [[#### **Arithmetic Intensity** | Arithmetic Intensity]]
-[[#***Visualizing Rooflines*** | Visualizing Rooflines]]
 
----
-
+- [[#Where Does The Time Go?|Where Does The Time Go?]]
+    - [[#Computation|Computation]]
+    - [[#Communication Within A Chip|Communication Within A Chip]]
+    - [[#Communication Between Chips|Communication Between Chips]]
+    - [[#Compute Bound|Compute Bound]]
+    - [[#Communication Bound|Communication Bound]]
+    - [[#Arithmetic Intensity|Arithmetic Intensity]]
+- [[#Visualizing Rooflines|Visualizing Rooflines]]
+- [[#Matrix Multiplication|Matrix Multiplication]]
+- [[#Related Notes|Related Notes]]
 
 ## ***Where Does The Time Go?***
 ---
@@ -135,3 +135,7 @@ This is a reasonable assumption for Transformer matmuls since we...
 - $D$ and $F$ > $8000$
 Thus, we generally become compute-bound when our per-replica batch size is greater than 240 tokens.
 
+## Related Notes
+
+- [[AI & ML/How to Scale Your Model/2 - How To Think About TPUs (NOT DONE).md|2 - How To Think About TPUs (NOT DONE)]] — The TPU note explains the accelerator hardware and matrix units behind the compute and memory limits discussed here.
+- [[AI & ML/How to Scale Your Model/7 - All About Transformer Inference (NOT DONE).md|7 - All About Transformer Inference (NOT DONE)]] — The inference note applies compute and communication trade-offs to transformer generation and KV-cache use.

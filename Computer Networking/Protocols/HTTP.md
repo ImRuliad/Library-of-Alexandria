@@ -1,22 +1,25 @@
-## Table of Contents
+## Table Of Contents
 
--   [Introduction](#introduction)
--   [HTTP Request Methods/Verbs](#http-request-methodsverbs)
-    -   [GET](#get)
-    -   [POST](#post)
-    -   [PUT](#put)
-    -   [DELETE](#delete)
-    -   [PATCH](#patch)
-    -   [OPTIONS](#options)
-    -   [CONNECT](#connect)
-    -   [TRACE](#trace)
-    -   [HEAD](#head)
--   [HTTP Response Status Codes](#http-response-status-codes)
--   [HTTP Versions](#http-versions)
--   [REST vs RPC](#rest-vs-rpc)
--   [Miscellaneous](#miscellaneous)
-
----
+- [[#Introduction|Introduction]]
+- [[#HTTP Request Methods/Verbs|HTTP Request Methods/Verbs]]
+  - [[#GET|GET]]
+  - [[#POST|POST]]
+  - [[#PUT|PUT]]
+  - [[#DELETE|DELETE]]
+  - [[#PATCH|PATCH]]
+  - [[#OPTIONS|OPTIONS]]
+  - [[#CONNECT|CONNECT]]
+  - [[#TRACE|TRACE]]
+  - [[#HEAD|HEAD]]
+- [[#HTTP Response Status Codes|HTTP Response Status Codes]]
+  - [[#Success|Success]]
+  - [[#Redirection|Redirection]]
+  - [[#Client Errors|Client Errors]]
+  - [[#Server Errors|Server Errors]]
+- [[#HTTP Versions|HTTP Versions]]
+- [[#REST vs RPC|REST vs RPC]]
+- [[#Miscellaneous|Miscellaneous]]
+- [[#Related Notes|Related Notes]]
 
 ## Introduction
 
@@ -152,3 +155,10 @@ HTTP provides certain request methods to the client to state the action of their
 -   [Head of Line Blocking](https://stackoverflow.com/questions/45583861/how-does-http2-solve-head-of-line-blocking-hol-issue)
 -   [The Weirdest Valid URL You Would Have Seen](https://www.youtube.com/watch?v=7eMBQEXdles)
 -   [HTTP Authentication Schemes (`WWW-Authenticate` header)](http://frontier.userland.com/stories/storyReader$2159)
+
+## Related Notes
+
+- [[Books/Computer Networking (A Top Down Approach)/Chapter 2/2.2 The Web and HTTP.md|2.2 The Web and HTTP]] — The textbook section explains HTTP request/response messages and connection behavior.
+- [[Computer Networking/Protocols/TCP.md|TCP]] — HTTP versions and connections depend on transport behavior.
+- [[Computer Networking/Protocols/DNS.md|DNS]] — DNS resolves the hostnames used in HTTP URLs.
+- [[Computer Networking/Protocols/E. Email.md|E. Email]] — HTTP and email are application protocols with distinct communication patterns.

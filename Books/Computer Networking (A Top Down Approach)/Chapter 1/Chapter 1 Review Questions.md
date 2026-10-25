@@ -1,17 +1,9 @@
+## Table Of Contents
 
-#### **SECTION 1.1**
+- [[#Related Notes|Related Notes]]
 
-1. What is the difference between a host and an end system? List several different types of end systems.
-2. Why are standards important for protocols?
+## Related Notes
 
----
-#### **SECTION 1.2**
-
-1. List four access technologies. Classify each one as home access, enterprise access, or wide-area wireless access.
-2. Is HFC Transmission rate dedicated of shared among users? Are collisions possible in a downstream HFC channel? Why or why not?
-3. List the available residential access technologies in your city. For each type of access, provide the advertised downstream rate, upstream rate, and monthly price.
-4. What is the transmission rate of Ethernet LANs?
-5. What are some of the physical media that Ethernet can run over?
-
----
-#### **SECTION 1.3**
+- [[Books/Computer Networking (A Top Down Approach)/Chapter 1/1.2 The Network Edge.md|1.2 The Network Edge]] — Section 1.2 questions correspond to access networks and physical media.
+- [[Books/Computer Networking (A Top Down Approach)/Chapter 1/1.3 The Network Core.md|1.3 The Network Core]] — Section 1.3 questions cover packet switching and the network core.
+- [[Books/Computer Networking (A Top Down Approach)/Chapter 1/1.5 Protocol Layers and Their Service Models.md|1.5 Protocol Layers and Their Service Models]] — Protocol and layering questions connect to the service-model note.

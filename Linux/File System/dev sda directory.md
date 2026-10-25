@@ -1,8 +1,12 @@
-## ***Table of Contents***
+## Table Of Contents
 
-
-
-
+- [[#Introduction|Introduction]]
+- [[#/dev|/dev]]
+- [[#/dev/sda|/dev/sda]]
+- [[#More Info About /dev/sda|More Info About /dev/sda]]
+    - [[#fdisk command|fdisk command]]
+    - [[#lsblk|lsblk]]
+- [[#Related Notes|Related Notes]]
 
 ## ***Introduction***
 ---
@@ -78,3 +82,8 @@ sda      8:0    0 465.8G  0 disk
 └─sda6   8:6    0   975M  0 part [SWAP]
 sr0     11:0    1  1024M  0 rom  
 ```
+
+## Related Notes
+
+- [[Linux/File System/dev directory.md|dev directory]] — This note focuses on the /dev/sda block device within the broader /dev directory.
+- [[Linux/Misc/The Boot Process.md|The Boot Process]] — The boot process discovers and uses storage devices such as /dev/sda.

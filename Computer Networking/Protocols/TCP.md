@@ -1,27 +1,26 @@
-## Table of Contents
+## Table Of Contents
 
--   [Introduction](#introduction)
--   [Reliable Communication Mechanisms](#reliable-communication-mechanisms)
--   [Important Terms](#important-terms)
--   [Congestion Control Algorithms](#congestion-control-algorithms)
-    -   [Slow Start](#slow-start-ss)
-    -   [Congestion Avoidance](#congestion-avoidance)
-    -   [Fast Retransmit](#fast-retransmit)
-    -   [Fast Recovery](#fast-recovery)
--   [Explicit Congestion Notification](#explicit-congestion-notification)
--   [Versions of TCP](#versions-of-tcp)
-    -   [TCP Tahoe](#tcp-tahoe)
-    -   [TCP Reno](#tcp-reno)
-    -   [TCP CUBIC](#tcp-cubic)
-    -   [TCP Vegas](#tcp-vegas)
-    -   [TCP BBR](#tcp-bbr)
-    -   [DCTCP](#dctcp)
--   [Enabling a TCP Congestion Control Algorithm](#enabling-a-tcp-congestion-control-algorithm)
--   [TCP Head-of-Line Blocking](#tcp-head-of-line-blocking)
--   [TCP Segmentation Offload](#tcp-segmentation-offload)
--   [Resources](#resources)
-
----
+- [[#Introduction|Introduction]]
+- [[#Reliable Communication Mechanisms|Reliable Communication Mechanisms]]
+- [[#Important Terms|Important Terms]]
+- [[#Congestion Control Algorithms|Congestion Control Algorithms]]
+  - [[#Slow Start (SS)|Slow Start (SS)]]
+  - [[#Congestion Avoidance|Congestion Avoidance]]
+  - [[#Fast Retransmit|Fast Retransmit]]
+  - [[#Fast Recovery|Fast Recovery]]
+- [[#Explicit Congestion Notification|Explicit Congestion Notification]]
+- [[#Versions of TCP|Versions of TCP]]
+  - [[#TCP Tahoe|TCP Tahoe]]
+  - [[#TCP Reno|TCP Reno]]
+  - [[#TCP CUBIC|TCP CUBIC]]
+  - [[#TCP Vegas|TCP Vegas]]
+  - [[#TCP BBR|TCP BBR]]
+  - [[#DCTCP|DCTCP]]
+- [[#TCP Head-of-Line Blocking|TCP Head-of-Line Blocking]]
+- [[#TCP Segmentation Offload|TCP Segmentation Offload]]
+- [[#Resources|Resources]]
+    - [[#Research papers|Research papers]]
+- [[#Related Notes|Related Notes]]
 
 ## ***Introduction***
 -   [Building Blocks of TCP](https://hpbn.co/building-blocks-of-tcp)
@@ -272,3 +271,12 @@ Read [Section 3.7.2](https://networking.harshkapadia.me/files/books/computer-net
 - [Transport Layer Security (TLS)](tls.md)
 - [Linux sysctl(8) command](linux.md#packet-handling)
 - [InstaGeni Monitor](https://flsmonitor.fed4fire.eu/genitests)
+
+## Related Notes
+
+- [[Computer Networking/Protocols/HOMA.md|HOMA]] — HOMA is a message-oriented data-center transport that contrasts with TCP streams.
+- [[Computer Networking/Misc/Linux in Networking.md|Linux in Networking]] — The Linux note describes packet processing and network-stack behavior relevant to TCP.
+- [[Books/Computer Networking (A Top Down Approach)/Chapter 1/1.4 Delay, Loss, and Throughput in Packet-Switches Networks.md|1.4 Delay, Loss, and Throughput in Packet-Switches Networks]] — TCP congestion control responds to delay, loss, and throughput conditions.
+- [[Books/Computer Networking (A Top Down Approach)/Chapter 1/1.5 Protocol Layers and Their Service Models.md|1.5 Protocol Layers and Their Service Models]] — TCP provides transport-layer services to application protocols.
+- [[Computer Networking/Protocols/HTTP.md|HTTP]] — HTTP uses TCP for transport in common versions.
+- [[Computer Networking/Protocols/E. Email.md|E. Email]] — SMTP, POP3, and IMAP can use TCP connections.

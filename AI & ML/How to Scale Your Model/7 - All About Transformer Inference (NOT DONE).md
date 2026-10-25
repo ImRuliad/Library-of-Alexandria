@@ -1,12 +1,9 @@
 ## Table Of Contents
-- [[#***The Basics of Transformer Inference***|The Basics of Transformer Inference]]
-- [[#***The KV Cache***|The KV Cache]]
-- [[#***What Do We Actually Want To Optimize?***|What Do We Actually Want To Optimize?]]
 
-
-
-
-
+- [[#The Basics of Transformer Inference|The Basics of Transformer Inference]]
+- [[#The KV Cache|The KV Cache]]
+- [[#What Do We Actually Want To Optimize?|What Do We Actually Want To Optimize?]]
+- [[#Related Notes|Related Notes]]
 
 ## ***The Basics of Transformer Inference***
 ---
@@ -80,3 +77,8 @@ We also append the KV activations for that new token to the KV cache. We repeat 
 
 ## ***What Do We Actually Want To Optimize?***
 ---
+
+## Related Notes
+
+- [[AI & ML/How to Scale Your Model/2 - How To Think About TPUs (NOT DONE).md|2 - How To Think About TPUs (NOT DONE)]] — The TPU note describes accelerator hardware used to run transformer inference.
+- [[AI & ML/How to Scale Your Model/1 - All About Rooflines (NOT DONE).md|1 - All About Rooflines (NOT DONE)]] — Roofline concepts help explain compute, memory bandwidth, and KV-cache costs during inference.

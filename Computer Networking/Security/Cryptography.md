@@ -1,24 +1,20 @@
-## Table of Contents
+## Table Of Contents
 
--   [Introduction](#introduction)
--   [Types of Cryptography](#types-of-cryptography)
--   [Ciphers](#ciphers)
-    -   [Feistel](#feistel)
-    -   [AES](#aes)
-    -   [DES, 2DES, 3DES](#des-2des-3des)
-    -   [Blowfish](#blowfish)
-    -   [RC5](#rc5)
--   [Key Exchange](#key-exchange)
-    -   [Diffie-Hellman](#diffie-hellman)
--   [Hashing](#hashing)
-    -   [SHA](#sha)
--   [Digital Signatures](#digital-signatures)
--   [Digital Certificates and Certificate Revocation (OCSP and CRL)](#digital-certificates-and-certificate-revocation-ocsp-and-crl)
--   [PGP](#pgp)
--   [Perfect Forward Secrecy](#perfect-forward-secrecy)
--   [Resources](#resources)
+- [[#Introduction|Introduction]]
+- [[#Types of Cryptography|Types of Cryptography]]
+- [[#Ciphers|Ciphers]]
+    - [[#Feistel|Feistel]]
+- [[#Key Exchange|Key Exchange]]
+    - [[#Diffie-Hellman|Diffie-Hellman]]
+- [[#Hashing|Hashing]]
+    - [[#SHA (Secure Hash Algorithm)|SHA (Secure Hash Algorithm)]]
+- [[#Digital Signatures|Digital Signatures]]
+- [[#Digital Certificates and Certificate Revocation (OCSP and CRL)|Digital Certificates and Certificate Revocation (OCSP and CRL)]]
+- [[#PGP|PGP]]
+- [[#Perfect Forward Secrecy|Perfect Forward Secrecy]]
+- [[#Resources|Resources]]
+- [[#Related Notes|Related Notes]]
 
----
 ## Introduction
 
 -   Cryptology is the scientific study of Cryptography and Cryptanalysis.
@@ -166,3 +162,9 @@
 -   [Cryptology, Cryptography, and Cryptanalysis – Get your Vocabulary Straight!](https://qvault.io/2019/12/16/cryptology-cryptography-and-cryptanalysis-get-your-vocabulary-straight)
 -   [Why Johnny Can’t Encrypt](https://people.eecs.berkeley.edu/~tygar/papers/Why_Johnny_Cant_Encrypt/OReilly.pdf)
 -   [How to Verify a Checksum on Windows (MD5 or SHA256)](https://windowsreport.com/checksum-on-windows)
+
+## Related Notes
+
+- [[Computer Networking/Security/IPSec.md|IPSec]] — IPsec uses cryptographic mechanisms for network-layer security.
+- [[Computer Networking/Protocols/DNS.md|DNS]] — DNSSEC uses digital signatures and keys to authenticate DNS records.
+- [[Computer Networking/Protocols/E. Email.md|E. Email]] — PGP and S/MIME apply cryptography to email.

@@ -1,50 +1,60 @@
-## Table of Contents
+## Table Of Contents
 
--   [Introduction](#introduction)
--   [Data Center Environment](#data-center-environment)
-    -   [Topology](#topology)
-    -   [Traffic Properties](#traffic-properties)
-    -   [Traffic Control Challenges](#traffic-control-challenges)
-    -   [Network Requirements](#network-requirements)
-    -   [Protocol Requirements](#protocol-requirements)
--   [Message vs Packet](#message-vs-packet)
--   [Problems with TCP](#problems-with-tcp)
-    -   [Stream Orientation](#stream-orientation)
-    -   [Connection Orientation](#connection-orientation)
-    -   [Fair Scheduling](#fair-scheduling)
-    -   [Sender-Driven Congestion Control](#sender-driven-congestion-control)
-    -   [In-Order Packet Delivery](#in-order-packet-delivery)
--   [Sender vs Receiver](#sender-vs-receiver)
--   [Packet Types](#packet-types)
--   [Features](#features)
-    -   [Message Orientation](#message-orientation)
-    -   [Connectionless Protocol](#connectionless-protocol)
-    -   [Shortest Remaining Processing Time (SRPT)](#srpt)
-    -   [Receiver-Driven Congestion Control](#receiver-driven-congestion-control)
-    -   [Out-of-Order Packet Tolerance](#out-of-order-packet-tolerance)
-    -   [No Per-Packet Acknowledgements](#no-per-packet-acknowledgements)
-    -   [At-Least-Once Semantics](#at-least-once-semantics)
--   [Design Principles](#design-principles)
--   [Linux Internals](#linux-internals)
--   [Streaming vs Messages](#streaming-vs-messages)
-    -   [The Problem with TCP Streaming](#the-problem-with-tcp-streaming)
-    -   [How Messages Help](#how-messages-help)
--   [API](#api)
--   [Message Sequence Scenarios](#message-sequence-scenarios)
-    -   [Error-Free Communication](#error-free-communication)
-    -   [Scheduled Data Loss](#scheduled-data-loss)
-    -   [Aborted RPC](#aborted-rpc)
-    -   [Unscheduled Data Loss](#unscheduled-data-loss)
--   [Algorithms](#algorithms)
-    -   [Sorting Peers and RPCs](#sorting-rpcs-and-peers)
-    -   [Calculating Scheduled Priorities](#calculating-scheduled-priorities)
-    -   [Calculating Unscheduled Priorities](#calculating-unscheduled-priorities)
-    -   [Calculating `rtt_bytes`](#calculating-rtt_bytes)
-    -   [Calculating `GRANT` Offset](#calculating-grant-offset)
-    -   [Calculating Unscheduled Bytes Offset](#calculating-unscheduled-bytes-offset)
--   [Resources](#resources)
-
----
+- [[#Introduction|Introduction]]
+- [[#Data Center Environment|Data Center Environment]]
+  - [[#Topology|Topology]]
+  - [[#Traffic Properties|Traffic Properties]]
+  - [[#Traffic Control Challenges|Traffic Control Challenges]]
+  - [[#Network Requirements|Network Requirements]]
+  - [[#Protocol Requirements|Protocol Requirements]]
+- [[#Message vs Packet|Message vs Packet]]
+- [[#Problems with TCP|Problems with TCP]]
+    - [[#Stream Orientation|Stream Orientation]]
+    - [[#Connection Orientation|Connection Orientation]]
+    - [[#Fair Scheduling|Fair Scheduling]]
+    - [[#Sender-Driven Congestion Control|Sender-Driven Congestion Control]]
+    - [[#In-Order Packet Delivery|In-Order Packet Delivery]]
+- [[#Sender vs Receiver|Sender vs Receiver]]
+- [[#HOMA Packet Types|HOMA Packet Types]]
+- [[#Features|Features]]
+  - [[#Message Orientation|Message Orientation]]
+  - [[#Connectionless Protocol|Connectionless Protocol]]
+  - [[#SRPT|SRPT]]
+  - [[#Receiver-Driven Congestion Control|Receiver-Driven Congestion Control]]
+  - [[#Out-of-Order Packet Tolerance|Out-of-Order Packet Tolerance]]
+  - [[#No Per-Packet Acknowledgements|No Per-Packet Acknowledgements]]
+  - [[#At-Least-Once Semantics|At-Least-Once Semantics]]
+- [[#Design Principles|Design Principles]]
+- [[#Linux Internals|Linux Internals]]
+- [[#The Problem with TCP Streaming|The Problem with TCP Streaming]]
+  - [[#How Messages Help|How Messages Help]]
+- [[#HOMA API|HOMA API]]
+- [[#Message Sequence Scenarios|Message Sequence Scenarios]]
+    - [[#Error-Free Communication|Error-Free Communication]]
+    - [[#Scheduled Data Loss|Scheduled Data Loss]]
+    - [[#Aborted RPC|Aborted RPC]]
+    - [[#Unscheduled Data Loss|Unscheduled Data Loss]]
+- [[#Algorithms|Algorithms]]
+  - [[#Sorting RPCs and Peers|Sorting RPCs and Peers]]
+    - [[#Algorithm|Algorithm]]
+    - [[#RPC and Peer Sorting Timing|RPC and Peer Sorting Timing]]
+  - [[#Calculating Scheduled Priorities|Calculating Scheduled Priorities]]
+    - [[#Algorithm|Algorithm]]
+    - [[#Examples|Examples]]
+  - [[#Calculating Unscheduled Priorities|Calculating Unscheduled Priorities]]
+    - [[#Unscheduled Priority Setting and Transmission Timing|Unscheduled Priority Setting and Transmission Timing]]
+      - [[#Initializations|Initializations]]
+      - [[#Sender|Sender]]
+      - [[#Receiver|Receiver]]
+  - [[#Calculating rttbytes|Calculating rttbytes]]
+  - [[#Calculating GRANT Offset|Calculating GRANT Offset]]
+    - [[#Algorithm|Algorithm]]
+    - [[#Offset and Scheduled Priority Calculation Timing|Offset and Scheduled Priority Calculation Timing]]
+  - [[#Calculating Unscheduled Bytes Offset|Calculating Unscheduled Bytes Offset]]
+    - [[#Algorithm|Algorithm]]
+    - [[#Unscheduled Bytes Offset Calculation Timing|Unscheduled Bytes Offset Calculation Timing]]
+- [[#Resources|Resources]]
+- [[#Related Notes|Related Notes]]
 
 ## Introduction
 - The [Transmission Control Protocol (TCP)](Protocols/TCP (Transmission Control Protocol)) is the most widely used transport protocol on the internet. It is well-designed, but just like any other protocol, it has its own issues. It is not suitable for every environment and faces [problems in a Data Center environment](#problems-with-tcp).
@@ -953,3 +963,9 @@ set_unscheduled_byte_offset(rpc) {
     -   [What is DPDK?](https://www.packetcoders.io/what-is-dpdk)
     -   [dpdk.org](https://www.dpdk.org)
 -   [Linux networking specifics](linux.md)
+
+## Related Notes
+
+- [[Computer Networking/Protocols/TCP.md|TCP]] — HOMA addresses data-center communication needs that differ from TCP's stream-oriented design.
+- [[Computer Networking/Misc/Linux in Networking.md|Linux in Networking]] — HOMA's implementation interacts with Linux kernel networking and packet processing.
+- [[Books/Computer Networking (A Top Down Approach)/Chapter 1/1.4 Delay, Loss, and Throughput in Packet-Switches Networks.md|1.4 Delay, Loss, and Throughput in Packet-Switches Networks]] — HOMA optimizes short-message completion time under data-center congestion.

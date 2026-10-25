@@ -1,3 +1,9 @@
+## Table Of Contents
+
+- [[#OSI Layers|OSI Layers]]
+  - [[#Resources|Resources]]
+  - [[#Related Notes|Related Notes]]
+
 # OSI Layers
 
 | No. | Name               | Protocol(s)                                                                                                          | Remarks                                                                  |
@@ -25,3 +31,12 @@
 -   [The Internet that Wasn't](files/research-papers/the-internet-that-wasnt.pdf) (OSI)
 -   [Encapsulation explained and why Ping (part of ICMP) doesn't work at layer three](https://www.youtube.com/watch?v=2shvrp0-yHw) and even then [ICMP is considered as a layer three protocol](https://serverfault.com/questions/511965/why-is-icmp-categorized-as-a-layer-3-protocol).
 -   [Protocols](./protocols.md)
+
+## Related Notes
+
+- [[Books/Computer Networking (A Top Down Approach)/Chapter 1/1.5 Protocol Layers and Their Service Models.md|1.5 Protocol Layers and Their Service Models]] — This note compares the OSI model with the Internet protocol-layer service model.
+- [[Computer Networking/Protocols/A. Table of Protocols.md|A. Table of Protocols]] — The protocol table provides a broader reference for the protocols mapped here.
+- [[Computer Networking/Protocols/HTTP.md|HTTP]] — HTTP is one of the application-layer protocols listed here.
+- [[Computer Networking/Protocols/DNS.md|DNS]] — DNS is one of the application-layer protocols listed here.
+- [[Computer Networking/Protocols/TCP.md|TCP]] — TCP is a transport-layer protocol listed here.
+- [[Computer Networking/Security/IPSec.md|IPSec]] — IPsec provides network-layer security protocols.

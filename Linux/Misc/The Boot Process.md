@@ -1,9 +1,10 @@
-## Table of Contents
+## Table Of Contents
 
--   [Introduction](## ***introduction***)
--   [The OS Boot Process](## ***The OS Boot Process***)
--   [Misc. Resources](## ***Resources***)
----
+- [[#Introduction|Introduction]]
+- [[#The OS Boot Process|The OS Boot Process]]
+- [[#Resources|Resources]]
+- [[#Related Notes|Related Notes]]
+
 ## ***Introduction***
 ---
 Booting the the process of loading and starting an Operating System.
@@ -74,3 +75,10 @@ Booting the the process of loading and starting an Operating System.
     -   [Linux Jargon Buster: What is Grub in Linux? What is it Used for?](https://itsfoss.com/what-is-grub)
     -   [Grub Boot Loader: The Complete Step-by-Step Tutorial](https://thelinuxcode.com/grub_boot_loader_full_tutorial)
 -   [How does an OS boot? // Source Dive](https://www.youtube.com/watch?v=KkenLT8S9Hs)
+
+## Related Notes
+
+- [[Linux/File System/dev directory.md|dev directory]] — The boot process relies on device nodes and filesystem access.
+- [[Linux/File System/dev sda directory.md|dev sda directory]] — Storage devices such as /dev/sda can participate in boot and filesystem setup.
+- [[Linux/Memory/Compiler, Assembler, Linker, and Loader.md|Compiler, Assembler, Linker, and Loader]] — The loader and executable formats connect to how operating-system components are built and loaded.
+- [[Linux/Misc/Commands For Gathering System Information.md|Commands For Gathering System Information]] — System inspection commands help observe booted services and hardware.

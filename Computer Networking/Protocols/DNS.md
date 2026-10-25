@@ -1,34 +1,33 @@
-## Table of Contents
+## Table Of Contents
 
--   [What is DNS and Why is DNS Needed?](#what-is-dns-and-why-is-dns-needed)
--   [DNS Infrastructure](#dns-infrastructure)
-    -   [DNS Zones](#dns-zones)
--   [Common DNS Records](#common-dns-records)
-    -   [A Record](#a-record)
-    -   [AAAA Record](#aaaa-record)
-    -   [CNAME Record](#cname-record)
-    -   [ALIAS/ANAME Record](#aliasaname-record)
-    -   [NS Record](#ns-record)
-    -   [MX Record](#mx-record)
-    -   [TXT Record](#txt-record)
-    -   [PTR Record](#ptr-record)
-    -   [CAA Record](#caa-record)
-    -   [SRV Record](#srv-record)
-    -   [CERT Record](#cert-record)
-    -   [SOA Record](#soa-record)
-    -   [RRSIG Record](#rrsig-record)
-    -   [DNSKEY Record](#dnskey-record)
-    -   [DS Record](#ds-record)
-    -   [NSEC Record](#nsec-record)
--   [Period (`.`) After Domain Name in FQDN](#period--after-domain-name-in-fqdn)
--   [(Distributed) Denial of Service](#distributed-denial-of-service)
--   [DNS Cache Poisoning/DNS Spoofing](#dns-cache-poisoningdns-spoofing)
--   [DNSSEC](#dnssec)
--   [Dynamic DNS](#dynamic-dns)
--   [DNS-0x20 Encoding](#dns-0x20-encoding)
--   [Resources](#resources)
-
----
+- [[#What is DNS and Why is DNS Needed?|What is DNS and Why is DNS Needed?]]
+- [[#DNS Infrastructure|DNS Infrastructure]]
+  - [[#DNS Zones|DNS Zones]]
+- [[#Common DNS Records|Common DNS Records]]
+  - [[#A Record|A Record]]
+  - [[#AAAA Record|AAAA Record]]
+  - [[#CNAME Record|CNAME Record]]
+  - [[#ALIAS/ANAME Record|ALIAS/ANAME Record]]
+  - [[#NS Record|NS Record]]
+  - [[#MX Record|MX Record]]
+  - [[#TXT Record|TXT Record]]
+  - [[#PTR Record|PTR Record]]
+  - [[#CAA Record|CAA Record]]
+  - [[#SRV Record|SRV Record]]
+  - [[#CERT Record|CERT Record]]
+  - [[#SOA Record|SOA Record]]
+  - [[#RRSIG Record|RRSIG Record]]
+  - [[#DNSKEY Record|DNSKEY Record]]
+  - [[#DS Record|DS Record]]
+  - [[#NSEC Record|NSEC Record]]
+- [[#Period (.) After Domain Name in FQDN|Period (.) After Domain Name in FQDN]]
+- [[#(Distributed) Denial of Service|(Distributed) Denial of Service]]
+- [[#DNS Cache Poisoning/DNS Spoofing|DNS Cache Poisoning/DNS Spoofing]]
+- [[#DNSSEC|DNSSEC]]
+- [[#Dynamic DNS|Dynamic DNS]]
+- [[#DNS-0x20 Encoding|DNS-0x20 Encoding]]
+- [[#Resources|Resources]]
+- [[#Related Notes|Related Notes]]
 
 ## What is DNS and Why is DNS Needed?
 
@@ -352,3 +351,10 @@ In the Absolute FQDN, why is there a period (`.`) after the domain name?
 -   Google introduced the TLDs `.zip`, `.mov`, `.foo` and more.
     -   [The Dangers of Google’s `.zip` TLD](https://medium.com/@bobbyrsec/the-dangers-of-googles-zip-tld-5e1e675e59a5)
     -   [New TLDs: Not Bad, Actually](https://textslashplain.com/2023/05/13/new-tlds-not-bad-actually)
+
+## Related Notes
+
+- [[Computer Networking/Protocols/A. Table of Protocols.md|A. Table of Protocols]] — The protocol table lists DNS beside related Internet protocols.
+- [[Computer Networking/Protocols/E. Email.md|E. Email]] — DNS MX and TXT records support email delivery and sender authentication.
+- [[Computer Networking/Protocols/HTTP.md|HTTP]] — DNS resolution supplies the addresses used to connect to web servers.
+- [[Computer Networking/Security/Cryptography.md|Cryptography]] — DNSSEC uses cryptographic signatures to authenticate DNS data.
