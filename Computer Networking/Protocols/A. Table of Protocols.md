@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Resources|Resources]]
 - [[#Related Notes|Related Notes]]
 

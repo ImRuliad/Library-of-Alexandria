@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Protocols|Protocols]]
   - [[#Transfer Protocols|Transfer Protocols]]
     - [[#SMTP|SMTP]]

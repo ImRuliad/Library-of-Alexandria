@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Introduction|Introduction]]
 - [[#Reliable Communication Mechanisms|Reliable Communication Mechanisms]]
 - [[#Important Terms|Important Terms]]

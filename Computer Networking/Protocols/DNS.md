@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#What is DNS and Why is DNS Needed?|What is DNS and Why is DNS Needed?]]
 - [[#DNS Infrastructure|DNS Infrastructure]]
   - [[#DNS Zones|DNS Zones]]
@@ -29,6 +31,7 @@
 - [[#Resources|Resources]]
 - [[#Related Notes|Related Notes]]
 
+- [[#Period (`.`) After Domain Name in FQDN|Period (`.`) After Domain Name in FQDN]]
 ## What is DNS and Why is DNS Needed?
 
 -   DNS stands for 'Domain Name System' or 'Domain Name Server.'

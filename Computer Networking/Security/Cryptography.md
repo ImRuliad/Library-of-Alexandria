@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Introduction|Introduction]]
 - [[#Types of Cryptography|Types of Cryptography]]
 - [[#Ciphers|Ciphers]]
@@ -15,6 +17,8 @@
 - [[#Resources|Resources]]
 - [[#Related Notes|Related Notes]]
 
+- [[#**Ciphers**|**Ciphers**]]
+- [[#**Key Exchange**|**Key Exchange**]]
 ## Introduction
 
 -   Cryptology is the scientific study of Cryptography and Cryptanalysis.

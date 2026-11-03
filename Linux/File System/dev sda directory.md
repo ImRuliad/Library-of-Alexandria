@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Introduction|Introduction]]
 - [[#/dev|/dev]]
 - [[#/dev/sda|/dev/sda]]

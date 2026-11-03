@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Compilers, Assemblers, and Linkers|Compilers, Assemblers, and Linkers]]
 - [[#Object Files and Executables|Object Files and Executables]]
 - [[#Related Notes|Related Notes]]

@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Introduction|Introduction]]
 - [[#What is the Function of the /dev Directory?|What is the Function of the /dev Directory?]]
 - [[#Character Special Files & Block Special Files|Character Special Files & Block Special Files]]

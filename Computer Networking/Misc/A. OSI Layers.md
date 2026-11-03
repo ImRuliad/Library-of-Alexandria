@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#OSI Layers|OSI Layers]]
   - [[#Resources|Resources]]
   - [[#Related Notes|Related Notes]]

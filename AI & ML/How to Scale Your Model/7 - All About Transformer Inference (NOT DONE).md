@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#The Basics of Transformer Inference|The Basics of Transformer Inference]]
 - [[#The KV Cache|The KV Cache]]
 - [[#What Do We Actually Want To Optimize?|What Do We Actually Want To Optimize?]]

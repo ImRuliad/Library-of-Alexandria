@@ -7,6 +7,8 @@ Source: https://jax-ml.github.io/scaling-book/tpus/
 
 ## Table Of Contents
 
+---
+
 - [[#Where Does The Time Go?|Where Does The Time Go?]]
     - [[#Computation|Computation]]
     - [[#Communication Within A Chip|Communication Within A Chip]]

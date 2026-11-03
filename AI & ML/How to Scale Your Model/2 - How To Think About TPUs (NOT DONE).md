@@ -8,6 +8,8 @@ Source: https://jax-ml.github.io/scaling-book/tpus/
 
 ## Table Of Contents
 
+---
+
 - [[#What Is a TPU?|What Is a TPU?]]
     - [[#Three Components Of a TPU|Three Components Of a TPU]]
     - [[#TPUs Are Very Very Fast at Matrix Multiplication|TPUs Are Very Very Fast at Matrix Multiplication]]

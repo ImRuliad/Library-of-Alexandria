@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Introduction|Introduction]]
 - [[#The OS Boot Process|The OS Boot Process]]
 - [[#Resources|Resources]]

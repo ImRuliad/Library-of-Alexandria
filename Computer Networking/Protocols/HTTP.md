@@ -1,5 +1,7 @@
 ## Table Of Contents
 
+---
+
 - [[#Introduction|Introduction]]
 - [[#HTTP Request Methods/Verbs|HTTP Request Methods/Verbs]]
   - [[#GET|GET]]
