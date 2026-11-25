@@ -44,7 +44,7 @@ $$
 *How do we avoid the above? How can we avoid re-processing the entire sequence each time we want to generate a new token?*
 
 Instead of doing the full forward pass each time, we can save some intermediate activations from each forward pass that lets us avoid re-processing previous tokens.
-- A given token only attends to previous tokens during dot product attention
+- A given token only attends to previous tokens during [[Attention|dot product attention]]
 - We can write each tokens key and value projections into a new data structure
 - Once key / value projections are saved for previous tokens, we can compute the dot products without performing any new FLOPs on the earlier tokens.
 
@@ -84,3 +84,4 @@ We also append the KV activations for that new token to the KV cache. We repeat 
 
 - [[AI & ML/How to Scale Your Model/2 - How To Think About TPUs (NOT DONE).md|2 - How To Think About TPUs (NOT DONE)]] — The TPU note describes accelerator hardware used to run transformer inference.
 - [[AI & ML/How to Scale Your Model/1 - All About Rooflines (NOT DONE).md|1 - All About Rooflines (NOT DONE)]] — Roofline concepts help explain compute, memory bandwidth, and KV-cache costs during inference.
+- [[Attention]] — Explains the dot-product attention whose keys and values the KV cache stores.
