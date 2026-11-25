@@ -329,7 +329,7 @@ Open problems worth tracking:
 
 ## ***Resources***
 ---
-*Papers for the facts, explainers for building intuition. Start with Weng for the history, then read the Transformer paper's Section 3.2.*
+*Papers for the facts, explainers for building intuition. Start with Weng for the history, then read the [[Transformer]] paper's Section 3.2.*
 
 **Primary papers**
 - [Sequence to Sequence Learning with Neural Networks](https://arxiv.org/abs/1409.3215): Sutskever, Vinyals, Le, Sep 2014. The bottleneck attention fixed.

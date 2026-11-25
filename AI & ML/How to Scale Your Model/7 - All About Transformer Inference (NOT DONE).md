@@ -9,7 +9,7 @@
 
 ## ***The Basics of Transformer Inference***
 ---
-*We have a trained transformer and we want to generate new sequences.*
+*We have a trained [[Transformer|transformer]] and we want to generate new sequences.*
 
 Sampling is conceptually simple
 - We put a sequence in
@@ -85,3 +85,4 @@ We also append the KV activations for that new token to the KV cache. We repeat 
 - [[AI & ML/How to Scale Your Model/2 - How To Think About TPUs (NOT DONE).md|2 - How To Think About TPUs (NOT DONE)]] — The TPU note describes accelerator hardware used to run transformer inference.
 - [[AI & ML/How to Scale Your Model/1 - All About Rooflines (NOT DONE).md|1 - All About Rooflines (NOT DONE)]] — Roofline concepts help explain compute, memory bandwidth, and KV-cache costs during inference.
 - [[Attention]] — Explains the dot-product attention whose keys and values the KV cache stores.
+- [[Transformer]] — The architecture being sampled from here: blocks of attention and feed-forward layers on a residual stream.
