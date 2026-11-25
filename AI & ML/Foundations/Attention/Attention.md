@@ -316,7 +316,7 @@ Softmax weights must sum to 1, so a head with nothing useful to read still has t
 | Approach | Saves | Risks |
 |---|---|---|
 | GQA / MQA | K/V cache size, decode bandwidth | Some quality loss as K/V heads shrink (MQA most) |
-| MLA | Cache size, beyond GQA | Extra compute to decompress; more complex kernels and position handling |
+| MLA | Cache size, beyond GQA | Extra compute to decompress; more complex kernels and [[Positional Encoding\|position handling]] |
 | Sliding window | Compute and cache on windowed layers | Windowed layers can't see far back; needs full layers mixed in |
 | Sparse / compressed (DSA, CSA/HCA, MSA) | Most compute and cache at 1M tokens | Indexer can miss the token that matters; custom kernels per GPU type |
 | Linear hybrids | Cache becomes fixed-size on most layers | Exact recall and multi-turn reasoning; MiniMax backed away for this reason |
@@ -355,6 +355,7 @@ Open problems worth tracking:
 ## Related Notes
 
 - [[Transformer]] — The architecture built around attention; covers how attention sits with feed-forward layers, residuals and normalization.
+- [[Positional Encoding]] — Attention is order-blind on its own; how RoPE, ALiBi and NoPE give it position.
 - [[KV Cache]] — Why causal attention lets past keys and values be stored, and what that memory costs at long context.
 - [[FlashAttention]] — Computes this exact attention while avoiding the slow GPU memory traffic of the $n \times n$ score matrix.
 - [[State Space Models]] — The Mamba family used as the linear-time layers in hybrid models.
