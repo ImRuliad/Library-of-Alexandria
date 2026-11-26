@@ -345,7 +345,7 @@ These are the [[Unikernels and Library OSes|library OS]] idea in practice: the O
 
 *Newer Linux features keep the kernel's TCP and its tooling but stop copying payloads, by having the NIC split headers from data and steer the data straight to its final buffer.*
 
-- **devmem TCP (Linux 6.12, Nov 2024):** payloads land in a dmabuf, e.g. GPU memory, while headers go to host memory for the kernel's TCP. Needs NIC header split and flow steering; the app reads with `recvmsg(MSG_SOCK_DEVMEM)`. Payloads are invisible to tcpdump and BPF ([kernel docs](https://docs.kernel.org/6.12/networking/devmem.html)).
+- **devmem TCP (Linux 6.12, Nov 2024):** payloads land in a dmabuf, e.g. [[Heterogeneous Memory and GPU Drivers|GPU memory]], while headers go to host memory for the kernel's TCP. Needs NIC header split and flow steering; the app reads with `recvmsg(MSG_SOCK_DEVMEM)`. Payloads are invisible to tcpdump and BPF ([kernel docs](https://docs.kernel.org/6.12/networking/devmem.html)).
 - **io_uring zero-copy receive, "zcrx" (Linux 6.15, May 2025):** the same split, but payloads land in user memory, and buffers come back to the kernel through a refill ring. Set up with `io_uring_register_ifq()` and `IORING_OP_RECV_ZC` ([kernel docs](https://docs.kernel.org/networking/iou-zcrx.html)). See [[io_uring]].
 
 ### Choosing One

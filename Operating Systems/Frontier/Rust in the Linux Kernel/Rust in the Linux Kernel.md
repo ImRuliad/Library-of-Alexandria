@@ -258,7 +258,7 @@ Source: [rust_minimal.rs](https://raw.githubusercontent.com/torvalds/linux/maste
 
 ### What Is Written in Rust
 
-*By late 2026 Rust is no longer only samples: it ships in Android phones, GPU drivers and the [[Block Layer and IO Schedulers|block layer]]'s test driver.*
+*By late 2026 Rust is no longer only samples: it ships in Android phones, [[Heterogeneous Memory and GPU Drivers|GPU drivers]] and the [[Block Layer and IO Schedulers|block layer]]'s test driver.*
 
 | Component | Kind | Status (Nov 2026) |
 |---|---|---|
