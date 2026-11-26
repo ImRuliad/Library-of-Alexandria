@@ -339,3 +339,4 @@ Open problems worth tracking:
 - [[Transient Execution Attacks and Mitigations]] — Why the verifier inserts speculation barriers.
 - [[Rust in the Linux Kernel]] — Safe Rust as an alternative to bytecode verification.
 - [[Formally Verified OS Components]] — Proving the verifier and JITs correct.
+- [[Kernel Observability and Tracing]] — The tracepoints, kprobes, perf events and ring buffers that BPF tracing programs attach to, and when to use ftrace or perf instead.

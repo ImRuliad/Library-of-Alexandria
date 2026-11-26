@@ -360,3 +360,4 @@ Open problems worth tracking:
 - [[Formally Verified OS Components]] — Proofs beyond seL4.
 - [[Replication]] — The distributed-systems idea behind multikernel state.
 - [[Device Drivers and the Driver Model]] — Where most kernel code and bugs live, and how Linux discovers, binds and isolates drivers.
+- [[Kernel Observability and Tracing]] — How a running kernel is inspected in production: tracepoints, ftrace, kprobes, perf and BPF.

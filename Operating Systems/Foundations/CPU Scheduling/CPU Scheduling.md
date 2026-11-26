@@ -567,3 +567,4 @@ Open problems:
 - [[Read-Copy-Update (RCU)]] — RCU callbacks and grace periods interact with preemption models.
 - [[Virtualization and Hypervisors]] — vCPU scheduling and steal time (the 7.4 steal governor).
 - [[Formally Verified OS Components]] — Why scheduler correctness is hard to prove.
+- [[Kernel Observability and Tracing]] — Scheduler tracepoints, run-queue latency histograms and off-CPU analysis.
