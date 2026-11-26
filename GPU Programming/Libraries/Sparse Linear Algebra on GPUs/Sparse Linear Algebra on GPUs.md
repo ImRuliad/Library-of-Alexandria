@@ -454,5 +454,6 @@ Net: in late 2026, [[Quantization]] and [[Low-Precision Formats - FP8, FP4 and M
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — The competitor that overtook 2:4 sparsity.
 - [[Mixture of Experts]] — Block-sparse expert routing.
 - [[Graph Analytics on GPUs]] — BFS and PageRank as SpMV over semirings; the same load-imbalance fixes.
+- [[Work Stealing and Dynamic Load Balancing]] — Merge path as static balancing, and the dynamic alternatives.
 - [[Sparse Attention]] — Attention-side sparsity and its kernels.
 - [[Quantization]] — The model-compression alternative to pruning.

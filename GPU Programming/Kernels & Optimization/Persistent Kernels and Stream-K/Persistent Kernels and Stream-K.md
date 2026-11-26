@@ -76,7 +76,7 @@ updated: 2026-11-26
 - **Wave quantization:** with 140 tiles on a 132-SM H100 SXM, a one-tile-per-block GEMM runs two waves, and the second wave keeps only 8 of 132 SMs (about 6%) busy. Overall efficiency is $140/264 = 53\%$.
 - **Decompositions:** **data-parallel** (one block per tile), **Split-K** (several blocks share a tile, split along K, then reduce), **Stream-K** (Osama, Merrill, Cecka, Garland, Owens; arXiv preprint and PPoPP 2023 poster): every block gets an equal share of all MAC-loop iterations, and tiles that straddle two blocks are "fixed up" by adding partial sums. A **hybrid** runs most tiles data-parallel and uses Stream-K only for the tail.
 - **History:** "persistent threads" come from Aila and Laine's ray tracer (HPG 2009) and were studied by Gupta, Stuart and Owens (InPar 2012).
-- **Where it is now (Nov 2026):** every fast Hopper and Blackwell GEMM in CUTLASS 4.x is persistent, with static, Stream-K or grouped schedulers. Blackwell adds **Cluster Launch Control (CLC)**, hardware work stealing that makes persistent scheduling dynamic. Triton has persistent matmul tutorials and CLC support, and FlashAttention-3 uses a dynamic persistent scheduler for causal attention. [[Megakernels]] apply the same loop to a whole model.
+- **Where it is now (Nov 2026):** every fast Hopper and Blackwell GEMM in CUTLASS 4.x is persistent, with static, Stream-K or grouped schedulers. Blackwell adds **Cluster Launch Control (CLC)**, hardware [[Work Stealing and Dynamic Load Balancing|work stealing]] that makes persistent scheduling dynamic. Triton has persistent matmul tutorials and CLC support, and FlashAttention-3 uses a dynamic persistent scheduler for causal attention. [[Megakernels]] apply the same loop to a whole model.
 
 ## ***The Problem***
 ---
@@ -441,3 +441,4 @@ Open problems and pitfalls:
 - [[Mixture of Experts]] — Persistent grouped GEMMs for expert layers.
 - [[cuBLAS and cuDNN]] — Library kernel selection per shape.
 - [[GEMM Autotuning and Kernel Selection]] — Choosing the decomposition, tile and cluster per shape by model or measurement.
+- [[Work Stealing and Dynamic Load Balancing]] — The general picture: static vs dynamic balancing, queues, stealing and plan-then-run schedules.

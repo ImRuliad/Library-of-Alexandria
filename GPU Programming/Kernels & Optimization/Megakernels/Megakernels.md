@@ -327,7 +327,7 @@ MPK (Mirage Persistent Kernel), from CMU with Tsinghua, NVIDIA and others, is "t
 **Cohere (Sep 2026)** serves North Mini Code, a 30B MoE with 3.3B active parameters, from a decode megakernel on one H100, open-sourced as `cohere-ai/cohere-megakernel` and built on ThunderKittens tiles ([Cohere](https://cohere.com/blog/megakernels)).
 
 - 16 opcodes cover the step (dense GEMMs, attention, MoE routing, MoE GEMMs, a fused add plus RMSNorm). All GEMMs share one warp-specialized pipeline.
-- Mostly static schedule: task $k$ goes to SM $k \bmod 132$, with a tuned wave order. Attention and MoE use dynamic work stealing through "claimer" tasks that pull from shared queues.
+- Mostly static schedule: task $k$ goes to SM $k \bmod 132$, with a tuned wave order. Attention and MoE use dynamic [[Work Stealing and Dynamic Load Balancing|work stealing]] through "claimer" tasks that pull from shared queues.
 - 292 tokens/s at batch 1, 62% of the 470 tokens/s speed of light and 1.58x vLLM. In the server, 1.25 to 1.41x average decode throughput. Accuracy matched vLLM on SciCode and LiveCodeBench.
 - Schedule matters: putting all attention first instead of the tuned order lost 19% at batch 1 and 7% at batch 8. "After the kernels are fast, the schedule is the rest of the speedup."
 - Limits: batch size at most 8 (a configuration limit), decode only, prefill pauses decoding and uses ordinary PyTorch kernels.
@@ -456,3 +456,4 @@ Open problems:
 - [[Debugging with compute-sanitizer and cuda-gdb]] — Finding races and hangs in a single persistent kernel.
 - [[LLM Serving]] — The decode loop megakernels accelerate, and where prefill still runs.
 - [[Mixture of Experts]] — Dynamic routing that megakernels handle with in-kernel work stealing.
+- [[Work Stealing and Dynamic Load Balancing]] — Static vs dynamic task scheduling, global work queues and CLC.
