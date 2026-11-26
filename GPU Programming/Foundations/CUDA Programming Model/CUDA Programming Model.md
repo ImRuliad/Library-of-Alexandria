@@ -253,7 +253,7 @@ sequenceDiagram
 A *stream* is an in-order queue of GPU work; work in different streams may overlap. Kernel launches and `cudaMemcpyAsync` return immediately, `cudaStreamSynchronize()` waits for one stream and `cudaDeviceSynchronize()` for all ([Asynchronous Execution](https://docs.nvidia.com/cuda/archive/13.2.1/cuda-programming-guide/02-basics/asynchronous-execution.html)). One trap: an async copy from ordinary (pageable) host memory "quietly runs synchronously"; it needs pinned memory to overlap. Streams, events and overlap get their own note, [[Streams, Events and Async Execution]], and recording a whole sequence once to replay it cheaply is [[CUDA Graphs]].
 
 #### **Errors**
-Every CUDA API call returns a `cudaError_t`. A kernel launch itself returns nothing, so check `cudaGetLastError()` right after launching (bad configuration) and the result of `cudaDeviceSynchronize()` later (faults while running). A clean launch "does not confirm that the kernel ran successfully" ([Intro to CUDA C++](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html)).
+Every CUDA API call returns a `cudaError_t`. A kernel launch itself returns nothing, so check `cudaGetLastError()` right after launching (bad configuration) and the result of `cudaDeviceSynchronize()` later (faults while running). A clean launch "does not confirm that the kernel ran successfully" ([Intro to CUDA C++](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/intro-to-cuda-cpp.html)). Tools for finding those faults are in [[Debugging with compute-sanitizer and cuda-gdb]].
 
 ## ***Where It Is Now***
 ---

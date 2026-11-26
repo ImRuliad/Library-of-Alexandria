@@ -65,7 +65,7 @@ updated: 2026-11-26
 - **The problem it fixes:** most operations in a neural network other than matrix multiplies (activations, normalization, softmax, residual adds) do a few arithmetic operations per byte loaded. Run as separate kernels, each one reads its input from HBM and writes its output back, so the GPU spends its time moving data, not computing.
 - **The fix:** do all of them in one pass over the data. Horace He calls operator fusion "the most important optimization in deep learning compilers"; fusing `x.cos().cos()` halves memory traffic and so roughly halves runtime ([He, 2022](https://horace.io/brrr_intro.html)).
 - **Kinds:** chains of elementwise ops (vertical), reductions with their inputs, extra work folded into a GEMM's prologue or [[CUTLASS and CuTe|epilogue]], independent ops batched side by side (horizontal), whole algorithms rewritten to fuse ([[FlashAttention]]), and whole models in one persistent kernel (megakernels).
-- **Who does it:** compilers (XLA, TVM, TorchInductor which writes [[Triton]] kernels, TensorRT), libraries (cuDNN's graph API, CUTLASS's Epilogue Visitor Trees), and hand-written kernels (Apex, Megatron, Liger). In PyTorch 2's ablation, turning off fusion and inlining made `torch.compile` *slower than eager* ([Ansel et al., ASPLOS 2024](https://docs.pytorch.org/assets/pytorch2-2.pdf)).
+- **Who does it:** compilers (XLA, TVM, TorchInductor which writes [[Triton]] kernels, TensorRT), libraries ([[cuBLAS and cuDNN|cuDNN's graph API]], CUTLASS's Epilogue Visitor Trees), and hand-written kernels (Apex, Megatron, Liger). In PyTorch 2's ablation, turning off fusion and inlining made `torch.compile` *slower than eager* ([Ansel et al., ASPLOS 2024](https://docs.pytorch.org/assets/pytorch2-2.pdf)).
 - **Where it is now (Nov 2026):** fusion has grown from per-op epilogues to whole-model **megakernels** for low-batch decoding (Hazy Research 2025, Mirage MPK at OSDI 2026, Cohere's production engine Sep 2026) and to compiler-generated fused attention (FlexAttention on FlashAttention-4, Mar 2026). Synchronization bugs and prefill support are the open problems.
 
 ## ***The Problem***
@@ -294,7 +294,7 @@ Sources: [Hazy Research](https://hazyresearch.stanford.edu/blog/2025-05-27-no-bu
 | Compute-bound + compute-bound | Nothing to save; can slow down | HFUSE found little benefit fusing two compute-bound kernels |
 | Reductions break parallelism | A reduction in the middle forces sync or a split | Inductor's split reductions; cuDNN allows a reduction only at the epilogue's end |
 | Store vs recompute | Training needs intermediates for backward | FlashAttention and Liger recompute instead of storing |
-| Fusion barriers | Library calls (cuBLAS, cuDNN, cuRAND) can't be fused through | XLA |
+| Fusion barriers | Library calls ([[cuBLAS and cuDNN\|cuBLAS, cuDNN]], cuRAND) can't be fused through | XLA |
 | Compile time | Each new fusion is a new kernel to compile and tune | FlexAttention recompiles when captured scalars change |
 | Numerics and debugging | Fused math reorders operations; bugs hide inside one big kernel | FlexAttention is not bitwise identical to FlashAttention; Liger's fused RoPE diverged on non-contiguous gradients |
 | Synchronization | Megakernel barrier counts miscounted → deadlock | Cohere: "Barrier accounting needs explicit invariants and careful testing" |

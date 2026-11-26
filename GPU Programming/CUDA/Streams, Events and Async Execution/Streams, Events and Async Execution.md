@@ -88,7 +88,7 @@ Kernel launches, `cudaMemcpyAsync`, `cudaMemsetAsync` and event records return t
 | Polling | `cudaStreamQuery`, `cudaEventQuery` (return `cudaErrorNotReady` if not done) | The CPU has other work to do meanwhile |
 | Callback | `cudaLaunchHostFunc(stream, fn, data)` | Run CPU code in stream order; the callback must not call CUDA APIs |
 
-A debugging tip from the guide: setting `CUDA_LAUNCH_BLOCKING=1` makes every launch synchronous, so an error is reported at the call that caused it. It is slow and only for debugging.
+A debugging tip from the guide: setting `CUDA_LAUNCH_BLOCKING=1` makes every launch synchronous, so an error is reported at the call that caused it. It is slow and only for debugging (see [[Debugging with compute-sanitizer and cuda-gdb]]).
 
 #### **Streams Are In-Order Queues**
 A stream is a sequence of operations that execute in the order they were issued. Two operations in the same stream never overlap (with two exceptions, Programmatic Dependent Launch and batched copies, covered below). Two operations in different streams carry no ordering at all; the hardware may run them concurrently, in either order, or one after the other.

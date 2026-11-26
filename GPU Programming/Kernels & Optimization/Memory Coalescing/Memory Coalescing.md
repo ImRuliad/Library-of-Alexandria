@@ -235,7 +235,7 @@ The full `--set full` profile also flags uncoalesced loads in its memory workloa
 
 Open problems:
 
-- **Irregular access.** Sparse matrices, graph algorithms and gather-heavy workloads such as MoE token routing or paged KV-cache lookups have data-dependent addresses that no remapping can make contiguous. The tools are reordering (sorting by destination), and blocking (pages of contiguous data, as in paged attention); neither is general.
+- **Irregular access.** [[Sparse Linear Algebra on GPUs|Sparse matrices]], graph algorithms and gather-heavy workloads such as MoE token routing or paged KV-cache lookups have data-dependent addresses that no remapping can make contiguous. The tools are reordering ([[Sorting and Hashing on GPUs|sorting]] by destination), and blocking (pages of contiguous data, as in paged attention); neither is general.
 - **Layout across the stack.** The best layout for one kernel (say, row-major for a GEMM's A operand) may be the worst for the next. Frameworks increasingly let compilers choose layouts per kernel and insert transposes, which [[Kernel Fusion]] then tries to hide.
 
 ## ***Resources***

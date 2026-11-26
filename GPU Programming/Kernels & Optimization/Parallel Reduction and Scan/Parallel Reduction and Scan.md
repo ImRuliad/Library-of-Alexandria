@@ -91,7 +91,7 @@ Two things make this hard:
 
 Scan adds a third problem: the output for element `i` depends on *all* elements before it, including ones owned by blocks that may not have run yet.
 
-These patterns are everywhere: softmax needs a max and a sum per row, LayerNorm and RMSNorm need sums of squares, stream compaction and radix sort are built on scan, and top-k selection uses both ([Blelloch](http://www.cs.cmu.edu/~guyb/papers/Ble93.pdf); [Milakov and Gimelshein](https://arxiv.org/abs/1805.02867)).
+These patterns are everywhere: softmax needs a max and a sum per row, LayerNorm and RMSNorm need sums of squares, stream compaction and [[Sorting and Hashing on GPUs|radix sort]] are built on scan, and top-k selection uses both ([Blelloch](http://www.cs.cmu.edu/~guyb/papers/Ble93.pdf); [Milakov and Gimelshein](https://arxiv.org/abs/1805.02867)).
 
 ## ***Foundations***
 ---
@@ -356,7 +356,7 @@ stateDiagram-v2
 
 Because most tiles find a `P` within a few steps, the look-back costs little, and the input is read only once. Merrill and Garland used tiles of 128 threads × 16 items = 2,048 elements, and report that "CUB throughput is able to match the performance ceiling of memcpy for large problems" on Kepler and Maxwell, with harmonic-mean speedups of 1.11× over StreamScan and 2.27× over Thrust at the time ([NVR-2016-002](https://research.nvidia.com/sites/default/files/pubs/2016-03_Single-pass-Parallel-Prefix/nvr-2016-002.pdf)). CUB's docs still describe DeviceScan as "~2n data movement" that "typically proceeds at 'memcpy' speeds" ([CUB DeviceScan](https://nvidia.github.io/cccl/cub/api/structcub_1_1DeviceScan.html)).
 
-The catch is the spin in step 3: it is only safe if the hardware guarantees that a waiting tile can't starve the tile it waits on. The paper says it "will run to completion if the system guarantees forward-progress for all processors". The same structure powers **Onesweep**, a single-pass radix sort that reaches about 29.4 billion 32-bit keys per second on an A100, about 1.5× CUB's previous sort ([Adinets and Merrill 2022](https://arxiv.org/abs/2206.01784)).
+The catch is the spin in step 3: it is only safe if the hardware guarantees that a waiting tile can't starve the tile it waits on. The paper says it "will run to completion if the system guarantees forward-progress for all processors". The same structure powers **Onesweep**, a single-pass [[Sorting and Hashing on GPUs|radix sort]] that reaches about 29.4 billion 32-bit keys per second on an A100, about 1.5× CUB's previous sort ([Adinets and Merrill 2022](https://arxiv.org/abs/2206.01784)).
 
 ## ***Where It Is Now***
 ---

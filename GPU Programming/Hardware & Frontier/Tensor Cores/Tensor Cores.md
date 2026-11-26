@@ -169,7 +169,7 @@ timeline
 The per-SM figures for Ampere, Hopper and Blackwell are derived here from the spec sheets with the formula in the [[#A Worked Example: Peak FLOPs From First Principles|worked example]]; NVIDIA states Volta's 1,024 directly and SemiAnalysis states Ampere's 2,048.
 
 Two side notes from that history:
-- **Sparsity under-delivered.** Ampere introduced 2:4 structured sparsity (two of every four weights zero) with a "2x" headline, and NVIDIA's spec sheets still lead with sparse numbers. SemiAnalysis reports that 2:4 sparse GEMMs on Hopper come nowhere near 2x in practice, because pruning hurts accuracy and the kernels are immature. Blackwell added a 4:8 pair-wise variant for NVFP4. Read any "with sparsity" figure as half that for real dense work.
+- **Sparsity under-delivered.** Ampere introduced [[Sparse Linear Algebra on GPUs|2:4 structured sparsity]] (two of every four weights zero) with a "2x" headline, and NVIDIA's spec sheets still lead with sparse numbers. SemiAnalysis reports that 2:4 sparse GEMMs on Hopper come nowhere near 2x in practice, because pruning hurts accuracy and the kernels are immature. Blackwell added a 4:8 pair-wise variant for NVFP4. Read any "with sparsity" figure as half that for real dense work.
 - **The bottleneck kept moving off the Tensor Core.** Ampere added `cp.async` so loads bypass registers. Hopper added the TMA copy engine and asynchronous MMA. Blackwell added TMEM so the accumulator stops occupying registers. Each step exists because the previous generation's Tensor Core sat idle waiting for data.
 
 ## ***How It Works***
@@ -180,7 +180,7 @@ Two side notes from that history:
 
 | Level | What you write | Who uses it |
 |---|---|---|
-| Library call | `cublasGemmEx`, `torch.matmul` | Almost everyone; cuBLAS picks the kernel |
+| Library call | `cublasGemmEx`, `torch.matmul` | Almost everyone; [[cuBLAS and cuDNN\|cuBLAS]] picks the kernel |
 | Template or DSL | [[CUTLASS and CuTe]], [[Triton]], CuTe DSL | Kernel authors fusing custom epilogues or new formats |
 | CUDA WMMA API | `nvcuda::wmma` fragments | Teaching; portable but slow on Hopper and Blackwell |
 | Inline PTX | `mma.sync`, `wgmma`, `tcgen05.*` | Library and framework kernel teams (see [[PTX and SASS]]) |

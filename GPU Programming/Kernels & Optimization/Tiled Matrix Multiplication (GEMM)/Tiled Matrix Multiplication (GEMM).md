@@ -286,7 +286,7 @@ Figures from NVIDIA's [Hopper](https://developer.nvidia.com/blog/nvidia-hopper-a
 
 ### Libraries, DSLs and Hand-Written Kernels
 
-- **cuBLAS / cuBLASLt** remains the default. cuBLAS 12.9 (May 2025) added block-scaled FP4 and FP8 and reported up to 6,787 TFLOPS FP4 on GB200 ([NVIDIA blog](https://developer.nvidia.com/blog/boosting-matrix-multiplication-speed-and-flexibility-with-nvidia-cublas-12-9)).
+- **[[cuBLAS and cuDNN|cuBLAS / cuBLASLt]]** remains the default. cuBLAS 12.9 (May 2025) added block-scaled FP4 and FP8 and reported up to 6,787 TFLOPS FP4 on GB200 ([NVIDIA blog](https://developer.nvidia.com/blog/boosting-matrix-multiplication-speed-and-flexibility-with-nvidia-cublas-12-9)).
 - **[[CUTLASS and CuTe]].** CUTLASS 4.x adds the Python CuTe DSL alongside C++ templates; 4.8 (Sept 2026) adds initial Rubin (SM107) support, which needs CUDA 13.4 and the R615 driver ([CUTLASS overview](https://docs.nvidia.com/cutlass/latest/overview.html)).
 - **CUDA Tile.** CUDA 13.1 (Dec 2025) introduced tile-based programming in Python, where you write the tile algorithm and the compiler maps it to Tensor Cores and TMA, along with grouped GEMM improvements in cuBLAS ([NVIDIA blog](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/)). C++ support followed in 13.3. See [[CUDA Programming Model]].
 - **[[Triton]]** expresses the block-tiled algorithm directly and is how most PyTorch custom GEMMs and [[Kernel Fusion|fused]] epilogues are written.

@@ -250,7 +250,7 @@ Adinets measured a filter kernel on a K80: plain global atomics fell from about 
 | Technique | How | Example |
 |---|---|---|
 | Branch on warp index, not thread index | Make whole warps take the same path | Harris's [[Parallel Reduction and Scan|reduction]]: `if (tid % (2*s) == 0)` (divergent) became `if (tid < s)` (only the last warps split), a 2.33× step |
-| Sort or bin work first | Put similar items in the same warp | Group particles, rays or sparse rows by type or length |
+| [[Sorting and Hashing on GPUs\|Sort]] or bin work first | Put similar items in the same warp | Group particles, rays or [[Sparse Linear Algebra on GPUs\|sparse rows]] by type or length |
 | Keep branches short | Let the compiler predicate | Clamp or select (`x = cond ? a : b`) instead of branching around a big block |
 | Hoist uniform conditions | Branch on values every lane shares | Loop bounds from kernel arguments, not per-thread data |
 | Pad to full warps | Avoid a partial last warp | Round sizes up to multiples of 32 and mask the tail |
@@ -302,7 +302,7 @@ AMD calls warps *wavefronts*. HIP's `warpSize` is "64 for gfx9 and 32 for gfx10 
 
 Open problems:
 
-- **Undefined behavior is silent.** A wrong mask may work on one GPU and hang or give wrong answers on another; `compute-sanitizer` synccheck catches some cases but not all.
+- **Undefined behavior is silent.** A wrong mask may work on one GPU and hang or give wrong answers on another; [[Debugging with compute-sanitizer and cuda-gdb|`compute-sanitizer` synccheck]] catches some cases but not all.
 - **Divergent workloads remain slow.** Ray tracing, graph traversal and sparse operations still lose lanes; the research ideas (dynamic warp formation, compaction) mostly live on as software sorting and binning.
 - **Portability.** 32-lane CUDA code with 32-bit masks must be rewritten for AMD's 64-lane wavefronts and 64-bit masks, and lockstep assumptions that are now wrong on NVIDIA are still true on AMD.
 - **Documentation gaps.** Some Nsight metric names for warp efficiency are confusingly labeled (predicated vs non-predicated variants), and the exact reconvergence rules after Volta are known mainly from reverse-engineering ([Shoushtary et al.](https://arxiv.org/pdf/2407.02944)).
