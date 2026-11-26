@@ -444,3 +444,4 @@ Open problems worth tracking:
 - [[CXL and Memory Tiering]] — Higher-latency memory makes lock handoff costlier.
 - [[Formally Verified OS Components]] — The difficulty of proving concurrent kernel code.
 - [[Consistency Models]] — The distributed-systems counterpart to memory ordering and linearizability.
+- [[Lock-Free Data Structures and Memory Ordering]] — Memory models, acquire/release, CAS-based structures, ABA and safe memory reclamation.
