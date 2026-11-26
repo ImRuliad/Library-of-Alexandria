@@ -4,7 +4,7 @@ tags:
   - concurrency
   - lock-free
   - memory-ordering
-status: draft
+status: complete
 sources:
   - https://www.microsoft.com/en-us/research/publication/make-multiprocessor-computer-correctly-executes-multiprocess-programs/
   - https://www.cl.cam.ac.uk/~pes20/weakmemory/cacm.pdf
@@ -327,7 +327,7 @@ The LKMM is written as a `herd7` model, so kernel developers can check a litmus 
 
 - **C++26 standardises reclamation.** Hazard pointers (P2530) and RCU (P2545), both voted into the C++26 working paper in 2023, are part of the C++26 standard library, so portable code no longer needs Folly or liburcu for them ([P2530R3](https://open-std.org/JTC1/sc22/wg21/docs/papers/2023/p2530r3.pdf), [P2545R4](https://open-std.org/JTC1/sc22/wg21/docs/papers/2023/p2545r4.pdf)).
 - **Hazard pointers for the kernel.** Mathieu Desnoyers posted v5 of a kernel hazard-pointer series in February 2026 (on v7.0-rc1), with four per-CPU slots per cache line and a scheduler hook that moves a task's slots aside on context switch ([RFC v5](https://lkml.iu.edu/2602.2/09055.html)). LWN's July 2026 write-up frames it as a complement to RCU where long grace periods hold too much memory; it had no in-kernel users yet, which normally blocks merging, and lockdep is named as the first planned user ([LWN](https://lwn.net/Articles/1084015/)).
-- **Rust in the kernel uses the kernel's model.** Rust code in Linux maps its atomics onto LKMM semantics rather than the C11 model, so Rust and C code sharing data agree on ordering; see [[Rust in the Linux Kernel]].
+- **Rust in the kernel uses the kernel's model.** Since Linux 6.18, Rust code in Linux uses `Atomic<T>` types whose operations follow LKMM semantics rather than the C11 model, so Rust and C code sharing data agree on ordering ([Phoronix](https://phoronix.com/news/Rust-Atomic-LKMM-Linux-6.18)); see [[Rust in the Linux Kernel]].
 - **Weak memory everywhere.** Arm servers (AWS Graviton, Ampere, NVIDIA Grace, Google Axion, Microsoft Cobalt) and RISC-V make weak ordering the common case in data centres, so code that "worked on x86" is now regularly exposed. Arm's newer `LDAPR` (RCpc acquire) and LSE atomics (`CAS`, `LDADD`) make acquire and RMW operations cheaper than the older LL/SC sequences.
 
 ## ***Trade-offs & Open Problems***
