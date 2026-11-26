@@ -57,7 +57,7 @@ updated: 2026-11-26
 
 ## ***The Problem***
 ---
-*A single-node relational database is simple and correct but runs out of capacity and can't survive losing its machine or region. Sharding it by hand trades those problems for operational pain and lost transactions.*
+*A single-node relational database is simple and correct but runs out of capacity and can't survive losing its machine or region. [[Partitioning|Sharding]] it by hand trades those problems for operational pain and lost transactions.*
 
 | Option | What you get | What breaks |
 |---|---|---|

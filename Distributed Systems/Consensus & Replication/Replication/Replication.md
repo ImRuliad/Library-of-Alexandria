@@ -298,7 +298,7 @@ sequenceDiagram
 
 ### Strong Systems Converged on Replicated Logs
 
-- **Per-shard consensus is the default.** DynamoDB (Multi-Paxos per partition), Spanner-style [[Distributed SQL]] (Paxos or Raft per range) and Kafka's metadata (KRaft) all replicate a log through a majority ([Elhemali et al.](https://usenix.org/system/files/atc22-elhemali.pdf); see [[Raft]] and [[Paxos]]). The open engineering is around the edges: leader leases ([[Leases and Fencing]]), and replicas that vote but store little.
+- **Per-shard consensus is the default.** DynamoDB (Multi-Paxos per [[Partitioning|partition]]), Spanner-style [[Distributed SQL]] (Paxos or Raft per range) and Kafka's metadata (KRaft) all replicate a log through a majority ([Elhemali et al.](https://usenix.org/system/files/atc22-elhemali.pdf); see [[Raft]] and [[Paxos]]). The open engineering is around the edges: leader leases ([[Leases and Fencing]]), and replicas that vote but store little.
 - **Cheap voters.** DynamoDB's log replicas and the witness regions in DynamoDB multi-region strong consistency and Aurora DSQL keep a majority without a full third copy ([[CAP and PACELC]], [[Witness Replicas]]).
 - **Quorum storage under a single writer.** Aurora's 4-of-6 storage quorum, with ordering from one writer, remains the template for disaggregated databases ([Verbitski et al.](https://pdos.csail.mit.edu/6.824/papers/aurora.pdf); [[Disaggregated Systems]]).
 
