@@ -276,7 +276,7 @@ Open problems worth tracking:
 - **Contention.** [[Hot Keys and Cache Stampedes|Hot keys]] cause lock queues, restarts or aborts in every design; deterministic ordering handles contention best but needs read and write sets in advance ([Calvin](https://www.cs.princeton.edu/courses/archive/fall19/cos418/papers/calvin.pdf)).
 - **Weaker isolation by default.** Several systems default to snapshot isolation, which allows write skew; see [[Consistency Models]] and [[Isolation Testing]].
 - **Correct recovery paths.** Staged records, prepared reads and speculative aborts are where subtle bugs live; formal models and simulation testing are how teams find them ([[Formal Methods in Practice]], [[Deterministic Simulation Testing]]).
-- **Transactions across systems.** Between services, databases and queues there is still no good alternative to sagas, idempotency keys and outbox patterns; see [[Reliability Patterns]] and [[Logs and Streaming]].
+- **Transactions across systems.** Between services, databases and queues there is still no good alternative to sagas, idempotency keys and outbox patterns; see [[Reliability Patterns]], [[Logs and Streaming]] and [[Change Data Capture#The Transactional Outbox|the transactional outbox]].
 
 ## ***Resources***
 ---
@@ -310,6 +310,7 @@ Open problems worth tracking:
 - [[Partitioning]] — Why data ends up on several shards in the first place.
 - [[Leaderless Consensus]] — Accord and fast paths for one-round-trip transactions.
 - [[Reliability Patterns]] — Idempotency and retries for sagas and cross-service work.
+- [[Change Data Capture]] — The transactional outbox: publishing saga messages atomically with a local commit.
 - [[Formal Methods in Practice]] — TLA+ models of commit protocols.
 - [[Isolation Testing]] — How Jepsen checks isolation claims.
 - [[CRDTs]] — Avoiding coordination altogether for data that can merge.

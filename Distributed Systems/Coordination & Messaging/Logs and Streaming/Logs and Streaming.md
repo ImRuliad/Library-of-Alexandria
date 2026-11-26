@@ -117,7 +117,7 @@ Kreps' definition: a log "is an append-only, totally-ordered sequence of records
 
 Two consequences matter:
 
-- **Tables and streams are duals.** A table is the current state; the log is the history of changes that produced it. "Tables support data at rest and logs capture change." Replay the changelog and you rebuild the table; publish a table's changelog and anyone can maintain a copy ([Kreps, 2013](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)). Change data capture, event sourcing and Kafka Streams' state stores ([[Stream Processing]]) all use this.
+- **Tables and streams are duals.** A table is the current state; the log is the history of changes that produced it. "Tables support data at rest and logs capture change." Replay the changelog and you rebuild the table; publish a table's changelog and anyone can maintain a copy ([Kreps, 2013](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)). [[Change Data Capture]], event sourcing and Kafka Streams' state stores ([[Stream Processing]]) all use this.
 - **Readers are decoupled.** Because readers track their own position, a slow warehouse load and a real-time service can read the same log at different speeds, and a new reader can start from the beginning.
 
 ### Logs and State Machine Replication
@@ -504,6 +504,7 @@ Open problems worth tracking:
 - [[Leases and Fencing]] — Producer epochs, BookKeeper ledger fencing, coordinator leases.
 - [[Distributed Transactions]] — Kafka transactions as two-phase commit with a coordinator log.
 - [[Reliability Patterns]] — Idempotency tokens, retries and outboxes around a log.
+- [[Change Data Capture]] — Database changelogs published into a log; outbox and event sourcing.
 - [[Consistency Models]] — What read_committed and Kafka transactions actually guarantee.
 - [[Isolation Testing]] — Jepsen-style checking for G0, G1 and aborted reads.
 - [[Partitioning]] — Key-hashed partitions as the unit of order and parallelism.

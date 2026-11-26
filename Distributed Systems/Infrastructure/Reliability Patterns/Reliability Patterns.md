@@ -266,6 +266,7 @@ Open problems:
 - [[Coordination Services]] — Chubby's authors saw client retry loops hammer the service
 - [[Leases and Fencing]] — the AWS 2025 collapse involved re-establishing leases fleet-wide
 - [[Distributed Transactions]] — another place where repeating a step must not repeat its effect
+- [[Change Data Capture]] — at-least-once change streams that need idempotent consumers
 - [[Deterministic Simulation Testing]] — a way to test recovery paths before production does
 - [[Time and Clocks]] — timeouts and deadlines depend on clocks
 - [[Consistency Models]] — retries and caches can serve stale results

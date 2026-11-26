@@ -395,6 +395,6 @@ Open problems:
 - [[Tail Latency and Hedging]] — Planned: why scatter-gather queries get slow.
 - [[Secondary Indexes]] — Local vs global indexes when lookups miss the shard key.
 - [[Cluster Metadata and Routing]] — how routers learn the shard map.
-- [[Change Data Capture]] — Planned: the WAL-based catch-up stream used in resharding.
+- [[Change Data Capture]] — The WAL-based catch-up stream used in resharding.
 - [[Hot Keys and Cache Stampedes]] — Hot tenants and keys too big for one shard: caching, coalescing and salting.
 - [[Deterministic Transactions]] — Planned: ordering before execution, another route to cross-shard consistency.

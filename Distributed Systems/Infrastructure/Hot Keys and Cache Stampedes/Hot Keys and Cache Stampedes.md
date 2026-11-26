@@ -380,4 +380,4 @@ Open problems:
 - [[Deterministic Simulation Testing]] — Testing cache-loss recovery before production does.
 - [[Tail Latency and Hedging]] — Planned: hedged requests and the tail cost of waiting on one fetch.
 - [[Queueing Theory for Systems]] — Planned: why load near capacity makes recovery so slow.
-- [[Change Data Capture]] — Planned: binlog-driven cache invalidation like Uber's Flux.
+- [[Change Data Capture]] — Binlog-driven cache invalidation like Uber's Flux.
