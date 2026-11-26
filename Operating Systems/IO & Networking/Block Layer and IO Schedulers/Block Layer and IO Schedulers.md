@@ -6,7 +6,7 @@ tags:
   - blk-mq
   - io-scheduler
   - linux
-status: draft
+status: complete
 sources:
   - https://docs.kernel.org/_sources/block/blk-mq.rst.txt
   - https://docs.kernel.org/7.0/block/switching-sched.html
@@ -198,7 +198,7 @@ Schedulers reorder within a queue; isolating tenants is the job of the cgroup v2
 
 *As of November 2026, the block layer's correctness and structure are settled, and the fight is over nanoseconds per I/O: user-space stacks like SPDK set the bar, and kernel developers are trimming allocation, locking and state-machine code from the submission and completion paths.*
 
-- **The SPDK benchmark as a target (May 2026):** after an LSFMM+BPF presentation comparing Linux's per-core I/O overhead with SPDK, Jens Axboe posted patches reported to give about 60% more per-core I/O performance ([Phoronix](https://www.phoronix.com/news/Axboe-60p-Faster-Per-Core-Perf)). See [[NVMe and User-Space Storage]] for SPDK itself.
+- **The SPDK benchmark as a target (May 2026):** after an LSFMM+BPF presentation comparing Linux's per-core I/O overhead with SPDK, Jens Axboe posted patches reported to give about 60% more per-core I/O performance. They extend io_uring registered buffers to hold a ready-to-use `struct bio` that is DMA-mapped in advance, so O_DIRECT submits it directly with no bio allocation or DMA map/unmap per I/O; they touch io_uring, the NVMe PCI driver and the block layer, and were not yet upstream when reported ([Phoronix, 10 May 2026](https://www.phoronix.com/news/Axboe-60p-Faster-Per-Core-Perf)). See [[NVMe and User-Space Storage]] for SPDK itself.
 - **Lean small direct I/O (7.3, released Oct 2026):** a simplified iomap path for direct reads no larger than the file system block size, written by Fengnan Chang (ByteDance), removed a "significant bottleneck" of allocations and state-machine logic: 4K random reads went from 1.92M to 2.19M IOPS on PCIe Gen5 NVMe, with up to 10% gains on ext4 and XFS through [[io_uring]] ([Phoronix, July 2026](https://phoronix.com/news/Linux-7.3-Faster-Small-Direct)).
 - **Polling over interrupts:** with `IORING_SETUP_IOPOLL` and NVMe poll queues, completions are reaped by spinning on the completion queue rather than taking an interrupt per I/O; the trade-off is covered in [[Interrupts and Exceptions]].
 - **Default practice:** NVMe devices typically run `none`; SATA and SCSI disks run `mq-deadline` or `bfq`, chosen by distribution udev rules.

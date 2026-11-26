@@ -6,14 +6,14 @@ tags:
   - spdk
   - io_uring
   - kernel-bypass
-status: draft
+status: complete
 sources:
   - https://nvmexpress.org/wp-content/uploads/NVM-Express-Base-Specification-2.0e-2024.07.29-Ratified.pdf
   - https://wiki.osdev.org/NVMe
   - https://blogs.oracle.com/linux/overview-of-nvme-architecture
   - https://www.intel.com/content/www/us/en/developer/articles/tool/introduction-to-the-storage-performance-development-kit-spdk.html
   - https://www.usenix.org/conference/fast24/presentation/joshi
-  - https://www.usenix.net/system/files/fast24-joshi.pdf
+  - https://www.usenix.org/system/files/fast24-joshi.pdf
   - https://docs.kernel.org/6.18/block/ublk.html
   - https://lists.infradead.org/pipermail/linux-nvme/2025-May/056053.html
   - https://www.snia.org/sites/default/files/technical-work/whitepapers/IntroductiontoStorageDataPlacementwithFDP.pdf
@@ -117,7 +117,7 @@ timeline
     title NVMe and the software race
     2011 : NVMe 1.0, queues in host memory over PCIe
     2012-2014 : Linux nvme driver; blk-mq (3.13) to match per-CPU queues
-    2015 : Intel open-sources SPDK, user-space polled NVMe driver
+    Mid-2010s : Intel open-sources SPDK, user-space polled NVMe driver
     2016 : NVMe over Fabrics (RDMA); TCP transport follows
     2019 : io_uring (5.1) with polled I/O
     2020-2022 : Zoned Namespaces; Flexible Data Placement (Meta, Google)
@@ -127,7 +127,7 @@ timeline
     2026 : NVMe 2.4 (Aug); per-core kernel I/O work after LSFMM
 ```
 
-- **SPDK (2015):** Intel's Storage Performance Development Kit moved the NVMe driver into the application: polled, lockless, one thread per core, no interrupts or context switches ([Intel](https://www.intel.com/content/www/us/en/developer/articles/tool/introduction-to-the-storage-performance-development-kit-spdk.html)). It is the storage cousin of DPDK in [[Kernel Bypass Networking]].
+- **SPDK (mid-2010s):** Intel's Storage Performance Development Kit moved the NVMe driver into the application: polled, lockless, one thread per core, no interrupts or context switches ([Intel](https://www.intel.com/content/www/us/en/developer/articles/tool/introduction-to-the-storage-performance-development-kit-spdk.html)). It is the storage cousin of DPDK in [[Kernel Bypass Networking]].
 - **io_uring (2019):** gave the kernel batched submission and completion polling (`IORING_SETUP_IOPOLL`), closing much of the gap without leaving the kernel ([[io_uring]]).
 - **I/O Passthru (2022-2024):** Samsung engineers upstreamed a way to send any NVMe command asynchronously via io_uring, so new device features (FDP, ZNS, computational storage) are usable without waiting for block-layer abstractions ([FAST '24](https://www.usenix.org/conference/fast24/presentation/joshi)).
 
@@ -195,7 +195,7 @@ Passthrough keeps the kernel driver but skips the block layer. The application o
 
 - **Keeps:** kernel ownership of the device, permissions, multiple processes, io_uring batching, polling and registered buffers.
 - **Skips:** bios, request merging, schedulers, and the block layer's view of what commands exist, so new NVMe features work immediately.
-- **Where it sits:** between the full kernel stack and SPDK in both speed and convenience.
+- **Where it sits:** between the full kernel stack and SPDK in both speed and convenience. The FAST '24 paper measured 16-40% more peak IOPS than the io_uring block path; on one core with a tuned kernel, about 5M IOPS (saturating the SSD) against 3.83M, and on two devices passthrough and SPDK both reached 10M IOPS against 7.55M for the block path. The char interface appeared in 5.13 and io_uring passthrough in 5.19 ([FAST '24 PDF](https://www.usenix.org/system/files/fast24-joshi.pdf)).
 
 ### ublk: Block Devices Served from User Space
 
@@ -228,7 +228,7 @@ quadrantChart
 *As of November 2026, NVMe is universal from phones to AI clusters, the spec is adding virtualization and security, and the kernel is chasing SPDK's per-core numbers while giving applications passthrough for new device features.*
 
 - **NVMe 2.4 (published 4 Aug 2026):** live migration of NVMe subsystems exported to virtual machines, post-quantum cryptography for security protocols, and SSD power telemetry ([The Register](https://assets.theregister.com/2026/08/04/20268/)). The previous release, 2.3 (Aug 2025), focused on data-center reliability and management.
-- **Kernel per-core push:** after an LSFMM+BPF 2026 comparison with SPDK, Jens Axboe reported patches worth about 60% more per-core I/O ([Phoronix](https://www.phoronix.com/news/Axboe-60p-Faster-Per-Core-Perf)); Linux 7.3 made small direct reads on PCIe Gen5 go from 1.92M to 2.19M IOPS ([Phoronix](https://phoronix.com/news/Linux-7.3-Faster-Small-Direct)). Details in [[Block Layer and IO Schedulers]].
+- **Kernel per-core push:** after an LSFMM+BPF 2026 comparison with SPDK, Jens Axboe reported patches worth about 60% more per-core I/O by keeping a ready-made, pre-DMA-mapped bio in each registered buffer so O_DIRECT skips bio allocation and DMA map/unmap ([Phoronix, May 2026](https://www.phoronix.com/news/Axboe-60p-Faster-Per-Core-Perf)); Linux 7.3 made small direct reads on PCIe Gen5 go from 1.92M to 2.19M IOPS ([Phoronix](https://phoronix.com/news/Linux-7.3-Faster-Small-Direct)). Details in [[Block Layer and IO Schedulers]].
 - **Data placement:** Flexible Data Placement lets the host tag writes so the SSD groups data with similar lifetimes, cutting write amplification ([SNIA](https://www.snia.org/sites/default/files/technical-work/whitepapers/IntroductiontoStorageDataPlacementwithFDP.pdf)); Linux gained "block write streams" mapped to FDP, usable per I/O from io_uring ([linux-nvme, May 2025](https://lists.infradead.org/pipermail/linux-nvme/2025-May/056053.html)).
 - **GPUs and storage:** GPU-direct storage and device-memory networking ([[Linux Networking Stack]]) push data from SSDs or NICs straight to accelerator memory, extending the bypass idea to [[Heterogeneous Memory and GPU Drivers|GPU drivers]].
 
@@ -265,7 +265,7 @@ Open problems:
 
 **User-space and passthrough**
 - [Intel: Introduction to the Storage Performance Development Kit (SPDK)](https://www.intel.com/content/www/us/en/developer/articles/tool/introduction-to-the-storage-performance-development-kit-spdk.html)
-- [Joshi et al.: I/O Passthru, Upstreaming a flexible and efficient I/O Path in Linux (FAST '24)](https://www.usenix.org/conference/fast24/presentation/joshi) ([PDF](https://www.usenix.net/system/files/fast24-joshi.pdf))
+- [Joshi et al.: I/O Passthru, Upstreaming a flexible and efficient I/O Path in Linux (FAST '24)](https://www.usenix.org/conference/fast24/presentation/joshi) ([PDF](https://www.usenix.org/system/files/fast24-joshi.pdf))
 - [Kernel docs: Userspace block device driver (ublk)](https://docs.kernel.org/6.18/block/ublk.html)
 
 **Where it is now**
