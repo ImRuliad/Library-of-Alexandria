@@ -528,3 +528,4 @@ vLLM's quantization page in late 2026 lists FP8 (per-tensor, per-channel, per-bl
 - [[LLM Serving]] — How quantized models are batched and served.
 - [[Distillation]] — The other main way to make a model cheaper to serve.
 - [[Reasoning Models]] — Long outputs make PTQ errors compound, motivating QAT.
+- [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — The GPU side: bit layouts, block-scaled tensor-core instructions and hardware support.
