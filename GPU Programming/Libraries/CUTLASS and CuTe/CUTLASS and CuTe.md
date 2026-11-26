@@ -328,7 +328,7 @@ It is the same vocabulary as the C++ version, without template instantiation. NV
 | One codebase from Volta to Rubin | NVIDIA only; `a`-target kernels don't move between GPUs |
 
 - **Complexity is the point and the problem.** CuTe makes layouts explicit because the hardware demands it. The DSL exists to "express compile-time configuration with Python instead of deeply nested C++ templates" ([DSL overview](https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/overview.html)), but the concepts carry over unchanged.
-- **Compile time limits autotuning.** C++ CUTLASS needs a full `nvcc` run per configuration, which kept it out of TorchInductor's autotuner until the DSL backend ([PyTorch, Apr 2026](https://pytorch.org/blog/gemms-torchinductor-cutedsl-backend/)).
+- **Compile time limits autotuning** (see [[GEMM Autotuning and Kernel Selection]]). C++ CUTLASS needs a full `nvcc` run per configuration, which kept it out of TorchInductor's autotuner until the DSL backend ([PyTorch, Apr 2026](https://pytorch.org/blog/gemms-torchinductor-cutedsl-backend/)).
 - **Formal foundations are new.** The layout algebra was formalized only in 2026, which says something about how much of it was folklore.
 - **Portability.** Each generation needs new atoms and schedules; SM100 kernels don't run on SM120. AMD and others have no CUTLASS; the closest portable option is Triton.
 - **Competition from NVIDIA itself.** CUDA Tile IR and cuTile aim at the same users with a higher-level model; how they and CuTe divide the work is not settled.
@@ -374,3 +374,4 @@ It is the same vocabulary as the C++ version, without template instantiation. NV
 - [[ThunderKittens and Tile DSLs]] — Other tile-level kernel DSLs.
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — Block-scaled formats in CUTLASS GEMMs.
 - [[Persistent Kernels and Stream-K]] — CUTLASS's persistent and Stream-K tile schedulers.
+- [[GEMM Autotuning and Kernel Selection]] — nvMatmulHeuristics ranking and `cutlass_profiler` tuning.

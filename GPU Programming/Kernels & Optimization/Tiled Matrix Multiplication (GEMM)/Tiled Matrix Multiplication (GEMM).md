@@ -310,7 +310,7 @@ Open problems:
 
 - **Small and skinny shapes.** Inference with small batches produces GEMMs below the ridge point, where the problem is memory bandwidth and launch overhead, not tiling. Grouped GEMM and fusion help, but there's no single answer.
 - **Portability across generations.** Each NVIDIA generation changed the MMA instruction (`mma.sync`, `wgmma`, `tcgen05`), so hand-tuned kernels are rewritten every two years. DSLs like CuTe DSL, CUDA Tile and Triton aim to absorb this.
-- **Heuristic kernel selection.** Picking among hundreds of variants per shape is still mostly heuristics and autotuning.
+- **Heuristic kernel selection.** Picking among hundreds of variants per shape is still mostly heuristics and autotuning (see [[GEMM Autotuning and Kernel Selection]]).
 - **Numerics.** Block-scaled FP4 and FP8 GEMMs depend on scaling choices that are still being worked out per model, and reductions across split K are not bit-reproducible unless done in a fixed order (see [[Parallel Reduction and Scan]]).
 
 ## ***Resources***
@@ -363,3 +363,4 @@ Open problems:
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — FP8 and FP4 block-scaled GEMMs.
 - [[Persistent Kernels and Stream-K]] — Tile schedulers that fix wave quantization in the GEMM grid.
 - [[Register Pressure and Spilling]] — Why the accumulator tile is capped by the register file.
+- [[GEMM Autotuning and Kernel Selection]] — How libraries and compilers pick tile sizes per shape.

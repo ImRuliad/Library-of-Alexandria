@@ -323,7 +323,7 @@ From the CUDA 13 Programming Guide's tables, with products from NVIDIA's GPU lis
 
 Open problems:
 
-- **No simple predictor.** Volkov showed simple models mispredict throughput by up to 1.7× and underestimate needed occupancy by up to 2× ([Volkov 2016](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2016/EECS-2016-143.pdf)). Autotuning over block size and register caps remains the practical answer ([[Triton]], CUTLASS profilers).
+- **No simple predictor.** Volkov showed simple models mispredict throughput by up to 1.7× and underestimate needed occupancy by up to 2× ([Volkov 2016](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2016/EECS-2016-143.pdf)). Autotuning over block size and register caps remains the practical answer ([[Triton]], CUTLASS profilers; see [[GEMM Autotuning and Kernel Selection]]).
 - **Limits differ by product line.** Data-center parts allow 64 warps per SM, client parts 48, and compute capability 10.7 32, so a kernel tuned on one may be badly occupied on another.
 - **Docs lag the hardware.** Register-allocation granularity and some per-architecture limits are documented only in tool data or forum posts, and NVIDIA documents disagree for compute capability 12.0.
 - **Low-occupancy kernels are fragile.** One-block-per-SM designs leave no slack: any unexpected stall (a bank conflict, an L2 miss on the far partition) stalls the whole SM.
@@ -377,3 +377,4 @@ Open problems:
 - [[Blackwell Architecture]] — Tensor Memory and what it frees in the register file.
 - [[Register Pressure and Spilling]] — What happens when registers are capped to raise occupancy.
 - [[Persistent Kernels and Stream-K]] — Launching exactly one wave of resident blocks.
+- [[GEMM Autotuning and Kernel Selection]] — Searching block and tile sizes when occupancy models fall short.
