@@ -323,7 +323,7 @@ The pattern: AMD's hardware is competitive on paper, especially in memory capaci
 - [[Warp Specialization]] — The NVIDIA pattern that doesn't pay off on AMD.
 - [[TMA and Asynchronous Copies]] — NVIDIA's copy engine; AMD's Tensor Data Movers are its counterpart.
 - [[Tensor Cores]] — NVIDIA's matrix units; AMD calls them Matrix Cores.
-- [[Low-Precision Formats: FP8, FP4 and MX]] — MXFP4/MXFP6 on CDNA 4.
+- [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — MXFP4/MXFP6 on CDNA 4.
 - [[Multi-GPU Communication: NVLink and NCCL]] — RCCL is AMD's NCCL fork.
 - [[Roofline Model and Arithmetic Intensity]] — The ridge-point arithmetic above.
 - [[AI Accelerators]] — The wider accelerator landscape.

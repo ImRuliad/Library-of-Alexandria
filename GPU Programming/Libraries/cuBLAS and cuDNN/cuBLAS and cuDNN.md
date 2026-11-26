@@ -241,7 +241,7 @@ cublasLtMatmul(lt, op, &alpha, A, a, B, b, &beta, C, c, D, c,            // 6
 5. `cublasLtMatmulAlgoGetHeuristic` returns up to N candidate algorithms ranked by predicted speed. Each `algo` is an opaque, cacheable kernel configuration (tile, stages, split-K, swizzle, cluster shape and so on).
 6. The matmul itself runs with the chosen algorithm. A framework caches the choice per shape, or **autotunes**: time several of the returned candidates once and keep the fastest.
 
-**Low precision.** cuBLASLt is where FP8 and block-scaled formats live. FP8 matmuls take per-tensor scale pointers for A, B, C and D and can return the absolute maximum of the output (amax) for the next step's scaling. Blackwell's block-scaled formats (MXFP8, MXFP4, NVFP4; see [[Low-Precision Formats: FP8, FP4 and MX]]) attach one scale factor to every 16 or 32 elements, and cuBLASLt takes those scale tensors through layout attributes; CUDA 13.4 even added an experimental alternative MXFP8 scale layout ([CUDA 13.4 notes](https://docs.nvidia.com/cuda/archive/13.4.2/cuda-toolkit-release-notes/index.html)).
+**Low precision.** cuBLASLt is where FP8 and block-scaled formats live. FP8 matmuls take per-tensor scale pointers for A, B, C and D and can return the absolute maximum of the output (amax) for the next step's scaling. Blackwell's block-scaled formats (MXFP8, MXFP4, NVFP4; see [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]]) attach one scale factor to every 16 or 32 elements, and cuBLASLt takes those scale tensors through layout attributes; CUDA 13.4 even added an experimental alternative MXFP8 scale layout ([CUDA 13.4 notes](https://docs.nvidia.com/cuda/archive/13.4.2/cuda-toolkit-release-notes/index.html)).
 
 **Heuristics outside the library.** NVIDIA also packages its GEMM performance model separately as **nvMatmulHeuristics**, which CUTLASS 4.2+ uses to prune the configurations an autotuner has to try ([NVIDIA blog](https://developer.nvidia.com/blog/improving-gemm-kernel-auto-tuning-efficiency-on-nvidia-gpus-with-heuristics-and-cutlass-4-2)).
 
@@ -427,7 +427,7 @@ In PyTorch, `torch.use_deterministic_algorithms(True)` makes non-deterministic o
 - [[Kernel Fusion]] — What cuBLASLt epilogues and cuDNN graphs provide.
 - [[FlashAttention]] — The open alternative to cuDNN's fused SDPA.
 - [[Triton]] — Generated kernels frameworks compare against cuBLAS.
-- [[Low-Precision Formats: FP8, FP4 and MX]] — The block-scaled formats cuBLASLt and cuDNN support.
+- [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — The block-scaled formats cuBLASLt and cuDNN support.
 - [[Mixture of Experts]] — The workload behind grouped GEMM.
 - [[Roofline Model and Arithmetic Intensity]] — Why GEMM shape decides the kernel.
 - [[Streams, Events and Async Execution]] — Handles and streams, and why multiple streams affect determinism.
