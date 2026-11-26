@@ -5,7 +5,7 @@ tags:
   - thunderkittens
   - tile-dsl
   - kernel-languages
-status: draft
+status: complete
 sources:
   - https://arxiv.org/abs/2410.20399
   - https://hazyresearch.stanford.edu/blog/2024-05-12-tk
@@ -22,6 +22,7 @@ sources:
   - https://triton-lang.org/main/gluon/
   - https://pytorch.org/blog/helion/
   - https://arxiv.org/abs/2609.29067
+  - https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/
 created: 2026-11-26
 updated: 2026-11-26
 ---
@@ -54,8 +55,8 @@ updated: 2026-11-26
 
 - **What it is:** an embedded C++/CUDA library (header-only) whose basic types are register tiles, shared-memory tiles and vectors, plus operations like `mma`, `load`, `exp` and row reductions. Introduced in the "GPUs Go Brrr" post (May 2024) and the paper *ThunderKittens: Simple, Fast, and Adorable AI Kernels* (ICLR 2025) ([paper](https://arxiv.org/abs/2410.20399)).
 - **The idea:** modern GPUs are built to multiply small matrices, so make a small matrix tile the unit you program, then give programmers control over warps, pipelines and [[Warp Specialization|producer/consumer roles]] instead of hiding them.
-- **Why it matters:** TK kernels match or beat hand-written baselines (cuBLAS GEMM, FlashAttention-3 attention forward) in a few hundred lines, and TK is the base for Hazy's [[Megakernels|megakernels]] and its AMD port **HipKittens** (MLSys 2026) ([HipKittens](https://arxiv.org/abs/2511.08083)).
-- **The wider field (Nov 2026):** TK 2.0 (Feb 2026), TileLang (used for DeepSeek's TileKernels), JAX Pallas on Mosaic GPU, Triton's Gluon and Meta's TLX, PyTorch's Helion, NVIDIA's [[CUDA Tile and cuTile|cuTile]] and CuTe DSL. They differ mainly in how much of the chip they let you steer.
+- **Why it matters:** the paper reports GEMM on par with cuBLAS and attention inference on par with FlashAttention-3, plus 10-40% faster attention backward, 8× on state-space models and 14× on linear attention over the best baselines, and TK is the base for Hazy's [[Megakernels|megakernels]] and its AMD port **HipKittens** (MLSys 2026) ([HipKittens](https://arxiv.org/abs/2511.08083)).
+- **The wider field (Nov 2026):** TK 2.0 (Feb 2026, MXFP8 and NVFP4 GEMMs that match or beat cuBLAS on B200), TileLang (used for DeepSeek's TileKernels), JAX Pallas on Mosaic GPU, Triton's Gluon and Meta's TLX, PyTorch's Helion, NVIDIA's [[CUDA Tile and cuTile|cuTile]] and CuTe DSL. They differ mainly in how much of the chip they let you steer.
 
 ## ***The Problem***
 ---
@@ -68,7 +69,7 @@ updated: 2026-11-26
 | [[Triton]] | Block-level math; compiler does the rest | Can't express warp specialization or explicit pipelines (outside Gluon) |
 | **Tile DSLs (TK etc.)** | Tiles plus explicit warp roles and pipelines | Fewer abstractions to learn; still need GPU knowledge |
 
-Hazy Research put the motivation in one line: on an H100, "most of the compute is in the tensor cores," and everything else (loads, softmax, bookkeeping) has to be arranged so those units never wait ([GPUs Go Brrr](https://hazyresearch.stanford.edu/blog/2024-05-12-tk)). That arrangement is the hard part, and the right abstraction for it is a tile, not a thread.
+Hazy Research's framing: on an H100 "all of the compute happens in the SM's. *Most* of it happens in the registers," and the tensor cores supply nearly all the FLOPs, so everything else (loads, softmax, bookkeeping) has to be arranged so those units never wait; without `wgmma`, they found the H100 tops out around 63% of peak ([GPUs Go Brrr](https://hazyresearch.stanford.edu/blog/2024-05-12-tk)). That arrangement is the hard part, and the right abstraction for it is a tile, not a thread.
 
 ## ***Foundations***
 ---
@@ -102,14 +103,14 @@ timeline
     2022-2023 : Hopper (TMA, wgmma); CuTe layouts in CUTLASS 3; JAX Pallas
     2024 : ThunderKittens (May blog, Oct paper); FlashAttention-3
     2025 : TK on Blackwell (Mar); TileLang paper; CuTe DSL; Gluon; Helion; CUDA Tile (Dec); HipKittens (Nov)
-    2026 : ThunderKittens 2.0 (Feb); TLX; DeepSeek TileKernels; cuTile C++
+    2026 : ThunderKittens 2.0 (Feb); cuTile C++ (May); DeepSeek TileKernels; Meta's TLX write-up (Nov)
 ```
 
-- **May 2024:** "GPUs Go Brrr" introduced TK with an H100 FlashAttention forward kernel in roughly 100 lines ([blog](https://hazyresearch.stanford.edu/blog/2024-05-12-tk)).
-- **Oct 2024:** the TK paper formalised the three-level design and reported results on GEMM, attention, linear attention and state-space kernels ([paper](https://arxiv.org/abs/2410.20399)).
+- **May 2024:** "GPUs Go Brrr" introduced TK with an H100 FlashAttention forward kernel in "just 100 lines" that ran about 30% faster than FlashAttention-2, and a 4090 version in about 60 lines ([blog](https://hazyresearch.stanford.edu/blog/2024-05-12-tk)).
+- **Oct 2024:** the TK paper (Spector, Arora, Singhal, Fu, Ré; ICLR 2025) formalised the three-level design and benchmarked GEMM, attention, linear attention and state-space kernels on H100 ([paper](https://arxiv.org/abs/2410.20399)).
 - **Mar 2025:** TK added Blackwell support (`tcgen05`, Tensor Memory, 2-CTA MMA) ([TK on Blackwell](https://hazyresearch.stanford.edu/blog/2025-03-15-tk-blackwell)).
 - **2025:** Hazy built [[Megakernels|megakernels]] (whole-model persistent kernels for LLM decode) on TK, and ported the ideas to AMD as HipKittens. Others followed with their own tile DSLs (TileLang, Gluon, Helion, cuTile).
-- **Feb 2026:** ThunderKittens 2.0 ([blog](https://hazyresearch.stanford.edu/blog/2026-02-19-tk-2)).
+- **Feb 2026:** ThunderKittens 2.0, by Stuart Sul and Chris Ré, added MXFP8 and NVFP4, cluster launch control scheduling and programmatic dependent launch ([blog](https://hazyresearch.stanford.edu/blog/2026-02-19-tk-2)).
 
 ## ***How It Works***
 ---
@@ -121,7 +122,7 @@ timeline
 |---|---|---|
 | Warp / warpgroup | `rt` register tiles, `st` shared tiles, `rv`/`sv` vectors; `mma_AB`, `load`, `store`, `exp`, `row_max`, `row_sum` | Tensor cores (`mma.sync`, `wgmma`, `tcgen05`), registers, swizzled shared memory |
 | Thread block | LCSF template: load, compute, store, finish; producer and consumer warpgroups; semaphores | [[TMA and Asynchronous Copies|TMA]], `mbarrier`, [[Warp Specialization]] |
-| Grid | Persistent blocks, tile-order (L2-friendly) scheduling | SMs, L2 cache |
+| Grid | Persistent grid that overlaps loads across block boundaries; block order chosen for L2 reuse | SMs, L2 cache |
 
 Source: [TK paper](https://arxiv.org/abs/2410.20399).
 
@@ -167,11 +168,11 @@ The LCSF template packages the [[Warp Specialization|warp-specialized]] pipeline
 
 ### HipKittens: The Same Idea on AMD
 
-HipKittens ported TK's tile abstractions to AMD MI325X and MI355X and found that the tile layer transfers but the scheduling does not ([HipKittens blog](https://hazyresearch.stanford.edu/blog/2025-11-09-amd-brr), [paper](https://arxiv.org/abs/2511.08083)):
+HipKittens (Hu et al., MLSys 2026) ported TK's tile abstractions to AMD's CDNA3 and CDNA4 GPUs (MI355X in the benchmarks) and found that the tile layer transfers but the scheduling does not ([HipKittens blog](https://hazyresearch.stanford.edu/blog/2025-11-09-amd-brr), [paper](https://arxiv.org/abs/2511.08083)):
 
-- AMD has no asynchronous matrix instructions on shared or tensor memory and no register reallocation, so producer/consumer wave specialization wastes registers.
+- The MI355X has no register reallocation, so producer waves hold registers they don't need and producer/consumer wave specialization underperforms.
 - Two schedules worked instead: **8-wave ping-pong** (two groups of waves alternate between memory and compute) and **4-wave interleave** (fine-grained alternation within each wave).
-- A chiplet-aware grid order mattered on the 8-XCD MI355X, raising one large GEMM from 900 to 1068 TFLOPS. BF16 GEMM reached 1605 TFLOPS, and attention backward beat AMD's baselines by up to 2.3×.
+- A chiplet-aware grid order mattered on the 8-XCD MI355X, raising a 14592³ GEMM from 900 to 1068 TFLOPS. The best BF16 GEMM reached 1605 TFLOPS, and the 4-wave pattern beat AMD's baselines by 2.3× on GQA non-causal attention backward. The paper sums it up as competitive with AMD's hand-written assembly on GEMM and attention, and 1.2-2.4× faster than the best baselines in some settings.
 
 See [[ROCm and HIP]] for the hardware behind these differences.
 
@@ -181,26 +182,27 @@ See [[ROCm and HIP]] for the hardware behind these differences.
 
 ### ThunderKittens 2.0
 
-Hazy released ThunderKittens 2.0 on Feb 19, 2026 with "even faster kernels" and Blackwell as a first-class target ([TK 2.0 blog](https://hazyresearch.stanford.edu/blog/2026-02-19-tk-2), [repo](https://github.com/HazyResearch/ThunderKittens)). TK kernels also ship through Together AI, which co-developed the Blackwell port.
+Hazy released ThunderKittens 2.0 on Feb 19, 2026 under the title "Even Faster Kernels for Your GPUs," focused on Blackwell: its BF16, MXFP8 and NVFP4 GEMMs "surpass or match cuBLAS performance on Nvidia B200s," and reworking tensor-core and copy scheduling alone recovered about 10% on NVFP4 GEMM ([TK 2.0 blog](https://hazyresearch.stanford.edu/blog/2026-02-19-tk-2), [repo](https://github.com/HazyResearch/ThunderKittens)). The post says TK 2.0 powers inference kernels at Together AI and training kernels for Cursor's Composer.
 
 ### The Tile DSL Landscape
 
 | DSL | From | Language | Scheduling | Targets |
 |---|---|---|---|---|
 | **ThunderKittens** | Hazy Research (Stanford) | C++ (CUDA) | Programmer: warp roles, LCSF template | NVIDIA; AMD via HipKittens |
-| **TileLang** | tile-ai (Peking Univ. and community) | Python on TVM | Compiler by default, low-level escape hatches | NVIDIA, AMD; Huawei Ascend port |
+| **TileLang** | tile-ai (started at Peking Univ.) | Python on TVM | Compiler by default, low-level escape hatches | NVIDIA, AMD, Huawei Ascend 950, Apple Metal |
 | **Pallas / Mosaic GPU** | Google (JAX) | Python | Programmer (warpgroups, barriers) on Mosaic GPU | NVIDIA Hopper/Blackwell; TPU via Mosaic TPU |
 | **Gluon** | Triton project | Python | Programmer: layouts, warp specialization | NVIDIA, AMD |
-| **TLX** | Meta | Triton extensions | Programmer: warp-group agents | NVIDIA |
+| **TLX** | Meta | Triton extensions | Programmer: warp-group roles, mbarriers, TMEM, clusters | NVIDIA Hopper/Blackwell; AMD MI300/MI350X |
 | **Helion** | PyTorch | Python, compiles to Triton | Compiler plus heavy autotuning | Where Triton runs |
 | **CuTe DSL** | NVIDIA | Python | Programmer: layouts, TMEM, warp roles | NVIDIA |
 | **cuTile** | NVIDIA | Python, C++ | Compiler, via Tile IR | NVIDIA |
 
-Sources: [TileLang](https://github.com/tile-ai/tilelang), [Pallas Mosaic GPU](https://docs.jax.dev/en/latest/pallas/gpu/reference.html), [Gluon](https://triton-lang.org/main/gluon/), [Helion](https://pytorch.org/blog/helion/); see [[CUTLASS and CuTe]] and [[CUDA Tile and cuTile]].
+Sources: [TileLang](https://github.com/tile-ai/tilelang), [Pallas Mosaic GPU](https://docs.jax.dev/en/latest/pallas/gpu/reference.html), [Gluon](https://triton-lang.org/main/gluon/), [Helion](https://pytorch.org/blog/helion/), [TLX](https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/); see [[CUTLASS and CuTe]] and [[CUDA Tile and cuTile]].
 
-- **TileLang in production.** DeepSeek published **TileKernels**, a kernel library written in TileLang ([TileKernels](https://github.com/deepseek-ai/TileKernels)), and TileLang has been ported to Huawei's Ascend chips.
+- **TileLang in production.** DeepSeek published **TileKernels**, "dozens of highly optimized kernels implemented in TileLang" for MoE routing, FP8/FP4 quantization, RoPE and more; it added Huawei Ascend support in September 2026 ([TileKernels](https://github.com/deepseek-ai/TileKernels)).
 - **Pallas on Blackwell.** JAX's docs include a tutorial for high-performance Blackwell matmuls in Pallas on Mosaic GPU ([JAX docs](https://docs.jax.dev/en/latest/_sources/pallas/gpu/blackwell_matmul.md)).
-- **Independent check.** The 2026 TileBench study on B200 found "most kernels remain far from roofline" across tile languages ([TileBench](https://arxiv.org/abs/2609.29067)).
+- **TLX at Meta.** Meta described TLX (Triton Low-Level Extensions) in November 2026: warp groups as explicit producer, consumer and epilogue roles, synchronised with mbarriers, used for production training and recommendation kernels and "typically on par with hand-tuned CUDA" ([Meta Engineering](https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/)).
+- **Independent check.** The 2026 TileBench study on B200 found "most kernels remain far from roofline limits" across tile languages ([TileBench](https://arxiv.org/abs/2609.29067)).
 
 ```mermaid
 quadrantChart
@@ -248,15 +250,15 @@ The placement is this note's judgement, not a measurement.
 - [ThunderKittens: Simple, Fast, and Adorable AI Kernels](https://arxiv.org/abs/2410.20399), Spector et al., ICLR 2025.
 - [ThunderKittens Now on Blackwells](https://hazyresearch.stanford.edu/blog/2025-03-15-tk-blackwell), Mar 2025, and [ThunderKittens 2.0](https://hazyresearch.stanford.edu/blog/2026-02-19-tk-2), Feb 2026.
 - [HazyResearch/ThunderKittens](https://github.com/HazyResearch/ThunderKittens).
-- [HipKittens](https://arxiv.org/abs/2511.08083) and [AMD GPUs go brrr](https://hazyresearch.stanford.edu/blog/2025-11-09-amd-brr), MLSys 2026.
+- [HipKittens: Fast and Furious AMD Kernels](https://arxiv.org/abs/2511.08083), Hu et al., MLSys 2026, and the [AMD GPUs go brrr](https://hazyresearch.stanford.edu/blog/2025-11-09-amd-brr) post.
 
 **Other tile DSLs**
 - [TileLang](https://github.com/tile-ai/tilelang) and its [paper](https://arxiv.org/abs/2504.17577); [DeepSeek TileKernels](https://github.com/deepseek-ai/TileKernels).
 - [Pallas: Writing Mosaic GPU kernels](https://docs.jax.dev/en/latest/pallas/gpu/reference.html), JAX docs.
-- [Gluon](https://triton-lang.org/main/gluon/), [Helion](https://pytorch.org/blog/helion/).
+- [Gluon](https://triton-lang.org/main/gluon/), [Helion](https://pytorch.org/blog/helion/), [How We Built TLX](https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/) (Meta, Nov 2026).
 - [TileBench](https://arxiv.org/abs/2609.29067), 2026.
 
-## Related Notes
+## ***Related Notes***
 
 - [[Triton]] — The compiler-scheduled block language TK sits beside.
 - [[CUDA Tile and cuTile]] — NVIDIA's own tile model.
@@ -270,3 +272,4 @@ The placement is this note's judgement, not a measurement.
 - [[Shared Memory and Bank Conflicts]] — The swizzles TK's shared tiles handle.
 - [[Occupancy and Latency Hiding]] — Register budgets that bound tile sizes.
 - [[Tiled Matrix Multiplication (GEMM)]] — The tiling every DSL here builds on.
+- [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — The MXFP8 and NVFP4 formats TK 2.0 kernels target.
