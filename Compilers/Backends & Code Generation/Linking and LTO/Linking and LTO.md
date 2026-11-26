@@ -325,7 +325,7 @@ The linker keeps the first group with a given signature and discards later ones 
 
 *Inputs grew to gigabytes and builds became incremental everywhere except the link; mold showed every phase can run in parallel.*
 
-Three trends made the link the slow step. Big C++ programs (Chrome, Clang, game engines) produce thousands of object files and gigabytes of debug info. Distributed and cached compilation (ccache, distcc, Bazel remote execution) made the compile step fast and incremental, but the final link still runs from scratch on one machine. And LTO moved optimization and code generation *into* the link.
+Three trends made the link the slow step. Big C++ programs (Chrome, Clang, game engines) produce thousands of object files and gigabytes of debug info. Distributed and cached compilation (ccache, distcc, Bazel remote execution; see [[Build Systems]]) made the compile step fast and incremental, but the final link still runs from scratch on one machine. And LTO moved optimization and code generation *into* the link.
 
 The generations differ mostly in data structures and parallelism:
 

@@ -464,7 +464,7 @@ Liu's 2025 *Foundations and Trends* survey ties incremental computation back to 
 - [[Language Servers and IDE Tooling]] — salsa's API, rust-analyzer's architecture and why IDEs drove query-based compilers.
 - [[Compiler Pipeline]] — The batch pipeline and how query-based compilers reorganize it.
 - [[Lexing and Parsing]] — Incremental parsing and red-green syntax trees, the tree-level form of the same reuse idea.
-- [[Build Systems]] — Planned: Make to Bazel, hermeticity and remote caching, the coarse-grained side of this note.
+- [[Build Systems]] — Make to Bazel, hermeticity and remote caching, the coarse-grained side of this note.
 - [[Linking and LTO]] — The link step, which most incremental pipelines still redo from scratch, and incremental LTO in GCC 15.
 - [[Dataflow Analysis]] — Fixed points over lattices, the same convergence condition salsa's cycle handling needs.
 - [[Abstract Interpretation]] — Monotone fixed-point iteration in its general form.

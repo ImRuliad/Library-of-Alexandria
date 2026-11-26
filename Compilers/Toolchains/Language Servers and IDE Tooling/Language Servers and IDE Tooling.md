@@ -491,7 +491,7 @@ Open problems:
 - **Language design decides IDE quality.** matklad's 2026 argument is that query machinery is a fallback forced by languages like Rust; Zig-style per-file name resolution avoids most of it ([matklad, 2026](https://matklad.github.io/2026/02/25/against-query-based-compilers.html)). New languages increasingly get judged on how well they can be served by an IDE.
 - **Determinism.** Salsa assumes pure queries, but procedural macros can be non-deterministic, which caused at least one cache-invalidation bug in rust-analyzer ([rust-analyzer blog](https://rust-analyzer.github.io/blog/2020/07/20/three-architectures-for-responsive-ide.html)). Build scripts and macros that read the environment remain hard to model.
 - **Memory.** Long-lived servers hold whole projects; gopls cut 75% by moving to compiler-style summaries, rust-analyzer is still shaving hundreds of MB, and agents that start a fresh server per task pay cold-start indexing every time.
-- **Project models.** A language server is only as good as its view of the build (`compile_commands.json`, Cargo metadata, `rust-project.json`). BSP solves this for the JVM and Scala world, but there is still no universal build-to-IDE protocol across ecosystems.
+- **Project models.** A language server is only as good as its view of the [[Build Systems|build]] (`compile_commands.json`, Cargo metadata, `rust-project.json`). BSP solves this for the JVM and Scala world, but there is still no universal build-to-IDE protocol across ecosystems.
 - **Protocol fidelity.** LSP's UTF-16 baseline for positions, stateless request model and generic capability set limit what servers can express; JetBrains still treats LSP as an add-on to native support ([IntelliJ SDK](https://plugins.jetbrains.com/docs/intellij/language-server-protocol.html)), and rust-analyzer keeps its `ide` API deliberately unconstrained by LSP.
 - **Agents as clients.** Positions in, positions out suits a cursor, not a model. Whether LSP grows symbol-oriented queries, or MCP and ACP wrappers become the standard agent interface, is unsettled as of November 2026.
 
@@ -547,6 +547,7 @@ Open problems:
 - [[LLVM]] — Home of Clang and clangd.
 - [[Compiler, Assembler, Linker, and Loader]] — The build stages whose flags `compile_commands.json` captures for clangd.
 - [[Linking and LTO]] — Build-side concerns that BSP and project models expose to IDEs.
+- [[Build Systems]] — Where `compile_commands.json` comes from, and the build graphs BSP servers expose.
 - [[Compiler Testing and Fuzzing]] — Fuzzing parsers and analyzers that must never crash on broken input.
 - [[Abstract Interpretation]] — Static analyses that IDEs surface as diagnostics.
 - [[Grammar-Constrained Decoding]] — Planned: incremental parsing reused to constrain LLM output, the other AI use of parser tech.

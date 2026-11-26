@@ -550,7 +550,7 @@ Open problems:
 - **Phase ordering** has no general solution; production pipelines are hand-tuned. Learned orderings and equality saturation are the main research directions ([[ML-Guided Optimization]], [[E-Graphs and Equality Saturation]], [[Superoptimization]]).
 - **Unoptimized-build speed.** The most common build is the debug build, where LLVM pays framework overhead without benefit; fast back ends like TPDE and Cranelift attack this directly.
 - **Correctness across many stages.** Each lowering is a chance to miscompile. Verified compilers prove the whole chain ([[Verified Compilers]]); everyone else relies on testing and fuzzing ([[Compiler Testing and Fuzzing]]).
-- **Parallelism inside the compiler.** Build systems already run one compiler per file, so threading inside a compiler can hurt as much as help, as Mehdi Amini noted in the 2023 LLVM thread ([LLVM Discourse, 2023](https://discourse.llvm.org/t/if-llvm-is-so-slow-is-anything-being-done-about-it/75389)).
+- **Parallelism inside the compiler.** [[Build Systems]] already run one compiler per file, so threading inside a compiler can hurt as much as help, as Mehdi Amini noted in the 2023 LLVM thread ([LLVM Discourse, 2023](https://discourse.llvm.org/t/if-llvm-is-so-slow-is-anything-being-done-about-it/75389)).
 - **C and C++ lack a high-level IR.** ClangIR may change this, but it is not yet complete enough to compile LLVM itself.
 
 ## ***Resources***
