@@ -351,7 +351,7 @@ Open problems:
 - [[Attention]] — The exact operation FlashAttention computes; this note is about computing it fast.
 - [[Transformer]] — Every block's attention layer runs on a kernel like this one.
 - [[KV Cache]] — What decode-time attention reads; Flash-Decoding and paged kernels read it efficiently.
-- [[PagedAttention]] — Block tables that attention kernels read the cache through (planned).
+- [[PagedAttention]] — Block tables that attention kernels read the cache through.
 - [[Positional Encoding]] — RoPE fits fused kernels because it adds no $n \times n$ bias matrix.
 - [[Sparse Attention]] — Skips most key blocks entirely; built on the same tiled kernel pattern.
 - [[Hybrid Attention]] — Linear-attention layers that replace most softmax attention, with their own fused kernels.

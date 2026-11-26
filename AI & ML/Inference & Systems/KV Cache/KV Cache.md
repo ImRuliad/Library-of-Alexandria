@@ -245,7 +245,7 @@ Two more moves don't shrink the cache but change where it lives: **offloading** 
 #### **Paging and Prefix Sharing**
 Early servers reserved one contiguous slab per request, sized for the maximum possible length. Because answers are usually much shorter than the maximum, most of that slab sat empty, and gaps between slabs could not be reused. Kwon et al. measured only 20.4% to 38.2% of cache memory holding real tokens ([PagedAttention](https://arxiv.org/abs/2309.06180)).
 
-**PagedAttention** splits each request's cache into small fixed-size blocks and keeps a per-request block table that maps logical positions to physical blocks, exactly like an operating system's page table. Waste is limited to the last, partly filled block, and two requests can point at the same physical block. That second property makes sharing cheap: parallel samples from one prompt, beam search branches, and requests with the same system prompt all reuse one copy, with copy-on-write when they diverge. A deeper note belongs in [[PagedAttention]].
+**PagedAttention** splits each request's cache into small fixed-size blocks and keeps a per-request block table that maps logical positions to physical blocks, exactly like an operating system's page table. Waste is limited to the last, partly filled block, and two requests can point at the same physical block. That second property makes sharing cheap: parallel samples from one prompt, beam search branches, and requests with the same system prompt all reuse one copy, with copy-on-write when they diverge. The details are in [[PagedAttention]].
 
 **Prefix caching** builds on the same idea across time. SGLang's RadixAttention keeps finished requests' blocks in a prefix tree (a radix tree) and, when a new request arrives, matches its longest cached prefix and skips prefill for that part ([Zheng et al.](https://arxiv.org/abs/2312.07104)). Chat history, agent loops that resend the same tools and instructions, and RAG with a fixed preamble all hit this. By 2026, automatic prefix caching is on by default in vLLM, SGLang, TensorRT-LLM and Dynamo ([LeCompute, Aug 2026](https://lecompute.fr/en/runtimes/kv-cache-objet-central-serving/)).
 
@@ -346,7 +346,7 @@ Open problems:
 - [[Attention]] — The operation whose keys and values the cache stores; causal masking is what makes caching valid.
 - [[Transformer]] — The decoder architecture being sampled; prefill and decode costs come from its blocks.
 - [[Positional Encoding]] — RoPE is applied once at write time, so cached keys never need re-encoding; MLA needs a decoupled rotary key.
-- [[PagedAttention]] — Deeper note on block tables, copy-on-write and vLLM's memory manager (planned).
+- [[PagedAttention]] — Deeper note on block tables, copy-on-write, prefix caching and how paging changed for hybrid models.
 - [[FlashAttention]] — The fused kernels that read the cache efficiently during prefill and decode.
 - [[Quantization]] — FP8, FP4 and INT formats, including the ones used for the cache.
 - [[Sparse Attention]] — Sliding windows and DeepSeek's compressed sparse attention, which cut how many tokens are cached or read.
