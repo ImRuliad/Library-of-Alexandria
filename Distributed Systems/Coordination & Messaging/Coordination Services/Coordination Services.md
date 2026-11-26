@@ -240,3 +240,4 @@ Open problems and lessons:
 - [[Distributed SQL]] — the larger NewSQL stores etcd compares itself against
 - [[Auto-Sharding]] — Slicer holds its ownership leases in Chubby locks; Shard Manager keeps state in ZooKeeper
 - [[Hot Keys and Cache Stampedes]] — the same herd problem in caches, solved with leases and request coalescing
+- [[Cluster Metadata and Routing]] — Chubby, ZooKeeper and etcd as the root of routing hierarchies, and the systems replacing them with their own metadata logs

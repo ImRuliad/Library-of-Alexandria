@@ -270,3 +270,4 @@ Open problems:
 - [[Time and Clocks]] — timeouts and deadlines depend on clocks
 - [[Consistency Models]] — retries and caches can serve stale results
 - [[Hot Keys and Cache Stampedes]] — keeping a cache miss from becoming a herd that overloads the database
+- [[Cluster Metadata and Routing]] — constant-work metadata refresh (DynamoDB MemDS) and the 2025 outages caused by bad routing and policy metadata

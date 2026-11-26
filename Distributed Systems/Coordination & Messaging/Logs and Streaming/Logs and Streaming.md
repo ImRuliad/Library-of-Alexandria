@@ -296,7 +296,7 @@ sequenceDiagram
 
 ### KRaft: Metadata as a Log
 
-*Kafka's own metadata (topics, partitions, ISR, ELR, leaders) now lives in a Raft-replicated log run by a small controller quorum. Brokers replay that log, so the cluster's control plane is the log idea applied to itself.*
+*Kafka's own metadata (topics, partitions, ISR, ELR, leaders) now lives in a Raft-replicated log run by a small controller quorum. Brokers replay that log, so the cluster's control plane is the log idea applied to itself. [[Cluster Metadata and Routing]] compares it with other metadata designs.*
 
 - A small quorum of controllers runs Raft; one is the active controller. Brokers fetch the metadata log and apply it, so each holds a consistent, versioned view of the cluster ([[Raft]]).
 - ISR and ELR changes are records in this log; the ELR page notes "the KRaft controller stores such replicas in the PartitionRecord field called Eligible Leader Replicas" ([Kafka docs](https://kafka.apache.org/44/operations/eligible-leader-replicas/)).
@@ -516,3 +516,4 @@ Open problems worth tracking:
 - [[Formal Methods in Practice]] — TLA+ models of Kafka replication and ELR.
 - [[Deterministic Simulation Testing]] — How S2 and WarpStream test their storage engines.
 - [[LSM Trees]] — Another append-then-compact storage design, for comparison with log compaction.
+- [[Cluster Metadata and Routing]] — KRaft beside other metadata designs, plus leader epochs and KIP-951 leader hints.

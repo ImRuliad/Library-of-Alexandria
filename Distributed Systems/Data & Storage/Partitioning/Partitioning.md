@@ -425,7 +425,7 @@ flowchart LR
 - **DynamoDB:** routers once downloaded a table's whole routing table; a 99.75% cache hit rate hid cold-start spikes where metadata traffic reached 75% of request volume. The fix was MemDS, an in-memory metadata store; routers refresh asynchronously on every hit, so metadata load stays constant. Storage nodes remain authoritative and correct a router that guessed wrong ([Elhemali et al.](https://usenix.org/system/files/atc22-elhemali.pdf)).
 - **Shard Manager:** shard maps flow through service discovery to a client routing library ([Shard Manager paper](https://research.facebook.com/file/245575980870853/Shard-Manager-A-Generic-Shard-Management-Framework-for-Geo-distributed-Applications.pdf)).
 
-The design rule that DynamoDB's story illustrates: a routing cache is fine, but the system must survive it being stale (the owner rejects or redirects) and survive it being empty (cold caches shouldn't stampede the metadata store). The metadata store itself is a [[Coordination Services|coordination service]] or a consensus log.
+The design rule that DynamoDB's story illustrates: a routing cache is fine, but the system must survive it being stale (the owner rejects or redirects) and survive it being empty (cold caches shouldn't stampede the metadata store). The metadata store itself is a [[Coordination Services|coordination service]] or a consensus log; [[Cluster Metadata and Routing]] covers how the map is stored, versioned and corrected in each system.
 
 ## ***Where It Is Now***
 ---
@@ -441,7 +441,7 @@ The design rule that DynamoDB's story illustrates: a routing cache is fine, but 
 ### Cassandra Moves Ownership Off the Ring
 
 - **6.0 status:** pre-release 6.0-alpha3 as of a September 14, 2026 survey, with 5.0.9 the current GA release ([Digitalis, Sep 2026](https://digitalis.io/post/apache-cassandra-6-0-everything-that-changed-in-one-page)).
-- **Transactional Cluster Metadata (CEP-21), always on in 6.0:** moves "topology, token ownership and schema out of gossip and into a linearized log of ordered events" committed by a small quorum (the CMS, grown to at least three members after `nodetool cms initialize`). Bootstrap, decommission and moves run as staged placements, with write placements applied before read placements so quorums overlap while data streams ([Digitalis](https://digitalis.io/post/apache-cassandra-6-0-everything-that-changed-in-one-page); [CEP-21](https://cwiki.apache.org/confluence/spaces/CASSANDRA/pages/217391203/CEP-21+Transactional+Cluster+Metadata)). See [[Gossip and Membership]] for what this replaces.
+- **Transactional Cluster Metadata (CEP-21), always on in 6.0** ([[Cluster Metadata and Routing#Metadata as a Replicated Log|details]]): moves "topology, token ownership and schema out of gossip and into a linearized log of ordered events" committed by a small quorum (the CMS, grown to at least three members after `nodetool cms initialize`). Bootstrap, decommission and moves run as staged placements, with write placements applied before read placements so quorums overlap while data streams ([Digitalis](https://digitalis.io/post/apache-cassandra-6-0-everything-that-changed-in-one-page); [CEP-21](https://cwiki.apache.org/confluence/spaces/CASSANDRA/pages/217391203/CEP-21+Transactional+Cluster+Metadata)). See [[Gossip and Membership]] for what this replaces.
 - **Flexible Placements (CEP-60, proposed Feb 19, 2026, "Under discussion"):** would make ranges per keyspace and table, call them tablets, and assign them to nodes explicitly instead of by ring position, aiming to "allow associating any range with any node" and to drive placement by capacity and load. It would be opt-in, keep token and vnode clusters supported, and leave auto-scaling to a later CEP; no release is targeted ([CEP-60](https://cwiki.apache.org/confluence/spaces/CASSANDRA/pages/406621457/CEP-60+Flexible+Placements)). If adopted, the main Dynamo descendant would end up with the Bigtable-style "explicit map plus placer" design.
 
 ### Sharded Postgres Arrives
@@ -557,3 +557,4 @@ Open problems worth tracking:
 - [[Failure Models]] — Why correlated failures make vnode spread a double-edged choice.
 - [[Sharded Postgres]] — Citus, Aurora Limitless, Neki, PgDog and Multigres: routers in front of unmodified Postgres shards.
 - [[Secondary Indexes]] — Local vs global indexes, transactional and asynchronous maintenance, uniqueness and online index builds.
+- [[Cluster Metadata and Routing]] — How routers learn the current map, epochs that catch stale caches, and staged ownership changes.

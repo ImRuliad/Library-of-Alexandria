@@ -396,5 +396,5 @@ The same idea now hides inside managed systems. Elasticsearch Serverless (Decemb
 - [[Formal Methods in Practice]] — Checking ownership-transfer protocols.
 - [[Hot Keys and Cache Stampedes]] — Salting, leases and coalescing for keys no split can fix.
 - [[Reconciliation and Control Loops]] — Planned: the desired-vs-actual loop Helix uses.
-- [[Cluster Metadata and Routing]] — Planned: how shard maps reach clients.
+- [[Cluster Metadata and Routing]] — how shard maps reach clients.
 - [[Tail Latency and Hedging]] — Planned: handling slow owners at request time.

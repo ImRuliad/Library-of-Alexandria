@@ -264,3 +264,4 @@ Open problems:
 - [[Time and Clocks]] — heartbeat timing and timeouts depend on local clocks
 - [[Replication]] — Dynamo-style rings, anti-entropy, and Cassandra moving metadata from gossip to a log
 - [[Anti-Entropy and Repair]] — Merkle trees, hints and read repair: anti-entropy as databases run it today
+- [[Cluster Metadata and Routing]] — what replaces gossip as the source of truth for ownership (Cassandra's metadata log), and Redis Cluster's gossip plus redirects

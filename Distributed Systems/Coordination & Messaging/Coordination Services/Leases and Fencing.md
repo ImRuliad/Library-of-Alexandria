@@ -258,3 +258,4 @@ Open problems:
 - [[3. System Interactions|GFS: System Interactions]] — GFS's master grants chunk leases
 - [[Auto-Sharding]] — Centrifuge and Slicer lease key ranges to the servers that own them
 - [[Hot Keys and Cache Stampedes]] — memcache leases, a different kind: permission to refill a cache slot, where a lost token only costs a miss
+- [[Cluster Metadata and Routing]] — the same owner-checks-the-version idea applied to routing caches: epochs that turn a stale route into a retry

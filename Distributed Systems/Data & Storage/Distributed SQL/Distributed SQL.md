@@ -182,7 +182,7 @@ The trade against Spanner: no commit wait on every write, but more retries under
 
 From the [TiDB VLDB 2020 paper](https://www.cs.purdue.edu/homes/csjgwang/CloudNativeDB/TiDBVLDB20.pdf):
 - **TiKV** stores rows as key-value pairs in Regions (default up to 96 MB), each a Raft group.
-- **PD (Placement Driver)** places Regions and is the **timestamp oracle**, issuing strictly increasing timestamps that double as transaction IDs. One logical clock sidesteps the clock-skew problem, at the cost of a round trip to PD per transaction.
+- **PD (Placement Driver)** places Regions (its region epochs and the TiDB region cache are in [[Cluster Metadata and Routing]]) and is the **timestamp oracle**, issuing strictly increasing timestamps that double as transaction IDs. One logical clock sidesteps the clock-skew problem, at the cost of a round trip to PD per transaction.
 - **Transactions** are Percolator-style 2PC with a primary key holding the transaction's status; snapshot isolation (repeatable read) over MVCC; optimistic or pessimistic locking.
 - **TiFlash** adds columnar replicas as Raft *learners*: they receive the log asynchronously and don't vote, giving analytics on fresh data without slowing writes. In the paper's CH-benCHmark tests, analytical load cut transactional throughput by at most about 10%, and about 99% of replication delays were under a second with light analytical load.
 
@@ -289,3 +289,4 @@ Open problems worth tracking:
 - [[Isolation Testing]] — How Jepsen checks these databases' isolation claims.
 - [[Sharded Postgres]] — The alternative that keeps stock Postgres on every shard and coordinates above it.
 - [[Secondary Indexes]] — Why indexes here are global and written in the row's transaction, and what that costs.
+- [[Cluster Metadata and Routing]] — Meta ranges, PD and the gateway caches that route each request to a leaseholder.
