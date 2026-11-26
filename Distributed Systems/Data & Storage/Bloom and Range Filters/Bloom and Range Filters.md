@@ -39,6 +39,7 @@ sources:
   - https://dev.to/polliog/timescaledb-227-added-bloom-filters-to-update-and-delete-your-explain-wont-tell-you-if-they-work-1c8n
   - https://issues.apache.org/jira/browse/SPARK-32268
   - https://issues.apache.org/jira/browse/SPARK-38841
+  - https://dist.apache.org/repos/dist/release/spark/docs/3.4.1/generated-runtime-sql-config-table.html
   - https://www.waitingforcode.com/apache-spark-sql/what-new-apache-spark-3.3-joins/read
   - https://people.cs.umass.edu/%7Eramesh/Site/HOME_files/CCRpaper_1.pdf
   - https://bitcoinops.org/en/topics/compact-block-filters/
@@ -354,7 +355,7 @@ with $O(1)$ query time, and this holds "regardless of the input data and query d
 *Outside the storage engine, filters are a way to send a cheap summary of a set over the network instead of the set itself.*
 
 - **Parquet and lakehouses.** Each Parquet column chunk can carry a split-block Bloom filter, located by `bloom_filter_offset` and `bloom_filter_length` in the column metadata ([Parquet spec](https://parquet.apache.org/docs/file-format/bloomfilter)). On [[Object Storage|object storage]] that turns "fetch the row group and scan it" into "fetch a few hundred bytes and skip it." Bloom filters complement min/max statistics: min/max prunes when data is sorted on the column, Bloom filters prune equality predicates on unsorted, high-cardinality columns. See [[Secondary Indexes]] for why lakehouses lean on per-file filters instead of global indexes.
-- **Runtime filters in distributed joins.** Build a Bloom filter from the small side's join keys, broadcast it, and drop non-matching rows on the big side before the shuffle. Spark shipped this in 3.3 (`spark.sql.optimizer.runtime.bloomFilter.enabled`) and turned it on by default in 3.4. Its rule only fires when the side being filtered is large (10 GB by default) and the side building the filter is small (10 MB by default) ([SPARK-32268](https://issues.apache.org/jira/browse/SPARK-32268), [SPARK-38841](https://issues.apache.org/jira/browse/SPARK-38841), [waitingforcode](https://www.waitingforcode.com/apache-spark-sql/what-new-apache-spark-3.3-joins/read)). On 5 TB TPC-DS, query 16 dropped from 84 s to 46 s.
+- **Runtime filters in distributed joins.** Build a Bloom filter from the small side's join keys, broadcast it, and drop non-matching rows on the big side before the shuffle. Spark shipped this in 3.3 (`spark.sql.optimizer.runtime.bloomFilter.enabled`) and turned it on by default in 3.4. Its rule only fires when the side being filtered is large (10 GB by default) and the side building the filter is small (10 MB by default) ([SPARK-32268](https://issues.apache.org/jira/browse/SPARK-32268), [SPARK-38841](https://issues.apache.org/jira/browse/SPARK-38841), [Spark 3.4 config reference](https://dist.apache.org/repos/dist/release/spark/docs/3.4.1/generated-runtime-sql-config-table.html), [waitingforcode](https://www.waitingforcode.com/apache-spark-sql/what-new-apache-spark-3.3-joins/read)). On 5 TB TPC-DS, query 16 dropped from 84 s to 46 s.
 
 ```mermaid
 sequenceDiagram
