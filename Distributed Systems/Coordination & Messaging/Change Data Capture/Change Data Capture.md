@@ -7,7 +7,7 @@ tags:
   - event-sourcing
   - debezium
   - logical-replication
-status: draft
+status: complete
 sources:
   - https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying
   - https://martin.kleppmann.com/2015/03/04/turning-the-database-inside-out.html
@@ -198,8 +198,8 @@ Plain CDC exposes internal table structure to every consumer; the outbox exists 
 timeline
     title Change data capture
     2005 : Fowler describes Event Sourcing
-    2012 : LinkedIn open-sources Databus, a log overlay on Oracle and MySQL
-    2013 : Kreps, The Log - tables and logs are duals
+    2013 : LinkedIn open-sources Databus, a log overlay on Oracle tables
+         : Kreps, The Log - tables and logs are duals
     2015 : Kleppmann, Turning the Database Inside Out
          : Debezium project starts, sponsored by Red Hat
     2018 : Netflix runs DBLog in production
@@ -212,7 +212,7 @@ timeline
          : Debezium 3.7
 ```
 
-- **Databus (LinkedIn).** Kreps describes it as "a log caching abstraction on top of our early Oracle tables", built so search indexes and the social graph could subscribe to database changes ([Kreps, 2013](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying); [LinkedIn, 2013](https://engineering.linkedin.com/data-replication/open-sourcing-databus-linkedins-low-latency-change-data-capture-system)). The same essay calls log extraction "the most log-friendly style of data extraction".
+- **Databus (LinkedIn).** Kreps describes it as "a log caching abstraction on top of our early Oracle tables", built so search indexes and the social graph could subscribe to database changes ([Kreps, 2013](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)). LinkedIn open-sourced it in February 2013 with the Oracle adapter, saying it captured changes from "multiple sources including Oracle and MySQL" ([LinkedIn, 2013](https://engineering.linkedin.com/data-replication/open-sourcing-databus-linkedins-low-latency-change-data-capture-system)). The same essay calls log extraction "the most log-friendly style of data extraction".
 - **"Turning the database inside out" (2014-15).** Kleppmann argued the replication stream, which is "not part of the public interface" of a database, should become "a first-class citizen in our data architecture", with caches and indexes rebuilt as materialized views: "A materialized view is just a cached subset of the log." He called splitting the database into a log plus derived views "unbundling" ([Kleppmann, 2015](https://martin.kleppmann.com/2015/03/04/turning-the-database-inside-out.html)). This is also the root of [[Stream Processing#Streams, Tables and Incremental Views|incremental view maintenance]].
 - **Debezium (2015 onward).** Red Hat sponsored the open-source project from its start in 2015 ([InfoQ, 2025](https://www.infoq.com/news/2025/02/debezium-joins-commonhaus)); it became the de facto set of Kafka Connect source connectors for MySQL, Postgres, MongoDB, SQL Server, Oracle and others.
 - **DBLog (Netflix).** In production since 2018 and published in 2020, it solved snapshots without locks and was used for Elasticsearch-backed search, database activity logging and Flink-based schema migrations ([DBLog](https://arxiv.org/pdf/2010.12597)). Debezium's later incremental snapshots use the same chunk-and-watermark approach ([Debezium docs](https://debezium.io/documentation/reference/2.2/connectors/postgresql.html); [Morling, 2024](https://www.morling.dev/blog/revisiting-the-outbox-pattern/)).
@@ -382,8 +382,8 @@ The relationship to CDC is the table/log equation run in the other direction: CD
 | System | Ordering | Duplicates | Retention | Notes |
 |---|---|---|---|---|
 | **DynamoDB Streams** | Per item: records "appear in the same sequence as the actual modifications to the item", not across a partition | "Each stream record appears exactly once in the stream" | "up to 24 hours" | View types `KEYS_ONLY`, `NEW_IMAGE`, `OLD_IMAGE`, `NEW_AND_OLD_IMAGES` ([AWS docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html)) |
-| **Spanner change streams** | Records carry commit timestamp and record sequence | Reader tracks partition tokens | 1 to 30 days, default 7 | Read via Beam/Dataflow, a Kafka connector, the API or Datastream ([Google docs](https://docs.cloud.google.com/spanner/docs/change-streams)) |
-| **CockroachDB changefeeds** | Per row: never emits "previously unseen versions of that row with a lower timestamp"; no transactional ordering | At least once: "Under some infrequent conditions a changefeed will emit duplicate messages" | Bounded by MVCC GC | **Resolved timestamps** mark that no unseen row with a lower timestamp will follow ([Cockroach docs](https://docs.cockroachlabs.com/docs/v26.1/changefeed-messages)) |
+| **Spanner change streams** | Records carry a commit timestamp and record sequence number | Not stated in the overview | 1 to 30 days, default 7 | API readers track partition tokens; read via Beam/Dataflow, a Kafka connector, the API or Datastream ([Google docs](https://docs.cloud.google.com/spanner/docs/change-streams)) |
+| **CockroachDB changefeeds** | Per row: never emits "previously unseen versions of that row with a lower timestamp"; no transactional ordering | At least once: "Under some infrequent conditions a changefeed will emit duplicate messages" | — | **Resolved timestamps** mark that no unseen row with a lower timestamp will follow ([Cockroach docs](https://docs.cockroachlabs.com/docs/v26.1/changefeed-messages)) |
 
 **Resolved timestamps** are the interesting idea. A resolved timestamp $r$ is "the high-water mark that guarantees that no previously unseen rows" with a lower update timestamp will be emitted. A consumer that buffers events and releases everything with $\mathrm{updated} \le r$ gets a consistent cut across rows and tables, ordered by [[Time and Clocks|HLC]] commit timestamps. It is the CDC version of a stream processor's [[Stream Processing#Watermarks and Completeness|watermark]], except that here it is exact rather than a guess.
 
@@ -443,7 +443,7 @@ The relationship to CDC is the table/log equation run in the other direction: CD
 - [Turning the Database Inside-Out with Apache Samza](https://martin.kleppmann.com/2015/03/04/turning-the-database-inside-out.html): Martin Kleppmann, 2015 (talk transcript).
 - [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html): Martin Fowler, Dec 2005.
 - [DBLog: A Watermark Based Change-Data-Capture Framework](https://arxiv.org/pdf/2010.12597): Andreakis and Papapanagiotou (Netflix), 2020.
-- [Open sourcing Databus](https://engineering.linkedin.com/data-replication/open-sourcing-databus-linkedins-low-latency-change-data-capture-system): LinkedIn Engineering.
+- [Open sourcing Databus](https://engineering.linkedin.com/data-replication/open-sourcing-databus-linkedins-low-latency-change-data-capture-system): LinkedIn Engineering, Feb 2013.
 
 **Patterns and practitioners**
 - [Pattern: Transactional outbox](https://microservices.io/patterns/data/transactional-outbox), [Transaction log tailing](https://microservices.io/patterns/data/transaction-log-tailing.html), [Polling publisher](https://microservices.io/patterns/data/polling-publisher.html): Chris Richardson, microservices.io.
