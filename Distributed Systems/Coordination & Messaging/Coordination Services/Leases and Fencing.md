@@ -259,3 +259,4 @@ Open problems:
 - [[Auto-Sharding]] — Centrifuge and Slicer lease key ranges to the servers that own them
 - [[Hot Keys and Cache Stampedes]] — memcache leases, a different kind: permission to refill a cache slot, where a lost token only costs a miss
 - [[Cluster Metadata and Routing]] — the same owner-checks-the-version idea applied to routing caches: epochs that turn a stale route into a retry
+- [[Message Queues]] — the visibility timeout is a lease on one message, with the same slow-holder problem and lease IDs as fencing tokens

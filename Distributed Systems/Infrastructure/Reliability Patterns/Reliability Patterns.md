@@ -163,7 +163,7 @@ Ways to protect goodput, from the [Builders' Library](https://builder.aws.com/co
 
 - **Reject early and cheaply** so the requests you accept stay fast. Google notes that for very cheap requests, rejecting costs almost as much as serving, so shedding has limits.
 - **Prioritize.** Amazon serves load balancer health pings first and favors finishing started work; Google tags requests with one of four criticality levels (CRITICAL_PLUS down to SHEDDABLE) that propagate to downstream calls.
-- **Bound queues and drop stale work**, including requests whose deadlines have passed.
+- **Bound queues and drop stale work**, including requests whose deadlines have passed. [[Message Queues]] works through backlog drain times and dead-letter limits.
 - **Throttle at the client.** Google's adaptive throttling lets a client keep sending until its requests reach about twice its accepted requests, then rejects new requests locally with rising probability, so an overloaded backend does not even see them.
 - **Measure capacity in resources, not requests.** Request costs vary too much; Google recommends provisioning on CPU.
 - **Watch your metrics.** Fast rejections can make latency look *better* during an overload ([AWS Builders' Library](https://builder.aws.com/content/3Eun1EEyX6p2e3VYNyRLSJzLuMV/using-load-shedding-to-avoid-overload)).
@@ -272,3 +272,4 @@ Open problems:
 - [[Consistency Models]] — retries and caches can serve stale results
 - [[Hot Keys and Cache Stampedes]] — keeping a cache miss from becoming a herd that overloads the database
 - [[Cluster Metadata and Routing]] — constant-work metadata refresh (DynamoDB MemDS) and the 2025 outages caused by bad routing and policy metadata
+- [[Message Queues]] — at-least-once delivery, idempotent consumers, dead-letter queues and backlog recovery

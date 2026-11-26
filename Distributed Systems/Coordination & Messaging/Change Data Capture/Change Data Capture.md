@@ -484,6 +484,6 @@ The relationship to CDC is the table/log equation run in the other direction: CD
 - [[LSM Trees]] — Where many sinks and stream processors keep derived state.
 - [[Write-Ahead Logging]] — Planned: the log CDC reads.
 - [[MVCC and Version Garbage Collection]] — Planned: why a stalled slot blocks vacuum.
-- [[Message Queues]] — Planned: queues versus logs as CDC transports.
+- [[Message Queues]] — Queues versus logs as CDC transports; the inbox table on the consuming side.
 - [[Lakehouse Table Formats]] — Planned: Iceberg and Delta as CDC destinations.
 - [[Incremental View Maintenance]] — Planned: materialized views derived from change streams.

@@ -529,7 +529,7 @@ Streaming databases embody the table-centric view. RisingWave positions itself a
 - [[Consistency Models]] — What read_committed output and exactly-once actually guarantee.
 - [[Deterministic Simulation Testing]] — Testing replay and recovery paths.
 - [[Change Data Capture]] — Database changelogs as stream input; snapshots, outbox and resolved timestamps.
-- [[Message Queues]] — Planned: queues versus logs as inputs.
+- [[Message Queues]] — Queues versus logs as inputs.
 - [[Diskless Streaming]] — Planned: object-storage logs under stream processors.
 - [[Lakehouse Table Formats]] — Planned: Iceberg and Paimon as streaming sinks.
 - [[Checkpointing]] — Planned: checkpoint intervals and costs in training clusters, the same trade-off.

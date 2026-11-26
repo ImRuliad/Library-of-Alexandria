@@ -205,7 +205,7 @@ timeline
 - The broker tracks the in-flight window between the share-partition start offset (SPSO) and end offset (SPEO).
 - Delivery is at-least-once, and order is only guaranteed within one fetched batch; redeliveries can arrive out of offset order.
 
-It "does not add the concept of a 'queue' to Kafka per se" ([4.0 announcement](https://kafka.apache.org/blog/2025/03/18/apache-kafka-4.0.0-release-announcement/)): records still live in an ordinary partitioned log, and a share group is a different way of reading it.
+It "does not add the concept of a 'queue' to Kafka per se" ([4.0 announcement](https://kafka.apache.org/blog/2025/03/18/apache-kafka-4.0.0-release-announcement/)): records still live in an ordinary partitioned log, and a share group is a different way of reading it. [[Message Queues]] compares share groups with SQS, RabbitMQ quorum queues, Pulsar and NATS.
 
 ### Replication: ISR, High Watermark, acks
 
@@ -519,3 +519,4 @@ Open problems worth tracking:
 - [[LSM Trees]] — Another append-then-compact storage design, for comparison with log compaction.
 - [[Cluster Metadata and Routing]] — KRaft beside other metadata designs, plus leader epochs and KIP-951 leader hints.
 - [[Stream Processing]] — Flink, Kafka Streams and Spark on top of the log: watermarks, checkpoints and exactly-once processing.
+- [[Message Queues]] — Per-message-ack queues (SQS, RabbitMQ, share groups) versus offset-tracking logs.

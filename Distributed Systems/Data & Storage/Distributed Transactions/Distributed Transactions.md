@@ -316,3 +316,4 @@ Open problems worth tracking:
 - [[CRDTs]] — Avoiding coordination altogether for data that can merge.
 - [[Sharded Postgres]] — 2PC over stock Postgres shards, and the fractured reads it leaves without a global snapshot.
 - [[Stream Processing]] — Two-phase-commit sinks tied to Flink checkpoints, and Kafka Streams' transactional read-process-write.
+- [[Message Queues]] — The queues sagas run on, and inbox tables for exactly-once processing.
