@@ -74,7 +74,7 @@ Demers and colleagues at Xerox PARC needed to keep a database replicated across 
 | Method | How | Strength | Weakness |
 |---|---|---|---|
 | **Direct mail** | Sender mails every site | Fast | Messages get lost; heavy load |
-| **Anti-entropy** | Each site periodically picks a random partner and reconciles everything | Guarantees eventual delivery | Expensive comparisons |
+| **[[Anti-Entropy and Repair|Anti-entropy]]** | Each site periodically picks a random partner and reconciles everything | Guarantees eventual delivery | Expensive comparisons |
 | **Rumor mongering** | Sites push a "hot" update and lose interest once peers already know it | Cheap and fast | Some sites may miss it |
 
 Let $p_i$ be the fraction of sites still *not* updated after round $i$. With anti-entropy:
@@ -263,3 +263,4 @@ Open problems:
 - [[Consistency Models]] — gossip gives eventual consistency of the membership view
 - [[Time and Clocks]] — heartbeat timing and timeouts depend on local clocks
 - [[Replication]] — Dynamo-style rings, anti-entropy, and Cassandra moving metadata from gossip to a log
+- [[Anti-Entropy and Repair]] — Merkle trees, hints and read repair: anti-entropy as databases run it today

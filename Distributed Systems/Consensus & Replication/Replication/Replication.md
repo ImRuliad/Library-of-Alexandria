@@ -225,7 +225,7 @@ Aurora pairs that with fast repair: data is cut into 10 GB segments, and "a 10GB
 
 ### Leaderless, Dynamo-Style Replication
 
-*Any of the $N$ replicas for a key accepts reads and writes. The system stays writable through failures by bending the quorum rule, and fixes the resulting divergence afterwards with read repair, anti-entropy and conflict resolution.*
+*Any of the $N$ replicas for a key accepts reads and writes. The system stays writable through failures by bending the quorum rule, and fixes the resulting divergence afterwards with read repair, anti-entropy and conflict resolution ([[Anti-Entropy and Repair]]).*
 
 Dynamo's mechanisms ([DeCandia et al.](https://www.cs.princeton.edu/courses/archive/fall15/cos518/papers/dynamo.pdf)):
 
@@ -237,7 +237,7 @@ Dynamo's mechanisms ([DeCandia et al.](https://www.cs.princeton.edu/courses/arch
 | **Hinted handoff** | A stand-in node keeps the write with a hint naming the intended owner and delivers it when the owner recovers | §4.6 |
 | **Vector clocks** | Detect concurrent versions; the client merges siblings on its next write (the shopping cart unions them) | §4.4 |
 | **Read repair** | During a read, the coordinator writes the newest version back to replicas that returned stale ones | §5 |
-| **Merkle-tree anti-entropy** | Replicas compare hash trees and only exchange the key ranges that differ | §4.7 |
+| **[[Anti-Entropy and Repair|Merkle-tree anti-entropy]]** | Replicas compare hash trees and only exchange the key ranges that differ | §4.7 |
 
 **Why sloppy quorums break the overlap.** $R + W > N$ only helps if both quorums come from the same $N$ nodes. Sloppy quorums drop that, so they buy write availability at the cost of read-your-latest-write.
 
@@ -309,7 +309,7 @@ sequenceDiagram
 - **Status:** as of a September 2026 survey, 6.0 was at alpha3 with no beta or release candidate, and 5.0.9 was the current GA release ([Digitalis, Sep 2026](https://digitalis.io/post/apache-cassandra-6-0-everything-that-changed-in-one-page)). An October 2026 IMDEA announcement still described 6.0 as upcoming ([IMDEA, Oct 2026](https://software.imdea.org/news/2026/10-28-accord/)).
 - **Accord (CEP-15):** leaderless multi-partition transactions with strict serializability, beta and off by default in 6.0, and requiring tables to opt in with a `transactional_mode` ([Digitalis](https://digitalis.io/post/apache-cassandra-6-0-everything-that-changed-in-one-page)). IMDEA reports a hand-written safety proof, formalized in Lean with AI help, plus a TLA+ model ([IMDEA](https://software.imdea.org/news/2026/10-28-accord/)). See [[Leaderless Consensus]] and [[Formal Methods in Practice]].
 - **Transactional Cluster Metadata (CEP-21):** schema and token ownership move out of gossip into "a linearized log of epochs committed by a small quorum of Cassandra nodes"; coordinators stamp messages with their epoch so stale replica plans are caught. It's always on in 6.0 ([Digitalis](https://digitalis.io/post/apache-cassandra-6-0-everything-that-changed-in-one-page)). That fixes a long-standing class of bugs where nodes disagreed about who owned a key; see [[Gossip and Membership]].
-- **Built-in repair (CEP-37):** anti-entropy repair scheduled inside Cassandra instead of by external cron jobs ([Digitalis](https://digitalis.io/post/apache-cassandra-6-0-everything-that-changed-in-one-page)).
+- **Built-in repair (CEP-37):** [[Anti-Entropy and Repair|anti-entropy repair]] scheduled inside Cassandra instead of by external cron jobs ([Digitalis](https://digitalis.io/post/apache-cassandra-6-0-everything-that-changed-in-one-page)).
 - **Proposed next:** mutation tracking (CEP-45) would give each write an ID and reconcile replicas by exchanging missing mutations instead of streaming whole partitions after a Merkle-tree mismatch, which also makes witness replicas workable. The CEP page doesn't give a target release ([CEP-45](https://cwiki.apache.org/confluence/display/CASSANDRA/CEP-45%3A+Mutation+Tracking)).
 
 ### Safer Defaults in Leader-Based Systems
@@ -336,7 +336,7 @@ sequenceDiagram
 Open problems worth tracking:
 - **Gray failures.** Most protocols assume a replica is up or down. A slow disk or a half-broken link makes a primary or chain node slow without failing it, which stalls synchronous writes; see [[Gray and Fail-Slow Failures]] and [[Reliability Patterns]].
 - **Correlated failures.** Quorum math assumes independent failures. Aurora's AZ+1 design and short repair windows are an answer for zones; software bugs and bad deploys that hit every replica at once have no quorum answer ([Verbitski et al.](https://pdos.csail.mit.edu/6.824/papers/aurora.pdf); [[Failure Models]]).
-- **Repair cost.** Merkle-tree repair streams whole partitions when anything differs, which is why Cassandra is proposing mutation-level reconciliation ([CEP-45](https://cwiki.apache.org/confluence/display/CASSANDRA/CEP-45%3A+Mutation+Tracking)).
+- **Repair cost.** Merkle-tree repair streams whole partitions when anything differs ([[Anti-Entropy and Repair]]), which is why Cassandra is proposing mutation-level reconciliation ([CEP-45](https://cwiki.apache.org/confluence/display/CASSANDRA/CEP-45%3A+Mutation+Tracking)).
 - **Cheaper majorities.** Log replicas and witnesses cut storage cost, but they complicate recovery and read paths; see [[Witness Replicas]].
 - **Wide-area writes.** A majority round trip across regions is expensive; leaderless consensus and fast paths try to shave it ([[Leaderless Consensus]], [[CAP and PACELC]]).
 - **Corruption.** Replication copies whatever the leader writes, including silently corrupted data; see [[Silent Data Corruption]] and [[Byzantine Fault Tolerance]].
@@ -392,3 +392,4 @@ Open problems worth tracking:
 - [[Byzantine Fault Tolerance]] — Replication when replicas can lie.
 - [[Reliability Patterns]] — Timeouts, retries and backpressure around replicated services.
 - [[Formal Methods in Practice]] — TLA+ and proofs for replication protocols like Accord.
+- [[Anti-Entropy and Repair]] — Hinted handoff, read repair and Merkle-tree repair in detail.
