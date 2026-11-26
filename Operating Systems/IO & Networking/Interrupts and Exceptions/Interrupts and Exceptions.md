@@ -536,4 +536,4 @@ Open problems worth tracking:
 - [[sched_ext and Pluggable Scheduling]] — Kernel-side custom scheduling, the counterpart to user-interrupt schedulers like Skyloft.
 - [[Linux Networking Stack]] — The receive and transmit paths NAPI feeds: GRO, RPS/RFS, protocols and sockets.
 - [[Linux in Networking]] — Existing vault note on the Linux network stack, including NAPI.
-- [[The Boot Process]] — Where the IDT and interrupt controllers are first set up.
+- [[Boot Process]] — Where the IDT and interrupt controllers are first set up.

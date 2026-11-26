@@ -614,4 +614,4 @@ Open problems worth tracking:
 - [[Kernel Security Hardening]] — `no_new_privs`, and the security questions new spawn APIs raise.
 - [[Memory Allocators]] — Per-thread allocator caches are the classic use of thread-local storage and the classic fork deadlock.
 - [[Compiler, Assembler, Linker, and Loader]] — What `exec` loads, and how the loader lays out TLS.
-- [[The Boot Process]] — How PID 1, the ancestor of every process, is started.
+- [[Boot Process]] — How PID 1, the ancestor of every process, is started.
