@@ -72,7 +72,7 @@ Failures at scale are not rare events; they are the steady state:
 |---|---|
 | Microsoft data centers averaged 5.2 device failures and 40.8 link failures per day; redundancy improved median traffic by only 43% ([Kingsbury and Bailis, 2014](https://aphyr.com/posts/288-the-network-is-reliable)) | The network fails all the time, and redundancy doesn't hide it |
 | 136 partition-caused failures across 25 widely used systems; most were catastrophic (data loss, deleted data reappearing, broken locks) and many could be triggered by isolating a single node ([Alquraan et al., OSDI 2018](https://www.usenix.org/conference/osdi18/presentation/alquraan)) | Mature systems mishandle failures their designers didn't model |
-| 419 unexpected interruptions in 54 days of training Llama 3 405B on up to 16K H100s, about 78% from confirmed hardware issues ([Llama 3 paper, 2024](https://arxiv.org/pdf/2407.21783)) | At AI-cluster scale, something fails every few hours |
+| 419 unexpected interruptions in 54 days of training Llama 3 405B on up to 16K H100s, about 78% from confirmed hardware issues ([Llama 3 paper, 2024](https://arxiv.org/pdf/2407.21783)) | At [[GPU Cluster Infrastructure\|AI-cluster scale]], something fails every few hours |
 
 The core difficulty: a node can't tell the difference between "the other node crashed", "the network dropped my message", and "the other node is just slow". Every failure model is a decision about how much of that uncertainty the protocol has to survive.
 
@@ -331,3 +331,4 @@ Open problems worth tracking:
 - [[Formal Methods in Practice]] — Checking protocols against an explicit failure model.
 - [[Gray and Fail-Slow Failures]] — Components that are broken for their users but look healthy to the system, and hardware that runs slow without failing.
 - [[Silent Data Corruption]] — Hardware that computes or stores wrong values without raising an error, now a fleet-scale problem in AI clusters.
+- [[GPU Cluster Infrastructure]] — Failures, stragglers and SDC at AI-training scale, where one fault stops thousands of GPUs.

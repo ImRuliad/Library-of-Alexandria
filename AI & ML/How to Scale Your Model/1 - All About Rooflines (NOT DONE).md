@@ -38,7 +38,7 @@ Within an Acceleration, tensors need to be transferred between accelerator memor
 - HBM Bandwidth on a TPU v6e is about [1.6 TB/s](https://cloud.google.com/tpu/docs/v6e)
 
 #### **Communication Between Chips**
-When we distribute a model across multiple accelerators, tensors frequently need to be transferred between them.
+When we distribute a model across multiple accelerators, tensors frequently need to be transferred between them ([[GPU Cluster Infrastructure]]).
 There a few options for this on hardware:
 - ICI
 - DCN
