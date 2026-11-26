@@ -587,6 +587,7 @@ Open problems:
 - [[SSA Form]] — The form `mem2reg` produced in the walkthrough, and why optimizers want it.
 - [[Dataflow Analysis]] — The analyses passes depend on.
 - [[Classic Optimizations]] — Constant propagation, CSE, DCE, inlining: the bulk of the middle end.
+- [[Closure Conversion and Defunctionalization]] — How functional compilers turn nested first-class functions into first-order code.
 - [[Loop Optimizations]] — Induction variables, LICM and loop deletion, as in the closed-form example.
 - [[Vectorization]] — Loop and SLP vectorizers late in the middle end.
 - [[Instruction Selection]] — SelectionDAG, GlobalISel and pattern matching.

@@ -469,5 +469,6 @@ MMTk is a Rust library of collectors (Immix, generational Immix, LXR and others)
 - [[WebAssembly]] — Linear memory vs WasmGC.
 - [[Type Systems and Inference]] — Types that make data acyclic or unique, which Perceus exploits.
 - [[Compiler Pipeline]] — Where GC lowering sits in a compiler.
+- [[Closure Conversion and Defunctionalization]] — Heap closures and their environments, and why linked environments retain dead data.
 - [[Escape Analysis]] — Planned: stack allocation and barrier removal for objects that never escape.
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages, a world without a collector.

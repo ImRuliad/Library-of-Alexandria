@@ -482,7 +482,7 @@ The handler is just a block label, and the continuation is a typed reference. Bo
 - [[WebAssembly]] — Stack switching and JSPI in the context of the other post-MVP proposals.
 - [[Garbage Collection]] — Suspended stacks become heap objects the collector must scan and free.
 - [[Reference Counting and Reuse]] — Planned: Perceus, which Koka pairs with evidence passing; Effekt's uniqueness check for one-shot resumes.
-- [[Closure Conversion and Defunctionalization]] — Planned: how CPS continuations become closures or state numbers.
+- [[Closure Conversion and Defunctionalization]] — How CPS continuations become heap closures or defunctionalized state machines.
 - [[Type Systems and Inference]] — Row types and effect inference in Koka.
 - [[Intermediate Representations]] — Where continuations and join points sit among IR designs.
 - [[JIT Compilation]] — Engines that must implement stack switching in every tier.

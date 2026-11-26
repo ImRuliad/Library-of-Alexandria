@@ -397,7 +397,7 @@ Contification is "a compiler optimization that turns a function that always retu
 
 | Compiler | Form | Evidence |
 |---|---|---|
-| SML/NJ | First-order CPS IR after optimization and closure conversion, then a CFG IR to LLVM (2021.1, replacing MLRISC) | [SML/NJ 2021.1 README](https://smlnj.org/dist/working/2021.1/2021.1-README.html) |
+| SML/NJ | First-order CPS IR after optimization and [[Closure Conversion and Defunctionalization|closure conversion]], then a CFG IR to LLVM (2021.1, replacing MLRISC) | [SML/NJ 2021.1 README](https://smlnj.org/dist/working/2021.1/2021.1-README.html) |
 | OCaml Flambda 2 (OxCaml) | Second-class CPS: `let_cont` declares a block; double-barrelled for exceptions; chosen following Kennedy | [OCamlPro, 2024](https://ocamlpro.com/blog/2024_03_19_the_flambda2_snippets_1); OxCaml "builds on our Flambda2 middle-end" ([Jane Street, June 2025](https://blog.janestreet.com/introducing-oxcaml/)) |
 | Upstream OCaml native | No CPS IR; effects via fibers | [Sivaramakrishnan et al.](https://arxiv.org/pdf/2104.00250) |
 | GHC | Direct-style Core with join points since 8.2.1 | [GHC #12988](https://mail.haskell.org/pipermail/ghc-tickets/2017-February/048264.html) |
@@ -524,6 +524,7 @@ Open problems:
 - [[Verified Compilers]] — CertiCoq's verified ANF/CPS middle end.
 - [[Garbage Collection]] — Heap-allocated continuation closures are the main runtime cost of naive CPS, and why native OCaml avoids it.
 - [[Compiler Pipeline]] — Where CPS or ANF conversion happens between the front end and closure conversion.
+- [[Closure Conversion and Defunctionalization]] — The next step after CPS or ANF: making environments explicit, lambda lifting, or defunctionalizing.
 - [[Sea of Nodes]] — Planned: Thorin and MimIR are higher-order CPS IRs in sea-of-nodes form.
 - [[Dependent and Refinement Types]] — Types that depend on values, and SMT-checked refinements.
 - [[Effect Handlers and Delimited Continuations]] — CPS is one of four ways to implement handlers; fibers, evidence passing and stack copying are the others.
