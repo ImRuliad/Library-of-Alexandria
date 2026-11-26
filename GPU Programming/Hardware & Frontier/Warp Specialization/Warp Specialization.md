@@ -6,7 +6,7 @@ tags:
   - blackwell
   - warp-specialization
   - pipelining
-status: draft
+status: complete
 sources:
   - https://research.nvidia.com/publication/2011-11_cudadma-optimizing-gpu-memory-bandwidth-warp-specialization
   - https://lightsighter.github.io/CudaDMA
@@ -16,6 +16,13 @@ sources:
   - https://pytorch.org/blog/hopper-tma-unit/
   - https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html
   - https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/blackwell.html
+  - https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/blackwell_cluster_launch_control.html
+  - https://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20240108/1272461.html
+  - https://forums.developer.nvidia.com/t/issue-using-bar-cta-sync-and-arrive/267694
+  - https://www.springerprofessional.de/doi/10.1145/2555243.2555258
+  - https://mlsys.org/virtual/2026/oral/3759
+  - https://2026.cgo.org/details/cgo-2026-papers/35/Tawa-Automatic-Warp-Specialization-for-Modern-GPUs-with-Asynchronous-References
+  - https://pldi25.sigplan.org/details/pldi-2025-papers/17/Task-Based-Tensor-Computations-on-Modern-GPUs
   - https://nvidia.github.io/cccl/unstable/libcudacxx/ptx/instructions/setmaxnreg.html
   - https://docs.nvidia.com/cuda/parallel-thread-execution/
   - https://arxiv.org/html/2603.05451
@@ -71,7 +78,7 @@ updated: 2026-11-26
 - **Why it exists:** on Hopper and Blackwell, one thread can launch a whole tile copy ([[TMA and Asynchronous Copies|TMA]]) or a whole matrix multiply (`tcgen05.mma`, see [[Tensor Cores]]). With so few instructions needed to drive the big units, giving every warp the same mixed job wastes registers and issue slots; dedicated roles keep the units fed with low [[Occupancy and Latency Hiding|occupancy]].
 - **How roles talk:** a ring of shared-memory stages, each with a "full" and an "empty" barrier. Producers wait for *empty*, fill, signal *full*; consumers wait for *full*, compute, signal *empty*. Producers also hand registers to consumers with `setmaxnreg`.
 - **History:** the term comes from **CudaDMA** (Bauer, Cook, Khailany, SC 2011), which dedicated "DMA warps" to loading on Fermi. It became the default design for fast kernels with Hopper's TMA and `wgmma` in 2022–2023 (CUTLASS 3, FlashAttention-3).
-- **Where it is now (Nov 2026):** every top Hopper/Blackwell GEMM and attention kernel uses it (CUTLASS, cuBLAS-class libraries, FlashAttention-4, ThunderKittens, DeepGEMM). The frontier is **making compilers do it**: Triton's automatic warp specialization, Gluon and Meta's TLX for explicit control, and research compilers (Tawa, Twill, Cypress) that derive the role split automatically.
+- **Where it is now (Nov 2026):** the fastest public Hopper/Blackwell GEMM and attention kernels use it (CUTLASS's SM90 and SM100 schedules, FlashAttention-3 and -4, ThunderKittens). The frontier is **making compilers do it**: Triton's automatic warp specialization, Gluon and Meta's TLX for explicit control, and research compilers (Tawa, Twill, Cypress) that derive the role split automatically.
 
 ## ***The Problem***
 ---
@@ -117,7 +124,7 @@ A role is chosen once, at the top of the kernel, from the warp's index. Because 
 |---|---|---|---|
 | Producer (load) | 1 warp, often 1 elected thread | Issues [[TMA and Asynchronous Copies|TMA]] or `cp.async` copies into shared memory | Few registers, a few barriers |
 | Consumer / math | 1–2 warpgroups (Hopper), or 1 warp issuing `tcgen05.mma` (Blackwell) | Tensor-core MMAs on staged tiles | Many registers on Hopper (accumulators); few on Blackwell (accumulators in TMEM) |
-| Epilogue | 4 warps (Blackwell) or the consumers themselves (Hopper) | Reads accumulators, applies bias/activation/scaling, stores via TMA | Registers for one slice of the output |
+| Epilogue | 4 warps (Blackwell, plus 1 epilogue-load warp in CUTLASS) or the consumers themselves (Hopper) | Reads accumulators, applies bias/activation/scaling, stores via TMA | Registers for one slice of the output |
 | Scheduler (optional) | 1 warp | Fetches the next tile in a persistent kernel | Almost nothing |
 
 A **warpgroup** is 4 consecutive warps (128 threads), the unit that issues Hopper's `wgmma` (see [[Tensor Cores]]).
@@ -156,7 +163,7 @@ $$
 \underbrace{128 \times 40}_{\text{producer}} + \underbrace{2 \times 128 \times 232}_{\text{consumers}} = 5{,}120 + 59{,}392 = 64{,}512 \le 65{,}536
 $$
 
-Without the split, each of 384 threads could have at most $65{,}536 / 384 \approx 170$ registers (168 after rounding to the allocation granularity of 8). With it, the threads holding accumulators get 232, about 38% more, which is what makes 128×256 tiles fit. These are the counts CUTLASS's ping-pong kernel uses ([PyTorch, 2024](https://pytorch.org/blog/cutlass-ping-pong-gemm-kernel/)).
+Without the split, each of 384 threads could have at most $65{,}536 / 384 \approx 170$ registers (168 after rounding to the allocation granularity of 8). With it, the threads holding accumulators get 232, about 38% more, which is what makes 128×256 tiles fit. These are the counts CUTLASS's ping-pong kernel uses: producers keep "only 40 registers, while consumers will get 232" ([PyTorch, 2024](https://pytorch.org/blog/cutlass-ping-pong-gemm-kernel/)).
 
 ## ***How We Got Here***
 ---
@@ -165,23 +172,23 @@ Without the split, each of 384 threads could have at most $65{,}536 / 384 \appro
 ```mermaid
 timeline
     title Warp specialization
-    2011 : CudaDMA on Fermi, DMA warps and named barriers (SC 2011)
-    2014 : Singe DSL compiler, warp-specialized chemistry kernels (PPoPP 2014)
+    2011 : CudaDMA on Fermi, DMA warps and compute warps (SC 2011)
+    2014 : Singe DSL compiler, named barriers between warps (PPoPP 2014)
     2020 : Ampere cp.async and shared-memory arrive/wait barriers
     2022 : Hopper TMA, wgmma, setmaxnreg, thread block clusters
-    2023 : CUTLASS 3.0 warp-specialized GEMM kernels
+    2023 : CUTLASS 3.x warp-specialized GEMM kernels
     2024 : FlashAttention-3, ThunderKittens, CUTLASS ping-pong explained
     2025 : Blackwell single-thread tcgen05, Triton automatic warp specialization (3.2), Gluon
     2026 : FlashAttention-4, Tawa (CGO), Twill (OSDI), Meta TLX
 ```
 
-- **2011, CudaDMA.** Michael Bauer, Henry Cook and Brucek Khailany (NVIDIA Research, Stanford, Berkeley) proposed splitting a block's warps into compute warps and "DMA warps" that only move data from global into shared memory, synchronizing through Fermi's named barriers ([CudaDMA, SC 2011](https://research.nvidia.com/publication/2011-11_cudadma-optimizing-gpu-memory-bandwidth-warp-specialization); [project page](https://lightsighter.github.io/CudaDMA)). The point was to emulate a DMA engine the hardware did not have.
-- **2014, Singe.** Bauer, Treichler and Aiken built a DSL compiler that warp-specializes combustion-chemistry kernels, giving each warp different parts of a large, irregular computation so the working set fits on chip ([Singe, PPoPP 2014](https://doi.org/10.1145/2555243.2555258)).
+- **2011, CudaDMA.** Michael Bauer, Henry Cook and Brucek Khailany (NVIDIA Research, Stanford, Berkeley) proposed splitting a block's warps into compute warps and "DMA warps" that only move data between global and shared memory. A CudaDMA object hides the synchronization: compute threads call "start" and later "wait", and the DMA threads wait for the start signal, copy, then signal that the buffer is full ([CudaDMA, SC 2011](https://research.nvidia.com/publication/2011-11_cudadma-optimizing-gpu-memory-bandwidth-warp-specialization); [project page](https://lightsighter.github.io/CudaDMA)). The point, in the authors' words, was to "untangle many of the performance penalties associated with the in-order instruction issue nature of GPUs", in effect emulating a DMA engine the hardware did not have. Version 1 targeted Fermi, version 2 Kepler.
+- **2014, Singe.** Bauer, Treichler and Aiken built a DSL compiler for combustion chemistry that splits a large, irregular computation into sub-computations assigned to different warps, so the working set fits on chip. "Fine-grain synchronization between warps is performed efficiently in hardware using producer-consumer named barriers", and the generated kernels were "up to 3.75X faster than previously optimized data-parallel GPU kernels" ([Singe, PPoPP 2014](https://www.springerprofessional.de/doi/10.1145/2555243.2555258)).
 - **2020, Ampere.** `cp.async` let loads go straight to shared memory, and hardware-accelerated arrive/wait barriers in shared memory appeared, the precursor of the mbarriers that Hopper pipelines use ([[TMA and Asynchronous Copies]]).
-- **2022–2023, Hopper.** TMA, asynchronous `wgmma`, `setmaxnreg` and clusters made producer/consumer kernels the natural design. CUTLASS 3.0 (Jan 2023) shipped `KernelTmaWarpSpecialized` and its cooperative and ping-pong variants ([[CUTLASS and CuTe]]).
+- **2022–2023, Hopper.** TMA, asynchronous `wgmma`, `setmaxnreg` and clusters made producer/consumer kernels the natural design. CUTLASS 3.0 (Jan 2023) introduced warp-specialized kernels, and the 3.x line's `KernelTmaWarpSpecialized` family includes the cooperative and ping-pong schedules ([[CUTLASS and CuTe]]).
 - **2024.** FlashAttention-3 brought the design to attention and reached up to 740 TFLOPS FP16 on H100 ([Shah et al.](https://arxiv.org/html/2407.08608v2)); ThunderKittens packaged it as a small "load-compute-store" template ([Spector et al.](https://arxiv.org/abs/2410.20399v1)); Pranjal Shankhdhar's public H100 GEMM worklog showed warp specialization as one rung on the way to 764 TFLOPS ([worklog](https://cudaforfun.substack.com/p/outperforming-cublas-on-h100-a-worklog)).
 - **2025.** Blackwell's single-thread `tcgen05.mma` and Tensor Memory pushed kernels to finer roles (one MMA warp, separate epilogue warps). Triton 3.2 added automatic warp specialization ([PyTorch, Feb 2025](https://pytorch.org/blog/warp-specialization/)).
-- **2026.** FlashAttention-4 (MLSys 2026), and compiler papers that treat role assignment as an optimization problem: Tawa (CGO 2026), Twill (OSDI 2026).
+- **2026.** FlashAttention-4 (MLSys 2026, [program](https://mlsys.org/virtual/2026/oral/3759)), and compiler papers that generate the roles: Tawa (CGO 2026) and Twill (OSDI 2026). Meta published TLX, which makes warp groups first-class in Triton.
 
 ## ***How It Works***
 ---
@@ -189,7 +196,7 @@ timeline
 
 ### Version 1 - Named Barriers (Any GPU)
 
-Every CUDA GPU has 16 hardware barriers per block. `__syncthreads()` uses barrier 0 for all threads; PTX `bar.sync id, count` waits on barrier `id` until `count` threads have arrived, and `bar.arrive id, count` adds an arrival *without waiting* ([PTX ISA](https://docs.nvidia.com/cuda/parallel-thread-execution/)). That asymmetry is exactly a producer/consumer signal. This sketch is the CudaDMA pattern: one producer warp, four consumer warps, two stages.
+Every CUDA GPU has 16 hardware barriers per block. `__syncthreads()` uses barrier 0 for all threads; PTX `bar.sync id, count` waits on barrier `id` until `count` threads have arrived, and `bar.arrive id, count` adds an arrival *without waiting* ([PTX ISA](https://docs.nvidia.com/cuda/parallel-thread-execution/)). Threads that execute the arrive variant "do not wait at the barrier", and waiting threads are released once the total count of arriving threads reaches the target ([NVIDIA forums, Crovella](https://forums.developer.nvidia.com/t/issue-using-bar-cta-sync-and-arrive/267694)). That asymmetry is exactly a producer/consumer signal, the "producer-consumer named barriers" Singe used. This sketch shows the pattern: one producer warp, four consumer warps, two stages.
 
 ```cpp
 // 160 threads: warp 0 = producer, warps 1-4 = consumers
@@ -229,10 +236,10 @@ Line by line:
 - `bar_sync` / `bar_arrive` wrap the two PTX instructions; `NT` is the number of threads that must arrive (all 160 here, producers plus consumers), and it must be a multiple of 32.
 - Barrier ids 1–2 are "full" for stages 0–1, ids 3–4 are "empty". Id 0 is left for `__syncthreads()`.
 - The **producer** skips the empty-wait for the first two iterations (both stages start empty), copies a slice into `buf[s]`, then *arrives* on full without blocking, so it can start the next stage.
-- The **consumers** *sync* on full (they block until the producer's arrival completes the count), use the data, then *arrive* on empty. They skip that arrival for the last two stages so no barrier is left half-counted when the kernel ends.
+- The **consumers** *sync* on full (they block until the producer's arrival completes the count), use the data, then *arrive* on empty. They skip that arrival for the last two stages, because no producer will wait on those, and a barrier that is left partly counted can let the wrong warps through if it is reused.
 - `"memory"` clobbers stop the compiler from moving shared-memory accesses across the barriers.
 
-On pre-Hopper GPUs this rarely beats a well-tuned uniform kernel, because the producer warp still moves data through registers; CudaDMA's gains came from cases where address math or register pressure dominated ([CudaDMA](https://lightsighter.github.io/CudaDMA)).
+On pre-Hopper GPUs the producer warp still moves data through registers, so this pays off mainly where address math, irregular access or on-chip working sets dominate, as in CudaDMA and Singe. NVIDIA now points to libcu++ barriers and pipelines for the same pattern rather than hand-written PTX ([NVIDIA forums](https://forums.developer.nvidia.com/t/issue-using-bar-cta-sync-and-arrive/267694)).
 
 ### Version 2 - Hopper Producer and Consumer Warpgroups
 
@@ -262,8 +269,8 @@ if (wg == 0) {                                    // producer
 ```
 
 - `threadIdx.x / 128` picks the warpgroup; the whole warpgroup takes the same branch.
-- `setmaxnreg.dec ... 40` gives back registers so the warpgroup keeps only 40 per thread; `.inc ... 232` waits until enough registers are free and claims 232. Both must be executed by all threads of the warpgroup (`.sync.aligned`), and the count must be a multiple of 8 between 24 and 256 ([CCCL PTX docs](https://nvidia.github.io/cccl/unstable/libcudacxx/ptx/instructions/setmaxnreg.html)).
-- The kernel must be compiled for `sm_90a` (or a later arch-specific target), since `setmaxnreg` is not part of the portable `sm_90` feature set ([[PTX and SASS]]).
+- `setmaxnreg.dec ... 40` gives back registers so the warpgroup keeps only 40 per thread; `.inc ... 232` waits until enough registers are free and claims 232. Both must be executed by all threads of the warpgroup (`.sync.aligned`), and the count "must be in the range 24 to 256 (both inclusive) and must be a multiple of 8" (PTX ISA, quoted in [LLVM review](https://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20240108/1272461.html)).
+- The kernel must be compiled for an arch-specific target (`sm_90a`, `sm_100a`/`f`, `sm_120a`/`f` and others; PTX ISA 8.0+), since `setmaxnreg` is not part of the portable `sm_90` feature set ([CCCL PTX docs](https://nvidia.github.io/cccl/unstable/libcudacxx/ptx/instructions/setmaxnreg.html); [[PTX and SASS]]).
 
 ### Cooperative vs Ping-Pong
 
@@ -272,7 +279,7 @@ With two consumer warpgroups there are two ways to use them ([PyTorch, 2024](htt
 | Schedule | What each consumer warpgroup does | Good at | Weak at |
 |---|---|---|---|
 | **Cooperative** | Both work on the **same** output tile, split along M; they run the epilogue together | Large tiles, fewer tiles in flight | Tensor cores idle during the epilogue |
-| **Ping-pong** | Each owns a **different** output tile; an ordered barrier makes them take turns on the tensor core | Epilogue of one overlaps math of the other | Smaller tile per warpgroup, more registers each |
+| **Ping-pong** | Each owns a **different** output tile; they take turns on the tensor cores | Epilogue of one overlaps math of the other | Smaller tile per warpgroup, more registers each |
 
 ```mermaid
 sequenceDiagram
@@ -282,29 +289,39 @@ sequenceDiagram
     P->>C1: stages for tile A
     C1->>C1: MMA (tile A)
     P->>C2: stages for tile B
-    C1->>C2: ordered barrier: your turn
+    C1->>C2: barrier: your turn
     C2->>C2: MMA (tile B)
     C1->>C1: epilogue (tile A) overlaps MMA of tile B
-    C2->>C1: ordered barrier: your turn
+    C2->>C1: barrier: your turn
     C1->>C1: MMA (tile C)
     C2->>C2: epilogue (tile B)
 ```
 
-Both run as **persistent kernels**: one block per SM that loops over output tiles, so the pipeline never drains between tiles. PyTorch found ping-pong the better choice for many FP8 inference shapes, where the epilogue (scaling, conversion) is a large share of each tile's time ([PyTorch, 2024](https://pytorch.org/blog/cutlass-ping-pong-gemm-kernel/)).
+In PyTorch's words, "one can be using the tensor cores for MMA while the other performs the epilogue, and then vice-versa", which "maximizes the 'continuous usage' of the tensor cores". Both run as **persistent kernels**: deep pipelines leave room for only one block per SM, so that block loops over many output tiles and the pipeline never drains between them. PyTorch calls ping-pong "one of the fastest matmul (GEMM) kernel architectures available for the Hopper GPU architecture" and benchmarked it on FP8 inference GEMMs ([PyTorch, 2024](https://pytorch.org/blog/cutlass-ping-pong-gemm-kernel/)).
 
 ### Version 3 - Blackwell Role Split
 
-Blackwell's `tcgen05.mma` is issued by a single thread and writes its accumulator to **Tensor Memory (TMEM)**, 256 KB per SM, instead of registers ([[Tensor Cores]]). That removes the reason consumers needed big register files and splits "consumer" into two roles ([CUTLASS Blackwell docs](https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/blackwell.html); [gau-nernst](https://gau-nernst.github.io/tcgen05/)):
+Blackwell's `tcgen05.mma` is issued by a single thread and writes its accumulator to **Tensor Memory (TMEM)**, 256 KB per SM, instead of registers ([[Tensor Cores]]). That removes the reason consumers needed big register files and splits "consumer" into separate MMA and epilogue roles. CUTLASS's warp-specialized persistent SM100 kernel assigns eight warps ([CUTLASS, Cluster Launch Control](https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/blackwell_cluster_launch_control.html)):
+
+| Warp | Role |
+|---|---|
+| 0 | MMA (one thread issues `tcgen05.mma`) |
+| 1 | Scheduler (Cluster Launch Control queries) |
+| 2 | Mainloop load (TMA for A and B) |
+| 3 | Epilogue load (TMA for the source C tensor the epilogue reads) |
+| 4–7 | Epilogue (TMEM → registers → global) |
 
 ```mermaid
 flowchart LR
     subgraph SM["One CTA on a Blackwell SM"]
-        T["TMA warp<br/>(1 elected thread)"]
+        T["Mainloop load warp<br/>(TMA, 1 elected thread)"]
         S[("smem stages<br/>full / empty mbarriers")]
         M["MMA warp<br/>(1 thread issues tcgen05.mma)"]
-        TM[("TMEM accumulators<br/>(2 buffers)")]
-        E["Epilogue warps x4<br/>tcgen05.ld → regs → TMA store"]
-        SC["Scheduler warp<br/>(next tile, optional)"]
+        TM[("TMEM accumulators")]
+        EL["Epilogue load warp<br/>(TMA for C)"]
+        E["Epilogue warps x4<br/>tcgen05.ld → regs → store"]
+        SC["Scheduler warp<br/>(CLC: next tile)"]
+        EL --> E
         T --> S --> M --> TM --> E
         SC -.-> T
         SC -.-> M
@@ -312,20 +329,20 @@ flowchart LR
     end
 ```
 
-- **TMA warp:** issues tile loads into the shared-memory ring (often 2-CTA, multicast across a cluster).
-- **MMA warp:** one thread waits on `full[s]`, issues `tcgen05.mma`, and uses `tcgen05.commit` to arrive on an mbarrier when the MMA finishes, which both frees the smem stage and tells the epilogue the accumulator is ready.
-- **Epilogue warps:** four warps, because TMEM's 128 lanes are split so each warp of a warpgroup reads its own 32 lanes with `tcgen05.ld`. They convert, scale and store.
-- **Double-buffered accumulators:** with two TMEM accumulator buffers, the MMA warp starts the next tile while the epilogue drains the previous one, the Blackwell version of ping-pong.
-- **Scheduler:** in persistent kernels a warp can query the next tile, on Blackwell via Cluster Launch Control, and broadcast it to the other roles.
+- **Load warps:** issue TMA tile loads into the shared-memory ring (on Blackwell often for a 2-CTA pair, see [[TMA and Asynchronous Copies]]).
+- **MMA warp:** one thread waits on `full[s]`, issues `tcgen05.mma`, and commits the MMA to an mbarrier, which tells the load warp the stage is free and the epilogue that the accumulator is ready ([gau-nernst](https://gau-nernst.github.io/tcgen05/)).
+- **Epilogue warps:** a full warpgroup of four warps, because each warp can only read its own quarter of TMEM's 128 lanes with `tcgen05.ld` ([[Tensor Cores]]). They convert, scale and store.
+- **Scheduler warp:** the producer of a small CLC pipeline (depth 3). It asks the hardware for the next tile and every other role consumes the answer; it also consumes its own result, because "it needs the `success` information from the query to terminate the persistent loop on end-of-grid" ([CUTLASS](https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/blackwell_cluster_launch_control.html)).
+- **Overlap across tiles:** with TMEM holding the accumulator, the MMA warp can start the next tile while the epilogue drains the previous one if TMEM has room for two accumulators, the Blackwell counterpart of ping-pong.
 
-The payoff is measurable in gau-nernst's B200 walkthrough: adding warp specialization (TMA / MMA / epilogue warps) took a hand-written BF16 GEMM to 1,209 TFLOPS, and later steps (persistence, double-buffered TMEM) reached about 1,476, against about 1,507 for cuBLAS ([gau-nernst, Dec 2025](https://gau-nernst.github.io/tcgen05/)).
+The payoff is measurable in gau-nernst's B200 walkthrough (BF16, 4096³): adding warp specialization (TMA / MMA / epilogue warps) took a hand-written GEMM from 940 to 1,209 TFLOPS; 2-SM MMA and a persistent kernel then reached about 1,476, against about 1,507 for cuBLAS ([gau-nernst, Dec 2025](https://gau-nernst.github.io/tcgen05/); [[Tensor Cores]]).
 
 ### Attention - FlashAttention-3 and -4
 
 Attention is harder than GEMM because two matmuls are separated by a softmax that runs on slow special-function units.
 
 - **FlashAttention-3 (Hopper, 2024).** Producer warps load Q, K and V with TMA; two consumer warpgroups use ping-pong scheduling so one warpgroup's softmax runs while the other's GEMMs use the tensor cores, and inside a warpgroup the softmax of one block overlaps the GEMM of the next. Ping-pong alone raised FP16 forward throughput from about 570 to 620–640 TFLOPS; the full kernel reaches up to 740 TFLOPS FP16 (75% utilization) and close to 1.2 PFLOPS FP8 ([Shah et al., 2024](https://arxiv.org/html/2407.08608v2)).
-- **FlashAttention-4 (Blackwell, 2026).** Built in CuTe DSL around `tcgen05` and TMEM, with more roles: load, MMA, several softmax warpgroups, a correction warpgroup that rescales outputs when the running max changes, and an epilogue. Because the exponential unit became the bottleneck, part of `exp` is computed in software on the FMA units ([FlashAttention-4](https://arxiv.org/html/2603.05451); [Tri Dao, 2026](https://tridao.me/blog/2026/flash4/); [[FlashAttention]]).
+- **FlashAttention-4 (Blackwell, 2026).** Written "entirely in CuTe-DSL" around `tcgen05` and TMEM, with more roles: one warpgroup drives the tensor cores and TMA, two softmax warpgroups (one thread per row), and a separate **correction** warpgroup that rescales the output when the running max changes, taking that work off the critical path. Because the exponential unit became the bottleneck, 10–25% of each softmax row's exponentials are computed with a polynomial on the FMA units instead. On B200 BF16 it reaches up to 1,613 TFLOPS (71% utilization), up to 1.3x cuDNN 9.13 and 2.7x Triton ([FlashAttention-4](https://arxiv.org/html/2603.05451); [Tri Dao, 2026](https://tridao.me/blog/2026/flash4/); [[FlashAttention]]).
 
 ### Compilers Take Over
 
@@ -336,10 +353,16 @@ Hand-writing roles, barriers and phase bits is error-prone, so the 2025–2026 w
 | CUTLASS / CuTe DSL kernel schedules | NVIDIA | Picked from a fixed menu (`...WarpSpecialized`, `Cooperative`, `Pingpong`, SM100 variants) |
 | Triton automatic warp specialization | Meta, OpenAI, NVIDIA | Add `warp_specialize=True` to a `tl.range` loop; the compiler partitions the loop body into producer and consumer warp groups ([PyTorch, Feb 2025](https://pytorch.org/blog/warp-specialization/)) |
 | Gluon `gl.warp_specialize` | Triton project | Programmer writes each partition as a function, with its own warp and register count ([Gluon tutorial](https://triton-lang.org/main/getting-started/tutorials/gluon/warp-specialization.html)) |
-| TLX | Meta | Triton extensions with explicit warp-group roles, async ops and local memory; in production at Meta ([TLX paper](https://arxiv.org/html/2605.10905v2); [Meta, Nov 2026](https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/)) |
-| Tawa | Research (CGO 2026) | Compiler IR with "asynchronous references" that partitions a tile program into warp roles automatically ([Tawa](https://arxiv.org/abs/2510.14719)) |
-| Twill | Stanford (OSDI 2026) | Solves software pipelining and warp assignment together as an optimization problem ([Twill](https://arxiv.org/abs/2512.18134); [OSDI paper](https://www.usenix.org/system/files/osdi26-soi.pdf)) |
-| Cypress | NVIDIA Research / Stanford (PLDI 2025) | Task-based programs mapped onto warp roles and async units by the compiler ([Cypress](https://arxiv.org/abs/2504.07004)) |
+| TLX | Meta | Triton extensions where "warp groups [are] first-class execution agents": the programmer names producer, consumer and epilogue warp groups and syncs them with mbarriers; in production at Meta ([TLX paper](https://arxiv.org/html/2605.10905v2); [Meta, Nov 2026](https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/)) |
+| Tawa | Cornell and NVIDIA (CGO 2026) | Compiles unmodified Triton kernels; "asynchronous references" (a buffer plus full/empty mbarriers) connect an automatically chosen producer warpgroup and consumer warpgroup ([Tawa](https://arxiv.org/abs/2510.14719); [CGO](https://2026.cgo.org/details/cgo-2026-papers/35/Tawa-Automatic-Warp-Specialization-for-Modern-GPUs-with-Asynchronous-References)) |
+| Twill | Stanford and NVIDIA (OSDI 2026) | Casts software pipelining and warp specialization as one joint optimization problem for an off-the-shelf constraint solver; "heuristic-free" and "guaranteed to produce optimal schedules" ([Twill](https://arxiv.org/abs/2512.18134); [OSDI paper](https://www.usenix.org/system/files/osdi26-soi.pdf)) |
+| Cypress | NVIDIA and Stanford (PLDI 2025) | Task-based programs with no explicit communication or synchronization; a mapping spec binds tasks to processors and the compiler emits the warp-specialized CUDA ([Cypress](https://arxiv.org/abs/2504.07004); [PLDI](https://pldi25.sigplan.org/details/pldi-2025-papers/17/Task-Based-Tensor-Computations-on-Modern-GPUs)) |
+
+How close the generated code gets, on H100 unless noted:
+
+- **Tawa:** up to 1.1x cuBLAS on GEMM (average 1.01x FP16, 1.06x FP8), 1.2x Triton on attention, and up to 96% of FlashAttention-3 in FP16 (89% in FP8). Its implementation was upstreamed to Triton ([Tawa](https://arxiv.org/html/2510.14719v2)).
+- **Cypress:** 0.88–1.06x cuBLAS on GEMM and 0.80–0.98x the best known Flash Attention ([Cypress](https://arxiv.org/abs/2504.07004)).
+- **Twill:** rediscovers the expert-designed Flash Attention schedules on Hopper and Blackwell, and thereby proves them optimal ([Twill](https://arxiv.org/abs/2512.18134)).
 
 Meta reports that Triton's automatic warp specialization gets B200 flash-attention forward kernels "close to Gluon and cuDNN implementations, and 1.5-2x of stock Triton (cuDNN still leads by 10-20%)" ([PyTorch, Jan 2026](https://pytorch.org/blog/warp-specialization-in-triton-design-and-roadmap/)).
 
@@ -347,12 +370,13 @@ Meta reports that Triton's automatic warp specialization gets B200 flash-attenti
 ---
 *As of November 2026, warp specialization is how every state-of-the-art NVIDIA GEMM and attention kernel is built. The open question is no longer whether to use it but who writes it: hand-tuned templates, DSLs with explicit roles, or compilers that derive the roles.*
 
-- **Libraries.** CUTLASS 4.x ships warp-specialized schedules for Hopper (SM90) and Blackwell (SM100), with initial Rubin support in 4.8 ([[CUTLASS and CuTe]]). DeepGEMM and ThunderKittens use the same structure ([[Tiled Matrix Multiplication (GEMM)]]).
+- **Libraries.** CUTLASS 4.x ships warp-specialized schedules for Hopper (SM90) and Blackwell (SM100), with initial Rubin support in 4.8 ([[CUTLASS and CuTe]]). ThunderKittens packages the same producer/consumer structure as a small template ([Spector et al.](https://arxiv.org/abs/2410.20399v1); [[Tiled Matrix Multiplication (GEMM)]]).
 - **Attention.** FlashAttention-4 is the reference Blackwell attention kernel, and since March 2026 FlexAttention can generate kernels on top of it ([[Kernel Fusion]]).
 - **Triton.** Warp specialization is on by default for persistent matmul and attention since Triton 3.5 (Oct 2025); Gluon gives explicit control; Meta's TLX is a production fork with explicit roles ([[Triton]]).
-- **Research compilers.** Tawa (CGO 2026) and Twill (OSDI 2026) show that role assignment and pipelining can be derived automatically, with Twill framing it as finding optimal schedules rather than hand-picked ones.
-- **Megakernels** extend the idea from one operator to a whole model: dedicated warps load weights, compute, and store, with an on-GPU scheduler handing out tasks ([Hazy Research, 2025](https://hazyresearch.stanford.edu/blog/2025-05-27-no-bubbles); [[Megakernels]]).
-- **AMD.** AMD GPUs have no TMA and allocate registers statically per wave, and HipKittens (Hazy Research, Nov 2025) reports that producer/consumer "wave specialization" underperforms on MI355X; it uses 8-wave ping-pong and 4-wave interleave schedules instead ([HipKittens](https://arxiv.org/abs/2511.08083); [[ROCm and HIP]]).
+- **Research compilers.** Tawa (CGO 2026) gets within a few percent of FlashAttention-3 from plain Triton code, and Twill (OSDI 2026) proves the hand-designed Flash Attention schedules optimal with a constraint solver. Role assignment is becoming a compiler problem.
+- **TLX in production.** Meta reports running TLX "in production across Meta's ML infrastructure for the past several months", with kernels for training and recommendation inference on Hopper and Blackwell ([Meta, Nov 2026](https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/)).
+- **Megakernels** extend overlap from one operator to a whole model: one persistent kernel starts loading the next operation's data while the current one computes, removing the "bubbles" between kernel launches ([Hazy Research, 2025](https://hazyresearch.stanford.edu/blog/2025-05-27-no-bubbles); [[Megakernels]]).
+- **AMD.** HipKittens (Hazy Research, Nov 2025) found that on MI355X "wave specialization achieves just 80% of peak BF16 GEMM performance", because "AMD hardware statically divides registers across all waves", so producer waves hold registers without producing output. A 256×256-tile BF16 GEMM ran at 1,610 TFLOPS with no producers and 893 TFLOPS with 4 producers and 8 consumers. It uses an 8-wave ping-pong (two waves per SIMD alternating compute and memory) and a 4-wave interleave instead ([HipKittens](https://arxiv.org/html/2511.08083v1); [[ROCm and HIP]]).
 - **Tile languages** such as CUDA Tile/cuTile aim to hide roles from the programmer entirely ([[CUDA Tile and cuTile]]).
 
 ## ***Trade-offs & Open Problems***
@@ -370,9 +394,9 @@ Meta reports that Triton's automatic warp specialization gets B200 flash-attenti
 Open problems:
 
 - **Deadlocks and hangs.** A missed arrival, a wrong expected byte count or a flipped phase bit hangs the kernel with no error. Tools for checking mbarrier protocols are still thin; megakernel work has started adding static deadlock checkers ([[Kernel Fusion]]).
-- **Performance modeling.** Which role split and stage count wins depends on shape, data type and GPU. Analytical models for warp-specialized kernels are an active topic ([Performance model, 2025](https://arxiv.org/abs/2506.11209)), and most libraries still pick by autotuning.
+- **Performance modeling.** Which role split and stage count wins depends on shape, data type and GPU. Analytical models are early: Liu and Grover (NVIDIA) model warp-specialized kernels with differential equations over tile size, matrix size, bandwidth and divergence ([Liu & Grover, 2025](https://arxiv.org/abs/2506.11209)), and Twill's solver-based schedules are another route. Most libraries still pick by autotuning.
 - **Portability.** Schedules written for Hopper must be rewritten for Blackwell (TMEM, single-thread MMA) and again for Rubin, and they do not carry over to AMD.
-- **Compiler quality.** Automatic warp specialization in Triton still trails cuDNN by 10–20% on Blackwell attention ([PyTorch, Jan 2026](https://pytorch.org/blog/warp-specialization-in-triton-design-and-roadmap/)); closing that gap without hand-written roles is the main goal of Tawa, Twill and TLX.
+- **Compiler quality.** Automatic warp specialization in Triton still trails cuDNN by 10–20% on B200 attention ([PyTorch, Jan 2026](https://pytorch.org/blog/warp-specialization-in-triton-design-and-roadmap/)); closing that gap without hand-written roles is the main goal of Tawa, Twill and TLX.
 - **Irregular work.** Fixed roles suit GEMM-like loops. Sparse, ragged or data-dependent kernels need dynamic role assignment, which is still mostly hand-built.
 
 ## ***Resources***
@@ -381,13 +405,13 @@ Open problems:
 
 **Origins**
 - [CudaDMA: Optimizing GPU Memory Bandwidth via Warp Specialization](https://research.nvidia.com/publication/2011-11_cudadma-optimizing-gpu-memory-bandwidth-warp-specialization): Bauer, Cook, Khailany, SC 2011; [project page](https://lightsighter.github.io/CudaDMA).
-- [Singe: Leveraging Warp Specialization for High Performance on GPUs](https://doi.org/10.1145/2555243.2555258): Bauer, Treichler, Aiken, PPoPP 2014.
+- [Singe: Leveraging Warp Specialization for High Performance on GPUs](https://www.springerprofessional.de/doi/10.1145/2555243.2555258): Bauer, Treichler, Aiken, PPoPP 2014.
 
 **Primary docs and kernels**
-- [CUTLASS: Efficient GEMM in CUDA](https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html) and [Blackwell functionality](https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/blackwell.html): NVIDIA.
+- [CUTLASS: Efficient GEMM in CUDA](https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html) and [Cluster Launch Control](https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/blackwell_cluster_launch_control.html) (the SM100 warp-role table): NVIDIA.
 - [setmaxnreg](https://nvidia.github.io/cccl/unstable/libcudacxx/ptx/instructions/setmaxnreg.html) and the [PTX ISA](https://docs.nvidia.com/cuda/parallel-thread-execution/) barrier instructions.
 - [FlashAttention-3](https://arxiv.org/html/2407.08608v2): Shah et al., 2024.
-- [FlashAttention-4](https://arxiv.org/html/2603.05451): 2026; [Tri Dao's blog post](https://tridao.me/blog/2026/flash4/).
+- [FlashAttention-4](https://arxiv.org/html/2603.05451): Mar 2026, MLSys 2026; [Tri Dao's blog post](https://tridao.me/blog/2026/flash4/).
 
 **Practitioner walkthroughs**
 - [Deep Dive on CUTLASS Ping-Pong GEMM Kernel](https://pytorch.org/blog/cutlass-ping-pong-gemm-kernel/): PyTorch, 2024.
@@ -403,7 +427,7 @@ Open problems:
 - [Tawa: Automatic Warp Specialization for Modern GPUs with Asynchronous References](https://arxiv.org/abs/2510.14719): CGO 2026.
 - [Optimal Software Pipelining and Warp Specialization for Tensor Core GPUs (Twill)](https://arxiv.org/abs/2512.18134): OSDI 2026.
 - [Task-Based Tensor Computations on Modern GPUs (Cypress)](https://arxiv.org/abs/2504.07004): PLDI 2025.
-- [A Performance Model for Warp Specialization Kernels](https://arxiv.org/abs/2506.11209): 2025.
+- [A Performance Model for Warp Specialization Kernels](https://arxiv.org/abs/2506.11209): Liu & Grover, Jun 2025.
 - [HipKittens: Fast and Furious AMD Kernels](https://arxiv.org/abs/2511.08083): Hazy Research, Nov 2025.
 
 ## Related Notes
