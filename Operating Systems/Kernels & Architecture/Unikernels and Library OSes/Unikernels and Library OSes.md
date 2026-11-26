@@ -277,7 +277,7 @@ The library-OS idea also runs on top of a normal host kernel:
 Open problems worth tracking:
 - **Debugging and observability.** No `gdb` attach to a process, no `strace`, no `top`. Tooling has improved but remains the most common reason teams give up.
 - **Compatibility long tail.** Every missing syscall is a failed app. Linux binary compatibility is a moving target.
-- **Security inside the image.** With no user/kernel boundary, memory-safety bugs in C applications reach the whole guest. Safe languages and hardware features (memory tagging, CHERI) are candidate fixes. See [[Kernel Security Hardening]].
+- **Security inside the image.** With no user/kernel boundary, memory-safety bugs in C applications reach the whole guest. Safe languages and hardware features (memory tagging, CHERI) are candidate fixes. See [[Kernel Security Hardening]] and [[Hardware Memory Safety]].
 - **Is specialized Linux enough?** Lupine and UKL suggest a trimmed Linux in a microVM gets most of the benefit with none of the compatibility cost. Unikernels' case rests on the extreme end: millions of instances and single-digit-ms cold starts.
 - **Snapshot safety.** Resuming many VMs from one snapshot duplicates entropy pools and secrets unless the guest re-seeds.
 

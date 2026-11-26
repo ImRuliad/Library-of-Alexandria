@@ -310,7 +310,7 @@ So microkernel cost matters for chatty, cache-hot paths and disappears for I/O-b
 Open problems worth tracking:
 - **Drivers are the weak point everywhere.** They are most of the code and most of the bugs. Rust drivers in Linux, user-space drivers in microkernels and DriverKit, and verified driver frameworks (seL4's LionsOS) are three answers to the same problem.
 - **Compatibility is the moat.** Any new architecture must run Linux binaries to matter; HongMeng and Asterinas both chose Linux ABI compatibility. How much of the Linux ABI can be reproduced faithfully, without its bugs, is unresolved.
-- **Hardware isolation keeps getting cheaper and more varied:** tagged TLBs, PKU/MPK memory keys, CHERI capabilities, confidential-computing enclaves. Each one changes the cost of crossing a boundary and so the balance between designs.
+- **Hardware isolation keeps getting cheaper and more varied:** tagged TLBs, PKU/MPK memory keys, CHERI capabilities ([[Hardware Memory Safety]]), confidential-computing enclaves ([[Confidential Computing]]). Each one changes the cost of crossing a boundary and so the balance between designs.
 - **Multicore verification.** seL4's proofs cover single-core configurations; verifying concurrency in a kernel remains hard. See [[Locks and Synchronization]] and [[Read-Copy-Update (RCU)]].
 - **Side channels ignore architecture.** Spectre-class attacks cross address spaces and language boundaries alike. See [[Transient Execution Attacks and Mitigations]].
 

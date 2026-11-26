@@ -243,3 +243,4 @@ Open problems:
 - [[CXL and Memory Tiering]]: allocation across memory tiers.
 - [[eBPF]]: a heavy user of `kmalloc_nolock()`.
 - [[Processes and Threads]]: per-thread caches in user-space allocators.
+- [[Hardware Memory Safety]]: allocators that set MTE tags and retag freed memory.

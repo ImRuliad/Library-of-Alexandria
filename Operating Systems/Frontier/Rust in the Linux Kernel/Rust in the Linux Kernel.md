@@ -385,3 +385,4 @@ Outside the kernel tree, the pull is the same. Android's 6.12 kernel is the firs
 - [[Virtualization and Hypervisors]] — Where Rust already dominates: Firecracker, Cloud Hypervisor and crosvm.
 - [[MicroVMs and Sandboxing]] — Rust VMMs built from rust-vmm crates.
 - [[Device Drivers and the Driver Model]] — The bus/device/driver model that the Rust driver abstractions wrap.
+- [[Hardware Memory Safety]] — MTE and CHERI: memory safety from hardware for the C that Rust won't replace.
