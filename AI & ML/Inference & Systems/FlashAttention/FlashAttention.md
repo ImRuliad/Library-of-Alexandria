@@ -90,7 +90,7 @@ Approximate attention methods (sparse, low-rank, kernel-based) cut the FLOPs to 
 *Four ideas are enough to understand FlashAttention: GPUs have a small fast memory and a large slow one, an operation's speed is set by whichever of math or memory runs out first, a GPU kernel only helps if it keeps data on-chip between steps, and softmax looks like it needs a whole row at once.*
 
 #### **The GPU Memory Hierarchy**
-A GPU has two kinds of memory that matter here. HBM (high-bandwidth memory) is large and off-chip; it holds the model and all tensors. SRAM (shared memory and registers) is tiny and sits inside each streaming multiprocessor (SM), right next to the arithmetic units.
+A GPU has two kinds of memory that matter here. HBM (high-bandwidth memory) is large and off-chip; it holds the model and all tensors. SRAM (shared memory and registers) is tiny and sits inside each streaming multiprocessor (SM), right next to the arithmetic units (see [[GPU Memory Hierarchy]]).
 
 | Memory | A100 (the FA1 paper's example) | Speed | Who can see it |
 |---|---|---|---|
@@ -113,7 +113,7 @@ block-beta
 ```
 
 #### **Compute-Bound vs Memory-Bound**
-An operation's *arithmetic intensity* is the number of math operations it does per byte it moves from memory. If that ratio is above the chip's own ratio of compute speed to memory bandwidth, the operation is *compute-bound* (the math units are the limit); below it, *memory-bound* (the memory is the limit). The dividing line is the chip's roofline (see [[1 - All About Rooflines (NOT DONE)|Rooflines]]).
+An operation's *arithmetic intensity* is the number of math operations it does per byte it moves from memory. If that ratio is above the chip's own ratio of compute speed to memory bandwidth, the operation is *compute-bound* (the math units are the limit); below it, *memory-bound* (the memory is the limit). The dividing line is the chip's roofline (see [[1 - All About Rooflines (NOT DONE)|Rooflines]] and [[Roofline Model and Arithmetic Intensity]]).
 
 Large matrix multiplies are compute-bound. Softmax, masking, dropout and other elementwise steps do a handful of operations per number read, so they are memory-bound. Standard attention chains a memory-bound step between two matrix multiplies, on matrices that are $n \times n$ in size, so the memory-bound part dominates.
 

@@ -121,7 +121,7 @@ The launch post's own table ([OpenAI, 2021](https://openai.com/index/triton/)):
 | Scheduling within an SM | Manual | Automatic |
 | Scheduling across SMs | Manual | Manual |
 
-The 2019 paper lists the passes that make this work: hierarchical tiling, memory coalescing, shared-memory allocation by live-range analysis, automatic insertion of shared-memory barriers by detecting read-after-write and write-after-read hazards, and automatic prefetching in loops ([Tillet, Kung, Cox, MAPL 2019](https://www.eecs.harvard.edu/~htk/publication/2019-mapl-tillet-kung-cox.pdf)).
+The 2019 paper lists the passes that make this work: hierarchical tiling, [[Memory Coalescing|memory coalescing]], shared-memory allocation by live-range analysis, automatic insertion of shared-memory barriers by detecting read-after-write and write-after-read hazards, and automatic prefetching in loops ([Tillet, Kung, Cox, MAPL 2019](https://www.eecs.harvard.edu/~htk/publication/2019-mapl-tillet-kung-cox.pdf)).
 
 The knobs you still turn are launch parameters, set per configuration ([triton.Config](https://triton-lang.org/main/python-api/generated/triton.Config.html)):
 

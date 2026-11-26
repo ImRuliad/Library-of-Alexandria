@@ -129,7 +129,7 @@ Sources for the values: [NVIDIA Blackwell Ultra](https://developer.nvidia.com/bl
 
 #### **Arithmetic Intensity**
 
-Arithmetic intensity is "the ratio of the total FLOPs it performs to the number of bytes it needs to communicate" ([Scaling Book](https://jax-ml.github.io/scaling-book/roofline)). A chip has its own **critical intensity**, peak FLOPs divided by bandwidth: the FLOPs it can do in the time it takes to fetch one byte. Work above that ratio is compute-bound; work below it is memory-bound.
+Arithmetic intensity is "the ratio of the total FLOPs it performs to the number of bytes it needs to communicate" ([Scaling Book](https://jax-ml.github.io/scaling-book/roofline)). A chip has its own **critical intensity**, peak FLOPs divided by bandwidth: the FLOPs it can do in the time it takes to fetch one byte. Work above that ratio is compute-bound; work below it is memory-bound (more in [[Roofline Model and Arithmetic Intensity]]).
 
 - **Matrix-matrix multiply** of a weight matrix by a batch of $B$ tokens reuses each weight $B$ times, so intensity grows with $B$. In BF16 a TPU v5e needs $B > 240$ tokens to be compute-bound; an H100's ratio is about 295 ([Scaling Book](https://jax-ml.github.io/scaling-book/roofline)).
 - **Matrix-vector multiply** (one token at a time) uses each 2-byte weight for one multiply and one add: about 1 FLOP per byte. That is two orders of magnitude below any modern chip's critical intensity.
@@ -153,7 +153,7 @@ flowchart TB
     N --> D["Host DRAM, SSD, other racks<br/>scale-out network, about 0.1 to 0.4 TB/s per chip"]
 ```
 
-- **SRAM** is on the compute die: very fast but expensive in area. On TPU7x the programmer-managed VMEM is 128 MiB with roughly 7x the bandwidth of HBM ([Scaling Book, TPUs](https://jax-ml.github.io/scaling-book/tpus)). Kernels like [[FlashAttention]] are designed to keep tiles in SRAM and touch HBM as little as possible.
+- **SRAM** is on the compute die: very fast but expensive in area. On TPU7x the programmer-managed VMEM is 128 MiB with roughly 7x the bandwidth of HBM ([Scaling Book, TPUs](https://jax-ml.github.io/scaling-book/tpus)). Kernels like [[FlashAttention]] are designed to keep tiles in SRAM and touch HBM as little as possible. The GPU's levels in detail are in [[GPU Memory Hierarchy]].
 - **HBM** (high-bandwidth memory) is stacked DRAM placed beside the compute die on a silicon interposer (TSMC's CoWoS packaging). It is where weights and the [[KV Cache]] live. Capacity and bandwidth per chip have grown from 80 GB at 3.35 TB/s (H100) to 288 GB at 22 TB/s (Rubin).
 - **SRAM-only designs** skip HBM: Groq's LPU keeps the working set in 500 MB of on-chip SRAM per chip at 150 TB/s ([NVIDIA, Mar 2026](https://developer.nvidia.com/blog/inside-nvidia-groq-3-lpx-the-low-latency-inference-accelerator-for-the-nvidia-vera-rubin-platform)); Cerebras' wafer-scale WSE-3 has 44 GB of SRAM at about 21 PB/s ([SemiAnalysis, May 2026](https://newsletter.semianalysis.com/p/cerebras-faster-tokens-please)). Huge bandwidth, small capacity, so a big model must be spread over many chips or wafers.
 
