@@ -3,7 +3,7 @@ tags:
   - operating-systems
   - kernels-and-architecture
   - device-drivers
-status: draft
+status: complete
 sources:
   - https://docs.kernel.org/driver-api/driver-model/overview.html
   - https://docs.kernel.org/driver-api/driver-model/binding.html
@@ -22,7 +22,7 @@ sources:
   - https://lwn.net/Kernel/LDD3/
   - https://pages.cs.wisc.edu/~remzi/OSTEP/file-devices.pdf
   - https://pdos.csail.mit.edu/6.1810/2024/xv6/book-riscv-rev4.pdf
-  - https://web.stanford.edu/~engler/osdi2001-errors.pdf
+  - https://www.read.seas.harvard.edu/~kohler/class/aosref/chou01empirical.pdf
   - https://dl.acm.org/doi/10.1145/945445.945466
   - https://docs.oasis-open.org/virtio/virtio/v1.3/virtio-v1.3.html
   - https://lkml.iu.edu/hypermail/linux/kernel/2502.1/01814.html
@@ -69,7 +69,7 @@ updated: 2026-11-26
 ---
 *A device driver is the kernel code that knows one kind of hardware: it pokes the device's registers, handles its interrupts and sets up its DMA, and presents it to the rest of the kernel through a standard interface (a block device, a network interface, a GPU). The Linux driver model is the framework that discovers devices, matches them to drivers, and tracks the whole tree in sysfs.*
 
-- **Drivers are most of the kernel, and most of its bugs.** The `drivers/` tree is the largest part of Linux's source, and a 2001 study of Linux found error rates in drivers 3 to 7 times higher than in the rest of the kernel ([Chou et al., SOSP 2001](https://web.stanford.edu/~engler/osdi2001-errors.pdf)); a 2003 study attributed 85% of Windows XP crashes to drivers ([Nooks, Swift et al., SOSP 2003](https://dl.acm.org/doi/10.1145/945445.945466)).
+- **Drivers are most of the kernel, and most of its bugs.** The `drivers/` tree is the largest part of Linux's source, and a 2001 study of Linux found error rates in drivers 3 to 7 times higher than in the rest of the kernel ([Chou et al., SOSP 2001](https://www.read.seas.harvard.edu/~kohler/class/aosref/chou01empirical.pdf)); a 2003 study attributed 85% of Windows XP crashes to drivers ([Nooks, Swift et al., SOSP 2003](https://dl.acm.org/doi/10.1145/945445.945466)).
 - **Three objects: bus, device, driver.** A **bus** (PCI, USB, platform, virtio...) finds **devices** and knows how to match them against **drivers**' ID tables. On a match the driver's `probe()` runs and the device is **bound**. Everything appears under `/sys`, and a uevent tells `udev` to load modules and create `/dev` nodes ([driver model overview](https://docs.kernel.org/driver-api/driver-model/overview.html)).
 - **Three ways to talk to hardware:** memory-mapped registers (MMIO), interrupts for "something happened", and DMA so the device reads and writes RAM itself, fenced by the IOMMU.
 - **No stable in-kernel API.** Linux deliberately changes internal driver interfaces freely and fixes every in-tree driver when it does; the price is that out-of-tree drivers break ([stable-api-nonsense](https://docs.kernel.org/process/stable-api-nonsense.html)).
@@ -370,7 +370,7 @@ Open problems:
 - [xv6 book](https://pdos.csail.mit.edu/6.1810/2024/xv6/book-riscv-rev4.pdf), ch. 5: the UART and virtio disk drivers, MIT 6.1810.
 
 **Papers**
-- [An Empirical Study of Operating Systems Errors](https://web.stanford.edu/~engler/osdi2001-errors.pdf): Chou, Yang, Chelf, Hallem, Engler, SOSP 2001.
+- [An Empirical Study of Operating Systems Errors](https://www.read.seas.harvard.edu/~kohler/class/aosref/chou01empirical.pdf): Chou, Yang, Chelf, Hallem, Engler, SOSP 2001.
 - [Improving the Reliability of Commodity Operating Systems (Nooks)](https://dl.acm.org/doi/10.1145/945445.945466): Swift, Bershad, Levy, SOSP 2003.
 
 **Specs and other systems**
