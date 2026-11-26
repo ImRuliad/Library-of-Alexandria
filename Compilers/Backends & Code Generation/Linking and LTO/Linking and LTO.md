@@ -7,7 +7,7 @@ tags:
   - post-link-optimization
   - elf
   - toolchain
-status: draft
+status: complete
 sources:
   - https://maskray.me/blog/2021-08-29-all-about-global-offset-table
   - https://maskray.me/blog/2021-09-19-all-about-procedure-linkage-table
@@ -21,14 +21,18 @@ sources:
   - https://research.google/pubs/pub34417/
   - https://blog.llvm.org/2015/11/new-elf-linker-from-llvm-project.html
   - https://lld.llvm.org/NewLLD.html
-  - https://github.com/rui314/mold/blob/main/docs/design.md
+  - https://github.com/rui314/mold/blob/v2.41.0/docs/design.md
   - https://raw.githubusercontent.com/rui314/mold/main/README.md
+  - https://github.com/rui314/mold/blob/main/LICENSE
   - https://github.com/wild-linker/wild
   - https://davidlattimore.github.io/posts/2024/11/19/designing-wilds-incremental-linking.html
   - https://davidlattimore.github.io/posts/2026/05/24/wild-update-0.9.0.html
   - https://phoronix.com/news/Wild-Linker-0.10
+  - https://phoronix.com/news/Wild-0.11-Released
+  - https://github.com/wild-linker/wild/blob/main/CHANGELOG.md
   - https://goals.rust-lang.org/2026/roadmap-fast-builds.html
   - https://developer.apple.com/wwdc23/10268
+  - https://developer.apple.com/documentation/xcode-release-notes/xcode-15-release-notes
   - https://sourceware.org/pipermail/binutils/2025-February/139195.html
   - https://www.fedoraproject.org/wiki/Changes/DeprecateGoldLinker
   - https://blog.rust-lang.org/2024/05/17/enabling-rust-lld-on-linux/
@@ -41,6 +45,7 @@ sources:
   - https://clang.llvm.org/docs/ThinLTO.html
   - https://releases.llvm.org/21.1.0/tools/lld/docs/ReleaseNotes.html
   - https://archive.fosdem.org/2025/schedule/event/fosdem-2025-5378-incremental-lto-in-gcc/
+  - https://gcc.gnu.org/gcc-15/changes.html
   - https://llvm.org/docs/TypeMetadata.html
   - https://research.google/pubs/safe-icf-pointer-safe-and-unwinding-aware-identical-code-folding-in-gold/
   - https://research.google/pubs/pub45290/
@@ -49,6 +54,7 @@ sources:
   - https://discourse.llvm.org/t/rfc-temporal-profiling-extension-for-irpgo/68068
   - https://llvm.org/devmtg/2024-04/slides/TechnicalTalks/Hoag-TemporalProfiling-and-OrderfileOptimization-forMobileApps.pdf
   - https://arxiv.org/abs/1807.06735
+  - https://research.facebook.com/file/534990324471927/BOLT-A-Practical-Binary-Optimizer-for-Data-Centers-and-Beyond.pdf
   - https://lists.llvm.org/pipermail/llvm-dev/2022-January/154668.html
   - https://research.google/pubs/propeller-a-profile-guided-relinking-optimizer-for-warehouse-scale-applications/
   - https://arxiv.org/pdf/2606.00131
@@ -62,6 +68,8 @@ sources:
   - https://discourse.ubuntu.com/t/link-time-optimization-lto-by-default-for-rust-packages-in-ubuntu/80114
   - https://kobzol.github.io/rust/rustc/2022/10/27/speeding-rustc-without-changing-its-code.html
   - https://rustc-dev-guide.rust-lang.org/building/optimized-build.html
+  - https://github.com/rust-lang/rust/blob/main/src/tools/opt-dist/src/main.rs
+  - https://conf.researchr.org/details/cgo-2024/cgo-2024-main-conference/28/Revamping-Sampling-Based-PGO-with-Context-Sensitivity-and-Pseudo-instrumentation
 created: 2026-11-26
 updated: 2026-11-26
 ---
@@ -106,7 +114,7 @@ updated: 2026-11-26
 - **Dynamic linking** defers part of that work to load time. Position-independent code reaches other modules through the **GOT** (a table of addresses) and the **PLT** (small stubs), optionally resolving functions lazily on first call ([MaskRay, GOT](https://maskray.me/blog/2021-08-29-all-about-global-offset-table); [MaskRay, PLT](https://maskray.me/blog/2021-09-19-all-about-procedure-linkage-table)).
 - **Speed.** GNU ld was single-threaded and slow on multi-GB C++ binaries; gold (2008), lld (2015) and mold (2021) each cut link times sharply, mold by parallelizing every pass. Rust switched its default Linux linker to lld in 1.90 (September 2025) ([Rust blog, 2025](https://blog.rust-lang.org/2025/09/01/rust-lld-on-1.90.0-stable)), and GNU binutils deprecated gold in 2.44 (February 2025) ([binutils 2.44](https://sourceware.org/pipermail/binutils/2025-February/139195.html)).
 - **LTO** ships compiler IR instead of machine code in `.o` files so the optimizer sees the whole program at link time. Full LTO merges everything into one module; **ThinLTO** keeps modules separate, links small summaries, and optimizes modules in parallel with cross-module imports and caching ([Johnson et al., CGO 2017](https://research.google/pubs/thinlto-scalable-and-incremental-lto/)).
-- **Profiles then layout.** PGO (instrumented or sampled, e.g. AutoFDO) feeds real branch and call frequencies to the optimizer; post-link optimizers **BOLT** and **Propeller** reorder the final machine code. BOLT reported up to 7.0% on top of PGO+LTO for Facebook services and up to 20.4% for GCC and Clang binaries ([Panchenko et al., CGO 2019](https://arxiv.org/abs/1807.06735)).
+- **Profiles then layout.** PGO (instrumented or sampled, e.g. AutoFDO) feeds real branch and call frequencies to the optimizer; post-link optimizers **BOLT** and **Propeller** reorder the final machine code. BOLT reported up to 7.0% on top of profile-guided function reordering and LTO for Facebook data-center applications, and up to 20.4% on top of FDO and LTO for GCC and Clang binaries ([Panchenko et al., CGO 2019](https://research.facebook.com/file/534990324471927/BOLT-A-Practical-Binary-Optimizer-for-Data-Centers-and-Beyond.pdf)).
 
 ## ***The Problem***
 ---
@@ -198,9 +206,10 @@ timeline
     2023 : Propeller paper at ASPLOS and Apple ships ld-prime in Xcode 15
     2025 : Linux 6.13 adds AutoFDO and Propeller builds
          : binutils 2.44 deprecates gold
+         : GCC 15 adds incremental LTO
          : Rust 1.90 makes lld the default Linux linker
          : LLVM 21 adds integrated distributed ThinLTO
-    2026 : Wild linker reaches 0.9 and 0.10
+    2026 : Wild linker releases 0.9, 0.10 and 0.11
 ```
 
 - **gold.** Ian Lance Taylor's gold was ELF-only, written in C++, and designed for speed; his blog series remains the clearest introduction to linkers ([Taylor, Linkers part 1](https://www.airs.com/blog/?p=38); [A New ELF Linker](https://research.google/pubs/pub34417/)).
@@ -326,19 +335,20 @@ The generations differ mostly in data structures and parallelism:
 | gold | 2008 | C++ | ELF | ELF-only, faster symbol tables, some threading; deprecated in binutils 2.44 |
 | lld | 2015+ | C++ | ELF, COFF, Mach-O, Wasm | Section-oriented, parallel relocation and output writing ([lld docs](https://lld.llvm.org/NewLLD.html)) |
 | mold | 2021+ | C++ | ELF | Parallel at every phase |
-| ld-prime | 2023 | C++ | Mach-O | Apple's rewrite of ld64, multithreaded ([WWDC23](https://developer.apple.com/wwdc23/10268)) |
-| wild | 2024+ | Rust | ELF | Parallel, aiming at incremental linking ([wild](https://github.com/wild-linker/wild)) |
+| ld-prime | 2023 | C++ | Mach-O | Apple's new linker replacing ld64, written to "significantly speed up static linking" ([Xcode 15 release notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-15-release-notes)) |
+| wild | 2024+ | Rust | ELF, Wasm (Mach-O port in progress) | Parallel, aiming at incremental linking ([wild](https://github.com/wild-linker/wild)) |
 
-mold's design document describes how each phase is parallelized ([mold design](https://github.com/rui314/mold/blob/main/docs/design.md)):
+mold's design document (written in 2020 and since marked partly outdated; it is no longer on the main branch) describes the approach: each pass runs serially, but the work inside a pass is a parallel for-loop ([mold design, v2.41.0](https://github.com/rui314/mold/blob/v2.41.0/docs/design.md)):
 
-- **Input reading and parsing** run in parallel per file, using `mmap`.
-- **Symbol resolution** uses a concurrent hash map. Each file's defined symbols are inserted in parallel, then a parallel pass picks winners by fixed priority, so the result is deterministic.
-- **Mergeable strings** (`SHF_MERGE`, e.g. string literals and debug strings) are deduplicated through a concurrent hash table instead of serially.
-- **Layout** computes every output offset up front with parallel prefix sums, so each thread can then write its own chunk of the output file independently.
-- **Relocation and writing** is embarrassingly parallel once addresses are known.
-- **Hiding latency.** mold forks a child to do the work, the parent exits once the output is complete, and the child cleans up afterwards.
+- **Data parallelism everywhere.** Input files, relocation tables and output chunks are processed by parallel for-loops, with no channels or futures; shared flags such as "needs a GOT entry" are atomics.
+- **Symbol resolution** uses a concurrent hash map: defined symbols are inserted from a parallel loop over input files.
+- **Mergeable strings** (`SHF_MERGE`, e.g. string literals and debug strings) are deduplicated by string interning rather than a serial merge.
+- **Relocation scanning** to size `.got` and `.plt` is a parallel loop over relocation tables.
+- **Build ID** is a map-reduce: SHA-1 of each 1 MiB block in parallel, then a hash of the hashes.
+- **Determinism** is an explicit goal, for reproducible builds.
+- **Hiding latency.** One process forks a second that does the work; the first exits as soon as the output file is written, so the user does not wait for the slow teardown of a process with many `mmap`ed files.
 
-The README states mold is "several times quicker than the LLVM lld linker" ([mold README](https://raw.githubusercontent.com/rui314/mold/main/README.md)). lld's advantage is reach: it ships with every LLVM toolchain and covers ELF, COFF, Mach-O and Wasm, which is why toolchains such as Rust bundle it.
+The README now says that in the project's August 2026 benchmarks mold "links 4.9x faster than LLVM lld and 1.9x faster than wild at the median" ([mold README](https://raw.githubusercontent.com/rui314/mold/main/README.md)). lld's advantage is reach: it ships with every LLVM toolchain and covers ELF, COFF, Mach-O and Wasm, which is why toolchains such as Rust bundle it.
 
 ### Full LTO
 
@@ -419,7 +429,7 @@ This is unsound if code outside the LTO unit (a shared library, a plugin) can ad
 *Remove what nothing reaches; merge what is byte-for-byte identical.*
 
 - **Section GC.** With `-ffunction-sections -fdata-sections` each function and global gets its own section, and `--gc-sections` (ELF), `-dead_strip` (Mach-O) or `/OPT:REF` (COFF) drops sections unreachable from the roots. LTO subsumes much of this, since internalized unused functions simply never get code-generated.
-- **ICF.** Template instantiations often compile to identical machine code (`vector<int*>` and `vector<long*>` on 64-bit). The linker hashes candidate sections, compares contents and relocation targets iteratively until a fixed point, and folds equal ones into one copy. `--icf=all` (lld, gold) and `/OPT:ICF` (MSVC) fold everything, which breaks programs that compare function addresses. `--icf=safe` folds only functions whose address is never taken, which gold's authors argued is the correct default for C++ ([Tallam et al., Safe ICF](https://research.google/pubs/safe-icf-pointer-safe-and-unwinding-aware-identical-code-folding-in-gold/)).
+- **ICF.** Template instantiations often compile to identical machine code (`vector<int*>` and `vector<long*>` on 64-bit). The linker hashes candidate sections, compares contents and relocation targets iteratively until a fixed point, and folds equal ones into one copy. `--icf=all` (lld, gold) and `/OPT:ICF` (MSVC) fold everything, which breaks programs that compare function addresses. `--icf=safe` folds only functions whose address is never taken, the approach introduced for gold in the Safe ICF work ([Tallam et al., Safe ICF](https://research.google/pubs/safe-icf-pointer-safe-and-unwinding-aware-identical-code-folding-in-gold/)).
 
 ### Profile-Guided Optimization
 
@@ -431,10 +441,10 @@ PGO (also called FDO) feeds measured counts back into inlining, block layout, fu
 |---|---|---|---|
 | **Instrumented** (`-fprofile-generate`, `-fprofile-instr-generate`) | Compiler inserts counters; run a training workload | Exact counts for that workload | Separate instrumented build, slow training runs, representative workload needed |
 | **Sampling, AutoFDO** | `perf` samples on production machines with LBR branch records, mapped to source lines through debug info | Approximate; degrades after optimizations reshape code | Profile production directly; no special build |
-| **CSSPGO** | Sampling plus *pseudo-probes* (instrumentation markers that cost nothing at run time) and context-sensitive call stacks | Close to instrumented on Meta's workloads | Requires probe-enabled builds |
+| **CSSPGO** | Sampling plus *pseudo-probes* (instrumentation markers with near-zero run-time cost) and context-sensitive call stacks | Aims to close the gap between sampling and instrumented PGO | Requires probe-enabled builds |
 | **Temporal profiling** | Records the *order* in which functions are first executed | Not counts but startup order | Lightweight instrumentation |
 
-AutoFDO made PGO practical for Google's fleet by profiling production binaries continuously instead of running training builds ([Chen et al., CGO 2016](https://research.google/pubs/pub45290/)). CSSPGO, from Meta, fixes AutoFDO's two main weaknesses (losing correlation after optimization, and merging profiles of a function across all callers) ([He et al., preprint](https://htyu.github.io/paper/Revamping_Sampling_based_PGO_with_Context_sensitivity_and_Pseudo_instrumentation_preprint.pdf); [EuroLLVM 2024 talk](https://llvm.org/devmtg/2024-04/slides/TechnicalTalks/He-Yu-Wang-Oh-RevampingSamplingBasedPGO.pdf)). Temporal profiling, added to LLVM's IR PGO in 2023, targets mobile app *startup*: the linker orders functions in first-use order so startup touches fewer pages ([RFC, 2023](https://discourse.llvm.org/t/rfc-temporal-profiling-extension-for-irpgo/68068); [Hoag, EuroLLVM 2024](https://llvm.org/devmtg/2024-04/slides/TechnicalTalks/Hoag-TemporalProfiling-and-OrderfileOptimization-forMobileApps.pdf)).
+AutoFDO made PGO practical for Google's fleet by profiling production binaries continuously instead of running training builds ([Chen et al., CGO 2016](https://research.google/pubs/pub45290/)). CSSPGO, from Meta (CGO 2024), targets AutoFDO's two main weaknesses (losing correlation after optimization, and merging profiles of a function across all callers) ([He et al., CGO 2024](https://conf.researchr.org/details/cgo-2024/cgo-2024-main-conference/28/Revamping-Sampling-Based-PGO-with-Context-Sensitivity-and-Pseudo-instrumentation); [preprint](https://htyu.github.io/paper/Revamping_Sampling_based_PGO_with_Context_sensitivity_and_Pseudo_instrumentation_preprint.pdf); [EuroLLVM 2024 talk](https://llvm.org/devmtg/2024-04/slides/TechnicalTalks/He-Yu-Wang-Oh-RevampingSamplingBasedPGO.pdf)). Temporal profiling, added to LLVM's IR PGO in 2023, targets mobile app *startup*: the linker orders functions in first-use order so startup touches fewer pages ([RFC, 2023](https://discourse.llvm.org/t/rfc-temporal-profiling-extension-for-irpgo/68068); [Hoag, EuroLLVM 2024](https://llvm.org/devmtg/2024-04/slides/TechnicalTalks/Hoag-TemporalProfiling-and-OrderfileOptimization-forMobileApps.pdf)).
 
 ### Post-Link Optimization with BOLT and Propeller
 
@@ -447,9 +457,9 @@ Large server binaries are limited by the instruction cache and iTLB, not by arit
 | Input | Final linked binary, plus `perf` LBR profile | Profile mapped back via basic-block address map; relinks from cached objects |
 | Mechanism | Disassembles, builds CFGs, rewrites the binary | Compiler emits each basic block in its own section; the linker reorders sections |
 | Scaling | Whole binary in one process; Lightning BOLT parallelized it | Distributed: only hot modules are recompiled, the rest come from cache |
-| Status | In LLVM monorepo since 2022 ([llvm-dev, 2022](https://lists.llvm.org/pipermail/llvm-dev/2022-January/154668.html)) | Paper at ASPLOS 2023 ([Shatalin et al.](https://research.google/pubs/propeller-a-profile-guided-relinking-optimizer-for-warehouse-scale-applications/)); basic-block sections in LLVM |
+| Status | In LLVM monorepo since 2022 ([llvm-dev, 2022](https://lists.llvm.org/pipermail/llvm-dev/2022-January/154668.html)) | Paper at ASPLOS 2023 ([Shen et al.](https://research.google/pubs/propeller-a-profile-guided-relinking-optimizer-for-warehouse-scale-applications/)); basic-block sections in LLVM |
 
-BOLT's paper reports speedups of up to 7.0% on top of PGO and LTO for Facebook data-center services and up to 20.4% for the GCC and Clang compilers ([Panchenko et al., CGO 2019](https://arxiv.org/abs/1807.06735)). Propeller's argument is about the cost of BOLT's approach at warehouse scale: disassembling a multi-GB binary in one process needs a lot of memory, while relinking from cached objects fits distributed builds.
+BOLT's CGO paper reports speedups of up to 7.0% on top of profile-guided function reordering and LTO for Facebook data-center applications, and up to 20.4% on top of FDO and LTO for the GCC and Clang compilers (up to 52.1% when those are built without FDO and LTO) ([Panchenko et al., CGO 2019](https://research.facebook.com/file/534990324471927/BOLT-A-Practical-Binary-Optimizer-for-Data-Centers-and-Beyond.pdf)). The earlier arXiv version of the abstract gives 8.0% for the data-center figure ([arXiv 1807.06735](https://arxiv.org/abs/1807.06735)). Propeller's argument is about the cost of BOLT's approach at warehouse scale: disassembling a multi-GB binary in one process needs a lot of memory, while relinking from cached objects fits distributed builds.
 
 ### How Much Each Buys
 
@@ -461,7 +471,7 @@ BOLT's paper reports speedups of up to 7.0% on top of PGO and LTO for Facebook d
 | PGO in Chrome | Up to 10% faster page loads (Chrome 85, Windows and Mac) | [Chromium blog, 2020](https://blog.chromium.org/2020/08/chrome-just-got-faster-with-profile.html) |
 | PGO in Ubuntu packages | 5 to 7% in Canonical's case study, as reported by Phoronix | [Canonical](https://canonical.com/blog/profile-guided-optimization-a-case-study); [Phoronix](https://phoronix.com/news/Ubuntu-PGO-Praises-Performance) |
 | AutoFDO vs instrumented PGO | Most of the instrumented gain without training builds | [Chen et al., CGO 2016](https://research.google/pubs/pub45290/) |
-| BOLT on top of PGO+LTO | Up to 7.0% (services), up to 20.4% (compilers) | [Panchenko et al., CGO 2019](https://arxiv.org/abs/1807.06735) |
+| BOLT on top of PGO+LTO | Up to 7.0% (data-center apps), up to 20.4% (GCC and Clang) | [Panchenko et al., CGO 2019](https://research.facebook.com/file/534990324471927/BOLT-A-Practical-Binary-Optimizer-for-Data-Centers-and-Beyond.pdf) |
 | PGO + BOLT for rustc | Compile-time wins across rustc's benchmark suite with no source changes | [Beránek, 2022](https://kobzol.github.io/rust/rustc/2022/10/27/speeding-rustc-without-changing-its-code.html) |
 
 The gains stack because each layer works with information the earlier ones lacked: LTO adds *scope*, PGO adds *frequencies*, and post-link adds *exact final layout*.
@@ -474,20 +484,20 @@ The gains stack because each layer works with information the earlier ones lacke
 
 - **Rust uses lld.** Rust 1.90 (September 2025) made the bundled `rust-lld` the default linker for `x86_64-unknown-linux-gnu`, after testing on nightly since May 2024 ([Rust blog, Sept 2025](https://blog.rust-lang.org/2025/09/01/rust-lld-on-1.90.0-stable); [Rust 1.90](https://blog.rust-lang.org/2025/09/18/Rust-1.90.0/); [Rust blog, May 2024](https://blog.rust-lang.org/2024/05/17/enabling-rust-lld-on-linux/)). Other targets still use the system linker by default.
 - **gold is on its way out.** GNU binutils 2.44 (February 2025) deprecated gold ([binutils 2.44](https://sourceware.org/pipermail/binutils/2025-February/139195.html)), and Fedora proposed deprecating it distro-wide for Fedora 43 ([Fedora change](https://www.fedoraproject.org/wiki/Changes/DeprecateGoldLinker)). GNU ld (BFD) stays the default on most Linux distributions.
-- **mold** is a mature, widely packaged ELF linker under the MIT license ([mold README](https://raw.githubusercontent.com/rui314/mold/main/README.md)).
-- **wild**, David Lattimore's linker in Rust, released 0.9 in May 2026 and then 0.10, which Phoronix reports adds GDB index support and a mitigation for Btrfs performance ([wild 0.9 post](https://davidlattimore.github.io/posts/2026/05/24/wild-update-0.9.0.html); [Phoronix, wild 0.10](https://phoronix.com/news/Wild-Linker-0.10)). Its stated long-term goal is incremental linking, so that relinking after a small edit costs time proportional to the edit ([Lattimore, 2024](https://davidlattimore.github.io/posts/2024/11/19/designing-wilds-incremental-linking.html)). The Rust project's 2026 roadmap lists fast builds as a goal ([Rust goals, Fast Builds](https://goals.rust-lang.org/2026/roadmap-fast-builds.html)).
-- **Apple** replaced ld64 with the multithreaded ld-prime in Xcode 15 (2023) and added *mergeable libraries*, which are dynamic libraries in debug builds and are statically merged into the app for release ([WWDC23, Meet mergeable libraries](https://developer.apple.com/wwdc23/10268)).
+- **mold** is a mature ELF linker, in production use since 2021 and the default linker of many large open-source projects according to its README, under the MIT license ([mold README](https://raw.githubusercontent.com/rui314/mold/main/README.md); [LICENSE](https://github.com/rui314/mold/blob/main/LICENSE)).
+- **wild**, David Lattimore's linker in Rust, released 0.9 in May 2026 (adding the gold-style linker plugin API, and so linker-plugin LTO), then 0.10 with GDB index support and a mitigation for Btrfs performance, then 0.11, which enables Wasm linking by default, can link Linux kernel modules and makes progress on a Mac port ([wild 0.9 post](https://davidlattimore.github.io/posts/2026/05/24/wild-update-0.9.0.html); [Phoronix, wild 0.10](https://phoronix.com/news/Wild-Linker-0.10); [Phoronix, wild 0.11](https://phoronix.com/news/Wild-0.11-Released); [wild changelog](https://github.com/wild-linker/wild/blob/main/CHANGELOG.md)). Its stated long-term goal is incremental linking, not yet implemented, so that relinking after a small edit costs time proportional to the edit ([wild](https://github.com/wild-linker/wild); [Lattimore, 2024](https://davidlattimore.github.io/posts/2024/11/19/designing-wilds-incremental-linking.html)). The Rust project's 2026 roadmap lists fast builds as a goal ([Rust goals, Fast Builds](https://goals.rust-lang.org/2026/roadmap-fast-builds.html)).
+- **Apple** made a new linker (commonly called ld-prime) the default in Xcode 15 (2023), "written to significantly speed up static linking", with ld64 kept as an opt-in for removal later ([Xcode 15 release notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-15-release-notes)), and added *mergeable libraries*, which are dynamic libraries in debug builds and are statically merged into the app for release ([WWDC23 session 10268, Meet mergeable libraries](https://developer.apple.com/wwdc23/10268)).
 
 ### LTO
 
 - **LLVM 21** (2025) added integrated distributed ThinLTO to lld for ELF and COFF ([lld 21 notes](https://releases.llvm.org/21.1.0/tools/lld/docs/ReleaseNotes.html)).
-- **GCC** gained incremental LTO, presented by Michal Jireš at FOSDEM 2025, which caches LTRANS partitions between builds ([FOSDEM 2025](https://archive.fosdem.org/2025/schedule/event/fosdem-2025-5378-incremental-lto-in-gcc/)).
-- **Distributions.** Fedora has built packages with GCC LTO by default since 2020 ([Fedora LTOByDefault](https://fedoraproject.org/wiki/LTOByDefault)); a 2026 proposal reported by Phoronix considers ThinLTO-style builds for Fedora 47 ([Phoronix](https://phoronix.com/news/Fedora-47-Considers-Thin-LTO)). Ubuntu is discussing LTO by default for its Rust packages ([Ubuntu Discourse](https://discourse.ubuntu.com/t/link-time-optimization-lto-by-default-for-rust-packages-in-ubuntu/80114)).
+- **GCC 15** (2025) added incremental LTO, enabled with `-flto-incremental=`, which cuts recompilation time after small edits by caching LTRANS partitions between builds ([GCC 15 changes](https://gcc.gnu.org/gcc-15/changes.html)); Michal Jireš presented the work at FOSDEM 2025 ([FOSDEM 2025](https://archive.fosdem.org/2025/schedule/event/fosdem-2025-5378-incremental-lto-in-gcc/)).
+- **Distributions.** Fedora has built packages with GCC LTO by default since Fedora 33 (2020) ([Fedora LTOByDefault](https://fedoraproject.org/wiki/LTOByDefault)); a 2026 proposal reported by Phoronix considers ThinLTO-style builds for Fedora 47 ([Phoronix](https://phoronix.com/news/Fedora-47-Considers-Thin-LTO)). Ubuntu is discussing LTO by default for its Rust packages ([Ubuntu Discourse](https://discourse.ubuntu.com/t/link-time-optimization-lto-by-default-for-rust-packages-in-ubuntu/80114)).
 
 ### PGO and Post-Link in Production
 
 - **Linux kernel.** Linux 6.13 added build support for AutoFDO and Propeller with Clang, documented in the kernel's dev-tools guides ([AutoFDO](https://docs.kernel.org/6.13/dev-tools/autofdo.html); [Propeller](https://docs.kernel.org/6.13/dev-tools/propeller.html)).
-- **Browsers and compilers.** Chrome has shipped with PGO since Chrome 85 on Windows and Mac ([Chromium blog, 2020](https://blog.chromium.org/2020/08/chrome-just-got-faster-with-profile.html)). The Rust compiler's Linux builds use PGO for rustc and LLVM and BOLT for LLVM ([rustc dev guide](https://rustc-dev-guide.rust-lang.org/building/optimized-build.html)).
+- **Browsers and compilers.** Chrome has shipped with PGO since Chrome 85 on Windows and Mac ([Chromium blog, 2020](https://blog.chromium.org/2020/08/chrome-just-got-faster-with-profile.html)). The Rust compiler's distributed x86-64 Linux builds use PGO for rustc and LLVM, and BOLT for both LLVM and rustc's driver library ([rustc dev guide](https://rustc-dev-guide.rust-lang.org/building/optimized-build.html); [opt-dist](https://github.com/rust-lang/rust/blob/main/src/tools/opt-dist/src/main.rs)).
 - **Distros** are measuring PGO on ordinary packages; Canonical published a case study in this direction ([Canonical](https://canonical.com/blog/profile-guided-optimization-a-case-study)).
 - **Machine-learned layout.** A June 2026 arXiv preprint, *AI-PROPELLER*, applies AlphaEvolve to warehouse-scale interprocedural code layout ([arXiv 2606.00131](https://arxiv.org/pdf/2606.00131)); see [[ML-Guided Optimization]].
 
@@ -512,7 +522,7 @@ The gains stack because each layer works with information the earlier ones lacke
 - **Staleness.** Profiles go stale as code changes; matching old profiles to new code (stale profile matching in BOLT and LLVM) is active work.
 - **Reproducibility and debugging.** LTO and PGO make output depend on profiles and on decisions across modules, which complicates reproducible builds, bisection and debugging. Miscompiles that only appear with LTO are hard to reduce; see [[Compiler Testing and Fuzzing]].
 - **Language boundaries.** Cross-language LTO (Rust and C++ in Chrome or Firefox) needs both compilers to use the same LLVM version.
-- **Linker speed vs features.** Linker scripts, exotic relocations and many targets limit how far a fast linker can simplify; mold and wild stay ELF-only partly for this reason.
+- **Linker speed vs features.** Linker scripts, exotic relocations and many targets limit how far a fast linker can simplify; mold stays ELF-only, and wild added Wasm and a Mac port only after years on ELF.
 
 ## ***Resources***
 ---
@@ -522,16 +532,17 @@ The gains stack because each layer works with information the earlier ones lacke
 - Ian Lance Taylor's [Linkers series](https://www.airs.com/blog/?p=38) ([index](https://www.wingolog.org/archives/2012/05/23/list-of-ian-lance-taylors-linker-articles)) and [A New ELF Linker](https://research.google/pubs/pub34417/) (gold, 2008).
 - Ulrich Drepper, [How To Write Shared Libraries](https://cs.miami.edu/~burt/learning/Csc521.091/docs/dsohowto.pdf); the [x86-64 psABI relocation table](https://ucw.cz/~hubicka/papers/abi/node19.html).
 - MaskRay (Fangrui Song) on the [GOT](https://maskray.me/blog/2021-08-29-all-about-global-offset-table), [PLT](https://maskray.me/blog/2021-09-19-all-about-procedure-linkage-table), [COMDAT](https://maskray.me/blog/2021-07-25-comdat-and-section-group), [weak symbols](https://maskray.me/blog/2021-04-25-weak-symbol) and [x86 linker details](https://maskray.me/blog/2023-02-19-linker-notes-on-x86).
-- [lld design](https://lld.llvm.org/NewLLD.html); [mold design](https://github.com/rui314/mold/blob/main/docs/design.md); [wild](https://github.com/wild-linker/wild) and [its incremental design](https://davidlattimore.github.io/posts/2024/11/19/designing-wilds-incremental-linking.html); Apple's [Meet mergeable libraries](https://developer.apple.com/wwdc23/10268).
+- [lld design](https://lld.llvm.org/NewLLD.html); [mold design](https://github.com/rui314/mold/blob/v2.41.0/docs/design.md); [wild](https://github.com/wild-linker/wild) and [its incremental design](https://davidlattimore.github.io/posts/2024/11/19/designing-wilds-incremental-linking.html); Apple's [Meet mergeable libraries](https://developer.apple.com/wwdc23/10268) and [Xcode 15 release notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-15-release-notes).
 
 **LTO**
 - [Optimizing real world applications with GCC LTO](https://arxiv.org/abs/1010.2196) (Glek and Hubička, 2010) and the [WHOPR proposal](https://opensource.googleblog.com/2008/11/whopr-scalable-whole-program-optimizer.html) (2008).
 - [ThinLTO](https://research.google/pubs/thinlto-scalable-and-incremental-lto/) (Johnson, Amini, Li, CGO 2017), with the [LLVM blog post](https://blog.llvm.org/2016/06/thinlto-scalable-and-incremental-lto.html) and [Clang docs](https://clang.llvm.org/docs/ThinLTO.html).
+- [GCC 15 changes](https://gcc.gnu.org/gcc-15/changes.html) (incremental LTO) and the [FOSDEM 2025 talk](https://archive.fosdem.org/2025/schedule/event/fosdem-2025-5378-incremental-lto-in-gcc/) by Michal Jireš.
 - [Type Metadata](https://llvm.org/docs/TypeMetadata.html) for whole-program devirtualization; [Safe ICF](https://research.google/pubs/safe-icf-pointer-safe-and-unwinding-aware-identical-code-folding-in-gold/) (Tallam et al.).
 
 **PGO and post-link**
-- [AutoFDO](https://research.google/pubs/pub45290/) (Chen, Li, Moseley, CGO 2016); [CSSPGO](https://htyu.github.io/paper/Revamping_Sampling_based_PGO_with_Context_sensitivity_and_Pseudo_instrumentation_preprint.pdf) (He, Yu, Wang, Oh); [temporal profiling](https://llvm.org/devmtg/2024-04/slides/TechnicalTalks/Hoag-TemporalProfiling-and-OrderfileOptimization-forMobileApps.pdf) (Hoag, EuroLLVM 2024).
-- [BOLT](https://arxiv.org/abs/1807.06735) (Panchenko, Auler, Nell, Ottoni, CGO 2019); [Propeller](https://research.google/pubs/propeller-a-profile-guided-relinking-optimizer-for-warehouse-scale-applications/) (Shatalin et al., ASPLOS 2023).
+- [AutoFDO](https://research.google/pubs/pub45290/) (Chen, Li, Moseley, CGO 2016); [CSSPGO](https://htyu.github.io/paper/Revamping_Sampling_based_PGO_with_Context_sensitivity_and_Pseudo_instrumentation_preprint.pdf) (He, Yu, Wang, Oh, CGO 2024); [temporal profiling](https://llvm.org/devmtg/2024-04/slides/TechnicalTalks/Hoag-TemporalProfiling-and-OrderfileOptimization-forMobileApps.pdf) (Hoag, EuroLLVM 2024).
+- [BOLT](https://research.facebook.com/file/534990324471927/BOLT-A-Practical-Binary-Optimizer-for-Data-Centers-and-Beyond.pdf) (Panchenko, Auler, Nell, Ottoni, CGO 2019; [arXiv](https://arxiv.org/abs/1807.06735)); [Propeller](https://research.google/pubs/propeller-a-profile-guided-relinking-optimizer-for-warehouse-scale-applications/) (Shen et al., ASPLOS 2023).
 - Kernel guides for [AutoFDO](https://docs.kernel.org/6.13/dev-tools/autofdo.html) and [Propeller](https://docs.kernel.org/6.13/dev-tools/propeller.html); Jakub Beránek, [Speeding up the Rust compiler without changing its code](https://kobzol.github.io/rust/rustc/2022/10/27/speeding-rustc-without-changing-its-code.html).
 
 ## Related Notes
