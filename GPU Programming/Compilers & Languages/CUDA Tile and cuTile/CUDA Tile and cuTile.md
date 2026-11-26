@@ -5,7 +5,7 @@ tags:
   - cuda-tile
   - cutile
   - kernel-languages
-status: draft
+status: complete
 sources:
   - https://developer.nvidia.com/blog/simplify-gpu-programming-with-nvidia-cuda-tile-in-python
   - https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/
@@ -20,6 +20,7 @@ sources:
   - https://docs.nvidia.com/cuda/cutile-python/generated/cuda.tile.mma.html
   - https://github.com/NVIDIA/cutile-python
   - https://arxiv.org/abs/2609.29067
+  - https://arxiv.org/html/2609.29067
 created: 2026-11-26
 updated: 2026-11-26
 ---
@@ -52,8 +53,8 @@ updated: 2026-11-26
 *CUDA Tile is NVIDIA's second programming model beside SIMT: you write a kernel as operations on whole tiles of an array, and the compiler maps them to threads, shared memory, TMA and Tensor Cores. It comes as a virtual ISA (CUDA Tile IR, the tile counterpart of PTX) plus languages on top: cuTile Python since CUDA 13.1 (Dec 2025) and CUDA Tile C++ since CUDA 13.3 (May 2026).*
 
 - **What it is:** a block-level model in the spirit of [[Triton]], but built and supported by NVIDIA inside the CUDA Toolkit. A cuTile kernel loads tiles (`ct.load`), does array math and matrix multiply-accumulate on them (`ct.mma`), and stores tiles (`ct.store`); per-thread indexing disappears.
-- **Why it matters:** each recent NVIDIA generation changed the [[Tensor Cores|tensor-core]] instruction (Ampere `mma.sync`, Hopper `wgmma`, Blackwell `tcgen05`) and how data reaches it ([[TMA and Asynchronous Copies|TMA]], Tensor Memory). Tile IR moves that churn into the compiler, so the same tile kernel targets new GPUs, and NVIDIA's own docs call it the path toward Rubin and beyond.
-- **Where it is now (Nov 2026):** supported on Ampere, Hopper (since 13.3) and Blackwell-family GPUs; CUDA 13.5 (Oct 2026) added Vera Rubin GA and multi-GPU tile communication. A Triton backend can emit Tile IR instead of PTX. On performance it is still young: the 2026 TileBench study on B200 found Triton beat cuTile on 37 of 45 operators ([TileBench](https://arxiv.org/abs/2609.29067)).
+- **Why it matters:** each recent NVIDIA generation changed the [[Tensor Cores|tensor-core]] instruction (Ampere `mma.sync`, Hopper `wgmma`, Blackwell `tcgen05`) and how data reaches it ([[TMA and Asynchronous Copies|TMA]], Tensor Memory). Tile IR moves that churn into the compiler, so the same tile kernel targets new GPUs, and NVIDIA says the tile model "abstracts away the details of using specialized hardware such as tensor cores" ([CUDA 13.1 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/)).
+- **Where it is now (Nov 2026):** supported on Ampere, Ada, Hopper (since 13.3) and Blackwell-family GPUs, with Rubin (sm_107) formats; cuTile Python is at 1.8.1 (Nov 12, 2026). CUDA 13.5 (Nov 4, 2026) added multi-GPU tile communication over NVLink and a preview of calling SIMT library functions from tile kernels. A Triton backend can emit Tile IR instead of PTX. On performance it is still young: the 2026 TileBench study on B200 found Triton faster on 37 of 45 operators, with cuTile ahead on a small cluster of Tensor-Core/TMA-friendly kernels ([TileBench](https://arxiv.org/abs/2609.29067)).
 - **Its limit:** like Triton, it hides the controls (warp roles, explicit pipelines, register budgets) that the fastest Hopper/Blackwell kernels use; for those, [[CUTLASS and CuTe]] or CuTe DSL remain the tools.
 
 ## ***The Problem***
@@ -99,15 +100,15 @@ flowchart TB
         CPP["CUDA Tile C++ (CUDA 13.3)"]
         TRI["Triton via Tile IR backend"]
     end
-    PY --> IR["CUDA Tile IR (virtual ISA, MLIR-based, bytecode)"]
+    PY --> IR["CUDA Tile IR (virtual ISA)"]
     CPP --> IR
     TRI --> IR
-    IR --> TC["Tile compiler (tileiras)"]
+    IR --> TC["tileiras (Tile IR compiler)"]
     TC --> SASS["SASS for sm_80 / sm_90 / sm_100 / sm_120 ..."]
     SIMT["SIMT CUDA C++"] --> PTX["PTX"] --> PTXAS["ptxas"] --> SASS
 ```
 
-NVIDIA describes Tile IR as the virtual ISA for tile programming, "similar to how PTX underlies SIMT" ([cuTile Python blog](https://developer.nvidia.com/blog/simplify-gpu-programming-with-nvidia-cuda-tile-in-python)). Both paths end in the same SASS, and the CUDA Programming Guide (rewritten for CUDA 13) teaches SIMT and tile kernels side by side ([Writing Tile Kernels](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-tile-kernels.html)).
+NVIDIA calls Tile IR "a new virtual instruction set architecture (ISA) for programming NVIDIA GPUs" ([CUDA 13.1 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/)), the tile counterpart of PTX for SIMT ([cuTile Python blog](https://developer.nvidia.com/blog/simplify-gpu-programming-with-nvidia-cuda-tile-in-python)). Both paths end in the same SASS, and the CUDA Programming Guide (rewritten for CUDA 13) teaches SIMT and tile kernels side by side ([Writing Tile Kernels](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-tile-kernels.html)).
 
 ## ***How We Got Here***
 ---
@@ -121,14 +122,14 @@ timeline
     2021-2023 : Triton 1.0 at OpenAI, PyTorch 2 TorchInductor emits Triton
     2023-2024 : CuTe layouts in CUTLASS 3; ThunderKittens tile primitives
     2025 : CuTe DSL (Python); CUDA 13.1 introduces CUDA Tile and cuTile Python (Dec)
-    2026 : Triton Tile IR backend (Jan); CUDA Tile C++ and Hopper support in 13.3 (May); 13.5 multi-GPU tiles, Rubin GA (Oct)
+    2026 : Triton Tile IR backend (Jan); Ampere/Ada in cuTile 1.2 (Mar); CUDA Tile C++ and Hopper in 13.3 (May); 13.5 multi-GPU tiles, Rubin GA (Nov)
 ```
 
 - **Tiles were always the real unit.** Every fast GEMM since CUTLASS 1.0 is organised around block tiles, warp tiles and MMA tiles; [[CUTLASS and CuTe]] made that explicit in C++ templates, and CuTe's layout algebra described how tiles map to threads.
 - **Triton showed the model works for users.** Tillet's Triton let researchers write fused kernels in Python at a block level, and became `torch.compile`'s code generator (see [[Triton]]).
 - **NVIDIA's motivation.** Hopper and Blackwell made hand-written SIMT tensor-core code much harder (asynchronous `wgmma`, TMA descriptors, `tcgen05` with Tensor Memory). A stable tile ISA lets NVIDIA change those details per generation while user kernels stay the same.
-- **Dec 2025, CUDA 13.1.** NVIDIA announced CUDA Tile as "the biggest" change to CUDA in years, releasing Tile IR and cuTile Python ([CUDA 13.1 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/)).
-- **2026.** NVIDIA released an incubator backend that compiles Triton to Tile IR ([NVIDIA, Jan 2026](https://developer.nvidia.com/blog/advancing-gpu-programming-with-the-cuda-tile-ir-backend-for-openai-triton/)); CUDA 13.3 (May 26, 2026) added CUDA Tile for C++ and Hopper (compute capability 9.0) support; CUDA 13.5 brought Vera Rubin to general availability and multi-GPU tile communication ([CUDA 13.5 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/)).
+- **Dec 2025, CUDA 13.1.** NVIDIA called 13.1 "the largest and most comprehensive update to the CUDA platform since it was invented two decades ago," releasing Tile IR and cuTile Python 1.0.0 (Dec 2), with C++ promised for a later release ([CUDA 13.1 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/)).
+- **2026.** NVIDIA released an incubator backend that compiles Triton to Tile IR ([NVIDIA, Jan 2026](https://developer.nvidia.com/blog/advancing-gpu-programming-with-the-cuda-tile-ir-backend-for-openai-triton/)); CUDA 13.3 (May 26, 2026) added CUDA Tile for C++ and Hopper (compute capability 9.0) support; CUDA 13.5 (Nov 4, 2026) brought Vera Rubin to general availability and multi-GPU tile communication ([CUDA 13.5 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/)).
 
 ## ***How It Works***
 ---
@@ -160,11 +161,11 @@ ct.launch(cp.cuda.get_current_stream(), grid, vector_add, (a, b, c, tile))
 - **`@ct.kernel`:** marks a function to be compiled to Tile IR and then to machine code, JIT, on first launch.
 - **`tile_size: ct.Constant[int]`:** a compile-time constant, so the tile shape is fixed when the kernel is specialised (like Triton's `tl.constexpr`).
 - **`ct.bid(0)`:** the block index along axis 0. There is no `threadIdx`.
-- **`ct.load(..., index=(pid,), shape=(tile_size,))`:** reads the `pid`-th tile of `tile_size` elements. Bounds at the array's end are handled by the load (padding), so there is no explicit `if i < n` guard.
+- **`ct.load(..., index=(pid,), shape=(tile_size,))`:** reads the `pid`-th tile of `tile_size` elements. There is no per-thread `if i < n` guard; bounds checking is on by default (a `check_bounds=False` option, added in cuTile 1.6, declares every element in range).
 - **`a_tile + b_tile`:** ordinary array arithmetic on whole tiles.
 - **`ct.launch(stream, grid, kernel, args)`:** launches on a CUDA stream; here CuPy supplies the arrays and the stream (see [[Numba and CuPy]]).
 
-Install is `pip install cuda-tile`, with CUDA Toolkit 13.1+ and driver R580+ (R590 for the tile developer tools).
+Install is `pip install cuda-tile[tileiras]` (which brings the `tileiras` compiler from pip), or `pip install cuda-tile` with a CUDA Toolkit 13.1+ installed; driver R580+ is required ([NVIDIA/cutile-python](https://github.com/NVIDIA/cutile-python)).
 
 ### Matrix Multiply in cuTile Python
 
@@ -180,19 +181,42 @@ def matmul(A, B, C, tm: ct.Constant[int], tn: ct.Constant[int], tk: ct.Constant[
     ct.store(C, index=(bx, by), tile=acc.astype(C.dtype))       # cast and write
 ```
 
-- **`ct.full`** makes a register-resident accumulator tile; FP32 accumulation with BF16 or FP16 inputs is the standard [[Tensor Cores|tensor-core]] recipe.
+- **`ct.full`** (or `ct.zeros`) makes the accumulator tile, the form the `ct.mma` docs use ([ct.mma](https://docs.nvidia.com/cuda/cutile-python/generated/cuda.tile.mma.html)); FP32 accumulation with BF16 or FP16 inputs is the standard [[Tensor Cores|tensor-core]] recipe.
 - **The loop** is the K loop of a [[Tiled Matrix Multiplication (GEMM)|tiled GEMM]]. In SIMT you would double-buffer shared memory, issue TMA or `cp.async`, and wait on barriers here; in cuTile the compiler pipelines the loads.
-- **`ct.mma(a, b, acc)`** is a matrix multiply-accumulate on tiles. The compiler lowers it to `mma.sync` on Ampere, `wgmma` on Hopper and `tcgen05.mma` on Blackwell.
+- **`ct.mma(a, b, acc)`** computes `(a @ b) + acc` as one operation; a `use_fast_acc` flag enables fast FP8 accumulation on Hopper. The compiler picks the architecture's tensor-core instruction (`mma.sync` on Ampere, `wgmma` on Hopper, `tcgen05.mma` on Blackwell).
 
 **Worked example (why tile size matters).** Each loop iteration loads $tm \cdot tk + tk \cdot tn$ elements and does $2\,tm\,tn\,tk$ FLOPs. With $tm = tn = 128$, $tk = 64$ in BF16 (2 bytes):
 
 $$I = \frac{2\cdot128\cdot128\cdot64}{2\,(128\cdot64 + 64\cdot128)} = \frac{2{,}097{,}152}{32{,}768} = 64 \text{ FLOP/byte}$$
 
-per tile load from global memory. That is well below a B200's ridge point (hundreds of FLOP/byte, see [[Roofline Model and Arithmetic Intensity]]), so the kernel relies on L2 reuse across neighbouring blocks, and larger tiles (256×128) raise intensity at the cost of registers and shared memory. Choosing tile sizes is still your job in cuTile; NVIDIA's CompileIQ autotuner (CUDA 13.3) searches compiler configurations for you.
+per tile load from global memory. That is well below a B200's ridge point (hundreds of FLOP/byte, see [[Roofline Model and Arithmetic Intensity]]), so the kernel relies on L2 reuse across neighbouring blocks, and larger tiles (256×128) raise intensity at the cost of registers and shared memory. Choosing tile sizes is still your job, though cuTile 1.3 added autotuning (`tune.exhaustive_search()`), and NVIDIA's CompileIQ (CUDA 13.3) searches compiler configurations with genetic algorithms, reporting up to 15% on already-tuned Triton attention and CUTLASS GEMM kernels.
 
 ### CUDA Tile in C++
 
-CUDA 13.3 extended the model to C++ "for high-level, tile-based kernel development" ([CUDA 13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/)). Tile kernels are ordinary C++ functions in a separate compilation mode of nvcc that emits Tile IR rather than PTX ([nvcc tile compilation](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/tile-compilation-in-cuda.html)); NVIDIA's C++ tile post walks through a GEMM ([NVIDIA, 2026](https://developer.nvidia.com/blog/develop-high-performance-gpu-kernels-in-cpp-with-nvidia-cuda-tile/)). The C++ form lets existing CUDA codebases add tile kernels without a Python dependency.
+CUDA 13.3 extended the model to C++ "for high-level, tile-based kernel development" ([CUDA 13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/)). A tile kernel is marked `__tile_global__` and compiled by nvcc in a tile mode that emits Tile IR rather than PTX ([nvcc tile compilation](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/tile-compilation-in-cuda.html)). NVIDIA's walkthrough by Bentz and Scudiero (May 26, 2026) shows the same vector add ([NVIDIA](https://developer.nvidia.com/blog/develop-high-performance-gpu-kernels-in-cpp-with-nvidia-cuda-tile/)). This is a sketch of its shape:
+
+```cpp
+#include "cuda_tile.h"
+namespace ct = cuda::tiles;
+using namespace ct::literals;
+
+__tile_global__ void vectorAdd(float* a, float* b, float* out, int n) {
+    auto i = ct::bid();                       // which tile this block owns
+    auto ta = ct::load_masked(a, i, 1024_c, n); // 1024-element tile, masked past n
+    auto tb = ct::load_masked(b, i, 1024_c, n);
+    ct::store_masked(out, i, ta + tb, n);     // one tile op, no per-thread index
+}
+
+// host: vectorAdd<<<BLOCKS, 1>>>(d_a, d_b, d_out, N);
+```
+
+- **`__tile_global__`:** marks a tile kernel, the C++ counterpart of `@ct.kernel`.
+- **`cuda_tile.h` and `cuda::tiles`:** the tile library; `ct::literals` gives compile-time sizes such as `1024_c`.
+- **`ct::bid()`:** the block index, like `ct.bid(0)` in Python.
+- **`load_masked` / `store_masked`:** tile loads and stores that skip elements past `n` (plain `load`/`store` exist for exact multiples).
+- **`<<<BLOCKS, 1>>>`:** the second launch argument must be 1, because the compiler, not you, picks how many threads run each block.
+
+Build with `nvcc -std=c++20 --enable-tile -arch sm_120 -o vectorAdd vectorAdd.cu`. It needs compute capability 8.x or newer and driver R580+ (R610+ to JIT code built with 13.3). The exact argument forms of the masked calls are simplified here; check the [C++ blog](https://developer.nvidia.com/blog/develop-high-performance-gpu-kernels-in-cpp-with-nvidia-cuda-tile/) for the full signatures. The C++ form lets existing CUDA codebases add tile kernels without a Python dependency.
 
 ### The Compiler Path
 
@@ -213,25 +237,25 @@ The key design choice is that Tile IR keeps **tile-level semantics** (a load of 
 
 ## ***Where It Is Now***
 ---
-*As of November 2026: CUDA Tile runs on Ampere, Hopper and Blackwell-family GPUs in Python and C++, with Rubin support in CUDA 13.5. Performance is promising on GEMM-like kernels but uneven, and independent benchmarks still favour Triton on most operators.*
+*As of November 2026: CUDA Tile runs on Ampere, Ada, Hopper and Blackwell-family GPUs in Python and C++, with Rubin GA in CUDA 13.5. Performance is promising on GEMM-like kernels but uneven, and independent benchmarks still favour Triton on most operators.*
 
 ### Releases and Hardware
 
 | CUDA | Date | Tile change |
 |---|---|---|
-| 13.1 | Dec 2025 | CUDA Tile model, Tile IR spec, cuTile Python |
-| 13.2 | early 2026 | Tile IR and cuTile updates |
-| 13.3 | May 26, 2026 | CUDA Tile C++; Hopper (CC 9.0) support; CompileIQ autotuning |
-| 13.4 | mid 2026 | C++ API reference out of developer preview |
-| 13.5 | Oct 2026 | Vera Rubin GA; multi-GPU tile communication |
+| 13.1 | Dec 2025 | CUDA Tile model, Tile IR spec, cuTile Python 1.0 |
+| 13.2 | Mar 2026 | cuTile 1.2: Ampere and Ada support, `ct.scan` |
+| 13.3 | May 26, 2026 | CUDA Tile C++; cuTile 1.4: Hopper (CC 9.0), block-scaled MMA, JAX; CompileIQ |
+| 13.4 | Sep 2026 | cuTile 1.6: programmatic dependent launch, bounds checks on by default |
+| 13.5 | Nov 4, 2026 | Vera Rubin GA; multi-GPU tile communication; Tile-SIMT interop preview; cuTile 1.8 |
 
-Sources: [13.1 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/), [13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/), [13.5 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/), [Tile IR release notes](https://docs.nvidia.com/cuda/tile-ir/latest/sections/release_notes.html).
+Sources: [13.1 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/), [13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/), [13.5 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/), [Tile IR release notes](https://docs.nvidia.com/cuda/tile-ir/latest/sections/release_notes.html), [cuTile Python release notes](https://docs.nvidia.com/cuda/cutile-python/release_notes.html).
 
-NVIDIA's cuTile Python page lists compute capability 8.x, 10.x, 11.x and 12.x as supported, with more "in future CUDA releases"; 13.3 added 9.0 (Hopper) ([cuTile Python blog](https://developer.nvidia.com/blog/simplify-gpu-programming-with-nvidia-cuda-tile-in-python)).
+At launch cuTile supported only Blackwell-family GPUs (compute capability 10.x and 12.x); Ampere and Ada (8.x) came with 1.2.0 in March 2026 and Hopper (9.0) with 1.4.0 in May ([cuTile Python release notes](https://docs.nvidia.com/cuda/cutile-python/release_notes.html)).
 
 ### How Fast Is It
 
-- **TileBench (2026)** compared tile languages on B200 under controlled conditions. Triton beat cuTile on 37 of 45 operators, and "most kernels remain far from roofline" for every language ([TileBench](https://arxiv.org/abs/2609.29067)).
+- **TileBench (Cui et al., Sep 2026)** compared tile languages on B200 under controlled conditions. Triton was faster on 37 of 45 operators and cuTile on 8; the two were within 5% on 14 and within 10% on 17. cuTile won on Tensor-Core and TMA-friendly kernels, Triton on irregular, streaming and bandwidth-bound ones. Even after autotuning only 7 Triton and 5 cuTile kernels reached 80% of roofline, and the authors conclude "most kernels remain far from roofline limits" ([TileBench](https://arxiv.org/abs/2609.29067)).
 - **Triton on Tile IR.** NVIDIA's backend lets existing Triton kernels reach Blackwell features through Tile IR instead of Triton's own PTX lowering; it is an incubator project enabled with `ENABLE_TILE=1` (see [[Triton]]).
 - **Where tiles win.** GEMM-shaped kernels with regular tiles map best, since `ct.mma` and TMA lowering are the parts NVIDIA has tuned most. Irregular kernels (gathers, sorting, sparse) still fit SIMT better.
 
@@ -262,7 +286,7 @@ cuTile is NVIDIA's productivity layer; CuTe DSL is its control layer. Most teams
 
 - **Performance gap.** TileBench's result that Triton still beats cuTile on most operators says the compiler is not yet as mature as Triton's; peak Blackwell kernels ([[Warp Specialization|warp-specialized]], deeply pipelined) remain CuTe territory.
 - **Portability vs. lock-in.** Tile IR is portable across NVIDIA generations, which is exactly what it was built for, but not across vendors. Triton's pitch is the reverse.
-- **Debugging and profiling.** A tile kernel's SASS is far from its source; NVIDIA ships tile-aware developer tools (needing driver R590+), and [[Profiling with Nsight Compute and Nsight Systems|Nsight]] reports at the SASS level.
+- **Debugging and profiling.** A tile kernel's SASS is far from its source; NVIDIA ships tile-aware developer tools, and [[Profiling with Nsight Compute and Nsight Systems|Nsight]] reports at the SASS level.
 - **Coverage.** Collectives, sparse and irregular access patterns arrived later or not at all; multi-GPU tile communication only landed in 13.5.
 
 ## ***Resources***
@@ -273,14 +297,15 @@ cuTile is NVIDIA's productivity layer; CuTe DSL is its control layer. Most teams
 - [Simplify GPU Programming with NVIDIA CUDA Tile in Python](https://developer.nvidia.com/blog/simplify-gpu-programming-with-nvidia-cuda-tile-in-python), NVIDIA, Dec 2025.
 - [CUDA 13.1 powers next-gen GPU programming with CUDA Tile](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/), NVIDIA, Dec 2025.
 - [CUDA 13.3: tile programming in C++, compiler autotuning](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/), NVIDIA, May 2026.
-- [Develop high-performance GPU kernels in C++ with CUDA Tile](https://developer.nvidia.com/blog/develop-high-performance-gpu-kernels-in-cpp-with-nvidia-cuda-tile/), NVIDIA, 2026.
+- [Develop high-performance GPU kernels in C++ with CUDA Tile](https://developer.nvidia.com/blog/develop-high-performance-gpu-kernels-in-cpp-with-nvidia-cuda-tile/), Bentz and Scudiero, NVIDIA, May 2026.
+- [cuTile Python release notes](https://docs.nvidia.com/cuda/cutile-python/release_notes.html), NVIDIA: what each version added.
 - [CUDA Programming Guide: Writing Tile Kernels](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-tile-kernels.html) and [Tile IR specification](https://docs.nvidia.com/cuda/tile-ir/latest/sections/release_notes.html).
 - [NVIDIA/cutile-python](https://github.com/NVIDIA/cutile-python): source and samples (matmul, attention, MoE).
 
 **Independent**
-- [TileBench](https://arxiv.org/abs/2609.29067), 2026: controlled benchmark of tile languages.
+- [TileBench](https://arxiv.org/abs/2609.29067), Cui et al., Sep 2026: controlled benchmark of tile languages on B200.
 
-## Related Notes
+## ***Related Notes***
 
 - [[Triton]] — The block-level model CUDA Tile follows; can compile to Tile IR.
 - [[CUTLASS and CuTe]] — NVIDIA's control-side tile tools (CuTe DSL).
@@ -294,3 +319,5 @@ cuTile is NVIDIA's productivity layer; CuTe DSL is its control layer. Most teams
 - [[Numba and CuPy]] — Python GPU arrays used with cuTile's launch API.
 - [[Memory Coalescing]] — Handled by tile loads.
 - [[Roofline Model and Arithmetic Intensity]] — The tile-size arithmetic above.
+- [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — The FP8 and block-scaled formats cuTile's `ct.mma` accepts.
+- [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]] — The links CUDA 13.5's multi-GPU tile communication uses.
