@@ -278,7 +278,7 @@ The physical layer is a separate risk: GNSS signals are weak and can be jammed o
 | Laptops, internet hosts | NTP or chrony to public servers, with NTS | Milliseconds |
 | Ordinary servers, logs that roughly line up | NTP or chrony in the data center | Tens to hundreds of µs |
 | HLC databases with small uncertainty windows, leases | Cloud time service with an error bound (ClockBound) | Under 100 µs, often under 40 µs ([AWS](https://aws.amazon.com/blogs/compute/its-about-time-microsecond-accurate-clocks-on-amazon-ec2-instances)) |
-| Commit-wait or clock-ordered consensus fast paths | PTP with hardware timestamps, or Huygens/Sundial-class sync | Sub-µs |
+| Commit-wait or [[Clock-Assisted Consensus|clock-ordered consensus fast paths]] | PTP with hardware timestamps, or Huygens/Sundial-class sync | Sub-µs |
 | Bootstrapping a clock securely with no trust in one server | Roughtime | Seconds-level radius |
 
 ## ***Where It Is Now***

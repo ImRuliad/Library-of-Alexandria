@@ -356,7 +356,7 @@ Tempo's argument against dependency graphs is that a command can be delayed by a
 
 Two details set it apart:
 - **Deps only need to be a superset.** Unlike EPaxos, different coordinators may see different dependency sets; each must just cover every conflict that could commit at a lower timestamp. Timestamps, not the graph, decide order.
-- **Reorder buffer.** Replicas hold each PreAccept until $t_0 + \text{SkewMax} + (\text{max latency from any coordinator}) - (\text{latency from this coordinator})$, then process in $t_0$ order. If clocks and latencies stay within the assumed bounds, conflicting transactions reach every replica in timestamp order and the fast path succeeds even under contention. That uses clocks for speed only, never for safety; see [[Clock Synchronization]].
+- **Reorder buffer.** Replicas hold each PreAccept until $t_0 + \text{SkewMax} + (\text{max latency from any coordinator}) - (\text{latency from this coordinator})$, then process in $t_0$ order. If clocks and latencies stay within the assumed bounds, conflicting transactions reach every replica in timestamp order and the fast path succeeds even under contention. That uses clocks for speed only, never for safety; see [[Clock-Assisted Consensus]] and [[Clock Synchronization]].
 
 ```mermaid
 sequenceDiagram
@@ -400,7 +400,7 @@ The CEP page contrasts Accord with its ancestors: EPaxos's fast path is disabled
 | Protocol | Idea | Source |
 |---|---|---|
 | **SwiftPaxos** (NSDI 2024) | Replicas vote on order, and may vote a second time to follow the leader instead of restarting; 2 message delays without contention, 3 with | [Ryabinin, Gotsman, Sutra](https://usenix.org/conference/nsdi24/presentation/ryabinin) |
-| **Nezha** (VLDB 2023) | Deadline-ordered multicast: "Senders tag messages with deadlines in synchronized time," so replicas usually receive requests in the same order | [Geng et al.](https://arxiv.org/abs/2206.03285) |
+| **Nezha** (VLDB 2023) | [[Clock-Assisted Consensus|Deadline-ordered multicast]]: "Senders tag messages with deadlines in synchronized time," so replicas usually receive requests in the same order | [Geng et al.](https://arxiv.org/abs/2206.03285) |
 | **EPaxos Revisited** (NSDI 2021) | Delays message processing using synchronized clocks to reduce conflicts in EPaxos by at least 50% | [Tollman, Park, Ousterhout](https://www.usenix.org/conference/nsdi21/presentation/tollman) |
 
 ## ***Where It Is Now***
@@ -442,7 +442,7 @@ No public benchmark of Accord's wide-area latency in 6.0 appeared in the sources
 - **Fast paths as add-ons (OSDI 2026).** Jetpack's view change hazard and its two principles turn the CURP-on-Raft bug into a checklist for any fast-path layer ([Tang et al.](https://www.usenix.org/system/files/osdi26-tang.pdf)).
 - **Synthesized fast paths (Sep 2026).** KCensus from EPFL and NVIDIA treats a fast path as a way of spreading knowledge about proposals, gives conditions it calls "both necessary and sufficient" for that to be safe, and searches for the latency-optimal combination per deployment. It reads Paxos, Fast Paxos, SwiftPaxos and EPaxos as special cases and reports up to 16% lower average latency on AWS. Its general rule for Fast-Paxos-style quorums is $q > (n + f)/2$, so 6 of 7 when $f = 3$, against EPaxos's 5 ([Burgelin et al., to appear EuroSys 2027](https://arxiv.org/pdf/2609.31302)).
 - **AI-assisted protocol design (Oct 2026).** *The End of Consensus Research?* describes a coding-agent harness that designed a geo-replication protocol, A-GREEMENT, borrowing SwiftPaxos's fast path for cold keys; its Lean formalization found four previously unreported vulnerabilities, two in EPaxos Revisited that "allow replicas to execute conflicting commands in opposite orders." The authors conclude that "agents reshape the researcher's role rather than end consensus research" ([Burgelin et al., arXiv Oct 2026](https://arxiv.org/pdf/2610.30114)).
-- **Testing.** The pattern across EPaxos, CURP and EPaxos Revisited is the same: the steady-state path was fine and recovery was wrong. That's the argument for [[Deterministic Simulation Testing]] and model checking before shipping a fast path.
+- **Testing.** The pattern across EPaxos, CURP and EPaxos Revisited is the same: the steady-state path was fine, and the bugs were in recovery (EPaxos, CURP) or in an optimization around the fast path (EPaxos Revisited's dependency pruning, not its clock-based delays). That's the argument for [[Deterministic Simulation Testing]] and model checking before shipping a fast path.
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -460,10 +460,10 @@ No public benchmark of Accord's wide-area latency in 6.0 appeared in the sources
 | Fast path layered on a leader (CURP, Jetpack) | Keeps a proven protocol; 1 RTT for writes | Commands sent twice; execution and reads after writes still follow the slow log |
 
 Open problems worth tracking:
-- **Correct recovery.** Every major fast-path protocol here has had a recovery bug found years after publication ([Sutra](https://ar5iv.arxiv.org/html/1906.10917), [Ryabinin et al.](https://arxiv.org/pdf/2511.02743), [Tang et al.](https://www.usenix.org/system/files/osdi26-tang.pdf), [Burgelin et al.](https://arxiv.org/pdf/2610.30114)). Proofs and model checking are becoming the entry fee; see [[Formal Methods in Practice]].
+- **Correct recovery.** Every major fast-path protocol here has had a recovery or optimization bug found years after publication ([Sutra](https://ar5iv.arxiv.org/html/1906.10917), [Ryabinin et al.](https://arxiv.org/pdf/2511.02743), [Tang et al.](https://www.usenix.org/system/files/osdi26-tang.pdf), [Burgelin et al.](https://arxiv.org/pdf/2610.30114)). Proofs and model checking are becoming the entry fee; see [[Formal Methods in Practice]].
 - **Tail latency under contention.** Median wins are real; the 99.9th percentile is where dependency-based protocols lose to Multi-Paxos ([Tollman et al.](https://www.usenix.org/conference/nsdi21/presentation/tollman), [Enes et al., 2021](https://software.imdea.org/~gotsman/papers/tempo-eurosys21.pdf)). Hot keys make every leaderless protocol behave like a slow leader-based one.
 - **Reads.** Linearizable reads in a leaderless protocol must be ordered like writes or wait for conflicting writes to execute; KCensus notes EPaxos reads degrade under Zipfian contention ([KCensus](https://arxiv.org/pdf/2609.31302)). Leader-based systems answer this with leases instead; see [[Leases and Fencing]].
-- **Clocks as a performance crutch.** Accord, Nezha and EPaxos Revisited all use synchronized clocks to make the fast path likely. Safety mustn't depend on them, and the gains depend on how tight [[Clock Synchronization]] is in practice ([[Time and Clocks]]).
+- **Clocks as a performance crutch.** Accord, Nezha, Tiga and EPaxos Revisited all use synchronized clocks to make the fast path likely. Safety mustn't depend on them, and the gains depend on how tight [[Clock Synchronization]] is in practice ([[Time and Clocks]]); the mechanisms are compared in [[Clock-Assisted Consensus]].
 - **Gray failures.** A fast quorum of 4 out of 5 means two slow replicas silently push everything onto the slow path; see [[Gray and Fail-Slow Failures]].
 - **Production evidence.** Accord in Cassandra 6.0 will be the first large-scale test of a leaderless consensus protocol in a widely deployed open-source database; as of November 2026 it was still a disabled-by-default beta in a pre-release line.
 
@@ -511,6 +511,7 @@ Open problems worth tracking:
 - [[Distributed Transactions]] — Janus and Accord fold concurrency control into consensus instead of layering 2PC over it.
 - [[Time and Clocks]] — Hybrid logical clocks order Accord transactions; Tempo uses logical timestamps.
 - [[Clock Synchronization]] — How tight clocks must be for Accord's reorder buffer, Nezha and EPaxos Revisited to pay off.
+- [[Clock-Assisted Consensus]] — Deadline-ordered multicast, Tiga, Domino and Clock-RSM: clocks for speed, not safety.
 - [[Failure Models]] — Crash faults, FLP, and why fast paths tolerate fewer failures than slow paths.
 - [[CAP and PACELC]] — The latency side of PACELC is what leaderless protocols try to shrink.
 - [[Consistency Models]] — EPaxos gives linearizability; Accord targets strict serializability.

@@ -259,6 +259,7 @@ Open problems:
 - [[Silent Data Corruption]] — corruption is one non-malicious source of Byzantine behavior
 - [[Gray and Fail-Slow Failures]] — partial failures that blur the line between crash and Byzantine
 - [[Leaderless Consensus]] — DAG protocols share the idea of not funneling everything through one leader
+- [[Clock-Assisted Consensus]] — Aspen uses synchronized clocks to make leaderless BFT fast paths succeed
 - [[Deterministic Simulation Testing]] — how teams find bugs in consensus implementations
 - [[Formal Methods in Practice]] — proving BFT protocols safe before coding them
 - [[Coordination Services]] — ZooKeeper and etcd use crash-fault consensus, not BFT
