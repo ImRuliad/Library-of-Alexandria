@@ -242,6 +242,7 @@ Open problems:
 ---
 
 - [[Page Cache and Memory Reclaim]]: where file data lives in RAM and how writeback works.
+- [[Block Layer and IO Schedulers]]: where file system bios are merged, scheduled and dispatched.
 - [[System Calls and the User-Kernel Boundary]]: `open()`, `read()`, `write()`, `fsync()`.
 - [[io_uring]]: asynchronous file I/O and FUSE-over-io_uring.
 - [[Read-Copy-Update (RCU)]]: lockless path walks in the dcache.
