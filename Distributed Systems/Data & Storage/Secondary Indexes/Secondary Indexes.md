@@ -437,5 +437,5 @@ Open problems:
 - [[Hot Keys and Cache Stampedes]] — Low-cardinality index values as hot keys, and how to salt or cache them.
 - [[Change Data Capture]] — Deriving indexes and views from a change stream instead of the write path.
 - [[Deterministic Transactions]] — Planned: cheaper multi-partition writes.
-- [[Bloom and Range Filters]] — Planned: the lightweight alternative to indexes in LSMs and lakehouses.
+- [[Bloom and Range Filters]] — The lightweight alternative to indexes in LSMs and lakehouses.
 - [[Lakehouse Table Formats]] — Planned: file-level statistics instead of secondary indexes.

@@ -241,10 +241,10 @@ flowchart TD
 ```
 
 - **Key range check:** each file's smallest and largest key are kept in memory, so files that can't hold the key are skipped ([SlateDB design overview](https://slatedb.io/docs/design/overview/)). In leveled compaction, at most one file per level past L0 qualifies.
-- **Bloom filters:** a compact bitmap per file (or per block) that answers "definitely not here" or "maybe here." Bigtable added them so that "most lookups for non-existent rows or columns do not need to touch disk" ([Bigtable, §6](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)).
+- **[[Bloom and Range Filters|Bloom filters]]:** a compact bitmap per file (or per block) that answers "definitely not here" or "maybe here." Bigtable added them so that "most lookups for non-existent rows or columns do not need to touch disk" ([Bigtable, §6](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)).
 - **Fence pointers:** the in-memory index of each file's blocks, storing the first key of each block, so a lookup reads exactly one block per file it checks ([Dayan et al., SIGMOD 2017](https://cs-people.bu.edu/mathan/publications/sigmod17-dayan.pdf)).
 - **Block cache:** recently read blocks stay in memory. Bigtable had both a block cache of SSTable blocks and a higher-level cache of key-value pairs ([Bigtable, §6](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)).
-- **Range scans** can't use Bloom filters. They open an iterator on every level and merge them, so scan cost grows with the number of sorted runs.
+- **Range scans** can't use Bloom filters (range filters like SuRF and Rosetta can; see [[Bloom and Range Filters]]). They open an iterator on every level and merge them, so scan cost grows with the number of sorted runs.
 
 The Bloom filter false-positive rate with $b$ bits per key (and the optimal number of hash functions) is
 
@@ -530,3 +530,4 @@ Open problems worth tracking:
 - [[Coordination Services]] — Bigtable's master election via Chubby, above its LSM storage.
 - [[Secondary Indexes]] — Index maintenance needs the old value, turning blind LSM writes into read-modify-writes.
 - [[Stream Processing]] — Operator state in RocksDB, and Flink 2.0's ForSt, an LSM tree whose primary copy lives on remote storage.
+- [[Bloom and Range Filters]] — Point and range filters per SSTable, Ribbon, Chucky, and the range-filter line from SuRF to Memento.
