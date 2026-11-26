@@ -8,7 +8,7 @@ tags:
   - tdx
   - arm-cca
   - attestation
-status: draft
+status: complete
 sources:
   - https://docs.kernel.org/security/snp-tdx-threat-model.html
   - https://kernel.org/doc/html/latest/arch/x86/amd-memory-encryption.html
@@ -252,7 +252,7 @@ A CVM guest kernel is an ordinary Linux with a new mindset: the hardware it talk
 - **Accept memory before use.** TDX and SNP guest memory starts unaccepted; firmware pre-accepts about 512 MB and Linux accepts the rest lazily as it allocates ([TDX docs](https://kernel.org/doc/html/latest/arch/x86/tdx.html)). Without this, boot would touch every page of a large VM.
 - **Share explicitly.** Only pages converted with `set_memory_decrypted()` and SWIOTLB bounce buffers are shared; kernel stacks must never be.
 - **Harden every input.** Drivers that parse host-provided data (virtio, PCI config space, ACPI) must validate it like network input. The kernel threat model lists malformed and malicious runtime input as primary threats ([kernel docs](https://docs.kernel.org/security/snp-tdx-threat-model.html)).
-- **Distrust interrupts and exceptions.** **Heckler** showed that injecting non-timer interrupts at the right moment bypasses OpenSSH and sudo authentication on both SNP and TDX ([arXiv](https://arxiv.org/abs/2404.03387)). **WeSee** injected a #VC exception (vector 29) into an SNP guest whose handler trusted the host's claimed exit reason, yielding arbitrary kernel read/write and a root shell ([arXiv](https://arxiv.org/html/2404.03526v1)). TDX blocks host injection of that vector.
+- **Distrust interrupts and exceptions.** **Heckler** showed that injecting non-timer interrupts at the right moment bypasses OpenSSH and sudo authentication on both SNP and TDX ([arXiv](https://arxiv.org/abs/2404.03387)). **WeSee** injected a #VC exception (vector 29) into an SNP guest whose handler trusted the host's claimed exit reason, yielding arbitrary kernel read/write and a root shell ([arXiv](https://arxiv.org/html/2404.03526v1)).
 - **Distrust time and randomness.** SNP's **Secure TSC** (6.18) gives the guest a timestamp counter the host can't skew.
 
 ### I/O, Devices and GPUs
@@ -269,14 +269,14 @@ Bounce buffers mean every byte of device I/O is copied between private and share
 
 | Release | Change |
 |---|---|
-| 6.18 (late 2025) | SNP CipherText Hiding, Secure TSC, Secure AVIC; groundwork for host mapping of guest_memfd ([Phoronix](https://phoronix.com/news/Linux-6.18-KVM)) |
+| 6.18 (late 2025) | SNP CipherText Hiding, Secure TSC, Secure AVIC ([Phoronix](https://phoronix.com/news/Linux-6.18-KVM)) |
 | 6.19 (early 2026) | PCI/TSM core, AMD SEV-TIO link encryption, IDE/DOE helpers, TDISP bind and guest-request skeletons ([pull](https://lkml.iu.edu/hypermail/linux/kernel/2512.0/04761.html)) |
-| 7.4 (merge window Oct 2026, release expected Dec 2026) | **TDX Dynamic PAMT** allocates PAMT in 2 MB chunks on demand instead of an all-or-nothing 0.4% of RAM, and TDX reports quote-buffer sizes because fixed 128 KB buffers are too small for post-quantum quotes ([Phoronix](https://phoronix.com/news/Linux-74-Intel-TDX-Dynamic-PAMT)); **AMD RMPOPT** for Zen 6 "Venice" after 16 revisions ([Phoronix](https://www.phoronix.com/news/AMD-RMPOPT-For-Linux-7.4)); Intel Instruction Timeout and Bus Lock exits so TD guests can't stall the host ([Phoronix](https://phoronix.com/news/Intel-Instruction-Timeout-Linux)) |
+| 7.4 (merge window Oct 2026, release expected Dec 2026) | **TDX Dynamic PAMT** allocates PAMT in 2 MB chunks on demand instead of an all-or-nothing 0.4% of RAM, and TDX reports quote-buffer sizes because fixed 128 KB buffers are too small for post-quantum quotes ([Phoronix](https://phoronix.com/news/Linux-74-Intel-TDX-Dynamic-PAMT)); **AMD RMPOPT** for Zen 6 "Venice" ([Phoronix](https://www.phoronix.com/news/AMD-RMPOPT-For-Linux-7.4)); Intel Instruction Timeout and Bus Lock exits so TD guests can't stall the host ([Phoronix](https://phoronix.com/news/Intel-Instruction-Timeout-Linux)) |
 | Not merged | **Arm CCA KVM host**: v17 posted 8 Sep 2026 as a trimmed first chunk of five that can't yet run Realms ([LWN](https://lwn.net/Articles/1093216/)). **TDX Connect**: VT-d trusted-DMA groundwork posted 15 Sep 2026 ([LWN](https://lwn.net/Articles/1094492/)) |
 
 **Clouds**
 
-- **Azure** made TDX CVMs (DCesv6, DCedsv6, ECesv6, ECedsv6 on 5th-gen Xeon, up to 128 vCPUs and 512 GiB) generally available on 26 Feb 2026, using its OpenHCL paravisor and the first local NVMe for Azure CVMs, with about 5× throughput over the previous SCSI generation ([Microsoft](https://techcommunity.microsoft.com/t5/azure-confidential-computing/announcing-general-availability-of-azure-intel-tdx-confidential/ba-p/4495693)). It also sells SNP families and an SNP + H100 confidential GPU size ([Microsoft Learn](https://learn.microsoft.com/en-us/azure/confidential-computing/virtual-machine-options)).
+- **Azure** made TDX CVMs (DCesv6, DCedsv6, ECesv6, ECedsv6) generally available on 26 Feb 2026, using its OpenHCL paravisor and the first local NVMe for Azure CVMs, with about 5× throughput over the previous SCSI generation ([Microsoft](https://techcommunity.microsoft.com/t5/azure-confidential-computing/announcing-general-availability-of-azure-intel-tdx-confidential/ba-p/4495693)). It also sells SNP families and an SNP + H100 confidential GPU size ([Microsoft Learn](https://learn.microsoft.com/en-us/azure/confidential-computing/virtual-machine-options)).
 - **Google Cloud** added TDX on C3 local-SSD (2 Sep 2026) and C4 (23 Sep 2026), SEV live migration on C3D (7 Apr 2026), H100 under TDX (July 2025) and RTX PRO 6000 under SEV (7 Aug 2026), and shipped TDX firmware fixes in February and August 2026 ([Google](https://docs.cloud.google.com/confidential-computing/confidential-vm/docs/release-notes)).
 - **AWS** has offered SEV-SNP since 2023.
 
@@ -288,11 +288,11 @@ Bounce buffers mean every byte of device I/O is copied between private and share
 | Oct 2025 | **RMPocalypse** (CVE-2025-0033) | A race during RMP initialization; one 8-byte overwrite breaks SNP ([THN](https://thehackernews.com/2025/10/rmpocalypse-single-8-byte-write.html)) | software |
 | Oct 2025 | **TEE.fail** | First DDR5 interposer; extracted keys from TDX and from SNP with CipherText Hiding, and forged attestation ([THN](https://thehackernews.com/2025/10/new-teefail-side-channel-attack.html)) | < $1,000 |
 | 2025 | **Fabricked** (CVE-2025-54510) | Rerouting Infinity Fabric MMIO gives SNP memory access and forged attestation ([Igor's Lab](https://www.igorslab.de/en/fabricked-eth-researchers-attack-amd-sev-snp-infinity-fabric/)) | software |
-| Sep 2026 | **DDRop** (CCS 2026) | DDR5 interposer silently drops writes; full TD control and a forged launch measurement on TDX ([THN](https://thehackernews.com/2026/09/new-ddrop-attack-breaks-intel-tdx-and.html)) | ~$159 |
-| Nov 2026 | **Mior** (CVE-2026-0462) | Redirects the security processor's RMP writes to a PCIe device; memory access and forged attestation in 1,000/1,000 tries on Zen 5 | software |
-| Nov 2026 | **Skyfall** (CVE-2026-40671) | TSA-style leaks of saved state from failed launches on Zen 3 and Zen 4 ([THN](https://thehackernews.com/2026/11/new-mior-and-skyfall-attacks-let-rogue.html)) | software |
+| Sep 2026 | **DDRop** (CCS 2026) | DDR5 interposer silently drops writes; on TDX it read and altered a victim's private memory and forged its launch measurement, with narrower effects on SEV-SNP; needs host control and brief physical access ([THN](https://thehackernews.com/2026/09/new-ddrop-attack-breaks-intel-tdx-and.html)) | ~$159 |
+| Nov 2026 | **Mior** (CVE-2026-0462) | A host with BIOS control and a PCIe device rewrites SNP's protection tables during startup, then reads and writes guest memory through debug commands (1,000 of 1,000 tries on a Zen 5 EPYC 9135) and can forge attestation | software |
+| Nov 2026 | **Skyfall** (CVE-2026-40671) | Builds on Transient Scheduler Attacks to recover a guest's saved registers and a disk-encryption key on Zen 3 and Zen 4 ([THN](https://thehackernews.com/2026/11/new-mior-and-skyfall-attacks-let-rogue.html)) | software |
 
-Intel's response to DDRop was "out of scope, but not out of mind," with no CVE. And in November 2026 a TEE-based AI inference service was breached through a remote-code-execution bug in its model-serving engine: the CVM worked, but the software inside it was the weak point ([CSA](https://labs.cloudsecurityalliance.org/research/csa-research-note-confidential-ai-inference-tee-limits-20261/)).
+Intel's response to DDRop was "out of scope, but not out of mind," with no CVE; TDX's optional cryptographic-integrity mode blocks part of it. AMD's firmware fixes for Skyfall and Mior were scheduled for November and December 2026. And in November 2026 a TEE-based AI inference service was breached through a remote-code-execution bug in its model-serving engine: the CVM worked, but the software inside it was the weak point ([CSA](https://labs.cloudsecurityalliance.org/research/csa-research-note-confidential-ai-inference-tee-limits-20261/)).
 
 ## ***Trade-offs & Open Problems***
 ---

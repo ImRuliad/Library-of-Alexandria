@@ -7,7 +7,7 @@ tags:
   - cheri
   - kasan
   - hardware
-status: draft
+status: complete
 sources:
   - https://msrc.microsoft.com/blog/2019/07/a-proactive-approach-to-more-secure-code/
   - https://www.chromium.org/Home/chromium-security/memory-safety/
@@ -17,14 +17,14 @@ sources:
   - https://arichardson.github.io/riscv-cheri/
   - https://ctsrd-cheri.github.io/morello-early-performance-results/
   - https://lwn.net/Articles/1037974/
-  - https://cheriot.org/
-  - https://tech.eu/
+  - https://cheriot.org/silicon/2026/03/04/cheriot-first-silicon.html
+  - https://tech.eu/2026/09/09/sci-semiconductor-raises-ps5m-to-ramp-up-production-of-memory-safe-chips/
   - https://github.com/riscv/riscv-cheri/issues/1337
   - https://security.apple.com/blog/memory-integrity-enforcement/
-  - https://blog.calif.io/
+  - https://blog.calif.io/p/first-public-kernel-memory-corruption
   - https://googleprojectzero.blogspot.com/2023/11/first-handset-with-mte-on-market.html
   - https://9to5google.com/2025/06/04/android-16-advanced-protection/
-  - https://www.androidauthority.com/
+  - https://www.androidauthority.com/grapheneos-pixel-11-mte-support-3707488/
   - https://arxiv.org/abs/2406.08719
   - https://www.vusec.net/projects/stickytags/
   - https://lwn.net/Articles/1020476/
@@ -116,7 +116,7 @@ timeline
     2023 : Pixel 8, first phone with MTE : LAM in Linux 6.4
     2024 : TikTag attack
     2025 : UK CHERI report : Apple MIE, iPhone 17 : CHERI Linux 6.16 purecap
-    2026 : CHERIoT first silicon : Pixel 11 MTE delay : RISC-V CHERI ARC review
+    2026 : CHERIoT first silicon : Pixel 11 ships with MTE off : RISC-V CHERI ARC review
 ```
 
 - **Capability machines.** The idea that a pointer should be an unforgeable token with rights attached dates to 1970s research machines. Cambridge and SRI's **CHERI** project (from 2010) revived it as an extension to existing instruction sets, so C could be recompiled rather than rewritten.
@@ -244,15 +244,15 @@ Intel's **Linear Address Masking** (Linux 6.4), Arm's Top Byte Ignore and RISC-V
 | Android 13+ / Pixel 8–10 | Per-app opt-in (`memtagMode`), developer option for full MTE | [Project Zero](https://googleprojectzero.blogspot.com/2023/11/first-handset-with-mte-on-market.html) |
 | Android 16 (Jun 2025) | MTE part of Advanced Protection mode | [9to5Google](https://9to5google.com/2025/06/04/android-16-advanced-protection/) |
 | GrapheneOS | MTE enabled on supported Pixels since 2023 | GrapheneOS project |
-| Pixel 11 (2026) | MTE disabled at launch, reported to return with Android 17 QPR2 around mid-November 2026 | [Android Authority](https://www.androidauthority.com/) |
+| Pixel 11 (2026) | Google left MTE off at launch; GrapheneOS found MTE support in Android 17 QPR2 beta firmware (Sep 2026) | [Android Authority](https://www.androidauthority.com/grapheneos-pixel-11-mte-support-3707488/) |
 
-- **MIE was bypassed anyway.** In May 2026, Calif published a data-only kernel exploit on macOS 26.4.1 on an M5 that works without violating tags ([Calif](https://blog.calif.io/)). Tagging stops pointer misuse, not logic bugs that corrupt data through valid pointers.
+- **MIE was bypassed anyway.** In May 2026, Calif published a data-only kernel exploit on macOS 26.4.1 on an M5 that works without violating tags ([Calif](https://blog.calif.io/p/first-public-kernel-memory-corruption)); it chains two vulnerabilities and runs with kernel MIE enabled. Tagging stops pointer misuse, not logic bugs that corrupt data through valid pointers.
 - **Side channels on tags.** **TikTag** (2024) used speculative execution to leak MTE tags with over 95% success in under 4 seconds, which lets an attacker forge the right tag ([arXiv](https://arxiv.org/abs/2406.08719)); Apple's tag-confidentiality feature targets exactly this. VUSec's **StickyTags** proposed a different tagging design with 4.0% overhead against 20.2% for a comparable baseline ([VUSec](https://www.vusec.net/projects/stickytags/)).
 - **Server costs.** A 2026 database study found MTE in synchronous mode cost Redis about 1% and LevelDB about 7%, while CHERI on Morello cost Redis about 5% and LevelDB about 53% ([arXiv](https://arxiv.org/abs/2610.11525)).
 
 **CHERI**
 
-- **First commercial silicon.** SCI Semiconductor's ICENI, a CHERIoT microcontroller, shipped first silicon in March 2026 ([CHERIoT](https://cheriot.org/)); SCI raised £5M in September 2026 ([tech.eu](https://tech.eu/)). CHERIoT is a small embedded profile with its own RTOS.
+- **First commercial silicon.** SCI Semiconductor's ICENI, a CHERIoT microcontroller, shipped first silicon in March 2026 ([CHERIoT](https://cheriot.org/silicon/2026/03/04/cheriot-first-silicon.html)); SCI raised £5M in September 2026 ([tech.eu](https://tech.eu/2026/09/09/sci-semiconductor-raises-ps5m-to-ramp-up-production-of-memory-safe-chips/)). CHERIoT is a small embedded profile with its own RTOS.
 - **Linux on CHERI.** Codasip's X730 RISC-V core, with under 5% area and under 5% performance cost, ran a purecap Linux 6.16 in late August 2025; porting KDE needed about 0.02% of its lines changed ([LWN](https://lwn.net/Articles/1037974/)). CHERI Linux is out of tree.
 - **Standardization slipped.** The RISC-V CHERI ("RVY") spec was at v0.9.8.2 in May 2026 and is not ratified; RISC-V's Architecture Review Committee was reviewing v0.9.10.1 in November 2026, behind the original 2025 plan ([GitHub](https://github.com/riscv/riscv-cheri/issues/1337)).
 - **No x86 CHERI.** Neither Intel nor AMD has announced capability hardware; Arm hasn't committed to CHERI beyond Morello.
