@@ -181,7 +181,7 @@ sequenceDiagram
 - A checksum in the commit block lets the whole transaction be written at once instead of waiting before TxEnd; ext4 adopted this.
 - Updates are batched into transactions committed roughly every 5 seconds.
 
-**Copy-on-write** never overwrites live data: it writes new versions of changed blocks and of every block that points to them, then atomically switches the root pointer. The old tree is still valid until the switch, so a crash just leaves the previous version, and keeping old roots gives snapshots. ZFS and log-structured file systems work this way; Btrfs and bcachefs follow the same model.
+**Copy-on-write** never overwrites live data: it writes new versions of changed blocks and of every block that points to them, then atomically switches the root pointer. The old tree is still valid until the switch, so a crash just leaves the previous version, and keeping old roots gives snapshots. ZFS and log-structured file systems work this way; Btrfs and bcachefs follow the same model (see [[Copy-on-Write File Systems]] and [[Flash and Log-Structured File Systems]]).
 
 | | Journaling (ext4, XFS) | Copy-on-write (ZFS, Btrfs, bcachefs) |
 |---|---|---|
@@ -250,3 +250,5 @@ Open problems:
 - [[Virtual Memory and Paging]]: `mmap()` of files.
 - [[Formally Verified OS Components]]: verified storage stacks.
 - [[Rust in the Linux Kernel]]: memory-safe file system code.
+- [[Copy-on-Write File Systems]]: ZFS, Btrfs and bcachefs in depth.
+- [[Flash and Log-Structured File Systems]]: FTLs, F2FS and zoned storage.
