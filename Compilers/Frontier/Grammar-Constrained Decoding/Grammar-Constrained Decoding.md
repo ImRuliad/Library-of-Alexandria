@@ -274,7 +274,7 @@ That loop is the $O(V \cdot \bar L)$ cost per step that every real engine exists
 
 ### Regex to FSM Index (Outlines)
 
-*Compile the regex to an FSM, then precompute for every FSM state the set of vocabulary tokens that can be read from it. Decoding becomes a dictionary lookup.*
+*Compile the regex to an FSM (see [[Regular Expression Engines]]), then precompute for every FSM state the set of vocabulary tokens that can be read from it. Decoding becomes a dictionary lookup.*
 
 Willard and Louf's paper ([arXiv 2307.09702](https://ar5iv.labs.arxiv.org/html/2307.09702)) does two passes before generation starts:
 
@@ -573,3 +573,4 @@ Results reported: compile around 10 ms vs over 1,000 ms for XGrammar on tool cal
 - [[Compiler Testing and Fuzzing]] — Grammar-based generators are the classical cousin of constrained sampling.
 - [[Verified Compilers]] — Where a proven-correct grammar engine would belong.
 - [[Language Servers and IDE Tooling]] — Planned: incremental parsing of incomplete programs, the same viable-prefix problem.
+- [[Regular Expression Engines]] — Regex to automaton compilation, derivatives and lazy DFAs in general.

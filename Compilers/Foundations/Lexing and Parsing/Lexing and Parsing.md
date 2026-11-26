@@ -144,7 +144,7 @@ Maximal munch needs bounded lookahead past the token. V8's JavaScript scanner lo
 
 *Regular expressions compile to an NFA in linear size, then to a DFA by subset construction; the DFA runs in one table lookup or branch per character.*
 
-The classic pipeline, used by lex, flex and re2c, is regex rules → NFA → DFA → minimized DFA → table-driven or direct-coded lexer.
+The classic pipeline, used by lex, flex and re2c (and, at run time, by the engines in [[Regular Expression Engines]]), is regex rules → NFA → DFA → minimized DFA → table-driven or direct-coded lexer.
 
 - **Thompson's construction** (Ken Thompson, CACM 1968; earlier McNaughton and Yamada, 1960) builds an NFA whose size is linear in the regex ([Wikipedia](https://en.wikipedia.org/wiki/Thompson%27s_construction)).
 - **Subset (powerset) construction** makes it deterministic: each DFA state is a *set* of NFA states.
@@ -553,3 +553,4 @@ The old lexer/parser split reappears exactly: regular token-level structure is p
 - [[Grammar-Constrained Decoding]] — Planned: Earley and pushdown parsing for structured LLM output.
 - [[Abstract Interpretation]] — The general theory of sound static analysis over abstract domains.
 - [[Dependent and Refinement Types]] — Types that depend on values, and SMT-checked refinements.
+- [[Regular Expression Engines]] — Run-time regex matching: backtracking vs lazy DFAs, derivatives, ReDoS.

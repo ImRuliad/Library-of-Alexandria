@@ -362,7 +362,7 @@ Because LLVM did the instruction selection and register allocation ahead of time
 | Domain | What gets JIT-compiled | Example |
 |---|---|---|
 | **eBPF** | Verified bytecode programs loaded into the Linux kernel, compiled to native code (x86-64, arm64 and others) after the verifier proves them safe | `net.core.bpf_jit_enable`; the kernel docs describe the eBPF instruction set as designed to map one-to-one onto native instructions for JITing ([kernel docs](https://docs.kernel.org/bpf/classic_vs_extended.html)) |
-| **Regular expressions** | The regex's automaton, compiled to a machine-code matcher | PCRE2 JIT, V8's Irregexp, .NET `RegexOptions.Compiled` |
+| **Regular expressions** | The regex's automaton, compiled to a machine-code matcher (see [[Regular Expression Engines]]) | PCRE2 JIT, V8's Irregexp, .NET `RegexOptions.Compiled` |
 | **Databases** | Query plans fused into tight loops instead of interpreted operator by operator | HyPer's data-centric code generation via LLVM ([Neumann, VLDB 2011](https://faculty.cc.gatech.edu/~jarulraj/courses/4420-s19/papers/03-compilation/p539-neumann.pdf)); PostgreSQL's LLVM JIT for expressions |
 | **[[WebAssembly]]** | Wasm modules: a fast single-pass baseline first, an optimizing compiler for hot code | V8's Liftoff then TurboFan ([V8, 2018](https://v8.dev/blog/liftoff)); Wasmtime's Winch then Cranelift; Titzer surveys the baselines ([Titzer, 2023](https://ar5iv.labs.arxiv.org/html/2305.13241)) |
 | **GPU drivers** | Shaders and kernels shipped as SPIR-V, DXIL or PTX, compiled for the exact GPU at load time | Mesa's ACO for AMD; NVIDIA's driver compiles PTX to SASS. See [[GPU Kernel Compilers]] |
@@ -471,3 +471,4 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[Sea of Nodes]] — The graph IR of HotSpot C2, Graal and (until 2025) TurboFan.
 - [[Escape Analysis]] — Removing heap allocations that never escape a method.
 - [[Deoptimization and Speculation]] — Guards, frame states, lazy invalidation and deopt loops.
+- [[Regular Expression Engines]] — Irregexp and PCRE2 JIT compile one pattern to native code.
