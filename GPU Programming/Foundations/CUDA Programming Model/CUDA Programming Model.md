@@ -324,3 +324,5 @@ Open problems:
 - [[CUTLASS and CuTe]] — NVIDIA's template library and layout algebra for tiled kernels.
 - [[PTX and SASS]] — What `nvcc` compiles kernels into.
 - [[ROCm and HIP]] — AMD's near-copy of this model.
+- [[CUDA Tile and cuTile]] — The tile model beside SIMT.
+- [[Numba and CuPy]] — SIMT kernels and GPU arrays from Python.

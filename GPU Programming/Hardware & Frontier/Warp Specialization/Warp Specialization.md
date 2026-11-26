@@ -448,3 +448,4 @@ Open problems:
 - [[CUDA Tile and cuTile]] — Tile programming that hides roles from the programmer.
 - [[ROCm and HIP]] — Why AMD kernels use ping-pong and interleave schedules instead.
 - [[FlashAttention]] — The best-known warp-specialized kernel family.
+- [[ThunderKittens and Tile DSLs]] — TK's LCSF template packages producer/consumer warpgroups.

@@ -358,3 +358,6 @@ Open problems:
 - [[Warp Specialization]] — Producer and consumer warps in persistent kernels.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Checking whether a GEMM is compute- or memory-bound.
 - [[FlashAttention]] — Attention written as fused, tiled GEMMs.
+- [[CUDA Tile and cuTile]] — GEMM as a few lines of tile code.
+- [[ThunderKittens and Tile DSLs]] — Tile primitives for GEMM and attention.
+- [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — FP8 and FP4 block-scaled GEMMs.

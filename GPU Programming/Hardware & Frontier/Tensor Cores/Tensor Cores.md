@@ -394,3 +394,5 @@ Open problems:
 - [[Quantization]] — How models use FP8, MXFP and NVFP4 formats.
 - [[FlashAttention]] — A case study in reshaping one algorithm around each Tensor Core generation.
 - [[AI Accelerators]] — How other chips (TPUs, Trainium, wafer-scale) approach the same matrix-multiply problem.
+- [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — FP8, FP6, FP4 and block-scaled formats the tensor cores consume.
+- [[CUDA Tile and cuTile]] — Tile programming that targets tensor cores portably.

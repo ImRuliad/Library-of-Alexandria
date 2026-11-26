@@ -383,3 +383,6 @@ The placement is this note's judgement, not a measurement. The pattern behind it
 - [[Roofline Model and Arithmetic Intensity]] — Why vector add and softmax are bandwidth-bound.
 - [[ROCm and HIP]] — The AMD stack Triton's ROCm backend targets.
 - [[FlashAttention]] — The attention kernels FlexAttention is measured against.
+- [[CUDA Tile and cuTile]] — NVIDIA's tile language; Triton can compile to its Tile IR.
+- [[ThunderKittens and Tile DSLs]] — ThunderKittens, Gluon, TileLang and other tile DSLs.
+- [[Numba and CuPy]] — The older Python GPU tools.

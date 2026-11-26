@@ -344,3 +344,4 @@ Open problems:
 - [[Warp Specialization]] — How megakernels and fused attention overlap work inside one kernel.
 - [[FlashAttention]] — The canonical algorithmic fusion.
 - [[Memory Coalescing]] — Fused kernels still need coalesced loads and stores.
+- [[Numba and CuPy]] — CuPy's ElementwiseKernel and cp.fuse.

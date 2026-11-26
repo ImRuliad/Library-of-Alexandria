@@ -370,3 +370,6 @@ It is the same vocabulary as the C++ version, without template instantiation. NV
 - [[Roofline Model and Arithmetic Intensity]] — Why tile sizes matter.
 - [[FlashAttention]] — FA3 built on CUTLASS, FA4 on the CuTe DSL.
 - [[GPU Memory Hierarchy]] — The levels the GEMM hierarchy maps onto.
+- [[CUDA Tile and cuTile]] — NVIDIA's compiler-scheduled tile layer beside CuTe DSL.
+- [[ThunderKittens and Tile DSLs]] — Other tile-level kernel DSLs.
+- [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — Block-scaled formats in CUTLASS GEMMs.
