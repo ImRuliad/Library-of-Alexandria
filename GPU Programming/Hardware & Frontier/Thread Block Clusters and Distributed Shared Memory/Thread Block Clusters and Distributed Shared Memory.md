@@ -13,7 +13,7 @@ tags:
   - blackwell
   - clusters
   - shared-memory
-status: draft
+status: complete
 sources:
   - https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/
   - https://docs.nvidia.com/cuda/hopper-tuning-guide/index.html

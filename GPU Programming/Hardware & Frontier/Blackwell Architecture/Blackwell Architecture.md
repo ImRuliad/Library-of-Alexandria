@@ -12,7 +12,7 @@ tags:
   - blackwell
   - nvidia
   - tensor-cores
-status: draft
+status: complete
 sources:
   - https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing
   - https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra-the-chip-powering-the-ai-factory-era
@@ -264,7 +264,7 @@ Sources: [NVIDIA, May 2025](https://developer.nvidia.com/blog/nvidia-blackwell-a
 - **Kernels caught up.** [[FlashAttention]]-4 (Mar 2026) reaches "up to 1613 TFLOPs/s (71% utilization)" in BF16 on B200, 1.3x over cuDNN 9.13, written entirely in CuTe DSL with "20-30× faster compile times" than C++ templates ([arXiv 2603.05451](https://arxiv.org/html/2603.05451v1)). CUTLASS claims "up to 98% relative peak" on Tensor Core operations ([NVIDIA](https://developer.nvidia.com/blog/cuda-toolkit-12-8-delivers-nvidia-blackwell-support/)).
 - **Rack-scale vs per-GPU.** SemiAnalysis's InferenceX v2 (Feb 2026) found each GB200 NVL72 GPU gives "slightly less than triple" a B200's throughput at 60 tokens/s per user but "nearly no advantage" at 130, and that Blackwell Ultra beats Blackwell by "up to 1.5x" in FP8 but only about 1.1x in FP4 ([SemiAnalysis](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs)).
 - **Blackwell at the edge.** Jetson Thor and DGX Spark bring the architecture to robots and desks; CUDA 13.0 unified the Arm toolkit and gave Thor MPS and green contexts ([NVIDIA, Sep 2025](https://developer.nvidia.com/blog/whats-new-in-cuda-toolkit-13-0-for-jetson-thor-unified-arm-ecosystem-and-more/); see [[MIG and MPS - Sharing a GPU]]).
-- **Next: Rubin.** Due in the second half of 2026: two reticle-sized dies, 288 GB of HBM4 at 22 TB/s, NVLink 6 at about 3.5 TB/s per GPU, and 35 PF dense NVFP4. NVIDIA kept the "NVL72" name for the Vera Rubin rack ([Lockwood, Apr 2026](https://glennklockwood.com/garden/processors/R200)). [[Tensor Cores]] tracks its production status.
+- **Next: Rubin.** Due in the second half of 2026: two reticle-sized dies, 288 GB of HBM4 at 22 TB/s, NVLink 6 at 3.5 to 3.6 TB/s per GPU (sources differ), and 35 PF dense NVFP4. NVIDIA kept the "NVL72" name for the Vera Rubin rack ([Lockwood, Apr 2026](https://glennklockwood.com/garden/processors/R200)). [[Tensor Cores]] tracks its production status.
 - **Competition.** AMD's MI355X is "quite competitive with B200" in FP8 serving but trails in FP4 disaggregated serving, per SemiAnalysis ([Feb 2026](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs)); see [[AI Accelerators]].
 
 ## ***Trade-offs & Open Problems***

@@ -13,7 +13,7 @@ tags:
   - mps
   - gpu-sharing
   - kubernetes
-status: draft
+status: complete
 sources:
   - https://docs.nvidia.com/deploy/mps/index.html
   - https://docs.nvidia.com/deploy/mps/architecture.html
@@ -284,12 +284,12 @@ Sources: [GPU Operator sharing](https://docs.nvidia.com/datacenter/cloud-native/
 ---
 *As of November 2026, the three mechanisms are converging: MPS is gaining hard partitions, MIG is gaining flexibility through dynamic allocation, and LLM servers partition SMs themselves with green contexts.*
 
-- **MPS v3 and static partitions.** The MPS docs (updated November 11, 2026) introduce MPS v3, "a new, opt-in control daemon interface" with scriptable commands (`server create`, `client list`, `sm-partition create`), plus namespaces, a configuration file and memory partitioning; "all existing Legacy MPS v2 functionality continues to work unchanged" ([MPS docs](https://docs.nvidia.com/deploy/mps/index.html)). Static SM partitioning gives clients exclusive SMs on Ampere and newer, closing part of the gap with MIG; memory bandwidth, L2 and fault fate are still shared ([MPS docs](https://docs.nvidia.com/deploy/mps/when-to-use-mps.html)).
+- **MPS v3 and static partitions.** The MPS docs (updated November 11, 2026) introduce MPS v3, "a new, opt-in control daemon interface" that replaces the interactive shell of Legacy MPS v2, with named servers, namespaces, a configuration file and memory partitioning; "all existing Legacy MPS v2 functionality continues to work unchanged" ([MPS docs](https://docs.nvidia.com/deploy/mps/index.html)). Static SM partitioning gives clients exclusive SMs on Ampere and newer, closing part of the gap with MIG; memory bandwidth, L2 and fault fate are still shared ([MPS docs](https://docs.nvidia.com/deploy/mps/when-to-use-mps.html)).
 - **MIG everywhere in Blackwell.** B200 and GB200 (from R570 drivers), B300 and GB300 (R595, CUDA 13), RTX PRO Blackwell with graphics-capable instances, and Jetson Thor's integrated GPU with one compute and one graphics instance ([supported GPUs](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/620/supported-gpus.html)).
 - **Kubernetes.** DRA's API went GA in Kubernetes 1.34 (Sep 2025) and is "Stable since Kubernetes v1.35" ([Kubernetes docs](https://www.kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation)). NVIDIA's DRA driver (v0.5.1, needs Kubernetes 1.32+) handles dynamic MIG, MPS, time slicing and multi-node NVLink "ComputeDomains" ([DRA driver docs](https://dra-driver-nvidia-gpu.sigs.k8s.io/docs/)); at KubeCon EU on March 24, 2026 NVIDIA donated it to the Kubernetes project, and its KAI scheduler (with GPU fractions) joined the CNCF Sandbox ([NVIDIA, Mar 2026](https://blogs.nvidia.com/blog/nvidia-at-kubecon-2026)).
-- **LLM serving on shared SMs.** Instead of separate GPUs for prefill and decode ([[LLM Serving]]), several systems split one GPU's SMs between them: MuxServe (ICML 2024) multiplexes several LLMs with MPS-style SM partitioning ([PMLR](https://proceedings.mlr.press/v235/duan24a.html)); PD-Multiplexing runs prefill and decode on separate green-context partitions and is integrated into SGLang ([LMSYS, Sep 2025](https://lmsys.org/blog/2025-09-28-pdmux); [arXiv 2504.14489](https://arxiv.org/html/2504.14489v1)).
-- **An OS for the GPU.** LithOS (CMU and Meta, SOSP 2025) schedules at the granularity of TPCs (pairs of SMs), splits kernels for fine-grained preemption and right-sizes hardware per job, transparently to applications, and compares itself directly with MPS and MIG ([arXiv 2504.15465](https://arxiv.org/abs/2504.15465)).
-- **Research on picking partitions.** MISO (SoCC 2022) uses short MPS co-location runs to predict the best MIG layout for a job mix without repeatedly reconfiguring MIG ([arXiv 2207.11428](https://arxiv.org/abs/2207.11428v1)).
+- **LLM serving on shared SMs.** Instead of separate GPUs for prefill and decode ([[LLM Serving]]), several systems share one GPU's compute between them. MuxServe (ICML 2024) colocates several LLMs and separates prefill and decode so they can share compute, reporting up to 1.8x higher throughput ([PMLR](https://proceedings.mlr.press/v235/duan24a.html)). PD-Multiplexing uses green contexts to "allocate just enough SMs to the decode phase to guarantee the ITL SLO, then dedicate all remaining SMs to prefill"; as of its Sep 2025 post it was a proof of concept with "full integration into SGLang ... underway" ([LMSYS](https://lmsys.org/blog/2025-09-28-pdmux); [arXiv 2504.14489](https://arxiv.org/html/2504.14489v1)).
+- **An OS for the GPU.** LithOS (arXiv, Apr 2025) schedules "at the granularity of individual TPCs" (pairs of SMs), splits kernels into atoms to reduce head-of-line blocking, and right-sizes the TPCs each atom gets, transparently to applications. It reports tail latencies "13x" lower than MPS when stacking inference jobs ([arXiv 2504.15465](https://arxiv.org/abs/2504.15465)).
+- **Research on picking partitions.** MISO (SoCC 2022) uses "the lightweight, more flexible Multi-Process Service (MPS) capability to predict the best MIG partition allocation", avoiding repeated MIG reconfiguration while it explores; it reports 49% and 16% lower average job completion time than unpartitioned and optimal static partitioning ([arXiv 2207.11428](https://arxiv.org/abs/2207.11428v1)).
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -317,8 +317,8 @@ Sources: [GPU Operator sharing](https://docs.nvidia.com/datacenter/cloud-native/
 
 **Measurements and research**
 - [Maximize AI infrastructure throughput by consolidating underutilized GPU workloads](https://developer.nvidia.com/blog/maximize-ai-infrastructure-throughput-by-consolidating-underutilized-gpu-workloads/): NVIDIA, Mar 2026. Time slicing vs MIG on A100.
-- [LithOS](https://arxiv.org/abs/2504.15465): CMU and Meta, SOSP 2025.
-- [PD-Multiplexing](https://arxiv.org/html/2504.14489v1) and [LMSYS post](https://lmsys.org/blog/2025-09-28-pdmux): green contexts in SGLang.
+- [LithOS](https://arxiv.org/abs/2504.15465): arXiv, Apr 2025. TPC-granularity GPU scheduling.
+- [PD-Multiplexing](https://arxiv.org/html/2504.14489v1) and [LMSYS post](https://lmsys.org/blog/2025-09-28-pdmux): green contexts for prefill/decode, headed for SGLang.
 - [MuxServe](https://proceedings.mlr.press/v235/duan24a.html): ICML 2024.
 - [MISO](https://arxiv.org/abs/2207.11428v1): SoCC 2022.
 
