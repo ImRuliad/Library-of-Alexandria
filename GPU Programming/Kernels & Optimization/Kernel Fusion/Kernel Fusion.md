@@ -347,3 +347,4 @@ Open problems:
 - [[Numba and CuPy]] — CuPy's ElementwiseKernel and cp.fuse.
 - [[Megakernels]] — Fusing a whole model's forward pass into one persistent kernel.
 - [[Persistent Kernels and Stream-K]] — Persistent blocks, the launch style megakernels and fused GEMMs build on.
+- [[Device-Side Math Libraries (MathDx)]] — Library FFTs, GEMMs and solvers you call inside a fused kernel.

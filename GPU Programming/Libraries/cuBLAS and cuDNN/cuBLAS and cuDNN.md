@@ -272,7 +272,7 @@ NVIDIA describes grouped GEMM as "a generalization of the batched APIs". It matt
 
 - **cuBLASXt** is a host API for level-3 BLAS on one or more GPUs: data can stay on the host, and "the Library will take care of dispatching the operation to, and transferring the data to, one or multiple GPUs" ([cuBLAS docs](https://docs.nvidia.com/cuda/cublas/index.html)). It suits matrices bigger than GPU memory, not deep learning.
 - **cuBLASMp** is "a high-performance, multi-process, GPU-accelerated library for distributed basic dense linear algebra": it uses a 2D block-cyclic data layout, PBLAS-like C APIs and an NCCL communication backend, and has a guide for using it for tensor parallelism ([cuBLASMp docs](https://docs.nvidia.com/cuda/cublasmp/index.html)); see [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]].
-- **cuBLASDx** is a separate download ("not shipped with the CUDA Toolkit") documented in its own section of the cuBLAS docs.
+- **cuBLASDx** is a separate download ("not shipped with the CUDA Toolkit") documented in its own section of the cuBLAS docs. It runs GEMM and TRSM inside your own kernel; see [[Device-Side Math Libraries (MathDx)]].
 
 ### cuDNN Legacy and Graph APIs
 
@@ -455,3 +455,4 @@ In PyTorch, `torch.use_deterministic_algorithms(True)` makes PyTorch use determi
 - [[ROCm and HIP]] — AMD's stack, and HIPIFY's translation of cuBLAS calls.
 - [[Profiling with Nsight Compute and Nsight Systems]] — How to see which library kernel actually ran.
 - [[GEMM Autotuning and Kernel Selection]] — Heuristics, `CUBLAS_GEMM_AUTOTUNE`, TunableOp and model-pruned tuning in depth.
+- [[Device-Side Math Libraries (MathDx)]] — cuBLASDx and cuSolverDx: BLAS and solvers called inside your own kernel.
