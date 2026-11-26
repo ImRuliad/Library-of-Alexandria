@@ -64,7 +64,7 @@ updated: 2026-11-26
 | One big Postgres or MySQL | Full SQL, transactions, simple reasoning | Write capacity of one machine; failover loses recent writes or takes minutes |
 | Primary plus async replicas | Read scaling | Stale reads; promoted replica may lack acknowledged writes |
 | Manual sharding | Write scaling | Cross-shard joins and transactions are on you; resharding is a project |
-| NoSQL (Dynamo-style) | Scale and availability | Gave up SQL, joins and multi-key transactions |
+| NoSQL ([[Replication|Dynamo-style]]) | Scale and availability | Gave up SQL, joins and multi-key transactions |
 | **Distributed SQL** | SQL and serializable or snapshot transactions across many nodes and regions | Higher write latency; complexity inside the database |
 
 Spanner's first customer is the canonical story: Google's ads backend, F1, had run on manually sharded MySQL where resharding was "extremely costly"; on Spanner it got synchronous replication across coasts and automatic failover that was "nearly invisible" to the team ([Spanner, OSDI 2012](https://www.cs.princeton.edu/courses/archive/fall15/cos518/papers/spanner.pdf)).
@@ -276,6 +276,7 @@ Open problems worth tracking:
 ## Related Notes
 
 - [[Paxos]] and [[Raft]] — The consensus protocols under every range.
+- [[Replication]] — Where per-range consensus sits among primary-backup, chain and leaderless replication.
 - [[Distributed Transactions]] — 2PC, Percolator and parallel commits across ranges.
 - [[Partitioning]] — How the key space is split into ranges and rebalanced.
 - [[Time and Clocks]] — TrueTime, hybrid logical clocks and timestamp oracles.

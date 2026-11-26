@@ -262,3 +262,4 @@ Open problems:
 - [[Reliability Patterns]] — retries, backoff and blast-radius limits
 - [[Consistency Models]] — gossip gives eventual consistency of the membership view
 - [[Time and Clocks]] — heartbeat timing and timeouts depend on local clocks
+- [[Replication]] — Dynamo-style rings, anti-entropy, and Cassandra moving metadata from gossip to a log

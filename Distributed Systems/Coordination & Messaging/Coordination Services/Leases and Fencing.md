@@ -253,4 +253,5 @@ Open problems:
 - [[Reliability Patterns]] — mass lease re-acquisition in the 2025 AWS outage
 - [[Distributed SQL]] — CockroachDB and Aurora DSQL lease and fence designs
 - [[Formal Methods in Practice]] — lease protocols are a classic place for subtle bugs
+- [[Replication]] — primary-backup failover needs exactly one primary, which leases and fencing provide
 - [[3. System Interactions|GFS: System Interactions]] — GFS's master grants chunk leases

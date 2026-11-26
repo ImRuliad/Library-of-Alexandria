@@ -255,7 +255,7 @@ $$
 - b1 [0,1,0] vs a2 [2,0,0]: b1 is ahead in slot B, a2 is ahead in slot A, so they are **concurrent**. The Lamport clock couldn't see this.
 - a1 [1,0,0] ≤ c2 [2,3,2], so a1 → c2, through two messages.
 
-The cost is size: $N$ counters per timestamp, which is prohibitive with thousands of nodes or clients ([Kulkarni et al.](https://www.cse.buffalo.edu//~demirbas/publications/hlc.pdf)). Version vectors (one entry per replica, not per process) are the practical form used to detect conflicting writes in Dynamo-style stores and [[CRDTs]].
+The cost is size: $N$ counters per timestamp, which is prohibitive with thousands of nodes or clients ([Kulkarni et al.](https://www.cse.buffalo.edu//~demirbas/publications/hlc.pdf)). Version vectors (one entry per replica, not per process) are the practical form used to detect conflicting writes in [[Replication|Dynamo-style stores]] and [[CRDTs]].
 
 #### **Synchronized Physical Clocks and Error Bounds**
 Physical clocks give real time but no causal guarantee. The modern way to use them safely is to never treat a reading as exact. Instead a clock read returns an **interval** guaranteed (with stated confidence) to contain true time:

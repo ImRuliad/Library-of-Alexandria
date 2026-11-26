@@ -253,7 +253,7 @@ Why it's safe: a value chosen by any phase 2 quorum is seen by every future phas
 | EPaxos (2013) | No leader; any replica commits commands that don't conflict in 1 round trip | Complex dependency tracking and recovery; the original had bugs (see below) |
 | Flexible Paxos (2016) | Different quorum sizes for phase 1 and phase 2 | Harder leader change |
 | [[Raft]] (2014) | Leader must already have an up-to-date log; strong leader | Elections can stall on split votes; randomized timeouts |
-| Viewstamped Replication (1988) | Same core ideas, framed as primary-backup with view changes | Developed independently of Paxos |
+| Viewstamped Replication (1988) | Same core ideas, framed as [[Replication|primary-backup]] with view changes | Developed independently of Paxos |
 
 ### From Algorithm to System
 

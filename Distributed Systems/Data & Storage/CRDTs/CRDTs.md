@@ -173,7 +173,7 @@ $$
 | Type | Concurrent writes resolve to | Use |
 |---|---|---|
 | **LWW-Register** | The write with the higher timestamp; the other is lost | Settings, caches, anything where losing a concurrent write is fine |
-| **MV-Register** (multi-value) | All concurrent values, detected with version vectors; the next write replaces them | Dynamo-style siblings; the app or user picks |
+| **MV-Register** (multi-value) | All concurrent values, detected with version vectors; the next write replaces them | [[Replication|Dynamo-style]] siblings; the app or user picks |
 
 The original paper notes that last-writer-wins gives a total order "at the cost of losing concurrent updates" ([SSS 2011](https://www.cs.tufts.edu/~nr/cs257/archive/marc-shapiro/CRDTs_SSS-2011.pdf)). LWW also depends on clocks, so skew decides the winner; see [[Time and Clocks]].
 
