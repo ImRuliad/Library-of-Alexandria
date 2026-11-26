@@ -149,7 +149,7 @@ Three things to read off the table:
 |---|---|---|---|
 | **SpMV** | $y = \alpha A x + \beta y$, $A$ sparse | Krylov solvers (CG, GMRES), PageRank, power iteration | Bandwidth |
 | **SpMM** | $C = \alpha A B + \beta C$, $A$ sparse, $B$ dense (many columns) | GNN aggregation, block Krylov, pruned-weight layers | Bandwidth, rising toward compute as $B$ widens (each nonzero reused $n$ times) |
-| **SpGEMM** | $C = A B$, both sparse, output sparse | Algebraic multigrid setup, graph algorithms (triangle counting, BFS frontiers) | Memory and output-size management |
+| **SpGEMM** | $C = A B$, both sparse, output sparse | Algebraic multigrid setup, graph algorithms (triangle counting, BFS frontiers; see [[Graph Analytics on GPUs]]) | Memory and output-size management |
 | **SDDMM** | $C = (A B^\top) \odot S$: compute dense dot products only where $S$ is nonzero | GNN edge scores, attention with a sparse mask | Like SpMM |
 | **SpTRSV / SpSM** | Solve $L x = b$ with $L$ sparse triangular | Preconditioners (ILU, IC), direct-solver solve phase | Dependencies (latency) |
 
@@ -453,5 +453,6 @@ Net: in late 2026, [[Quantization]] and [[Low-Precision Formats - FP8, FP4 and M
 - [[Kernel Fusion]] — SpMVOp's fused epilogues.
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — The competitor that overtook 2:4 sparsity.
 - [[Mixture of Experts]] — Block-sparse expert routing.
+- [[Graph Analytics on GPUs]] — BFS and PageRank as SpMV over semirings; the same load-imbalance fixes.
 - [[Sparse Attention]] — Attention-side sparsity and its kernels.
 - [[Quantization]] — The model-compression alternative to pruning.
