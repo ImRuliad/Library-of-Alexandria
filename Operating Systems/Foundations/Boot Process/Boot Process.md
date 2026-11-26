@@ -3,7 +3,7 @@ tags:
   - operating-systems
   - foundations
   - boot-process
-status: draft
+status: complete
 sources:
   - https://docs.kernel.org/arch/x86/boot.html
   - https://docs.kernel.org/admin-guide/efi-stub.html
