@@ -7,8 +7,16 @@ tags:
   - cfi
   - lsm
   - kspp
-status: draft
+status: complete
 sources:
+  - https://github.com/nccgroup/exploit_mitigations/blob/main/linux_mitigations.md
+  - https://arxiv.org/abs/2304.07940
+  - https://kernelnewbies.org/Linux_4.9
+  - https://kernelnewbies.org/Linux_5.7
+  - https://outflux.net/blog/archives/2017/05/02/security-things-in-linux-v4-11/
+  - https://landlock.io/news/1/
+  - https://lkml.iu.edu/hypermail/linux/kernel/2308.3/04296.html
+  - https://lkml.iu.edu/hypermail/linux/kernel/2308.3/05242.html
   - https://docs.kernel.org/security/self-protection.html
   - https://outflux.net/slides/2016/cs/kspp.pdf
   - https://events19.linuxfoundation.org/wp-content/uploads/2017/12/Overview-and-Recent-Developments-Kernel-Self-Protection-Project_Kees-Cook.pdf
@@ -167,7 +175,7 @@ timeline
     2009-2011 : stack protector (2.6.30) : kptr_restrict (2.6.38) : SMEP (3.0)
     2012-2014 : SMAP (3.7) : x86 KASLR and stack-protector-strong (3.14)
     2015 : KSPP founded (Nov) : RODATA on ARM and arm64
-    2016-2017 : hardened usercopy (4.8) : VMAP_STACK (4.9) : refcount_t (4.11) : FORTIFY_SOURCE (4.13) : randstruct (4.14)
+    2016-2017 : hardened usercopy (4.8) : VMAP_STACK (4.9) : refcount_t (4.11) : FORTIFY_SOURCE, randstruct (4.13)
     2018 : KPTI, retpoline, %p hashing (4.15) : usercopy whitelisting (4.16) : VLAs removed : STACKLEAK (4.20)
     2019-2021 : init_on_alloc/free (5.3) : lockdown LSM (5.4) : BPF LSM (5.7) : Landlock (5.13)
     2022-2023 : kernel IBT (5.18) : kCFI (6.1) : FineIBT (6.2) : user shadow stacks, LIST_HARDENED, random kmalloc caches (6.6)
@@ -195,7 +203,7 @@ $$
 \text{entropy} = \log_2\!\left(\frac{\text{window}}{\text{alignment}}\right) = \log_2\!\left(\frac{2^{30}}{2^{21}}\right) = 9 \text{ bits}
 $$
 
-*In plain words: there are only 512 possible positions, so a blind guess succeeds 1 time in 512, and any single leaked kernel pointer reveals the offset for the whole image.* (The 1 GiB and 2 MiB figures are the standard x86-64 layout; check `Documentation/arch/x86/x86_64/mm.rst` for a specific version.)
+*In plain words: there are only 512 possible positions, so a blind guess succeeds 1 time in 512, and any single leaked kernel pointer reveals the offset for the whole image.* The kernel image is 2 MiB-aligned inside a 1 GiB window, giving 512 offsets and 9 bits of entropy ([arXiv 2304.07940](https://arxiv.org/abs/2304.07940)).
 
 **FGKASLR** (function-granular KASLR) shuffled every function separately so one leak reveals only one function. v10 (February 2022) cost about 1 second of extra boot time, about 1% on kernel builds, and grew the compressed image about 15%, and it was never merged ([LWN](https://lwn.net/Articles/884297/)). OpenBSD's **KARL** takes a different route: it relinks the kernel in a random order on every boot.
 
@@ -271,7 +279,7 @@ Most modern kernel exploits are heap exploits: free an object, then reallocate i
 
 | Defence | Year | What it does |
 |---|---|---|
-| Freelist pointer obfuscation, `SLAB_FREELIST_RANDOM` | 4.14 | Free-list pointers are XORed with a secret; allocation order is shuffled |
+| Freelist pointer obfuscation (`SLAB_FREELIST_HARDENED`), `SLAB_FREELIST_RANDOM` | 4.14, 4.8 | Free-list pointers are XORed with a secret; allocation order is shuffled |
 | `CONFIG_LIST_HARDENED` | 6.6 | Cheap integrity checks on linked-list operations |
 | `RANDOM_KMALLOC_CACHES` | 6.6 | Several copies of each kmalloc cache, chosen per call site, so the attacker's spray may land in a different cache |
 | `SLAB_BUCKETS` / `kmem_buckets` | 6.11 | Separate caches for allocations whose size the user controls (e.g. `msg_msg`, xattrs) |
