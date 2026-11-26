@@ -265,7 +265,7 @@ $$
 t_{\text{now}} - \Delta \cdot \beta \cdot \ln(U) \ \ge\ t_{\text{expiry}}, \qquad U \sim \text{Uniform}(0, 1)
 $$
 
-*In words:* $-\ln U$ is an exponential random number with mean 1, so each read pretends the clock is a random amount ahead, typically about $\Delta\beta$. With $g = t_{\text{expiry}} - t_{\text{now}}$ left, one read triggers with probability $e^{-g/(\Delta\beta)}$. $\beta = 1$ is the default and "works well in practice"; larger $\beta$ refreshes earlier. The authors stress that it "requires no parameter tuning", because it doesn't need to know the request rate.
+*In words:* $-\ln U$ is an exponential random number with mean 1, so each read pretends the clock is a random amount ahead, typically about $\Delta\beta$. With $g = t_{\text{expiry}} - t_{\text{now}}$ left, one read triggers with probability $e^{-g/(\Delta\beta)}$. $\beta = 1$ is the default and works well in practice; larger $\beta$ refreshes earlier. The authors stress that it "requires no parameter tuning", because it doesn't need to know the request rate.
 
 *Worked example.* Recompute takes $\Delta = 2$ s, $\beta = 1$, and the key gets $r = 1{,}000$ reads/s. Expected triggers per second are $r \cdot e^{-g/2}$, which reaches 1 when $g = 2\ln 1000 \approx 13.8$ s. So the first refresh typically starts about 14 seconds before expiry, long before the herd would form, and only a couple more reads trigger during the 2 seconds it runs. The general lead time is about $\Delta\beta \ln r$, growing only with the *log* of the traffic.
 
