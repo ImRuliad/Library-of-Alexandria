@@ -49,6 +49,7 @@ sources:
   - https://arxiv.org/abs/2611.21084
   - https://arxiv.org/html/2607.26306
   - https://docs.sel4.systems/projects/sel4/verified-configurations.html
+  - https://microkerneldude.org/2021/05/05/sel4-on-risc-v-verified-to-binary-code/
 created: 2026-11-26
 updated: 2026-11-26
 ---
@@ -361,7 +362,7 @@ seL4's functional-correctness proof is about C. Sewell, Myreen and Klein closed 
 | Failed / aborted | 0 / 26 | 18 / 62 |
 | Proof time | about 59 min | about 4 h 23 min |
 
-The failures at `-O2` came mostly from loop-structure changes like unrolling, which the method couldn't relate; nested loops weren't handled. The authors found no genuine gcc bugs. Small source changes (packed structs, `uint32_t` instead of enums) were needed to make the proof go through. As of November 2026, seL4's [verified-configurations page](https://docs.sel4.systems/projects/sel4/verified-configurations.html) lists binary correctness only for the AArch32 (`ARM`) configurations; AArch64, RISC-V and x86-64 have C-level proofs only. See [[Microkernels and seL4]].
+The failures at `-O2` came mostly from loop-structure changes like unrolling, which the method couldn't relate; nested loops weren't handled. The authors found no genuine gcc bugs. Small source changes (packed structs, `uint32_t` instead of enums) were needed to make the proof go through. As of November 2026, seL4's [verified-configurations page](https://docs.sel4.systems/projects/sel4/verified-configurations.html) lists binary correctness only for the AArch32 (`ARM`) configurations; AArch64, RISC-V and x86-64 have C-level proofs only, even though Gernot Heiser announced in 2021 that RISC-V 64 had been verified to binary code ([Heiser, 2021](https://microkerneldude.org/2021/05/05/sel4-on-risc-v-verified-to-binary-code/)). See [[Microkernels and seL4]].
 
 ### Alive and Alive2
 
