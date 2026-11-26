@@ -47,7 +47,7 @@ updated: 2026-11-26
 - **What they are:** a handful of replicas (typically 3 or 5) running [[Paxos]], Zab or [[Raft]], exposing a tiny file-system or key-value API with sessions, ephemeral entries and change notifications.
 - **Chubby (Google, 2006):** coarse-grained locks and small files; GFS and Bigtable use it to elect masters, and it became Google's main internal name service ([Chubby paper](https://static.usenix.org/event/osdi06/tech/full_papers/burrows/burrows_html/index.html)).
 - **ZooKeeper (Yahoo, 2010):** a wait-free API of znodes and watches from which clients build their own locks and elections ([ZooKeeper paper](https://pdos.csail.mit.edu/6.824/papers/zookeeper.pdf)).
-- **etcd:** Raft-backed key-value store with revisions, leases and watches, holding all of Kubernetes' cluster state ([etcd docs](https://etcd.io/docs/next/learning/why)).
+- **etcd:** Raft-backed key-value store with revisions, leases and watches, holding all of Kubernetes' cluster state, which its scheduler and controllers read and write ([[Cluster Scheduling]]) ([etcd docs](https://etcd.io/docs/next/learning/why)).
 - **Watch out:** Jepsen found etcd's locks let two clients hold the same lock and calls distributed locks "a fundamentally unsafe concept in asynchronous systems" without fencing ([Jepsen](https://jepsen.io/analyses/etcd-3.4.3)). See [[Leases and Fencing]].
 
 ## ***The Problem***
