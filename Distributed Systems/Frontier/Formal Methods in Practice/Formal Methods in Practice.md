@@ -147,13 +147,13 @@ Notice how small the specs are: a few hundred lines each.
 
 ### P and Checking Production Logs
 
-P models a design as state machines exchanging messages, closer to how engineers already think about services. AWS teams used it to validate the protocol changes behind S3's move to strong read-after-write consistency. **PObserve** (2023) takes structured logs from running systems and checks them against the P spec, so the spec keeps earning its keep after launch ([Brooker and Desai, ACM Queue](https://queue.acm.org/detail.cfm?id=3712057)). Brooker and Desai describe specs as "test oracles that provide the correct answers" for testing.
+P models a design as state machines exchanging messages, closer to how engineers already think about services. AWS teams used it to validate the protocol changes behind [[Object Storage|S3]]'s move to strong read-after-write consistency. **PObserve** (2023) takes structured logs from running systems and checks them against the P spec, so the spec keeps earning its keep after launch ([Brooker and Desai, ACM Queue](https://queue.acm.org/detail.cfm?id=3712057)). Brooker and Desai describe specs as "test oracles that provide the correct answers" for testing.
 
 Modeling also pays off in performance: modeling Aurora's commit protocol let AWS cut distributed commits from two to 1.5 network round trips without losing safety ([ACM Queue](https://queue.acm.org/detail.cfm?id=3712057)). Compare [[Distributed Transactions]].
 
 ### Lightweight Formal Methods
 
-ShardStore, S3's 40,000-line Rust storage node, uses three pieces ([Murat Demirbas on the SOSP 2021 paper](https://muratbuffalo.blogspot.com/2021/10/using-lightweight-formal-methods-to.html)):
+ShardStore, [[Object Storage|S3]]'s 40,000-line Rust storage node, uses three pieces ([Murat Demirbas on the SOSP 2021 paper](https://muratbuffalo.blogspot.com/2021/10/using-lightweight-formal-methods-to.html)):
 
 ```mermaid
 flowchart LR

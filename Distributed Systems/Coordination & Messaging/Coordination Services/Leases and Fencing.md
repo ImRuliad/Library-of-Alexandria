@@ -193,7 +193,7 @@ The one point both sides agree on is that a lock service by itself cannot stop a
 | etcd | Lease with TTL | Lock key's revision, if the resource checks it ([Jepsen](https://jepsen.io/analyses/etcd-3.4.3)) |
 | Aurora Limitless | Consistency leases of a few seconds | A node with an expired lease stops serving reads ([Murat Demirbas](https://muratbuffalo.blogspot.com/2025/01/use-of-time-in-distributed-databases_14.html)) |
 | Aurora DSQL adjudicators | Time ranges of authority over key ranges | A new adjudicator sets a time-based fence that blocks older ones, instead of Paxos leader election ([Murat Demirbas](https://muratbuffalo.blogspot.com/2025/01/use-of-time-in-distributed-databases_14.html)) |
-| S3 conditional writes | Lock files with validity timeouts | Increasing lock IDs; create only succeeds if the file does not exist (`If-None-Match`) ([Willison on Morling](https://www.simonwillison.net/2024/Aug/30/leader-election-with-s3-conditional-writes)) |
+| [[Object Storage\|S3]] conditional writes | Lock files with validity timeouts | Increasing lock IDs; create only succeeds if the file does not exist (`If-None-Match`) ([Willison on Morling](https://www.simonwillison.net/2024/Aug/30/leader-election-with-s3-conditional-writes)) |
 
 DSQL leans on bounded clocks: correctness breaks only if a clock goes wrong *and* the ClockBound API keeps reporting high confidence instead of widening its bounds ([Murat Demirbas](https://muratbuffalo.blogspot.com/2025/01/use-of-time-in-distributed-databases_14.html)). See [[Time and Clocks]].
 
