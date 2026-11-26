@@ -237,7 +237,7 @@ With Tensor Cores the ladder is steeper. Shankhdhar's H100 BF16 worklog started 
 While the math units work on tile $t$, the next tiles should already be on their way. **Double buffering** keeps two shared-memory buffers and alternates, so one is loaded while the other is used ([CUTLASS blog](https://developer.nvidia.com/blog/cutlass-linear-algebra-cuda)). Modern kernels use 3–7 stages:
 
 - **Ampere**: `cp.async` copies global to shared memory without going through registers.
-- **Hopper and later**: [[TMA and Asynchronous Copies|TMA]] copies a whole multi-dimensional tile with one instruction, and **warp specialization** dedicates producer warps to issuing copies while consumer warpgroups do math ([CUTLASS efficient GEMM](https://docs.nvidia.com/cutlass/4.5.1/media/docs/cpp/efficient_gemm.html)).
+- **Hopper and later**: [[TMA and Asynchronous Copies|TMA]] copies a whole multi-dimensional tile with one instruction, and **[[Warp Specialization|warp specialization]]** dedicates producer warps to issuing copies while consumer warpgroups do math ([CUTLASS efficient GEMM](https://docs.nvidia.com/cutlass/4.5.1/media/docs/cpp/efficient_gemm.html)).
 - **Persistent kernels** launch one block per SM that loops over many tiles, overlapping one tile's epilogue (writing $C$) with the next tile's main loop. CUTLASS's "Cooperative" kernels split one tile across two consumer warpgroups; "Ping-Pong" kernels give each warpgroup its own tile and alternate math and epilogue.
 
 ### Tile Order and L2 Reuse
