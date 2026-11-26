@@ -447,7 +447,7 @@ The pattern across all four: dynamic queues pay off when task times are data-dep
 - [[CUDA Graphs]] — Capturing plan-then-run kernels and counter resets.
 - [[Memory Coalescing]] — Keeping chunked claims coalesced.
 - [[ROCm and HIP]] — Where software queues remain the portable option.
-- [[Forward Progress and Inter-Block Synchronization]] — Why spin-waiting queues can deadlock (planned).
+- [[Forward Progress and Inter-Block Synchronization]] — Why spin-waiting queues can deadlock, and the ticket, cooperative-launch and fallback fixes.
 - [[Grouped GEMM and Ragged Batches]] — Balancing MoE expert GEMMs.
 - [[Deterministic and Batch-Invariant Kernels]] — Reproducibility under dynamic schedules (planned).
 - [[Green Contexts and SM Partitioning]] — Reserving SMs, the opposite of stealing them (planned).

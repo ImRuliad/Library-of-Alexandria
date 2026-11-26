@@ -443,3 +443,4 @@ Open problems and pitfalls:
 - [[cuBLAS and cuDNN]] — Library kernel selection per shape.
 - [[GEMM Autotuning and Kernel Selection]] — Choosing the decomposition, tile and cluster per shape by model or measurement.
 - [[Work Stealing and Dynamic Load Balancing]] — The general picture: static vs dynamic balancing, queues, stealing and plan-then-run schedules.
+- [[Forward Progress and Inter-Block Synchronization]] — Why waits between persistent blocks assume co-residency, and the safe patterns.

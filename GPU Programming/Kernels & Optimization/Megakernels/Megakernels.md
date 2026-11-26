@@ -457,3 +457,4 @@ Open problems:
 - [[LLM Serving]] — The decode loop megakernels accelerate, and where prefill still runs.
 - [[Mixture of Experts]] — Dynamic routing that megakernels handle with in-kernel work stealing.
 - [[Work Stealing and Dynamic Load Balancing]] — Static vs dynamic task scheduling, global work queues and CLC.
+- [[Forward Progress and Inter-Block Synchronization]] — The progress rules behind co-residency and dependency-counter waits.

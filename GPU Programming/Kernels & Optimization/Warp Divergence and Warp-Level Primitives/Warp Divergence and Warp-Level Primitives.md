@@ -358,3 +358,4 @@ Open problems:
 - [[Profiling with Nsight Compute and Nsight Systems]] — Branch efficiency and active threads per instruction.
 - [[FlashAttention]] — Warp-specialized attention in practice.
 - [[Cooperative Groups]] — Typed handles for warps, tiles and coalesced groups.
+- [[Forward Progress and Inter-Block Synchronization]] — Intra-warp locks before and after independent thread scheduling, and the block-level picture.

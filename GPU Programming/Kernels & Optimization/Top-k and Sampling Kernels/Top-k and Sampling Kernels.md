@@ -468,3 +468,4 @@ Open problems:
 - [[Sparse Attention]] — DeepSeek Sparse Attention's indexer selects the top 2048 tokens per query.
 - [[Speculative Decoding]] — Verification is rejection sampling too.
 - [[Mixture of Experts]] — Router top-k over experts.
+- [[Forward Progress and Inter-Block Synchronization]] — Why multi-block barriers need co-residency and are gated on SM count.

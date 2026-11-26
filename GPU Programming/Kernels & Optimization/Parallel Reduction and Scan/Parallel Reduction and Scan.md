@@ -380,7 +380,7 @@ Floating-point addition isn't associative: $(0.1 + 10^{20}) - 10^{20} = 0$, whil
 
 ### Portability Beyond NVIDIA
 
-Decoupled look-back assumes forward progress. Raph Levien found in 2021 that it works on Vulkan and DX12 fairly portably but not on Metal or WebGPU, and that some Apple and ARM GPUs don't guarantee forward progress; piet-gpu fell back to a tree ([Levien](https://raphlinus.github.io/gpu/2021/11/17/prefix-sum-portable.html)). The Gridwise WebGPU project reports decoupled look-back "locked up the entire machine" on Apple hardware ([Gridwise](https://gridwise-webgpu.github.io/gridwise/scan-and-reduce)).
+Decoupled look-back assumes [[Forward Progress and Inter-Block Synchronization|forward progress]]. Raph Levien found in 2021 that it works on Vulkan and DX12 fairly portably but not on Metal or WebGPU, and that some Apple and ARM GPUs don't guarantee forward progress; piet-gpu fell back to a tree ([Levien](https://raphlinus.github.io/gpu/2021/11/17/prefix-sum-portable.html)). The Gridwise WebGPU project reports decoupled look-back "locked up the entire machine" on Apple hardware ([Gridwise](https://gridwise-webgpu.github.io/gridwise/scan-and-reduce)).
 
 The 2025 answer is **Decoupled Fallback** (Smith, Levien and Owens, SPAA 2025): a tile that finds a predecessor stalled stops spinning and recomputes that predecessor's reduction itself. It needs neither 64-bit atomics nor memory barriers for correctness, doesn't depend on subgroup size, and reaches "near-Memcpy speeds" on Apple M1 Max and M3 under WebGPU ([eScholarship](https://escholarship.org/uc/item/0bk9z4bt)). On AMD, the same CUDA-style code ports through [[ROCm and HIP]], where a wavefront can be 64 lanes rather than 32, so warp-level loops must not hard-code 32.
 
@@ -462,3 +462,4 @@ Open problems:
 - [[Cooperative Groups]] — Grid-wide sync and tiled partitions for reductions.
 - [[CUDA Memory Model and Atomics]] — Fences, scopes and atomics behind single-pass reductions and scans.
 - [[Top-k and Sampling Kernels]] — Radix select's histograms and inverse-transform sampling's block scans.
+- [[Forward Progress and Inter-Block Synchronization]] — Why decoupled look-back needs forward progress, ticket IDs vs blockIdx, and fallbacks.

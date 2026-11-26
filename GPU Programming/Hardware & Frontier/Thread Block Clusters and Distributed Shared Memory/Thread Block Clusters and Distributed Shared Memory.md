@@ -361,3 +361,4 @@ Source: [arXiv 2501.12084](https://arxiv.org/html/2501.12084v2). "DSM does not a
 - [[Occupancy and Latency Hiding]] — How cluster size limits active blocks.
 - [[FlashAttention]] — 2-CTA clusters in FlashAttention-4.
 - [[Megakernels]] — Fusing whole layers, where DSMEM reductions help.
+- [[Forward Progress and Inter-Block Synchronization]] — Clusters as CUDA's guaranteed unit of inter-block progress.

@@ -468,3 +468,4 @@ Open problems and pitfalls:
 - [[Multi-GPU Communication - NVLink and NCCL]] — Where multi-device synchronization went after CUDA 13.
 - [[Locks and Synchronization]] — The CPU-side theory of barriers and spin-waiting.
 - [[Programmatic Dependent Launch]] — Overlapping kernels at a boundary without co-residency.
+- [[Forward Progress and Inter-Block Synchronization]] — Which waits are guaranteed to terminate, and why grid sync needs co-residency.

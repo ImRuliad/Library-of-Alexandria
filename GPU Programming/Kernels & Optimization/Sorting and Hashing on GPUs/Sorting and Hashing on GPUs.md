@@ -478,3 +478,4 @@ Open problems:
 - [[GPU Memory Hierarchy]] — L2 size decides when a hash join falls off a cliff.
 - [[Top-k and Sampling Kernels]] — Radix select, AIR Top-K and LLM sampling in depth.
 - [[GPU Databases and Dataframes]] — The engines (cuDF, Polars GPU, Spark, Presto, Sirius) built on these joins and group-bys.
+- [[Forward Progress and Inter-Block Synchronization]] — The progress assumption under Onesweep's chained look-back.
