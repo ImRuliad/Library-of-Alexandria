@@ -77,7 +77,7 @@ updated: 2026-11-26
 - **Domains are the design space.** Non-relational domains (signs, intervals, congruences, known bits) track each variable alone; relational ones (octagons $\pm x \pm y \le c$, polyhedra) track relations between variables at a steep cost: octagons are $O(n^2)$ memory and $O(n^3)$ time, polyhedra exponential in practice ([Miné](https://lara.epfl.ch/w/_media/sav09/article-mine-hosc06.pdf)).
 - **Widening makes infinite domains terminate.** Intervals have infinite ascending chains, so analyzers jump unstable bounds to $\pm\infty$ (or to the next program constant) and then *narrow* back down; iteration order (Bourdoncle's weak topological ordering, widening at loop heads) matters for both speed and precision ([Møller and Schwartzbach](https://users-cs.au.dk/amoeller/spa/5-widening-and-narrowing.pdf); [Kim, Venet and Thakur](https://arxiv.org/pdf/2009.05865)).
 - **Compilers do it quietly.** LLVM's KnownBits and ConstantRange are abstract domains whose transformers have had dozens of soundness bugs, and ScalarEvolution's closed forms act like a relational domain without widening; GCC's Ranger computes multi-range plus bitmask facts on demand ([Taneja, Liu and Regehr, CGO 2020](https://www-old.cs.utah.edu/~regehr/cgo20.pdf); [Red Hat](https://developers.redhat.com/blog/2021/04/28/value-range-propagation-in-gcc-with-project-ranger)).
-- **As of November 2026.** The frontier is *building* abstract interpreters automatically: synthesized LLVM/MLIR transformers (POPL 2026), LLM-generated sound transformers for neural network verifiers (PLDI 2026), and "agentic interpretation" papers at SAS 2026; abstract-interpretation-style bound propagation still dominates neural network verification (VNN-COMP 2025).
+- **As of November 2026.** The frontier is *building* abstract interpreters automatically: synthesized LLVM/MLIR transformers (POPL 2026), LLM-generated sound transformers for neural network verifiers (PLDI 2026), and "agentic interpretation" papers at SAS 2026; abstract-interpretation-style bound propagation still dominates [[Neural Network Verification|neural network verification]] (VNN-COMP 2025).
 
 ## ***The Problem***
 ---
@@ -576,3 +576,4 @@ VNN-COMP 2025 (8 teams, 16 regular and 9 extended benchmarks, reported December 
 - [[Type Systems and Inference]] — Type checking as an abstract interpretation, as the 1977 paper suggests.
 - [[Dependent and Refinement Types]] — Refinement types state the same kind of numeric invariants as types.
 - [[ML Compilers]] — Range and stride facts over tensor IRs; neural network verification reuses the same domains.
+- [[Neural Network Verification]] — Abstract interpretation and SMT applied to neural networks.

@@ -322,7 +322,7 @@ The [[Dataflow Analysis]] note shows Doop's four core rules (allocation, assignm
 
 *If the language says an object of one type cannot be accessed through an lvalue of an unrelated type, the compiler can answer NoAlias from the types alone, with no points-to analysis at all.*
 
-C's "strict aliasing" rule (C11 6.5p7) says "an object shall have its stored value accessed only by an lvalue expression" of a type compatible with its effective type, a qualified or signed/unsigned variant of it, an aggregate or union containing such a member, or "a character type" ([ACCU Overload 160](https://accu.org/journals/overload/28/160/anonymous)). So an `int*` and a `float*` cannot legally point to the same object, and code that does it (type punning through pointer casts) has undefined behavior.
+C's "strict aliasing" rule (C11 6.5p7) says "an object shall have its stored value accessed only by an lvalue expression" of a type compatible with its effective type, a qualified or signed/unsigned variant of it, an aggregate or union containing such a member, or "a character type" ([ACCU Overload 160](https://accu.org/journals/overload/28/160/anonymous)). So an `int*` and a `float*` cannot legally point to the same object, and code that does it (type punning through pointer casts) has [[Undefined Behavior and Compiler Semantics|undefined behavior]].
 
 ```c
 int h(int *i, float *x) {
@@ -659,3 +659,4 @@ Open problems:
 - [[Verified Compilers]] — Memory models and provenance, where alias rules are made precise.
 - [[Compiler Testing and Fuzzing]] — How aliasing miscompiles like the Rust noalias bugs are found.
 - [[Escape Analysis]] — Planned: the capture question from the JIT and allocation side.
+- [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.

@@ -81,7 +81,7 @@ updated: 2026-11-26
 
 ## ***TL;DR***
 ---
-*Compilers are tested mostly by machines: a generator writes random but well-defined programs, several compilers (or one compiler at several settings) run them, and any disagreement is a bug candidate that a reducer shrinks to a few lines. The hard parts are knowing the right answer (the oracle) and keeping undefined behavior out of the tests.*
+*Compilers are tested mostly by machines: a generator writes random but well-defined programs, several compilers (or one compiler at several settings) run them, and any disagreement is a bug candidate that a reducer shrinks to a few lines. The hard parts are knowing the right answer (the oracle) and keeping [[Undefined Behavior and Compiler Semantics|undefined behavior]] out of the tests.*
 
 - **The oracle is the problem.** Nobody knows what a random 80 KB C program should print. *Differential testing* (McKeeman, 1998) sidesteps this by comparing implementations against each other; *metamorphic testing* and **EMI** compare a program with transformed versions of itself ([Le, Afshari and Su, PLDI 2014](https://www.cs.ucdavis.edu/~su/publications/emi.pdf)).
 - **UB poisons everything.** If the test program has undefined behavior, two different outputs are both "correct". Csmith (PLDI 2011) wraps arithmetic in safe functions and analyzes pointers to stay UB-free, and found **325 bugs**, 202 in LLVM and 79 in GCC ([Yang et al.](https://users.cs.utah.edu/~regehr/papers/pldi11-preprint.pdf)). YARPGen tracks values statically instead and later grew loop generation for loop optimizers ([PLDI 2023](https://www-old.cs.utah.edu/~regehr/pldi23.pdf)).
@@ -149,7 +149,7 @@ UB returns during reduction, too: a reducer that deletes an initializer can crea
 
 ### Three Kinds of Oracle
 
-*Differential testing compares implementations, metamorphic testing compares inputs, and translation validation proves each compilation individually.*
+*Differential testing compares implementations, metamorphic testing compares inputs, and [[Translation Validation|translation validation]] proves each compilation individually.*
 
 **Differential testing.** William McKeeman's 1998 paper "Differential testing for software" (*Digital Technical Journal* 10(1)) named the idea: feed the same input to several implementations and flag any difference ([Wikipedia summary](https://en.wikipedia.org/wiki/Differential_testing)). For compilers $C_1, C_2$ and a UB-free, deterministic program $P$ with input $i$:
 
@@ -544,3 +544,5 @@ Open problems as of late 2026:
 - [[Deterministic Simulation Testing]] — The same generate-check-reduce loop applied to distributed systems.
 - [[MicroVMs and Sandboxing]] — Why miscompilations in Wasm compilers are security bugs.
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
+- [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
+- [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.

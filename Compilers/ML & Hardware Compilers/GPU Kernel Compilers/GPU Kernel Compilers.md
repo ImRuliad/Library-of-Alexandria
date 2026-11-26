@@ -479,3 +479,4 @@ KernelBench (Ouyang et al., Stanford, Feb 2025) has 250 PyTorch workloads in thr
 - [[LLM Serving]] — Where kernel latency and compile time meet production.
 - [[Profile-Guided Optimization]] — Using run-time profiles to guide inlining, layout and splitting.
 - [[Instruction Scheduling]] — Ordering instructions for pipelines, including modulo scheduling.
+- [[LLM-Written Kernels]] — Agents writing GPU kernels, and how their speedups get audited.

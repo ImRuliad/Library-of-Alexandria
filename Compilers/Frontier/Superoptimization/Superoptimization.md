@@ -602,3 +602,5 @@ Open problems as of late 2026:
 - [[GPU Kernel Compilers]] — Agentic assembly search on GPU kernels.
 - [[Instruction Scheduling]] — Cost effects that IR-level search cannot see.
 - [[Register Allocation]] — Another place where optimal solvers serve mainly as a yardstick.
+- [[Program Synthesis]] — Searching for programs that meet a spec, the engine behind superoptimizers.
+- [[Translation Validation]] — Checking each compiler run instead of proving the compiler.

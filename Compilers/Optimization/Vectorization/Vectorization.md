@@ -472,7 +472,7 @@ The TSVC2 study found indirect accesses defeated GCC and Clang on all 8 such loo
 - **Predictability and cost.** Compilers disagree on near-identical loops, and vectorized code is not always faster ([Sakib et al.](https://arxiv.org/html/2502.11906v1)); static per-instruction costs miss cache and gather effects. Learned cost models are one direction ([[ML-Guided Optimization]]).
 - **Beyond innermost loops.** Outer-loop and whole-function vectorization in LLVM still sit on the VPlan roadmap rather than in the default pipeline ([VPlan docs](https://rocm.docs.amd.com/projects/llvm-project/en/docs-7.14.1/LLVM/llvm/html/VectorizationPlan.html)).
 - **Portable types meet scalable hardware.** `std::simd` sizes are compile-time constants, and Rust's design question about scalable vectors is still open, so neither maps directly onto vector-length-agnostic SVE or RVV.
-- **Correctness.** Vectorizers are a rich source of miscompiles (wrong alias checks, poison in masked lanes); see [[Compiler Testing and Fuzzing]] and translation validation in [[Verified Compilers]].
+- **Correctness.** Vectorizers are a rich source of miscompiles (wrong alias checks, poison in masked lanes); see [[Compiler Testing and Fuzzing]] and [[Translation Validation|translation validation]] in [[Verified Compilers]].
 
 ## ***Resources***
 ---
@@ -508,3 +508,4 @@ The TSVC2 study found indirect accesses defeated GCC and Clang on all 8 such loo
 - [[Compiler Testing and Fuzzing]] — Finding vectorizer miscompiles.
 - [[AI Accelerators]] — Hardware that goes beyond SIMD to matrix units.
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages that produce the assembly shown here.
+- [[Translation Validation]] — Checking each compiler run instead of proving the compiler.

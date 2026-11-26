@@ -498,3 +498,4 @@ The second round of area-team elections (members serve one-year terms) closed on
 - [[GPU Kernel Compilers]] — Triton and other stacks that end in NVPTX or AMDGPU.
 - [[Compiler, Assembler, Linker, and Loader]] — The owner's note on the C build stages that Clang, the MC layer and LLD implement.
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
+- [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.

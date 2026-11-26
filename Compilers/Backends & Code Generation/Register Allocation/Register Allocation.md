@@ -437,7 +437,7 @@ With RISC-V's real register file, a compiler would keep everything in registers;
 - **Phase ordering.** Scheduling for latency raises register pressure; allocating first constrains scheduling. Most compilers run pre-RA scheduling, allocation, then post-RA scheduling, and live with the mismatch.
 - **Copies from SSA destruction and constraints.** Optimal coalescing is NP-complete even on chordal graphs; heuristics leave residual `mov`s that only show up in hot loops.
 - **Compile-time outliers.** Huge generated functions (Wasm, machine-generated C) can blow up eviction and splitting loops; Fallin counts having fewer compile-time outliers than the previous allocator among regalloc2's most important gains ([Fallin, 2022](https://cfallin.org/blog/2022/06/09/cranelift-regalloc2/)).
-- **Correctness.** Allocators are a classic source of miscompiles. Cranelift's symbolic checker and fuzzing approach is one answer ([[Compiler Testing and Fuzzing]]); translation validation and verified allocators such as CompCert's (which checks a coloring after the fact) are another ([[Verified Compilers]]).
+- **Correctness.** Allocators are a classic source of miscompiles. Cranelift's symbolic checker and fuzzing approach is one answer ([[Compiler Testing and Fuzzing]]); [[Translation Validation|translation validation]] and verified allocators such as CompCert's (which checks a coloring after the fact) are another ([[Verified Compilers]]).
 
 ## ***Resources***
 ---
@@ -485,3 +485,4 @@ With RISC-V's real register file, a compiler would keep everything in registers;
 - [[Verified Compilers]] — CompCert's validated register allocation.
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages where this pass's output becomes assembly.
 - [[Instruction Scheduling]] — Planned: the phase-ordering partner of register allocation.
+- [[Translation Validation]] — Checking each compiler run instead of proving the compiler.

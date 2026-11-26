@@ -82,7 +82,7 @@ updated: 2026-11-26
 - **The catalogue is old.** Allen and Cocke listed procedure integration, CSE, code motion, constant folding, dead code elimination, strength reduction and peephole optimization in an IBM report dated September 1971 ([CHM](https://www.computerhistory.org/collections/catalog/102655328); [Fermat's Library](https://fermatslibrary.com/p/77219a71)). Modern LLVM and GCC still run every one of those.
 - **SSA made them cheap.** On [[SSA Form]], constant propagation (SCCP), value numbering (GVN) and dead code elimination (ADCE) become sparse passes over def-use chains instead of dense [[Dataflow Analysis|dataflow]] over every program point.
 - **Enabling beats doing.** Inlining saves a call, but its real payoff is giving every other pass a private copy of the callee to specialise ([Godbolt, Dec 2025](https://bbv.xania.org/202512/17-inlining-the-ultimate-optimisation)). Much of compiler engineering is *phase ordering*: arranging passes so each exposes work for the next.
-- **Undefined behavior is fuel.** LLVM's `nsw`, `nuw`, `inbounds` and `samesign` flags turn "this can't happen" into *poison*, which licenses rewrites like `x + 1 > x` → `true` for signed `x` ([Lee et al., PLDI 2017](https://www-old.cs.utah.edu/~regehr/papers/undef-pldi17.pdf)).
+- **[[Undefined Behavior and Compiler Semantics|Undefined behavior]] is fuel.** LLVM's `nsw`, `nuw`, `inbounds` and `samesign` flags turn "this can't happen" into *poison*, which licenses rewrites like `x + 1 > x` → `true` for signed `x` ([Lee et al., PLDI 2017](https://www-old.cs.utah.edu/~regehr/papers/undef-pldi17.pdf)).
 - **As of November 2026**, every new LLVM InstCombine fold must come with an Alive2 proof ([LLVM docs](https://llvm.org/docs/InstCombineContributorGuide.html)), `undef` is formally deprecated in favour of poison ([LLVM UB manual](https://www.llvm.org/docs/_sources/UndefinedBehavior.rst.txt)), and LLM-plus-verifier tools are finding missed peepholes that humans then upstream ([Xu et al., 2025](https://arxiv.org/abs/2508.16125v2)).
 
 ## ***The Problem***
@@ -494,3 +494,4 @@ Open problems:
 - [[Compiler Testing and Fuzzing]] — Finding miscompilations and missed optimizations.
 - [[Compiler, Assembler, Linker, and Loader]] — The owner's note on the C build stages around the optimizer.
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
+- [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.

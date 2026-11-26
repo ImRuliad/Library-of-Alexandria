@@ -82,7 +82,7 @@ updated: 2026-11-26
 
 ## ***TL;DR***
 ---
-*A verified compiler comes with a machine-checked proof that the code it emits behaves the way the source program's semantics says it should. The alternative, translation validation, skips proving the compiler and instead checks each individual compilation; between them they are the only way to stop trusting the compiler on faith.*
+*A verified compiler comes with a machine-checked proof that the code it emits behaves the way the source program's semantics says it should. The alternative, [[Translation Validation|translation validation]], skips proving the compiler and instead checks each individual compilation; between them they are the only way to stop trusting the compiler on faith.*
 
 - **The guarantee.** *Semantic preservation*: if the source program has a defined behavior (terminate with some I/O trace, or run forever with one), the compiled program has that same behavior. Proofs go pass by pass using *simulation diagrams* and compose into one end-to-end theorem ([Leroy, CACM 2009](https://xavierleroy.org/publi/compcert-CACM.pdf)).
 - **CompCert** is the flagship: an optimizing C compiler written and proved in Coq (now Rocq). When Csmith fuzzed every major C compiler in 2011, it found "the middle-end bugs we found in all other compilers are absent" from CompCert ([Yang et al., PLDI 2011](https://www-old.cs.utah.edu/~regehr/papers/pldi11-preprint.pdf)). AbsInt sells it, and in early 2026 it was qualified for avionics on the ATR 42/72 under DO-178C/DO-333/DO-330 ([compcert.org](https://compcert.org/)).
@@ -96,7 +96,7 @@ updated: 2026-11-26
 
 Every guarantee you get from source code (a code review, a static analyzer, a proof of the source program) is a guarantee about the *source*. The machine runs the *output*. If the compiler mistranslates, the guarantee evaporates without any warning.
 
-Compilers are big, heavily optimized and full of subtle reasoning about undefined behavior, so they do mistranslate. Csmith, a random C program generator, reported **79 GCC bugs and 202 LLVM bugs** in its first years ([Yang, Chen, Eide & Regehr, PLDI 2011](https://www-old.cs.utah.edu/~regehr/papers/pldi11-preprint.pdf); see [[Compiler Testing and Fuzzing]]). Running Alive2 over LLVM's own unit tests turned up 47 more reported miscompilations ([Lopes et al., PLDI 2021](https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf)).
+Compilers are big, heavily optimized and full of subtle reasoning about [[Undefined Behavior and Compiler Semantics|undefined behavior]], so they do mistranslate. Csmith, a random C program generator, reported **79 GCC bugs and 202 LLVM bugs** in its first years ([Yang, Chen, Eide & Regehr, PLDI 2011](https://www-old.cs.utah.edu/~regehr/papers/pldi11-preprint.pdf); see [[Compiler Testing and Fuzzing]]). Running Alive2 over LLVM's own unit tests turned up 47 more reported miscompilations ([Lopes et al., PLDI 2021](https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf)).
 
 Three settings make this intolerable:
 
@@ -525,3 +525,5 @@ Open problems as of late 2026:
 - [[Cryptography]] — Where Fiat Cryptography's verified field arithmetic is used.
 - [[Compiler, Assembler, Linker, and Loader]] — The toolchain stages that usually stay in the trusted base.
 - [[Superoptimization]] — SMT-checked search for equivalent code, the same solver machinery as Alive2.
+- [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
+- [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.

@@ -566,3 +566,4 @@ Open problems as of late 2026:
 - [[Vectorization]] — Another hand-tuned cost model ripe for learning.
 - [[Loop Optimizations]] — Schedules and polyhedral autoschedulers with learned costs.
 - [[AI Accelerators]] — TPUs and MTIA, where learned cost models and kernel agents run in production.
+- [[LLM-Written Kernels]] — Agents writing GPU kernels, and how their speedups get audited.
