@@ -615,3 +615,4 @@ Open problems worth tracking:
 - [[Memory Allocators]] — Per-thread allocator caches are the classic use of thread-local storage and the classic fork deadlock.
 - [[Compiler, Assembler, Linker, and Loader]] — What `exec` loads, and how the loader lays out TLS.
 - [[Boot Process]] — How PID 1, the ancestor of every process, is started.
+- [[Signals and IPC]] — How processes notify and talk to each other: signals, pidfds, pipes, sockets, shared memory.

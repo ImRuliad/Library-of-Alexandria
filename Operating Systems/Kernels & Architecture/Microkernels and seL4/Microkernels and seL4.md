@@ -355,3 +355,4 @@ Open problems worth tracking:
 - [[Kernel Security Hardening]] — What a monolith does instead of a small TCB.
 - [[Transient Execution Attacks and Mitigations]] — Side channels outside functional correctness proofs.
 - [[Formal Methods in Practice]] — Verification techniques used across systems, from TLA+ to Isabelle.
+- [[Signals and IPC]] — Linux's IPC menu, Binder and bus1, compared with microkernel IPC.

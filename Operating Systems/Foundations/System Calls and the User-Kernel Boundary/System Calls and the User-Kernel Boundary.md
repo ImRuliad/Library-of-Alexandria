@@ -558,3 +558,4 @@ Open problems worth tracking:
 - [[Time and Clocks]] — Why cheap `clock_gettime` through the vDSO matters for timestamps.
 - [[Clock Synchronization]] — The clocks the vDSO reads are the ones NTP and PTP discipline.
 - [[Compiler, Assembler, Linker, and Loader]] — The vDSO is an ELF shared object the loader finds via the auxiliary vector.
+- [[Signals and IPC]] — Signal delivery on the exit-to-user path, the signal frame and `rt_sigreturn`.
