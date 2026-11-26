@@ -634,7 +634,7 @@ Open problems:
 
 - [[Classic Optimizations]] — InstCombine, `nsw` and poison in everyday folds; the Lee et al. story in more detail.
 - [[Pointer and Alias Analysis]] — Strict aliasing with real output, TBAA, Stacked and Tree Borrows, LLVM capture and provenance work.
-- [[Memory Models and Pointer Provenance]] — Planned: PNVI-ae-udi, LLVM's provenance model and Rust's in full.
+- [[Memory Models and Pointer Provenance]] — PNVI-ae-udi, C++29 provenance, LLVM's `ptrtoaddr` and byte type, Rust's strict provenance and CHERI in full.
 - [[Sanitizers]] — Planned: how UBSan, ASan, MSan and TSan are implemented.
 - [[Compiler Testing and Fuzzing]] — Why test programs must be UB-free; Csmith, Rustlantis and Miri as an oracle.
 - [[Verified Compilers]] — Refinement, CompCert's "goes wrong" behavior, Alive2.

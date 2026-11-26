@@ -658,5 +658,6 @@ Open problems:
 - [[Type Systems and Inference]] — Types as alias facts; strict aliasing.
 - [[Verified Compilers]] — Memory models and provenance, where alias rules are made precise.
 - [[Compiler Testing and Fuzzing]] — How aliasing miscompiles like the Rust noalias bugs are found.
-- [[Escape Analysis]] — Planned: the capture question from the JIT and allocation side.
+- [[Escape Analysis]] — The capture question from the JIT and allocation side.
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
+- [[Memory Models and Pointer Provenance]] — The memory model behind NoAlias answers: exposure at casts, `ptrtoaddr`, Tree Borrows and CHERI.
