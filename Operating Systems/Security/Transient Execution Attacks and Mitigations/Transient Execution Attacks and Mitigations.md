@@ -7,11 +7,11 @@ tags:
   - side-channels
   - cpu-microarchitecture
   - kpti
-status: draft
+status: complete
 sources:
   - https://meltdownattack.com/meltdown.pdf
   - https://spectreattack.com/spectre.pdf
-  - https://googleprojectzero.blogspot.com/2018/01/reading-privileged-memory-with-side.html
+  - https://projectzero.google/2018/01/reading-privileged-memory-with-side.html
   - https://gruss.cc/files/kaiser.pdf
   - https://support.google.com/faqs/answer/7625886
   - https://foreshadowattack.eu/
@@ -40,6 +40,9 @@ sources:
   - https://lpc.events/event/18/contributions/1761/
   - https://lkml.iu.edu/hypermail/linux/kernel/2501.1/04842.html
   - https://lkml.iu.edu/hypermail/linux/kernel/2510.0/01762.html
+  - https://lkml.iu.edu/2509.3/00833.html
+  - https://www.theregister.com/2025/07/09/amd_tsa_side_channel/
+  - https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf
 created: 2026-11-26
 updated: 2026-11-26
 ---
@@ -75,7 +78,7 @@ updated: 2026-11-26
 - **Spectre** (2018) tricks the *victim* into speculatively running code paths it never would architecturally, by mistraining branch predictors. **Meltdown** (2018) lets the *attacker's own* code transiently read memory it has no permission to read, because the permission check lands after the data is already in use ([Lipp et al.](https://meltdownattack.com/meltdown.pdf); [Kocher et al.](https://spectreattack.com/spectre.pdf)).
 - **The OS response** is a stack of mitigations at every privilege crossing: [[Virtual Memory and Paging|page-table]] isolation (KPTI) for Meltdown, retpolines and IBRS for branch injection, `array_index_nospec()` for bounds-check bypass, buffer clearing (`VERW`) for MDS, return-stack stuffing on [[Processes and Threads|context switches]], and SMT restrictions for cross-thread leaks.
 - **The cost lands on hot paths:** [[System Calls and the User-Kernel Boundary|system calls]], [[Interrupts and Exceptions|interrupts]], context switches and VM exits. Measured overheads range from ~1% to over 800% for KPTI depending on workload ([Gregg, 2018](https://www.brendangregg.com/blog/2018-02-09/kpti-kaiser-meltdown-performance.html)), and up to 14% (AMD) and 39% (Intel) for Retbleed's mitigations in the researchers' tests ([Wikner & Razavi, 2022](https://comsec.ethz.ch/research/microarch/retbleed/)).
-- **Late 2026:** it never ended. 2025 brought Training Solo / Indirect Target Selection (ITS), Transient Scheduler Attacks (TSA) and VMSCAPE; Linux 6.17 added **attack vector controls** so admins can mitigate by *threat* (user→kernel, guest→host, …) instead of by CVE; and Google's **Address Space Isolation (ASI)** is the leading attempt to replace whack-a-mole with a structural fix.
+- **Late 2026:** it never ended. 2025 brought Training Solo / Indirect Target Selection (ITS), Transient Scheduler Attacks (TSA) and VMSCAPE; Linux 6.17 added **attack vector controls** so admins can mitigate by *threat* (user→kernel, guest→host, …) instead of by CVE, across the 18 issues the kernel now tracks; and Google's **Address Space Isolation (ASI)** is the leading attempt to replace whack-a-mole with a structural fix, though it was not yet merged as of its December 2025 Plumbers talk.
 
 ## ***The Problem***
 ---
@@ -152,7 +155,7 @@ timeline
 ```
 
 - **Before 2018.** Cache timing side channels were known for decades (Flush+Reload is from 2014), and KAISER ([Gruss et al., 2017](https://gruss.cc/files/kaiser.pdf)) proposed unmapping the kernel from user page tables to protect KASLR. Nobody had shown that speculation could *read* across privilege lines.
-- **January 2018.** Google Project Zero (Jann Horn), Paul Kocher, and teams at Graz, Penn, Adelaide and others disclosed Spectre and Meltdown ([Project Zero](https://googleprojectzero.blogspot.com/2018/01/reading-privileged-memory-with-side.html)). KAISER became **KPTI** in Linux 4.15 and was backported; Google published **retpolines** for Spectre v2 ([Google](https://support.google.com/faqs/answer/7625886)); Intel and AMD shipped microcode adding IBRS, IBPB and STIBP controls.
+- **January 2018.** Google Project Zero (Jann Horn) had reported the issues to Intel, AMD and Arm on 1 June 2017; Paul Kocher, Daniel Gruss, Moritz Lipp, Yuval Yarom, Daniel Genkin, Michael Schwarz and others found them independently. All were disclosed together ([Project Zero](https://projectzero.google/2018/01/reading-privileged-memory-with-side.html)). KAISER became **KPTI** in Linux 4.15 and was backported; Google published **retpolines** for Spectre v2 ([Google](https://support.google.com/faqs/answer/7625886)); Intel and AMD shipped microcode adding IBRS, IBPB and STIBP controls.
 - **2018–2019: the Meltdown family grows.** L1TF/Foreshadow ([Foreshadow](https://foreshadowattack.eu/)) let guests read the L1 cache of their SMT sibling; MDS ([mdsattacks.com](https://mdsattacks.com/)) leaked from fill and store buffers. Mitigations needed microcode (`VERW` clears buffers) plus OS changes, and **SMT** stopped being safe between distrusting tenants. Linux 5.2 added one switch, `mitigations=`, for all of it.
 - **2022–2023: the Spectre family comes back.** Hardware eIBRS was supposed to end branch injection, but Spectre-BHB showed *branch history* could still be poisoned across privilege levels ([VUSec](https://www.vusec.net/projects/bhi-spectre-bhb/)), and Retbleed showed *returns* fall back to the attackable branch predictor on some Intel and AMD parts, defeating retpolines ([ETH Zürich](https://comsec.ethz.ch/research/microarch/retbleed/)). Downfall ([downfall.page](https://downfall.page/)) and Inception ([ETH Zürich](https://comsec.ethz.ch/research/microarch/inception/)) followed in 2023.
 - **2024–2025: tidying up.** The kernel rewrote its mitigation selection so new variants slot in consistently, then added attack vector controls (6.17). Meanwhile research kept finding holes in domain isolation itself: Training Solo showed an attacker can mistrain the predictor *from inside the victim's own domain* ([VUSec, S&P 2025](https://download.vusec.net/papers/trainingsolo_sp25.pdf)), and VMSCAPE showed a guest can poison the *host's user-space* VMM ([Intel](https://www.intel.com/content/www/us/en/developer/articles/news/more-information-vmscape.html)).
@@ -271,10 +274,10 @@ CPUs with hardware Meltdown fixes report `RDCL_NO`, and `pti=auto` (the default)
 
 ### Return and Branch-History Attacks
 
-- **Retbleed** (2022). On Intel Skylake-era and AMD Zen 1/2 cores, a return whose RSB entry underflows (or always, on AMD) is predicted by the BTB, which the attacker can train, so retpolines stopped helping ([ETH Zürich](https://comsec.ethz.ch/research/microarch/retbleed/)). Linux's fixes: IBRS on kernel entry for Intel, and **return thunks** (`jmp2ret`, "untrained return") on AMD that route every kernel `ret` through one location the kernel keeps trained. Measured costs were high; Phoronix called the mitigated performance "painful" ([Phoronix](https://www.phoronix.com/review/retbleed-benchmark)).
+- **Retbleed** (2022). On Intel Core generations 6–8 and AMD Zen 1, 1+ and 2, a return whose RSB entry underflows (or always, on AMD) is predicted by the BTB, which the attacker can train, so retpolines stopped helping ([ETH Zürich](https://comsec.ethz.ch/research/microarch/retbleed/)). Linux's fixes: IBRS on kernel entry for Intel, and **return thunks** (`jmp2ret`, "untrained return") on AMD that route every kernel `ret` through one location the kernel keeps trained. The researchers measured 14% overhead for AMD's patches and 39% for Intel's; Phoronix called the mitigated performance "painful" ([Phoronix](https://www.phoronix.com/review/retbleed-benchmark)).
 - **Spectre-BHB / BHI** (2022, 2024). eIBRS stops *targets* being injected across privilege levels, but the *branch history* that selects a prediction is still shared, so user space can steer kernel predictions ([VUSec](https://www.vusec.net/projects/bhi-spectre-bhb/)). Fixes: a software loop that overwrites the history on entry (`clear_bhb_loop`), or the hardware `BHI_DIS_S` control on newer Intel parts.
 - **Inception / SRSO** (2023). On AMD Zen, the attacker can make the CPU believe a `call` happened and plant a return prediction ("phantom" speculation). Linux uses a "safe RET" thunk or IBPB on entry, depending on microcode.
-- **ITS** (2025). On some Intel parts, an indirect branch or return in the *lower* half of a 64-byte cache line can be predicted with a stale target, which revived attacks Training Solo built on ([VUSec](https://vusec.net/projects/training-solo); [kernel ITS doc](https://docs.kernel.org/admin-guide/hw-vuln/indirect-target-selection.html)). Linux aligns indirect-branch thunks into the upper half of a line and stuffs the RSB where needed.
+- **ITS** (2025, CVE-2024-28956). On Intel CPUs with eIBRS released before Alder Lake (Skylake-X through Rocket Lake), an attacker can control the prediction of indirect branches and returns that sit in the *lower* half of a cache line, one of the holes Training Solo exploited ([VUSec](https://vusec.net/projects/training-solo); [kernel ITS doc](https://docs.kernel.org/admin-guide/hw-vuln/indirect-target-selection.html)). Linux patches each vulnerable branch site to its own thunk whose branch sits in the *second* half of the line, sends returns to one static safe thunk, routes [[eBPF]] indirect branches through a fixed thunk array, and can use call-depth-tracking RSB stuffing instead (`indirect_target_selection=on|off|vmexit|stuff|force`).
 
 All of these land in the same few instructions at kernel entry and exit, which is why entry code (`entry_64.S`) is now dense with macros like `IBRS_ENTER`, `UNTRAIN_RET` and `CLEAR_BRANCH_HISTORY` (see [[Interrupts and Exceptions]]).
 
@@ -303,6 +306,8 @@ $ grep . /sys/devices/system/cpu/vulnerabilities/*
 | guest → guest | VMs from each other | One tenant per host |
 | cross-thread | Data across SMT siblings | SMT disabled, or core scheduling keeps tenants apart |
 
+On the command line these are switches after the global setting, for example `mitigations=auto,no_user_kernel` or `mitigations=auto,nosmt,no_guest_host,no_guest_guest`. Plain `auto` mitigates cross-thread attacks only partly and leaves SMT on; `auto,nosmt` mitigates fully and may turn SMT off; a per-vulnerability option such as `retbleed=off` still wins over the vectors. The doc's table maps 18 issues (BHI, ITS, GDS, L1TF, MDS, MMIO, Meltdown, Retbleed, RFDS, Spectre v1, Spectre v2, Spectre v2 user, SRBDS, SRSO, SSB, TAA, TSA, VMSCAPE) to the vectors they matter for ([attack vector controls, 7.3-rc7](https://www.kernel.org/doc/html/v7.3-rc7/admin-guide/hw-vuln/attack_vector_controls.html)).
+
 *In plain words: a cloud host running only VMs can keep guest-side protections and drop user-to-user ones; a single-tenant HPC node can drop most of them.* The vectors map to the boundary table in [[#The Problem|The Problem]].
 
 **Scheduling.** Core scheduling (Linux 5.14) lets the scheduler run only mutually trusting tasks on sibling hyperthreads, a middle ground between SMT on and SMT off (see [[CPU Scheduling]]).
@@ -315,14 +320,14 @@ $ grep . /sys/devices/system/cpu/vulnerabilities/*
 
 | When | Attack | Who | What Linux does |
 |---|---|---|---|
-| May 2025 | Training Solo; Indirect Target Selection (ITS) | VUSec ([S&P 2025](https://download.vusec.net/papers/trainingsolo_sp25.pdf)) | Thunks aligned to the upper half of a cache line, RSB stuffing, BPF JIT changes ([ITS doc](https://docs.kernel.org/admin-guide/hw-vuln/indirect-target-selection.html)) |
-| Jul 2025 | Transient Scheduler Attacks (TSA) | AMD with Microsoft and ETH Zürich researchers | `VERW` buffer clearing at transitions on affected Zen parts |
-| Sep 2025 | VMSCAPE | ETH Zürich ([Intel](https://www.intel.com/content/www/us/en/developer/articles/news/more-information-vmscape.html)) | IBPB before returning to the user-space VMM after a VM exit ([VMSCAPE doc](https://docs.kernel.org/admin-guide/hw-vuln/vmscape.html)) |
-| Sep 2025 | Attack vector controls | Kernel (AMD-led patch set) | Mitigate by threat model, Linux 6.17 |
+| May 2025 | Training Solo; Indirect Target Selection (ITS) | VUSec ([S&P 2025](https://download.vusec.net/papers/trainingsolo_sp25.pdf)) | Per-site thunks with the branch in the second half of a cache line, RSB stuffing, fixed thunks for eBPF ([ITS doc](https://docs.kernel.org/admin-guide/hw-vuln/indirect-target-selection.html)) |
+| Jul 2025 | Transient Scheduler Attacks (TSA) | AMD, while investigating a Microsoft report ([The Register](https://www.theregister.com/2025/07/09/amd_tsa_side_channel/)) | `VERW` buffer clearing at transitions on affected EPYC and Ryzen parts ([AMD guidance](https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf)) |
+| Sep 2025 | VMSCAPE (CVE-2025-40300) | ETH Zürich COMSEC ([Intel](https://www.intel.com/content/www/us/en/developer/articles/news/more-information-vmscape.html)) | Between the VM exit and the return to the user-space VMM (QEMU): IBPB, or on some CPUs IBRS or a branch-history clear instead ([VMSCAPE doc](https://docs.kernel.org/admin-guide/hw-vuln/vmscape.html)) |
+| Sep 2025 | Attack vector controls | Kernel x86 maintainers | Mitigate by threat model, Linux 6.17 |
 
-**Address Space Isolation (ASI).** Google's ASI ([RFC v1, July 2024](https://lpc.events/event/18/contributions/1761/); [RFC v2, Jan 2025](https://lkml.iu.edu/hypermail/linux/kernel/2501.1/04842.html)) runs most kernel code in a *restricted* address space that doesn't map other processes' or guests' sensitive memory, switching to the full one only when needed. If secrets aren't mapped, no speculation can read them, which could retire many per-variant mitigations at once. The 2025 discussion ("ASI is fast again", [Oct 2025](https://lkml.iu.edu/hypermail/linux/kernel/2510.0/01762.html)) and the Linux Plumbers 2025 session "Let's merge ASI" ([LPC 2025](https://lpc.events/event/19/contributions/2029/)) focused on landing a first, minimal piece upstream.
+**Address Space Isolation (ASI).** Google's ASI ([RFC v1, July 2024](https://lpc.events/event/18/contributions/1761/); [RFC v2, Jan 2025](https://lkml.iu.edu/hypermail/linux/kernel/2501.1/04842.html)) runs most kernel code in a *restricted* address space that doesn't map other processes' or guests' sensitive memory, switching to the full one only when needed. If secrets aren't mapped, no speculation can read them, which could retire many per-variant mitigations at once. In September 2025 the first non-RFC series, "mm: ASI direct map management", went to the list ([LKML](https://lkml.iu.edu/2509.3/00833.html)), with the "ASI is fast again" discussion following ([Oct 2025](https://lkml.iu.edu/hypermail/linux/kernel/2510.0/01762.html)). At Linux Plumbers in December 2025, Brendan Jackman's talk "Address Space Isolation is ready" argued that the big unknowns, including performance for native (not just guest) attackers, were solved and that ASI should move from RFCs to mergeable series ([LPC 2025](https://lpc.events/event/19/contributions/2029/)). ASI was not in mainline as of that talk; the sources read for this note don't show it merged by November 2026.
 
-**Hardware.** CPUs since roughly 2019 are immune to Meltdown and L1TF, so KPTI and PTE inversion are off by default on them; eIBRS and `BHI_DIS_S` replaced retpolines on new Intel parts. But every year has shown that hardware "fixes" constrain one predictor while another stays shared, so the kernel's software layer keeps growing. The [hw-vuln index](https://docs.kernel.org/admin-guide/hw-vuln/index.html) in the 7.x kernels lists well over a dozen separate documents.
+**Hardware.** CPUs since roughly 2019 are immune to Meltdown and L1TF, so KPTI and PTE inversion are off by default on them; eIBRS and `BHI_DIS_S` replaced retpolines on new Intel parts. But every year has shown that hardware "fixes" constrain one predictor while another stays shared, so the kernel's software layer keeps growing. The kernel's [hw-vuln index](https://docs.kernel.org/admin-guide/hw-vuln/index.html) now has 18 documents, from Spectre and L1TF to ITS and VMSCAPE.
 
 **Practice.** Cloud providers run with full mitigations and SMT restrictions between tenants. Some HPC and single-tenant users boot with `mitigations=off` for speed; attack vector controls give them a finer choice.
 
@@ -359,10 +364,11 @@ $ grep . /sys/devices/system/cpu/vulnerabilities/*
 - [Training Solo: On the Limitations of Domain Isolation Against Spectre-v2 Attacks](https://download.vusec.net/papers/trainingsolo_sp25.pdf): IEEE S&P 2025.
 
 **Disclosures and project pages**
-- [Reading privileged memory with a side-channel](https://googleprojectzero.blogspot.com/2018/01/reading-privileged-memory-with-side.html): Project Zero, Jan 2018.
+- [Reading privileged memory with a side-channel](https://projectzero.google/2018/01/reading-privileged-memory-with-side.html): Project Zero, Jan 2018.
 - [Retpoline: a software construct for preventing branch-target-injection](https://support.google.com/faqs/answer/7625886): Google.
 - [Foreshadow](https://foreshadowattack.eu/), [MDS](https://mdsattacks.com/), [BHI](https://www.vusec.net/projects/bhi-spectre-bhb/), [Retbleed](https://comsec.ethz.ch/research/microarch/retbleed/), [Inception](https://comsec.ethz.ch/research/microarch/inception/), [Downfall](https://downfall.page/), [Training Solo](https://vusec.net/projects/training-solo).
 - [More information on VMSCAPE](https://www.intel.com/content/www/us/en/developer/articles/news/more-information-vmscape.html): Intel, 2025.
+- [Technical guidance for mitigating Transient Scheduler Attacks](https://www.amd.com/content/dam/amd/en/documents/resources/bulletin/technical-guidance-for-mitigating-transient-scheduler-attacks.pdf): AMD, 2025.
 
 **Kernel docs**
 - [Hardware vulnerabilities index](https://docs.kernel.org/admin-guide/hw-vuln/index.html): one page per variant, with options and sysfs strings.
@@ -373,7 +379,7 @@ $ grep . /sys/devices/system/cpu/vulnerabilities/*
 **Performance and where it is now**
 - [KPTI/KAISER Meltdown Initial Performance Regressions](https://www.brendangregg.com/blog/2018-02-09/kpti-kaiser-meltdown-performance.html): Brendan Gregg, 2018.
 - [Benchmarking the Linux mitigated performance for Retbleed](https://www.phoronix.com/review/retbleed-benchmark): Phoronix, 2022.
-- [Let's merge ASI](https://lpc.events/event/19/contributions/2029/): Linux Plumbers 2025.
+- [Address Space Isolation is ready](https://lpc.events/event/19/contributions/2029/): Brendan Jackman, Linux Plumbers 2025.
 
 ## ***Related Notes***
 ---
