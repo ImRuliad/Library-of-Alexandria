@@ -189,7 +189,7 @@ Sources: [Chubby paper](https://static.usenix.org/event/osdi06/tech/full_papers/
 
 *As of November 2026, etcd is the most visible coordination service because of Kubernetes, and in 2025 two of the largest users changed course: Kafka built consensus in, and AWS rebuilt etcd's internals.*
 
-- **Kafka without ZooKeeper (March 2025):** Kafka 4.0 runs in KRaft mode by default, managing its own metadata with a built-in Raft quorum, which the project says lowers operational overhead and simplifies administration ([Apache Kafka](https://kafka.apache.org/blog/2025/03/18/apache-kafka-4.0.0-release-announcement/)).
+- **Kafka without ZooKeeper (March 2025):** [[Logs and Streaming|Kafka]] 4.0 runs in KRaft mode by default, managing its own metadata with a built-in Raft quorum, which the project says lowers operational overhead and simplifies administration ([Apache Kafka](https://kafka.apache.org/blog/2025/03/18/apache-kafka-4.0.0-release-announcement/)).
 - **etcd at 100,000 nodes (July 2025):** to support 100K-node EKS clusters, AWS replaced etcd's Raft consensus with an internal component called "journal", moved etcd's BoltDB storage onto in-memory tmpfs, doubled the supported database size to 20 GB, and split busy resource types into separate etcd clusters for up to five times the write throughput, while keeping etcd's API semantics ([AWS](https://aws.amazon.com/blogs/containers/under-the-hood-amazon-eks-ultra-scale-clusters)).
 - **Locks for performance, not safety:** Jepsen's advice stands: use the lock key's etcd revision as a fencing token and have the protected resource reject lower ones ([Jepsen](https://jepsen.io/analyses/etcd-3.4.3)).
 
