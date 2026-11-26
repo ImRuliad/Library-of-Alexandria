@@ -307,7 +307,7 @@ A distributed FFT splits the array across GPUs, does local FFTs along the axes e
 | Pencil (2D) | Along two axes | Two all-to-alls, each within a row or column of GPUs | Scales to $N^2$ GPUs |
 
 - **cuFFTXt** handles up to 16 GPUs on one node: `cufftXtSetGPUs`, `cufftXtMalloc`, `cufftXtMemcpy`, then execute ([cuFFT docs](https://docs.nvidia.com/cuda/cufft/index.html)).
-- **cuFFTMp** is the multi-process, multi-node library, with slab and pencil decompositions with arbitrary block sizes, a standalone reshape API, and NVSHMEM or NCCL communication backends; version 12.6.0 is current ([cuFFTMp docs](https://docs.nvidia.com/cuda/cufftmp)). See [[Multi-GPU Communication: NVLink and NCCL]] and [[GPUDirect RDMA and Storage]].
+- **cuFFTMp** is the multi-process, multi-node library, with slab and pencil decompositions with arbitrary block sizes, a standalone reshape API, and NVSHMEM or NCCL communication backends; version 12.6.0 is current ([cuFFTMp docs](https://docs.nvidia.com/cuda/cufftmp)). See [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]] and [[GPUDirect RDMA and Storage]].
 
 NVIDIA's December 2025 scaling study gives the numbers ([NVIDIA blog](https://developer.nvidia.com/blog/how-to-scale-fast-fourier-transforms-to-exascale-on-modern-nvidia-gpu-architectures/)):
 
@@ -415,7 +415,7 @@ FlashFFTConv also adds two sparse variants: **partial convolutions** (zero the t
 - [[Occupancy and Latency Hiding]] — FFT kernels trade occupancy for registers; Volkov's CUFFT example.
 - [[Streams, Events and Async Execution]] — `cufftSetStream` and overlap.
 - [[CUDA Graphs]] — Cutting launch overhead for many small FFTs.
-- [[Multi-GPU Communication: NVLink and NCCL]] — The all-to-all behind distributed FFTs.
+- [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]] — The all-to-all behind distributed FFTs.
 - [[cuBLAS and cuDNN]] — The sibling NVIDIA math libraries.
 - [[ROCm and HIP]] — rocFFT and hipFFT.
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — FP8 Tensor Cores as an FP64 FFT engine.

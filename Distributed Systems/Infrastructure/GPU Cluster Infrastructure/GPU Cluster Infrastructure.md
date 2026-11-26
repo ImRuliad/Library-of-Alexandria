@@ -492,3 +492,6 @@ Open problems worth tracking:
 - [[2 - How To Think About TPUs (NOT DONE)|How To Think About TPUs]] — ICI, 3D tori and TPU pods, Google's scale-up network.
 - [[Transformer]] — The layer structure that sets tensor-parallel traffic.
 - [[Scaling Laws]] — Why the compute, and so the clusters, keep growing.
+- [[Multi-GPU Communication - NVLink and NCCL]] — NVLink, NVSwitch and NCCL from the GPU programmer's side.
+- [[GPUDirect RDMA and Storage]] — GPU-to-NIC and GPU-to-storage paths that skip the CPU.
+- [[Blackwell Architecture]] — The B200/GB300 chips and NVL72 racks.

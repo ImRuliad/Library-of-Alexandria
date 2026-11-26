@@ -484,3 +484,4 @@ DiLoCo (Nov 2023) lets each worker group run many local AdamW steps and synchron
 - [[Long Context]] — Context parallelism and ring attention exist to train long sequences.
 - [[FlashAttention]] — Avoids storing attention scores, the biggest activation term.
 - [[Attention]] — Why sequence splitting is hard: every query needs every key.
+- [[Multi-GPU Communication - NVLink and NCCL]] — How NCCL implements the collectives these strategies use.

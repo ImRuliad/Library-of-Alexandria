@@ -326,3 +326,5 @@ Open problems:
 - [[ROCm and HIP]] — AMD's near-copy of this model.
 - [[CUDA Tile and cuTile]] — The tile model beside SIMT.
 - [[Numba and CuPy]] — SIMT kernels and GPU arrays from Python.
+- [[Thread Block Clusters and Distributed Shared Memory]] — The cluster level of the hierarchy in depth.
+- [[Multi-GPU Communication - NVLink and NCCL]] — Programming many GPUs: NVLink and NCCL collectives.

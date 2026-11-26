@@ -332,3 +332,4 @@ Open problems:
 - [[Kernel Fusion]] — The fix for memory-bound chains of small kernels.
 - [[GPU Memory Hierarchy]] — The L1, L2 and DRAM levels in memory workload analysis.
 - [[Tensor Cores]] — Tensor-core rooflines and pipe utilization in Nsight Compute.
+- [[Multi-GPU Communication - NVLink and NCCL]] — What the NCCL kernels on a multi-GPU timeline are doing.

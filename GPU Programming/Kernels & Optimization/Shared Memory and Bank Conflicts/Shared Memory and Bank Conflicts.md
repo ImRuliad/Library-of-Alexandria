@@ -386,3 +386,4 @@ Open problems and caveats:
 - [[FlashAttention]] — Attention tiles kept in shared memory.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Wavefront and conflict metrics.
 - [[Blackwell Architecture]] — Tensor Memory and the 2-SM MMA.
+- [[Thread Block Clusters and Distributed Shared Memory]] — Distributed shared memory: reading other blocks' shared memory in a cluster.

@@ -372,3 +372,4 @@ Open problems:
 - [[GPU Architecture Basics]] — SMs, copy engines and the hardware work queues streams map onto.
 - [[Distributed Training]] — Overlapping gradient communication with compute on separate streams.
 - [[GPU Cluster Infrastructure]] — The networks whose transfers streams overlap with compute.
+- [[MIG and MPS - Sharing a GPU]] — Sharing one GPU between processes with MPS and MIG.

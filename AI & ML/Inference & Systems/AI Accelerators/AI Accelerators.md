@@ -411,3 +411,4 @@ Open questions: how far FP4 (and below) can go for pretraining without loss; whe
 - [[Speculative Decoding]] — Raises decode arithmetic intensity; LPX can host the draft model.
 - [[Mixture of Experts]] — All-to-all expert traffic is why scale-up domain size and topology matter.
 - [[Scaling Laws]] — The compute trend these chips supply, and the $6ND$ and $2N$ FLOP counts used here.
+- [[Blackwell Architecture]] — NVIDIA's Blackwell generation in depth.

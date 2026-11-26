@@ -391,3 +391,4 @@ Open problems:
 - [[Blackwell Architecture]] — TMEM, tcgen05 and CTA pairs.
 - [[FlashAttention]] — FlashAttention-3 and -4 are built on TMA pipelines.
 - [[Kernel Fusion]] — Fused kernels lean on async pipelines to overlap their memory and math.
+- [[Thread Block Clusters and Distributed Shared Memory]] — Clusters, TMA multicast and remote shared-memory stores.

@@ -260,7 +260,7 @@ Grouped GEMM matters most for MoE: each expert's GEMM has its own token count, a
 ### cuBLASXt, cuBLASMp and cuBLASDx
 
 - **cuBLASXt** is a host API for level-3 BLAS on one or more GPUs: data can stay on the host, and "the Library will take care of dispatching the operation to, and transferring the data to, one or multiple GPUs" ([cuBLAS docs](https://docs.nvidia.com/cuda/cublas/index.html)). It suits matrices bigger than GPU memory, not deep learning.
-- **cuBLASMp** is a separate library for distributed dense linear algebra across GPUs and nodes (2D block-cyclic distributions, ScaLAPACK-style), with a guide for using it for tensor parallelism ([cuBLASMp docs](https://docs.nvidia.com/cuda/cublasmp/index.html)); see [[Multi-GPU Communication: NVLink and NCCL]].
+- **cuBLASMp** is a separate library for distributed dense linear algebra across GPUs and nodes (2D block-cyclic distributions, ScaLAPACK-style), with a guide for using it for tensor parallelism ([cuBLASMp docs](https://docs.nvidia.com/cuda/cublasmp/index.html)); see [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]].
 - **cuBLASDx** (not shipped with the toolkit) is the opposite: device-side GEMM building blocks you call *inside your own kernel*, so you can fuse a small GEMM with other work. It overlaps with [[CUTLASS and CuTe]].
 
 ### cuDNN Legacy and Graph APIs
@@ -433,6 +433,6 @@ In PyTorch, `torch.use_deterministic_algorithms(True)` makes non-deterministic o
 - [[Streams, Events and Async Execution]] — Handles and streams, and why multiple streams affect determinism.
 - [[CUDA Graphs]] — Library calls inside captured graphs; autotuning can't run during capture.
 - [[Blackwell Architecture]] — The hardware behind block-scaled formats and FP64 emulation.
-- [[Multi-GPU Communication: NVLink and NCCL]] — Where cuBLASMp and tensor parallelism meet.
+- [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]] — Where cuBLASMp and tensor parallelism meet.
 - [[ROCm and HIP]] — AMD's equivalents (hipBLASLt, MIOpen).
 - [[Profiling with Nsight Compute and Nsight Systems]] — How to see which library kernel actually ran.

@@ -307,3 +307,4 @@ Open problems in late 2026:
 - [[AI Accelerators]] — How GPUs compare with TPUs and other AI chips.
 - [[GPU Cluster Infrastructure]] — What happens when you connect thousands of these chips.
 - [[FlashAttention]] — A case study in fitting one algorithm to each GPU generation.
+- [[Thread Block Clusters and Distributed Shared Memory]] — GPCs, clusters and the SM-to-SM network.

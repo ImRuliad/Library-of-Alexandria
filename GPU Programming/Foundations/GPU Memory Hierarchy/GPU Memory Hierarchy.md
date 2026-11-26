@@ -267,3 +267,6 @@ Open problems:
 - [[Profiling with Nsight Compute and Nsight Systems]] — Measuring traffic at each level.
 - [[FlashAttention]] — The hierarchy argument applied to attention.
 - [[AI Accelerators]] — How other AI chips arrange SRAM and HBM.
+- [[Thread Block Clusters and Distributed Shared Memory]] — Distributed shared memory across a cluster's SMs.
+- [[MIG and MPS - Sharing a GPU]] — Partitioning L2 and HBM between tenants with MIG.
+- [[Multi-GPU Communication - NVLink and NCCL]] — NVLink, the next level out from HBM.

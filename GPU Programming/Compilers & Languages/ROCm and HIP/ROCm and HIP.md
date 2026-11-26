@@ -96,7 +96,7 @@ block-beta
     G["Hardware: Instinct (CDNA), Radeon (RDNA), Ryzen APUs"]
 ```
 
-The libraries come in pairs: a `roc*` implementation (rocBLAS, rocFFT) and a `hip*` wrapper with a cuBLAS-like API (hipBLAS, hipFFT) so ported code changes only names. hipBLASLt is the one that matters for AI GEMMs, the counterpart of cuBLASLt. RCCL is AMD's fork of NCCL, see [[Multi-GPU Communication: NVLink and NCCL]].
+The libraries come in pairs: a `roc*` implementation (rocBLAS, rocFFT) and a `hip*` wrapper with a cuBLAS-like API (hipBLAS, hipFFT) so ported code changes only names. hipBLASLt is the one that matters for AI GEMMs, the counterpart of cuBLASLt. RCCL is AMD's fork of NCCL, see [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]].
 
 ### What HIP Is
 
@@ -324,6 +324,6 @@ The pattern: AMD's hardware is competitive on paper, especially in memory capaci
 - [[TMA and Asynchronous Copies]] — NVIDIA's copy engine; AMD's Tensor Data Movers are its counterpart.
 - [[Tensor Cores]] — NVIDIA's matrix units; AMD calls them Matrix Cores.
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — MXFP4/MXFP6 on CDNA 4.
-- [[Multi-GPU Communication: NVLink and NCCL]] — RCCL is AMD's NCCL fork.
+- [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]] — RCCL is AMD's NCCL fork.
 - [[Roofline Model and Arithmetic Intensity]] — The ridge-point arithmetic above.
 - [[AI Accelerators]] — The wider accelerator landscape.

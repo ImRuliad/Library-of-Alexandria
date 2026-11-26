@@ -357,3 +357,4 @@ Open problems:
 - [[GPU Architecture Basics]] — The GPU MMU and copy engines that unified memory relies on.
 - [[GPU Cluster Infrastructure]] — Superchip nodes and NVLink domains at rack scale.
 - [[KV Cache]] — The inference memory pressure that drives CPU offload on superchips.
+- [[Multi-GPU Communication - NVLink and NCCL]] — NVLink and peer-to-peer access between GPUs.

@@ -458,3 +458,4 @@ Open problems:
 - [[Triton]] — `tl.sum` and `tl.cumsum` as block-level reductions.
 - [[ROCm and HIP]] — 64-lane wavefronts and portable warp code.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Measuring achieved bandwidth against peak.
+- [[Thread Block Clusters and Distributed Shared Memory]] — Cross-block reductions through distributed shared memory.
