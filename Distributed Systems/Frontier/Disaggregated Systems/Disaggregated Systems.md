@@ -482,3 +482,4 @@ Open problems worth tracking:
 - [[KV Cache]] — The "page" of LLM serving, moved between prefill and decode pools.
 - [[PagedAttention]] — Fixed-size KV blocks that make the cache movable and poolable.
 - [[Deterministic Simulation Testing]] — Testing multi-tier storage systems under injected faults.
+- [[Stream Processing]] — Flink 2.0's disaggregated state (ForSt): remote primary state with a local cache.

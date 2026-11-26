@@ -81,7 +81,7 @@ updated: 2026-11-26
 
 ## ***TL;DR***
 ---
-*A log is an append-only, totally ordered sequence of records. Put one in the middle of a system and it becomes the shared source of truth that databases replicate from, services integrate through, and stream processors read; Kafka made that idea the default way companies move data, and most of the field's recent work is about making the log cheaper and its guarantees sharper.*
+*A log is an append-only, totally ordered sequence of records. Put one in the middle of a system and it becomes the shared source of truth that databases replicate from, services integrate through, and [[Stream Processing|stream processors]] read; Kafka made that idea the default way companies move data, and most of the field's recent work is about making the log cheaper and its guarantees sharper.*
 
 - **The idea:** Jay Kreps (2013) argued the log is "real-time data's unifying abstraction": the same structure that [[Replication|replicates]] a database (state machine replication) can integrate every system in a company ([Kreps, 2013](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)).
 - **Kafka's design:** a topic is split into partitions; each partition is a replicated log addressed by offsets and stored as segment files. A record is committed once every in-sync replica (ISR) has it; the high watermark marks how far consumers may read; `acks=all` plus `min.insync.replicas` sets durability ([Kafka docs](https://kafka.apache.org/44/design/design/)).
@@ -117,7 +117,7 @@ Kreps' definition: a log "is an append-only, totally-ordered sequence of records
 
 Two consequences matter:
 
-- **Tables and streams are duals.** A table is the current state; the log is the history of changes that produced it. "Tables support data at rest and logs capture change." Replay the changelog and you rebuild the table; publish a table's changelog and anyone can maintain a copy ([Kreps, 2013](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)). Change data capture, event sourcing and Kafka Streams' state stores all use this.
+- **Tables and streams are duals.** A table is the current state; the log is the history of changes that produced it. "Tables support data at rest and logs capture change." Replay the changelog and you rebuild the table; publish a table's changelog and anyone can maintain a copy ([Kreps, 2013](https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying)). Change data capture, event sourcing and Kafka Streams' state stores ([[Stream Processing]]) all use this.
 - **Readers are decoupled.** Because readers track their own position, a slow warehouse load and a real-time service can read the same log at different speeds, and a new reader can start from the beginning.
 
 ### Logs and State Machine Replication
@@ -517,3 +517,4 @@ Open problems worth tracking:
 - [[Deterministic Simulation Testing]] — How S2 and WarpStream test their storage engines.
 - [[LSM Trees]] — Another append-then-compact storage design, for comparison with log compaction.
 - [[Cluster Metadata and Routing]] — KRaft beside other metadata designs, plus leader epochs and KIP-951 leader hints.
+- [[Stream Processing]] — Flink, Kafka Streams and Spark on top of the log: watermarks, checkpoints and exactly-once processing.

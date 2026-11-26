@@ -540,3 +540,4 @@ Open problems worth tracking:
 - [[Reliability Patterns]] — Handling 503 Slow Down with backoff and jitter.
 - [[Witness Replicas]] — Vote-only replicas, not to be confused with S3's cache witness.
 - [[Time and Clocks]] — Why lease timeouts still need bounded clock drift.
+- [[Stream Processing]] — Checkpoints and, since Flink 2.0, primary operator state kept in object storage.

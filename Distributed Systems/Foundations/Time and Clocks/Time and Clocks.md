@@ -455,3 +455,4 @@ Open problems worth tracking:
 - [[Deterministic Simulation Testing]] — Injecting clock skew and jumps on purpose.
 - [[Clock Synchronization]] — How NTP, PTP and cloud time services produce the clocks and error bounds used here.
 - [[2. Design Overview|GFS: Design Overview]] — GFS's master grants chunk leases, a time-based mechanism.
+- [[Stream Processing]] — Event time versus processing time, watermarks, and Chandy-Lamport-style snapshots of running dataflows.
