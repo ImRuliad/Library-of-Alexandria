@@ -3,7 +3,7 @@ tags:
   - operating-systems
   - foundations
   - signals-and-ipc
-status: draft
+status: complete
 sources:
   - https://man7.org/linux/man-pages/man7/signal.7.html
   - https://man7.org/linux/man-pages/man7/signal-safety.7.html
