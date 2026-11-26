@@ -5,10 +5,14 @@ tags:
   - sharding
   - databases
   - data-and-storage
-status: draft
+status: complete
 sources:
   - https://docs.citusdata.com/en/stable/get_started/concepts.html
   - https://paper-notes.zhjwpku.com/assets/pdfs/citus.pdf
+  - https://www.citusdata.com/blog/2016/03/24/citus-unforks-goes-open-source/
+  - https://www.citusdata.com/blog/2019/01/24/microsoft-acquires-citus-data/
+  - https://www.citusdata.com/blog/2022/09/19/citus-11-1-shards-postgres-tables-without-interruption/
+  - https://docs.citusdata.com/en/v12.1/develop/api_guc.html
   - https://www.citusdata.com/blog/2022/06/17/citus-11-goes-fully-open-source/
   - https://www.citusdata.com/blog/2023/07/18/citus-12-schema-based-sharding-for-postgres/
   - https://www.citusdata.com/updates/v14-0/
@@ -82,7 +86,7 @@ A single Postgres primary is limited in a few concrete ways:
 | **Connections** | Each connection is a process; thousands of app servers overwhelm it | Partly, with poolers |
 | **Blast radius** | One bad query or one failover affects every customer | No |
 
-Teams hit these walls in the same order. Notion's 2021 write-up says they moved to sharding when their monolith's CPU spiked, vacuum stalled and they risked transaction ID wraparound, which forces Postgres to stop accepting writes ([Notion, 2021](https://www.notion.com/blog/sharding-postgres-at-notion)). Figma described a database stack that grew almost 100x from 2020 and was approaching the largest instance size AWS sold ([Figma, Mar 2024](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)).
+Teams hit these walls in the same order. Notion's 2021 write-up says they moved to sharding when their monolith's CPU spiked, vacuum stalled and they risked transaction ID wraparound, which forces Postgres to stop accepting writes ([Notion, 2021](https://www.notion.com/blog/sharding-postgres-at-notion)). Figma started 2020 on a single Postgres database on AWS's largest physical instance, and its database stack grew almost 100x after that ([Figma, Mar 2024](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)).
 
 The alternatives each have a cost. Moving to a [[Distributed SQL]] engine means a new storage engine, new failure modes and partial Postgres compatibility. Vertical partitioning (moving some tables to their own database) buys time but stops working when one table outgrows a node. Sharding keeps Postgres but pushes complexity into routing, cross-shard semantics and operations.
 
@@ -93,7 +97,7 @@ The alternatives each have a cost. Moving to a [[Distributed SQL]] engine means 
 ### Shard Keys and Hash Ranges
 Every sharded Postgres design starts by choosing a **shard key** (Citus calls it the *distribution column*, Neki a *shard index*, Vitess a *vindex*). Most use hashing so that load spreads evenly no matter how the key values cluster.
 
-Citus is the clearest example. It hashes the distribution column to a signed 32-bit integer and splits the hash space into equal ranges, one per shard; the metadata stores each shard's minimum and maximum hash value ([Citus concepts](https://docs.citusdata.com/en/stable/get_started/concepts.html)). With $N$ shards:
+Citus is the clearest example. It hashes the distribution column (Postgres hash functions return a signed 32-bit integer) and gives each shard a contiguous range of hash values, stored in its metadata as `shardminvalue` and `shardmaxvalue`; the ranges are disjoint and together cover the whole hash space ([Citus concepts](https://docs.citusdata.com/en/stable/get_started/concepts.html); [Citus paper](https://paper-notes.zhjwpku.com/assets/pdfs/citus.pdf)). By default a hash-distributed table gets 32 shards ([Citus configuration](https://docs.citusdata.com/en/v12.1/develop/api_guc.html)). With $N$ shards:
 
 $$
 \text{shard}(k) = \left\lfloor \frac{h(k) + 2^{31}}{2^{32} / N} \right\rfloor, \qquad h(k) \in [-2^{31},\ 2^{31})
@@ -119,10 +123,10 @@ Because moving data is expensive, almost every design creates **many more logica
 
 | System | Logical shards | Physical placement |
 |---|---|---|
-| Instagram (2012) | Several thousand, each a Postgres *schema* | A handful of physical servers ([Instagram](https://instagram-engineering.com/1cf5a71e5a5c)) |
+| Instagram (2011) | Several thousand, each a Postgres *schema* | "Far fewer" physical shards, starting with a few servers ([Instagram](https://instagram-engineering.com/1cf5a71e5a5c)) |
 | Notion (2021) | 480, one schema per logical shard | 32 physical databases, 15 schemas each ([Notion, 2021](https://www.notion.com/blog/sharding-postgres-at-notion)) |
 | Notion (2023) | Same 480 | 96 databases, 5 each ([Notion, 2023](https://www.notion.com/blog/the-great-re-shard)) |
-| Citus | `shard_count` per table, default 32 | Shards are tables spread over worker nodes; the rebalancer moves them ([Citus concepts](https://docs.citusdata.com/en/stable/get_started/concepts.html)) |
+| Citus | `shard_count` per table, default 32 | Shards are tables spread over worker nodes; the rebalancer moves them ([Citus concepts](https://docs.citusdata.com/en/stable/get_started/concepts.html); [Citus configuration](https://docs.citusdata.com/en/v12.1/develop/api_guc.html)) |
 
 Notion's choice of 480 is a nice piece of arithmetic. $480 = 2^5 \cdot 3 \cdot 5$ has many divisors (24 of them, including 32, 48, 96, 120, 160 and 240), so the same 480 logical shards can be spread evenly over many different machine counts. Going from 32 to 96 databases changed only the logical-to-physical map: $480 / 32 = 15$ schemas per database became $480 / 96 = 5$, and no row's logical shard changed.
 
@@ -152,20 +156,20 @@ The shard map itself lives in a consistent store: Citus metadata tables on the c
 
 | Year | Event |
 |---|---|
-| 2012 | **Instagram** publishes how it shards Postgres: thousands of logical shards as schemas on few servers, and IDs built from time plus shard number ([Instagram](https://instagram-engineering.com/1cf5a71e5a5c)) |
-| 2016 | **Citus** is released as an open-source Postgres extension rather than a fork ([Citus paper](https://paper-notes.zhjwpku.com/assets/pdfs/citus.pdf)) |
-| 2019 | Microsoft acquires Citus Data; Citus runs on Azure as Hyperscale (Citus) |
-| 2021 | **Notion** moves from one Postgres to 480 logical shards on 32 databases ([Notion](https://www.notion.com/blog/sharding-postgres-at-notion)); the Citus paper appears at SIGMOD |
+| 2011 | **Instagram** publishes how it shards Postgres: thousands of logical shards as schemas on few servers, and IDs built from time plus shard number ([Instagram](https://instagram-engineering.com/1cf5a71e5a5c)) |
+| 2016 | **Citus** "unforks" and is released as an open-source Postgres extension rather than a fork (Mar 24) ([Citus, Mar 2016](https://www.citusdata.com/blog/2016/03/24/citus-unforks-goes-open-source/)) |
+| 2019 | Microsoft acquires Citus Data (Jan 24) ([Citus, Jan 2019](https://www.citusdata.com/blog/2019/01/24/microsoft-acquires-citus-data/)) |
+| 2021 | **Notion** moves from one Postgres to 480 logical shards on 32 databases, with five minutes of scheduled downtime at cutover ([Notion](https://www.notion.com/blog/sharding-postgres-at-notion)); the Citus paper appears at SIGMOD |
 | 2022 | Citus 11 (Jun) makes the whole extension open source and lets any node coordinate queries ([Citus, Jun 2022](https://www.citusdata.com/blog/2022/06/17/citus-11-goes-fully-open-source/)) |
 | 2023 | Notion reshards from 32 to 96 databases without downtime ([Notion](https://www.notion.com/blog/the-great-re-shard)); Citus 12 (Jul) adds schema-based sharding, one tenant per schema ([Citus, Jul 2023](https://www.citusdata.com/blog/2023/07/18/citus-12-schema-based-sharding-for-postgres/)); AWS previews Aurora Limitless |
 | 2024 | **Figma** describes DBProxy and its first horizontally sharded tables ([Figma](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)); **Aurora PostgreSQL Limitless** goes GA on Oct 31 ([AWS](https://aws.amazon.com/blogs/aws/amazon-aurora-postgresql-limitless-database-is-now-generally-available)) |
-| 2025 | **Supabase** announces Multigres, led by Vitess co-creator Sugu Sougoumarane (Jun 10) ([Supabase](https://supabase.com/blog/multigres-vitess-for-postgres)); PgDog launches as an open-source sharding pooler |
+| 2025 | **Supabase** announces Multigres, led by Vitess co-creator Sugu Sougoumarane (Jun 10) ([Supabase](https://supabase.com/blog/multigres-vitess-for-postgres)) |
 | 2026 | OpenAI describes running ChatGPT on one unsharded primary (Jan) ([OpenAI](https://openai.com/index/scaling-postgresql/)); Citus 14 adds PostgreSQL 18 (Feb); Multigres v0.1 alpha (Jun); **PlanetScale Neki** platform preview (Sep 10) ([PlanetScale](https://planetscale.com/blog/introducing-neki)) |
 
 ```mermaid
 timeline
     title Sharded Postgres
-    2012 : Instagram logical shards as schemas
+    2011 : Instagram logical shards as schemas
     2016 : Citus open-source extension
     2021 : Notion 480 logical shards
          : Citus paper at SIGMOD
@@ -174,12 +178,11 @@ timeline
     2024 : Figma DBProxy
          : Aurora Limitless GA
     2025 : Multigres announced
-         : PgDog
     2026 : Citus 14 on PG 18
          : Neki preview
 ```
 
-The arc mirrors MySQL's a decade earlier, where YouTube's in-house sharding became Vitess and then PlanetScale ([Vitess docs](https://vitess.io/docs/reference/features/sharding/)). Two of the 2025 to 2026 Postgres projects, Neki and Multigres, come directly from Vitess's builders.
+The arc mirrors MySQL's a decade earlier, where YouTube's in-house sharding became Vitess and then PlanetScale ([Vitess docs](https://vitess.io/docs/reference/features/sharding/)). Two of the 2025 to 2026 Postgres projects come from Vitess's builders: Multigres is led by Vitess co-creator Sugu Sougoumarane ([Supabase](https://supabase.com/blog/multigres-vitess-for-postgres)), and PlanetScale bills Neki as "Sharded Postgres, from the team behind Vitess" ([PlanetScale](https://planetscale.com/blog/the-architecture-of-neki)).
 
 ## ***How It Works***
 ---
@@ -219,7 +222,7 @@ sequenceDiagram
     R-->>App: 345
 ```
 
-Proxies must parse Postgres SQL themselves. PgDog uses the Postgres parser (via `pg_query`) to find shard keys and rewrites cross-shard results, merging sorted rows and combining aggregates in the proxy ([PgDog docs](https://docs.pgdog.dev/features/sharding/cross-shard-queries/)). Figma's DBProxy has its own parser, logical planner and physical planner, and deliberately supports only a subset of SQL so that every query shape is one it can run efficiently ([Figma](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)).
+Proxies must parse Postgres SQL themselves. PgDog speaks the Postgres wire protocol and parses SQL to find the shard key; a query without one goes to every shard, and PgDog then does "any requested sorting, aggregation, or row disambiguation" itself ([PgDog docs](https://docs.pgdog.dev/features/sharding/cross-shard-queries/)). Neki's router parses each query with a Postgres-compatible parser, plans it against the current shard layout, and runs cross-shard joins itself ([PlanetScale](https://planetscale.com/blog/the-architecture-of-neki)). Figma's DBProxy has a parser, a logical planner that extracts logical shard IDs, and a physical planner that maps them to databases; it deliberately supports a subset covering "the most common 90% of queries", with joins allowed only inside a colo and on the shard key ([Figma](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)).
 
 A query with no shard key becomes a scatter to every shard, so its latency is the *maximum* over shards. With 32 shards each having a 1% chance of a 100 ms stall, a scatter query stalls $1 - 0.99^{32} \approx 27\%$ of the time, versus 1% for a single-shard query. This is why sharded schemas push hard toward single-shard access ([[Tail Latency and Hedging]]).
 
@@ -242,9 +245,9 @@ sequenceDiagram
     C->>B: COMMIT PREPARED 'tx_81'
 ```
 
-The coordinator must record its decision before telling shards to commit, and a recovery process must finish or roll back prepared transactions left behind by a crashed coordinator, because a prepared transaction holds its locks until resolved. Citus writes commit records on the coordinator and its maintenance daemon recovers orphaned prepared transactions; it also runs distributed deadlock detection, because two transactions can each wait on the other on *different* shards where no single Postgres instance sees the cycle ([Citus paper](https://paper-notes.zhjwpku.com/assets/pdfs/citus.pdf)).
+The coordinator must record its decision before telling shards to commit, and a recovery process must finish or roll back prepared transactions left behind by a crashed coordinator, because a prepared transaction holds its locks until resolved. Citus writes a commit record for each prepared transaction into its metadata before committing locally, and a maintenance daemon periodically compares pending prepared transactions against those records, committing the ones with a record and aborting the rest. The same daemon runs distributed deadlock detection: every 2 seconds it polls each worker's lock graph, merges the edges by distributed transaction, and cancels the youngest transaction in any cycle, because two transactions can each wait on the other on *different* shards where no single Postgres instance sees the cycle ([Citus paper](https://paper-notes.zhjwpku.com/assets/pdfs/citus.pdf)).
 
-Several systems simply don't offer this. Application-level sharding (Instagram, Notion) and early proxies leave cross-shard atomicity to the app, and Figma's DBProxy initially limited transactions to a single shard ([Figma](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)).
+Several systems simply don't offer this. Application-level sharding (Instagram, Notion) and early proxies leave cross-shard atomicity to the app, and Figma "chose not to support atomic cross-shard transactions": full transactions work only within one shard key ([Figma](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/)).
 
 ### The Missing Global Snapshot
 2PC makes a multi-shard write atomic, but it doesn't make concurrent *reads* see it atomically. Each shard has its own snapshot, so a reader that touches two shards can see one half of a committed transaction and not the other.
@@ -263,8 +266,8 @@ R sums 40 + 50 = 90 and concludes 10 units vanished. No single shard misbehaved;
 
 Fixes need a shared notion of order across shards:
 
-- **Accept it.** Citus does not provide distributed snapshot isolation; multi-shard reads get each shard's own snapshot ([Citus paper](https://paper-notes.zhjwpku.com/assets/pdfs/citus.pdf)).
-- **Clocks.** Aurora Limitless gives transactions a snapshot time from tightly synchronized clocks, so all shards read as of the same instant and commits are ordered by time ([AWS docs](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/limitless-query.distributed.html); [Murat Demirbas](https://muratbuffalo.blogspot.com/2025/01/use-of-time-in-distributed-databases_14.html)). This is the same move Spanner and CockroachDB make ([[Time and Clocks]], [[Clock Synchronization]]).
+- **Accept it.** Citus multi-node transactions "do not provide distributed snapshot isolation guarantees": a concurrent multi-node query "could obtain a local MVCC snapshot before commit on one node, and after commit on another" ([Citus paper](https://paper-notes.zhjwpku.com/assets/pdfs/citus.pdf)).
+- **Clocks.** Aurora Limitless uses "time-based Multi Version Concurrency Control": each transaction's commit time is recorded, its start time becomes its snapshot time, and a commit is visible to a reader only if its commit time is earlier than the reader's snapshot time; commits go through an optimized two-phase commit when needed. Murat Demirbas lists Limitless among systems that get "consistent global reads using timestamps", with consistency leases of a few seconds so zombie nodes can't serve stale reads ([AWS docs](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/limitless-query.distributed.html); [Murat Demirbas](https://muratbuffalo.blogspot.com/2025/01/use-of-time-in-distributed-databases_14.html)). This is the same move Spanner and CockroachDB make ([[Time and Clocks]], [[Clock Synchronization]]).
 - **A central sequencer.** Postgres-XL-style global transaction managers hand out snapshots from one node, which is correct but becomes a bottleneck and a single point of failure.
 
 ### IDs Without a Single Sequence
@@ -277,7 +280,7 @@ packet-beta
   54-63: "per-shard sequence mod 1024 (10 bits)"
 ```
 
-Reading an ID tells you its shard without a lookup, and IDs sort roughly by creation time. Each logical shard can mint 1,024 IDs per millisecond, and 41 bits of milliseconds last about 69 years ($2^{41}$ ms $\approx 69.7$ years). The cost: moving a row to another shard leaves its ID naming the old one, so the shard number in the ID must refer to a *logical* shard that moves as a unit.
+Reading an ID tells you its shard without a lookup, and IDs sort roughly by creation time. Each logical shard can mint 1,024 IDs per millisecond, and 41 bits of milliseconds since a custom epoch (Jan 1, 2011 in the post's example) last about 69.7 years ($2^{41}$ ms $\approx 2.2 \times 10^{12}$ ms); the post itself says 41 years, which undercounts. The cost: moving a row to another shard leaves its ID naming the old one, so the shard number in the ID must refer to a *logical* shard that moves as a unit.
 
 ### Resharding Online
 Shards fill up or get hot, so every mature system can move data while serving traffic. They all follow the same copy, catch up, cut over pattern described in [[Partitioning]]:
@@ -297,15 +300,16 @@ How each step is done differs:
 
 | System | Copy and catch up | Cutover |
 |---|---|---|
-| Citus | Logical replication from source shard to target, so splits and moves don't block writes ([Citus concepts](https://docs.citusdata.com/en/stable/get_started/concepts.html)) | Brief write block while metadata switches |
-| Notion (2023) | Postgres logical replication to the new databases, then verification with dark reads ([Notion](https://www.notion.com/blog/the-great-re-shard)) | Switched connection routing in its pooler layer |
-| Vitess-style (Neki, Multigres) | Stream WAL-derived changes into new shards while old ones serve | Flip the serving map in the topology store; seconds of read-only ([[Partitioning]]) |
+| Citus (11.1+) | Shard splits, moves, rebalancing and even distributing a table are "built on top of logical replication" so writes continue during the copy ([Citus, Sep 2022](https://www.citusdata.com/blog/2022/09/19/citus-11-1-shards-postgres-tables-without-interruption/)) | "a brief blip in latency at the end" while the metadata switches |
+| Notion (2023) | Postgres logical replication to the new databases, then verification with dark reads, reaching "near 100% equivalence" ([Notion](https://www.notion.com/blog/the-great-re-shard)) | Pause traffic, confirm replication caught up, update the PgBouncer shard map, resume; no perceived user downtime |
+| Neki | A Replicator copies rows, then keeps them current by decoding a Postgres logical replication stream ([PlanetScale](https://planetscale.com/blog/the-architecture-of-neki)) | Flip the shard layout in etcd; the router buffers queries during the switch and then releases them |
+| Vitess (MySQL) | VReplication streams changes into new shards while old ones serve | Flip the serving map in the topology server; seconds of read-only ([[Partitioning]]) |
 | Aurora Limitless | Managed shard split | Managed by AWS ([AWS docs](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/limitless-architecture.html)) |
 
 The catch-up stream is [[Change Data Capture]] from the WAL; correctness depends on the cutover fencing off the old copy so no write lands on it after the map flips ([[Leases and Fencing]]).
 
 ### Each Shard Is Still a Postgres Cluster
-Sharding splits data; it doesn't replace [[Replication]]. Each shard needs its own primary, standbys and failover. Neki makes each shard a full cluster of a primary and two replicas across three availability zones ([PlanetScale](https://planetscale.com/blog/introducing-neki)); Multigres puts consensus-backed durability and failover first, ahead of sharding ([Supabase](https://supabase.com/blog/multigres-v0-1-alpha)). With $S$ shards and $r$ copies each, you operate $S \cdot r$ Postgres servers: 32 shards at 3 copies is 96 servers to upgrade, monitor and back up. That operational multiplier, more than query routing, is what managed offerings sell.
+Sharding splits data; it doesn't replace [[Replication]]. Each shard needs its own primary, standbys and failover. Neki makes each shard "a full Postgres cluster with one primary and at least two replicas across 3 availability zones" ([PlanetScale](https://planetscale.com/blog/introducing-neki)); Multigres puts consensus-backed durability and failover first, ahead of sharding ([Supabase](https://supabase.com/blog/multigres-v0-1-alpha)). With $S$ shards and $r$ copies each, you operate $S \cdot r$ Postgres servers: 32 shards at 3 copies is 96 servers to upgrade, monitor and back up. That operational multiplier, more than query routing, is what managed offerings sell.
 
 ## ***Where It Is Now***
 ---
@@ -316,15 +320,15 @@ Sharding splits data; it doesn't replace [[Replication]]. Each shard needs its o
 | System | Model | Status (Nov 2026) |
 |---|---|---|
 | **Citus** | Open-source extension; coordinator plus workers; hash or schema-based sharding; 2PC across shards | 14.0 in Feb 2026 added PostgreSQL 18; 14.2 in Aug 2026 ([Citus 14.0](https://www.citusdata.com/updates/v14-0/)). Run by Microsoft as elastic clusters in Azure Database for PostgreSQL ([Microsoft Learn](https://learn.microsoft.com/azure/postgresql/flexible-server/concepts-elastic-clusters)) |
-| **Aurora PostgreSQL Limitless** | Managed routers plus shards; sharded, reference and standard tables; clock-based distributed snapshots | GA since Oct 31, 2024 ([AWS](https://aws.amazon.com/blogs/aws/amazon-aurora-postgresql-limitless-database-is-now-generally-available)) |
-| **PlanetScale Neki** | Vitess-style routers over shards that are each a three-zone Postgres cluster; online resharding from unsharded | Platform preview since Sep 10, 2026, not for production ([PlanetScale](https://planetscale.com/blog/introducing-neki)) |
+| **Aurora PostgreSQL Limitless** | Managed routers plus shards; sharded, collocated and reference tables; time-based MVCC for distributed snapshots | GA since Oct 31, 2024 ([AWS](https://aws.amazon.com/blogs/aws/amazon-aurora-postgresql-limitless-database-is-now-generally-available)) |
+| **PlanetScale Neki** | Routers (shard map in etcd) over shards that are each a three-zone Postgres cluster; online resharding, so you can start unsharded | Platform preview since Sep 10, 2026, not for production ([PlanetScale](https://planetscale.com/blog/introducing-neki)) |
 | **PgDog** | Open-source pooler and load balancer that also routes and merges across shards | Open source, actively developed ([PgDog docs](https://docs.pgdog.dev/features/sharding/)) |
 | **Supabase Multigres** | Vitess for Postgres, Apache 2.0; pooling, failover and consensus-backed durability first | v0.1 alpha Jun 4, 2026; private alpha on Supabase Oct 1, 2026; sharding "is not in this release" ([Supabase](https://supabase.com/blog/multigres-v0-1-alpha); [changelog](https://supabase.com/changelog/multigres-private-alpha)) |
 
-The common pattern, set by Vitess, is: keep each shard an unmodified Postgres, put a SQL-aware router in front, store the shard map in a consistent metadata store, and make resharding an online workflow. Where they differ is how much SQL survives across shards (Citus and Limitless try hardest; proxies support a subset) and whether reads across shards are snapshot-consistent (Limitless yes, the others no).
+The common pattern, set by Vitess, is: keep each shard an unmodified Postgres, put a SQL-aware router in front, store the shard map in a consistent metadata store, and make resharding an online workflow. Where they differ is how much SQL survives across shards (Citus and Limitless try hardest; proxies support a subset) and whether reads across shards are snapshot-consistent (Limitless documents time-based snapshots, Citus says it has none, and Neki's launch posts don't say).
 
 ### How Far One Primary Goes
-OpenAI's January 2026 post is the strongest recent argument for delaying sharding. ChatGPT's main Postgres runs as one primary on Azure Database for PostgreSQL with about 50 read replicas across regions, serving millions of queries per second; OpenAI moved shardable, write-heavy workloads to Azure Cosmos DB instead of sharding Postgres, and stopped adding new tables to the main database ([OpenAI, Jan 2026](https://openai.com/index/scaling-postgresql/)). The lesson isn't "never shard". It's that read-heavy workloads go a very long way on replicas, and that the expensive part of sharding is rewriting every query path, which OpenAI chose to avoid by moving new write-heavy data elsewhere.
+OpenAI's January 2026 post is the strongest recent argument for delaying sharding. ChatGPT's main Postgres runs as one primary on Azure Database for PostgreSQL with "nearly 50 read replicas" across regions, serving millions of queries per second. OpenAI has been moving shardable, write-heavy workloads to sharded systems such as Azure Cosmos DB rather than sharding Postgres, because that would mean "changes to hundreds of application endpoints", and it no longer allows new tables in the main database; it isn't ruling out sharding Postgres later ([OpenAI, Jan 2026](https://openai.com/index/scaling-postgresql/)). The lesson isn't "never shard". It's that read-heavy workloads go a very long way on replicas, and that the expensive part of sharding is rewriting every query path, which OpenAI chose to avoid by moving new write-heavy data elsewhere.
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -341,7 +345,7 @@ OpenAI's January 2026 post is the strongest recent argument for delaying shardin
 Open problems:
 
 - **Choosing the key once.** Changing a shard key means rewriting every table that carries it. Online resharding (Vitess, Neki, Citus) moves shards cheaply but doesn't change the key ([[Partitioning]]).
-- **Consistent cross-shard reads without special clocks.** Limitless uses tightly synchronized clocks; the open-source systems don't offer distributed snapshots. A portable answer would need either clocks ([[Time and Clocks]]) or a sequencer ([[Deterministic Transactions]]).
+- **Consistent cross-shard reads without special clocks.** Limitless uses time-based snapshots; Citus documents none and the other open-source systems don't describe any. A portable answer would need either clocks ([[Time and Clocks]]) or a sequencer ([[Deterministic Transactions]]).
 - **Global secondary indexes.** A lookup by a non-key column (email, file name) must scatter unless you maintain a separate index sharded by that column, which then needs cross-shard atomic updates ([[Secondary Indexes]]).
 - **Schema changes.** DDL must reach every shard and either succeed everywhere or nowhere; a migration that fails on shard 17 of 32 leaves a mixed schema.
 - **Hot tenants.** Hashing spreads tenants, not load; one giant tenant still fits on one shard. Citus's tenant isolation and schema-based sharding move a big tenant to its own node, but can't split it ([[Hot Keys and Cache Stampedes]]).
@@ -363,9 +367,9 @@ Open problems:
 - [Vitess sharding](https://vitess.io/docs/reference/features/sharding/): the model the newer proxies follow.
 
 **Practitioners and teams**
-- [Sharding & IDs at Instagram](https://instagram-engineering.com/1cf5a71e5a5c): Instagram Engineering, 2012.
-- [Herding elephants: lessons learned from sharding Postgres at Notion](https://www.notion.com/blog/sharding-postgres-at-notion): Notion, 2021.
-- [The Great Re-shard](https://www.notion.com/blog/the-great-re-shard): Notion, 2023.
+- [Sharding & IDs at Instagram](https://instagram-engineering.com/1cf5a71e5a5c): Instagram Engineering, 2011.
+- [Herding elephants: lessons learned from sharding Postgres at Notion](https://www.notion.com/blog/sharding-postgres-at-notion): Notion, Oct 2021.
+- [The Great Re-shard](https://www.notion.com/blog/the-great-re-shard): Notion, Jul 2023.
 - [How Figma's databases team lived to tell the scale](https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/): Figma, Mar 2024.
 - [Scaling PostgreSQL to power 800 million ChatGPT users](https://openai.com/index/scaling-postgresql/): OpenAI, Jan 2026.
 - [Amazon Aurora PostgreSQL Limitless Database is now generally available](https://aws.amazon.com/blogs/aws/amazon-aurora-postgresql-limitless-database-is-now-generally-available): AWS, Oct 2024.
