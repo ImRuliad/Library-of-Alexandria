@@ -336,7 +336,7 @@ From the [kernel docs](https://docs.kernel.org/userspace-api/seccomp_filter.html
 
 - **Nested virtualization.** MicroVMs need KVM; inside a cloud VM that means nested virtualization, which is slower and not always offered. gVisor's systrap avoids this, which is part of why it spread.
 - **GPUs and accelerators.** Passing a GPU into a microVM reintroduces a huge driver and DMA attack surface; AI workloads want GPUs and isolation at once.
-- **Side channels.** A VM boundary doesn't stop cache or speculative-execution leaks between tenants on the same core; hosts disable SMT or pin tenants to cores, losing density.
+- **Side channels.** A VM boundary doesn't stop cache or [[Transient Execution Attacks and Mitigations|speculative-execution]] leaks between tenants on the same core; hosts disable SMT or pin tenants to cores, losing density.
 - **Snapshot safety.** Cloned VMs must notice they were cloned before using randomness; guests and libraries are still catching up.
 - **Memory overcommit.** Idle microVMs hold guest memory that the host can't easily reclaim; balloon devices, free-page reporting and snapshots help but add complexity (see [[Page Cache and Memory Reclaim]]).
 - **The boundary moves.** Every feature added for compatibility (PCI, GPUs, more syscalls) grows the attack surface these designs exist to shrink, as Firecracker's 2026 PCI bug showed.
