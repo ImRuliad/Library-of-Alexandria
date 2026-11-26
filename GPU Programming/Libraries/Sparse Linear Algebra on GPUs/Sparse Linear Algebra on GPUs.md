@@ -5,7 +5,7 @@ tags:
   - sparse
   - cusparse
   - spmv
-status: draft
+status: complete
 sources:
   - https://research.nvidia.com/publication/2009-11_implementing-sparse-matrix-vector-multiplication-throughput-oriented-processors
   - https://www.nvidia.com/docs/io/66889/nvr-2008-004.pdf
@@ -13,6 +13,10 @@ sources:
   - https://arxiv.org/abs/1307.6209
   - https://docs.nvidia.com/cuda/cusparse
   - https://docs.nvidia.com/cuda/cusparse/generic-api/generic-api.html
+  - https://docs.nvidia.com/cuda/cusparse/generic-api/generic-api-functions.html
+  - https://docs.nvidia.com/cuda/cusparse/generic-api/sparse-matrix.html
+  - https://docs.nvidia.com/cuda/archive/12.8.1/cusparse/generic-api/dense-vector.html
+  - https://developer.download.nvidia.com/video/gputechconf/gtc/2020/presentations/s22085-accelerating-sparsity-in-the-nvidia-ampere-architecture%E2%80%8B.pdf
   - https://docs.nvidia.com/cuda/archive/13.4.2/pdf/CUDA_Toolkit_Release_Notes.pdf
   - https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/
   - https://docs.nvidia.com/cuda/cusparselt/release_notes.html
@@ -269,7 +273,7 @@ cuSPARSE exposes this as `SpSV` (one right-hand side) and `SpSM` (many), each sp
 
 ### cuSPARSE and the Generic API
 
-cuSPARSE has two layers. The **legacy API** follows the Sparse BLAS style and "will not be improved in future releases"; the **generic API** is the standard interface, with opaque descriptors for sparse matrices (COO, CSR, CSC, BSR, Blocked-ELL, Sliced-ELL) and dense vectors and matrices, a choice of value, index (32- or 64-bit) and compute types, and an algorithm enum per routine ([cuSPARSE docs](https://docs.nvidia.com/cuda/cusparse), [generic types](https://docs.nvidia.com/cuda/cusparse/generic-api/generic-api.html)). Most routines can be captured in [[CUDA Graphs]], and results are bit-reproducible run to run for the same arguments and algorithm on the same machine (transposed operations excepted).
+cuSPARSE has two layers. The **legacy API** follows the Sparse BLAS style and "will not be improved in future releases"; the **generic API** is the standard interface, with opaque descriptors for sparse matrices (COO, CSR, CSC, BSR, Blocked-ELL, Sliced-ELL) and dense vectors and matrices, a choice of value, index (32- or 64-bit) and compute types, and an algorithm enum per routine ([cuSPARSE docs](https://docs.nvidia.com/cuda/cusparse), [generic types](https://docs.nvidia.com/cuda/cusparse/generic-api/generic-api.html)). Most routines can be captured in [[CUDA Graphs]], and the docs promise bit-wise identical results for identical calls on the same machine, except for transposed operations, a changed algorithm, or algorithms documented as non-deterministic (such as CSR SpMV ALG1).
 
 Every generic routine follows the same pattern:
 
@@ -305,13 +309,13 @@ cusparseSpMV(handle, CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha, matA, vecX,
 - Lines 6–7: wrap `x` and `y` as dense vectors.
 - Lines 8–10: ask how much scratch memory this exact call needs. The answer depends on the algorithm and sizes, which is why it is a separate query.
 - Line 11: you own the allocation, so you can pool or reuse it.
-- Lines 12–13: the actual SpMV. (Signatures follow the long-standing generic API; check `cusparse.h` for your CUDA version.) The compute type (`CUDA_R_32F`) and algorithm enum are explicit; other enums pick merge-style or row-split CSR algorithms with different determinism and preprocessing costs.
+- Lines 12–13: the actual SpMV. Signatures match the cuSPARSE reference ([SpMV](https://docs.nvidia.com/cuda/cusparse/generic-api/generic-api-functions.html), [CSR](https://docs.nvidia.com/cuda/cusparse/generic-api/sparse-matrix.html), [dense vector](https://docs.nvidia.com/cuda/archive/12.8.1/cusparse/generic-api/dense-vector.html)); the descriptor parameters are declared as `cusparseConst...` types, and non-const descriptors are accepted. The compute type (`CUDA_R_32F`) and algorithm enum are explicit. For CSR, `CUSPARSE_SPMV_CSR_ALG1` is the default and its results "may differ slightly between runs"; `CUSPARSE_SPMV_CSR_ALG2` is bit-wise deterministic for the non-transposed case but slower; `CUSPARSE_SPMV_SELL_ALG1` (Sliced-ELL) is deterministic ([SpMV reference](https://docs.nvidia.com/cuda/cusparse/generic-api/generic-api-functions.html)).
 
 Two newer pieces matter for performance work. **SpMVOp** (experimental since CUDA 13.1) builds SpMV kernels at run time, with an optional user epilogue fused in, using nvJitLink, in the spirit of [[Kernel Fusion]]; later 13.x releases cut its planning latency and avoided recompiling the same epilogue ([CUDA 13.4 release notes](https://docs.nvidia.com/cuda/archive/13.4.2/pdf/CUDA_Toolkit_Release_Notes.pdf)). The JIT-based SpMM sibling, SpMMOp, was deprecated in 13.2 Update 1.
 
 ### Structured Sparsity and cuSPARSELt
 
-Since Ampere, Tensor Cores support **fine-grained structured sparsity**: in every group of four consecutive weights, at least two are zero ("2:4"). The hardware skips the zeros, doubling math throughput, and the compressed operand needs half the storage and bandwidth ([NVIDIA, Dec 2020](https://developer.nvidia.com/blog/exploiting-ampere-structured-sparsity-with-cusparselt/)). The compressed matrix keeps the nonzero values plus small metadata recording each value's position in its group of four (a 2-bit index per kept value in the A100 whitepaper's description; not re-checked here). At the PTX level this is the `mma.sp` family ([[PTX and SASS]]).
+Since Ampere, Tensor Cores support **fine-grained structured sparsity**: in every group of four consecutive weights, at least two are zero ("2:4"). The hardware skips the zeros, doubling math throughput, and the compressed operand needs half the storage and bandwidth ([NVIDIA, Dec 2020](https://developer.nvidia.com/blog/exploiting-ampere-structured-sparsity-with-cusparselt/)). The compressed matrix keeps the nonzero values plus a 2-bit index per kept value recording its position in its group of four: 12.5% overhead for FP16 data and 25% for 8-bit data, against 100–200% for CSR indices ([Pool, GTC 2020](https://developer.download.nvidia.com/video/gputechconf/gtc/2020/presentations/s22085-accelerating-sparsity-in-the-nvidia-ampere-architecture%E2%80%8B.pdf)).
 
 Unlike general sparsity, 2:4 does not change the shape of the work: the kernel is still a dense, tiled GEMM ([[Tiled Matrix Multiplication (GEMM)]]) with half of one operand. That is why it reaches Tensor Cores and general sparsity mostly does not.
 
@@ -420,6 +424,7 @@ Net: in late 2026, [[Quantization]] and [[Low-Precision Formats - FP8, FP4 and M
 - [cuSPARSE documentation](https://docs.nvidia.com/cuda/cusparse): formats, generic API, reproducibility and graph-capture notes.
 - [CUDA Toolkit 13.4 release notes](https://docs.nvidia.com/cuda/archive/13.4.2/pdf/CUDA_Toolkit_Release_Notes.pdf) and [CUDA 13.5 announcement](https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/): what changed in cuSPARSE release by release.
 - [Exploiting Ampere Structured Sparsity with cuSPARSELt](https://developer.nvidia.com/blog/exploiting-ampere-structured-sparsity-with-cusparselt/): Busato & Pool, Dec 2020; the 2:4 workflow and A100 numbers.
+- [Accelerating Sparsity in the NVIDIA Ampere Architecture](https://developer.download.nvidia.com/video/gputechconf/gtc/2020/presentations/s22085-accelerating-sparsity-in-the-nvidia-ampere-architecture%E2%80%8B.pdf): Jeff Pool, GTC 2020; the 2:4 compressed format and its metadata overhead.
 - [Accelerating Matrix Multiplication with Block Sparse Format and Tensor Cores](https://developer.nvidia.com/blog/accelerating-matrix-multiplication-with-block-sparse-format-and-nvidia-tensor-cores): Blocked-ELL SpMM.
 - [cuSPARSELt release notes](https://docs.nvidia.com/cuda/cusparselt/release_notes.html) and [cuDSS release notes](https://docs.nvidia.com/cuda/cudss/latest/release_notes.html).
 - [AMGX](https://github.com/NVIDIA/AMGX): algebraic multigrid and Krylov solvers.
