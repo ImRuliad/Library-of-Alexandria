@@ -421,7 +421,7 @@ HSA_XNACK=1 ./mini
 - **Heisenbugs.** A race that depends on timing may vanish under a sanitizer, `CUDA_LAUNCH_BLOCKING` or `-G`, because all three change scheduling. NVIDIA warns that races "can change behavior under instrumentation" and to check with racecheck ([NVIDIA, Dec 2025](https://developer.nvidia.com/blog/better-bug-detection-how-compile-time-instrumentation-for-compute-sanitizer-enhances-memory-safety/)).
 - **`-G` changes the code.** It forces `-O0`, so a bug caused by the optimizer (or by register pressure, see [[Register Pressure and Spilling]]) may disappear in the debug build. `-lineinfo` keeps optimized code but gives only line numbers, and stepping may be erratic.
 - **Overhead.** NVIDIA does not publish a single slowdown figure. The guide warns that tracking data can exhaust device memory with many concurrent launches, and that padding raises memory pressure ([user guide](https://docs.nvidia.com/compute-sanitizer/ComputeSanitizer/index.html)). Use `--kernel-name` and `--launch-count` to check only the kernel you suspect.
-- **Coverage limits.** racecheck covers shared memory, not races through global memory between blocks (those need [[CUDA Memory Model and Atomics|atomics and fences]] done right, and reasoning). Sanitizer core dumps include only threads that hit errors, and racecheck does not work with them. Child kernels launched with dynamic parallelism (CDP) are not checked unless they match a filter. Undefined behavior can give false positives or negatives.
+- **Coverage limits.** racecheck covers shared memory, not races through global memory between blocks (those need [[CUDA Memory Model and Atomics|atomics and fences]] done right, and reasoning, or research tools such as iGUARD and Dartagnan: see [[GPU Memory Model Testing and Verification]]). Sanitizer core dumps include only threads that hit errors, and racecheck does not work with them. Child kernels launched with dynamic parallelism (CDP) are not checked unless they match a filter. Undefined behavior can give false positives or negatives.
 - **Silent data corruption is out of scope.** A kernel that computes wrong numbers with in-bounds, race-free accesses passes every tool. That needs reference implementations and tolerance tests; faulty hardware is its own problem ([[Silent Data Corruption]]).
 - **Tile languages hide threads.** In [[Triton]], [[CUDA Tile and cuTile|cuTile]] and the CuTe DSL, the source has no per-thread code, so "switch to thread 1023" maps poorly back to what you wrote. Tool support for these levels is still young.
 
@@ -468,6 +468,7 @@ HSA_XNACK=1 ./mini
 - [[Triton]] — Interpreter mode and built-in sanitizers.
 - [[Blackwell Architecture]] — The newest hardware the tools track.
 - [[CUDA Memory Model and Atomics]] — Global-memory races racecheck cannot see.
+- [[GPU Memory Model Testing and Verification]] — Research race detectors, model checkers and litmus tests for what racecheck misses.
 - [[Register Pressure and Spilling]] — Why `-G` and compile-time instrumentation change resource use.
 - [[ROCm and HIP]] — AMD's toolchain, ROCgdb and GPU ASan.
 - [[Silent Data Corruption]] — Wrong answers no software tool catches.

@@ -454,7 +454,7 @@ Open problems:
 - [[MIG and MPS - Sharing a GPU]] — How sharing shrinks and destabilizes the occupancy bound.
 - [[ROCm and HIP]] — AMD's execution model and cooperative groups.
 - [[Debugging with compute-sanitizer and cuda-gdb]] — Finding hangs and barrier misuse.
-- [[GPU Memory Model Testing and Verification]] — Litmus testing for memory and progress models (planned).
+- [[GPU Memory Model Testing and Verification]] — Litmus testing, model checkers and race detectors for memory-model bugs, including the XF barrier.
 - [[Green Contexts and SM Partitioning]] — Another way the usable SM count changes (planned).
 - [[Locks and Synchronization]] — The CPU side: spin locks, ticket locks and fairness.
 - [[Lock-Free Data Structures and Memory Ordering]] — Algorithms that need no scheduler fairness.
