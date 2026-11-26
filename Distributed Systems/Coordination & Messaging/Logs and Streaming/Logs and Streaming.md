@@ -523,3 +523,4 @@ Open problems worth tracking:
 - [[Cluster Metadata and Routing]] — KRaft beside other metadata designs, plus leader epochs and KIP-951 leader hints.
 - [[Stream Processing]] — Flink, Kafka Streams and Spark on top of the log: watermarks, checkpoints and exactly-once processing.
 - [[Message Queues]] — Per-message-ack queues (SQS, RabbitMQ, share groups) versus offset-tracking logs.
+- [[Write-Ahead Logging]] — The single-node log that Kafka generalizes, and its fsync and group-commit trade-offs.

@@ -66,7 +66,7 @@ updated: 2026-11-26
 *A witness is a group member that votes but doesn't keep a full copy of the data. It lets a system keep a majority, and so survive a failure, without paying for another full replica; the price is paid in durability, read capacity or recovery, depending on what the witness does store.*
 
 - **The idea.** Majority quorums need $2f + 1$ voters to survive $f$ failures, but surviving $f$ failures only needs $f + 1$ copies of the data. Witnesses fill the gap: $f + 1$ full replicas plus $f$ cheap voters ([[Failure Models]], [[Paxos]]).
-- **What a witness keeps decides what it's worth.** It ranges from nothing but a version number (Pâris, 1986), through cluster metadata (a Windows quorum witness), to the recent write-ahead log (DynamoDB log replicas, Aurora DSQL witness regions). A witness that stores the log keeps a committed write on two machines; one that stores nothing can leave it on one.
+- **What a witness keeps decides what it's worth.** It ranges from nothing but a version number (Pâris, 1986), through cluster metadata (a Windows quorum witness), to the recent [[Write-Ahead Logging|write-ahead log]] (DynamoDB log replicas, Aurora DSQL witness regions). A witness that stores the log keeps a committed write on two machines; one that stores nothing can leave it on one.
 - **Two kinds of vote.** Some witnesses count toward write commits *and* leader elections (Spanner). Others vote only in elections (MongoDB arbiters), so a majority write still needs most of the data-bearing members.
 - **Where it is now (Nov 2026):** witness *regions* are how the big clouds sell three-region strong consistency at two-region cost: Spanner's multi- and dual-region configurations, DynamoDB multi-region strong consistency (GA June 30, 2025) and Aurora DSQL multi-region clusters (GA May 27, 2025). In open source, Cassandra's log-based witnesses (CEP-46) are still being finished, and etcd has an open proposal.
 
@@ -373,3 +373,4 @@ Sources: [Spanner replication](https://docs.cloud.google.com/spanner/docs/replic
 - [[Gray and Fail-Slow Failures]] — Witnesses that fail without anyone noticing.
 - [[Formal Methods in Practice]] — Checking election and reconfiguration rules with extra roles.
 - [[Deterministic Simulation Testing]] — Exercising failover paths a witness only sees during failures.
+- [[Write-Ahead Logging]] — What a log replica stores, and why a log is enough to rebuild state.

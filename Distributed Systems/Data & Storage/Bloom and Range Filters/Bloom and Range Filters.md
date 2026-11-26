@@ -469,5 +469,5 @@ A filter shipped to another node is a snapshot. Keys added at the source after i
 - [[Silent Data Corruption]] — A corrupted filter block is a silent false negative.
 - [[Lakehouse Table Formats]] — Planned: Parquet and Iceberg file-level statistics and Bloom filters.
 - [[Databases on Object Storage]] — Planned: where filter placement decides GET counts.
-- [[Write-Ahead Logging]] — Planned: the other half of an LSM's storage layout.
+- [[Write-Ahead Logging]] — The other half of an LSM's storage layout.
 - [[Probabilistic Sketches]] — Planned: HyperLogLog, Count-Min and other approximate summaries.

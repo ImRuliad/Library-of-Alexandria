@@ -54,6 +54,7 @@ sources:
   - https://rmarcus.info/dbscholar/papers/hddfd005d29d7b6da
   - https://arxiv.org/abs/2603.05439
   - https://vldb.org/2026/program.html
+  - https://www.vldb.org/pvldb/vol19/p3786-zablotchi.pdf
   - https://en.wikipedia.org/wiki/Log-structured_merge-tree
 created: 2026-11-26
 updated: 2026-11-26
@@ -210,7 +211,7 @@ flowchart LR
     L2 -- "compaction" --> LN["Last level: most of the data"]
 ```
 
-1. **Log:** the write is appended to the WAL so it survives a crash. In Pebble, each WAL corresponds one-to-one with a memtable ([CockroachDB docs](https://docs.cockroachlabs.com/docs/stable/architecture/storage-layer.md)). Cassandra calls this the commit log ([Cassandra docs](https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html)).
+1. **Log:** the write is appended to the WAL ([[Write-Ahead Logging]]) so it survives a crash. In Pebble, each WAL corresponds one-to-one with a memtable ([CockroachDB docs](https://docs.cockroachlabs.com/docs/stable/architecture/storage-layer.md)). Cassandra calls this the commit log ([Cassandra docs](https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html)).
 2. **Memtable:** the write is inserted into a sorted in-memory structure, typically a skip list ([SlateDB design overview](https://slatedb.io/docs/design/overview/)).
 3. **Flush:** when the memtable reaches its size limit it is frozen, a fresh memtable takes new writes, and the frozen one is written as an SSTable in L0. Once flushed, its WAL can be dropped. Bigtable calls this a minor compaction; it "shrinks the memory usage" and "reduces the amount of data that has to be read from the commit log during recovery" ([Bigtable, §5.4](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)).
 4. **Compaction:** background threads merge SSTables, keeping the newest version of each key and dropping what's shadowed. SSTables "are immutable; they are never modified, even during the compaction process" ([CockroachDB docs](https://docs.cockroachlabs.com/docs/stable/architecture/storage-layer.md)): a compaction writes new files and then atomically swaps the file set in a manifest.
@@ -444,7 +445,7 @@ This is the storage side of [[Disaggregated Systems]]: compute nodes hold a cach
 | **HATS** (Ren, Sheng, Cao, Li, Lee) | FAST 2026, February | Co-schedules reads and compaction across Cassandra replicas to cut latency spikes ([USENIX](https://www.usenix.org/conference/fast26/presentation/ren)) |
 | **O3-LSM** (Lin et al.) | arXiv, March 2026 | Offloads memtables, flushes and compaction to disaggregated memory; up to 4.5x write throughput over Disaggregated-RocksDB, CaaS-LSM and Nova-LSM ([arXiv](https://arxiv.org/abs/2603.05439)) |
 | **LSM-Raft** (Zhang et al.) | SIGMOD 2026 | Raft log units are entries or compacted SSTables; safety checked in TLA+ ([dbscholar](https://rmarcus.info/dbscholar/papers/hddfd005d29d7b6da)) |
-| **Tidehunter** (Chursin et al., Mysten Labs) | VLDB 2026 | Treats the WAL as permanent storage with small index tables, avoiding value compaction; 830K writes/s on 1 TB of 1 KB values, 8.4x RocksDB ([VLDB 2026 program](https://vldb.org/2026/program.html)) |
+| **Tidehunter** (Chursin et al., Mysten Labs) | VLDB 2026 | Treats the WAL as permanent storage with small index tables, avoiding value compaction; 763K writes/s on 1 TB of 1 KB values, 6.8x RocksDB and 2.2x BlobDB in the published paper (the February 2026 preprint said 830K and 8.4x) ([PVLDB](https://www.vldb.org/pvldb/vol19/p3786-zablotchi.pdf); [VLDB 2026 program](https://vldb.org/2026/program.html)) |
 | **Terark-DS** (Zhang et al., HUST and ByteDance) | VLDB 2026 | Key-value separation on disaggregated storage with access-pattern-aware redundancy; 20.4%–63.9% higher write throughput, 22.7%–58.6% lower cost ([VLDB 2026 program](https://vldb.org/2026/program.html)) |
 
 The direction is clear: compaction is now treated as a schedulable, offloadable job (to other replicas, remote workers, disaggregated memory or FaaS), and value separation has moved from research to defaults. See [[Formal Methods in Practice]] for LSM-Raft's and SlateDB's verification.
@@ -531,3 +532,4 @@ Open problems worth tracking:
 - [[Secondary Indexes]] — Index maintenance needs the old value, turning blind LSM writes into read-modify-writes.
 - [[Stream Processing]] — Operator state in RocksDB, and Flink 2.0's ForSt, an LSM tree whose primary copy lives on remote storage.
 - [[Bloom and Range Filters]] — Point and range filters per SSTable, Ribbon, Chucky, and the range-filter line from SuRF to Memento.
+- [[Write-Ahead Logging]] — The log behind the memtable, group commit, and Tidehunter's WAL-as-storage design.

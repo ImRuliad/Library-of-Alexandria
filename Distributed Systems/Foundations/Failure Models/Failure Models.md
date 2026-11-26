@@ -279,7 +279,7 @@ Silent corruption is a Byzantine fault produced by hardware, not by an attacker.
 | Choice | Buys | Costs |
 |---|---|---|
 | Assume crash-stop | $2f+1$ nodes, simple protocols | Wrong under silent corruption, lying nodes, amnesia after restart |
-| Assume crash-recovery with stable storage | Survives reboots | An fsync on the critical path; disks that lie about fsync break it |
+| Assume crash-recovery with stable storage | Survives reboots | An fsync on the critical path ([[Write-Ahead Logging]]); disks that lie about fsync break it |
 | Assume Byzantine | Survives arbitrary faults | $3f+1$ nodes, more messages, cryptography; see [[Byzantine Fault Tolerance]] |
 | Short timeouts | Fast failover | More false suspicions, leader churn, split-brain risk without fencing |
 | Long timeouts | Fewer false suspicions | Slow failover; fail-slow nodes stay in the critical path |
@@ -332,3 +332,4 @@ Open problems worth tracking:
 - [[Gray and Fail-Slow Failures]] — Components that are broken for their users but look healthy to the system, and hardware that runs slow without failing.
 - [[Silent Data Corruption]] — Hardware that computes or stores wrong values without raising an error, now a fleet-scale problem in AI clusters.
 - [[GPU Cluster Infrastructure]] — Failures, stragglers and SDC at AI-training scale, where one fault stops thousands of GPUs.
+- [[Write-Ahead Logging]] — How crash-recovery with stable storage is built, and fsyncgate.

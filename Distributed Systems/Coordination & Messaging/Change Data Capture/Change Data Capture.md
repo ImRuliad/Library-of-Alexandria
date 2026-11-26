@@ -482,7 +482,7 @@ The relationship to CDC is the table/log equation run in the other direction: CD
 - [[Time and Clocks]] — HLC timestamps behind resolved timestamps.
 - [[Distributed SQL]] — Spanner and CockroachDB, which ship built-in change streams.
 - [[LSM Trees]] — Where many sinks and stream processors keep derived state.
-- [[Write-Ahead Logging]] — Planned: the log CDC reads.
+- [[Write-Ahead Logging]] — The log CDC reads: LSNs, checkpoints and why slots pin WAL.
 - [[MVCC and Version Garbage Collection]] — Planned: why a stalled slot blocks vacuum.
 - [[Message Queues]] — Queues versus logs as CDC transports; the inbox table on the consuming side.
 - [[Lakehouse Table Formats]] — Planned: Iceberg and Delta as CDC destinations.

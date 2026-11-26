@@ -438,3 +438,4 @@ Open problems worth tracking:
 - [[Formal Methods in Practice]] — TLA+ for Raft, leases and reconfiguration.
 - [[Byzantine Fault Tolerance]] — Consensus when nodes can lie, not just stop.
 - [[Silent Data Corruption]] — Faults that break Raft's crash-only assumption.
+- [[Write-Ahead Logging]] — The local log each replica fsyncs, and what happens when an entry is corrupted.

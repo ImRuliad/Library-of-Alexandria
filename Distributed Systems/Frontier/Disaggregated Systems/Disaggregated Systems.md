@@ -254,7 +254,7 @@ flowchart LR
 - Against the earlier design: 2 copies of data instead of 4 (plus backup), commit latency under 0.5 ms instead of 3 ms, log throughput 100+ MB/s instead of 50, maximum size 100 TB instead of 4 TB (Table 1). Each page server covers a partition of about 128 GB, so a database of hundreds of terabytes runs thousands of page servers (§6).
 
 **Neon** (serverless PostgreSQL) uses the same three roles ([Neon docs](https://neon.com/docs/introduction/architecture-overview); [Linnakangas, 2023](https://neon.com/blog/get-page-at-lsn)):
-- **Compute** is stock PostgreSQL that "streams WAL to the storage layer" instead of writing it to local disk; "Compute nodes do not own durable state and can be replaced freely."
+- **Compute** is stock PostgreSQL that "streams WAL ([[Write-Ahead Logging]]) to the storage layer" instead of writing it to local disk; "Compute nodes do not own durable state and can be replaced freely."
 - **Safekeepers:** WAL goes to three safekeeper nodes that replicate it with a Paxos-like protocol; a transaction commits when a quorum acknowledges (see [[Paxos]]).
 - **Pageservers** turn WAL into immutable *delta layers* (changes over a key and LSN range) and periodic *image layers* (full snapshots), uploaded to object storage. Because history is kept, a *branch* is just a pointer to an older LSN with copy-on-write, and an idle compute can scale to zero (the 2023 post says after five minutes of inactivity).
 
@@ -484,3 +484,4 @@ Open problems worth tracking:
 - [[Deterministic Simulation Testing]] — Testing multi-tier storage systems under injected faults.
 - [[Stream Processing]] — Flink 2.0's disaggregated state (ForSt): remote primary state with a local cache.
 - [[Diskless Streaming]] — Kafka-style logs split into stateless brokers, object storage and a metadata coordinator.
+- [[Write-Ahead Logging]] — The log these designs make into the database: Aurora, Socrates, Neon, AlloyDB and DSQL's journal.
