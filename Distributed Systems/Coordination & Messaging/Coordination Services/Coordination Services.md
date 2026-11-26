@@ -150,7 +150,7 @@ Its guarantees are precise and a bit unusual: **writes are linearizable**, each 
 etcd is a Raft-replicated key-value store aimed at systems that must never split-brain, even at the cost of availability ([etcd docs](https://etcd.io/docs/next/learning/why)):
 
 - **Linearizable reads** by default, unlike ZooKeeper.
-- **MVCC revisions:** every change bumps a global revision number, and older versions stay readable until compacted.
+- **MVCC revisions:** every change bumps a global revision number, and older versions stay readable until compacted ([[MVCC and Version Garbage Collection]]).
 - **Watches** can replay history from a revision, so a client that reconnects does not silently miss events.
 - **Leases** with TTLs, plus built-in lock and election RPCs.
 - **Size:** a maximum reliable database of several gigabytes, versus hundreds of megabytes for ZooKeeper and Consul.

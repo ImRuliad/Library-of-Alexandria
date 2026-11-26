@@ -230,7 +230,7 @@ timeline
 - A **replication slot** "represents a stream of changes that can be replayed to a client in the order they were made on the origin server. Each slot streams a sequence of changes from a single database."
 - An **output plugin** turns the internal WAL format into what the consumer wants. `pgoutput` "is the standard logical decoding output plug-in in PostgreSQL 10+" and ships with the server ([Debezium docs](https://debezium.io/documentation/reference/2.2/connectors/postgresql.html)). DBLog used `wal2json`.
 
-**The hazard.** Slots "persist across crashes and know nothing about the state of their consumer(s). They will prevent removal of required resources even when there is no connection using them": WAL piles up on disk and `VACUUM` can't clean catalog rows, and "in extreme cases this could cause the database to shut down to prevent transaction ID wraparound" ([Postgres docs](https://www.postgresql.org/docs/19/logicaldecoding-explanation.html)). This links CDC to [[MVCC and Version Garbage Collection]]: an abandoned reader stops garbage collection on the source.
+**The hazard.** Slots "persist across crashes and know nothing about the state of their consumer(s). They will prevent removal of required resources even when there is no connection using them": WAL piles up on disk and `VACUUM` can't clean catalog rows ([[MVCC and Version Garbage Collection]]), and "in extreme cases this could cause the database to shut down to prevent transaction ID wraparound" ([Postgres docs](https://www.postgresql.org/docs/19/logicaldecoding-explanation.html)). This links CDC to [[MVCC and Version Garbage Collection]]: an abandoned reader stops garbage collection on the source.
 
 Morling's 2025 field guide lists the usual fixes ([Morling, 2025](https://morling.dev/blog/mastering-postgres-replication-slots)):
 
@@ -483,7 +483,7 @@ The relationship to CDC is the table/log equation run in the other direction: CD
 - [[Distributed SQL]] — Spanner and CockroachDB, which ship built-in change streams.
 - [[LSM Trees]] — Where many sinks and stream processors keep derived state.
 - [[Write-Ahead Logging]] — The log CDC reads: LSNs, checkpoints and why slots pin WAL.
-- [[MVCC and Version Garbage Collection]] — Planned: why a stalled slot blocks vacuum.
+- [[MVCC and Version Garbage Collection]] — Why a stalled slot blocks vacuum, and how CockroachDB and TiCDC hold history with expiring protected timestamps and service safe points.
 - [[Message Queues]] — Queues versus logs as CDC transports; the inbox table on the consuming side.
 - [[Lakehouse Table Formats]] — Planned: Iceberg and Delta as CDC destinations.
 - [[Incremental View Maintenance]] — Planned: materialized views derived from change streams.

@@ -80,7 +80,7 @@ Single-node databases solve this with a log and locks on one machine. Across mac
 | Problem | Question | Typical tools |
 |---|---|---|
 | **Atomic commit** | Do all participants commit, or all abort? | 2PC, Paxos Commit, commit records, deterministic ordering |
-| **Isolation** | What may a transaction see of others running at the same time? | Two-phase locking, MVCC snapshots, optimistic validation, timestamp ordering |
+| **Isolation** | What may a transaction see of others running at the same time? | Two-phase locking, MVCC snapshots ([[MVCC and Version Garbage Collection]]), optimistic validation, timestamp ordering |
 | **Durability and replication** | Does a committed change survive machine loss? | Consensus logs per shard |
 
 Real systems mix and match. Spanner: 2PC for atomicity, locking plus TrueTime timestamps for isolation, Paxos for replication ([Spanner](https://www.cs.princeton.edu/courses/archive/fall15/cos518/papers/spanner.pdf)). Percolator: 2PC with locks stored in the data, snapshot isolation from a timestamp oracle ([Percolator](https://www.cs.princeton.edu/courses/archive/fall10/cos597B/papers/percolator-osdi10.pdf)). Aurora DSQL: one optimistic check at commit, then a replicated journal ([Brooker](https://brooker.co.za/blog/2024/12/05/inside-dsql-writes/)).
@@ -317,3 +317,4 @@ Open problems worth tracking:
 - [[Sharded Postgres]] — 2PC over stock Postgres shards, and the fractured reads it leaves without a global snapshot.
 - [[Stream Processing]] — Two-phase-commit sinks tied to Flink checkpoints, and Kafka Streams' transactional read-process-write.
 - [[Message Queues]] — The queues sagas run on, and inbox tables for exactly-once processing.
+- [[MVCC and Version Garbage Collection]] — Keeping snapshot versions, resolving stale locks before GC, and snapshot-too-old.

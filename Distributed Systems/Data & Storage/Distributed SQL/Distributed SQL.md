@@ -98,7 +98,7 @@ Fault tolerance is the usual majority math: $f$ failures need $2f + 1$ replicas 
 
 *Values are never overwritten; each write adds a version at a timestamp. Reads pick a timestamp and see a consistent snapshot without locking writers out.*
 
-A transaction reads at a snapshot timestamp $t_s$ and sees, for each key, the newest version with timestamp $\le t_s$. Snapshot reads need no locks, which is why read-only transactions are cheap in every one of these systems.
+A transaction reads at a snapshot timestamp $t_s$ and sees, for each key, the newest version with timestamp $\le t_s$. Snapshot reads need no locks, which is why read-only transactions are cheap in every one of these systems. Old versions are kept only for a configured window (4 hours in CockroachDB, 10 minutes in TiDB, 1 hour in Spanner by default); see [[MVCC and Version Garbage Collection]].
 
 The hard part is choosing timestamps across machines so that they respect real time. If transaction $T_1$ commits before $T_2$ starts, we want:
 
@@ -290,3 +290,4 @@ Open problems worth tracking:
 - [[Sharded Postgres]] — The alternative that keeps stock Postgres on every shard and coordinates above it.
 - [[Secondary Indexes]] — Why indexes here are global and written in the row's transaction, and what that costs.
 - [[Cluster Metadata and Routing]] — Meta ranges, PD and the gateway caches that route each request to a leaseholder.
+- [[MVCC and Version Garbage Collection]] — GC windows, protected timestamps and service safe points in these systems.

@@ -85,7 +85,7 @@ Three things make time hard in a distributed system:
 Why it matters: many core mechanisms quietly depend on ordering events.
 
 - **Last-writer-wins replication** keeps the write with the larger timestamp. If the later write came from a machine whose clock is behind, the earlier write wins and the later one is silently lost. See [[Replication]].
-- **Snapshot reads and MVCC** pick "all writes before time $t$". If clocks disagree, a snapshot can miss a write that had already been acknowledged. See [[Distributed Transactions]] and [[Consistency Models]].
+- **Snapshot reads and [[MVCC and Version Garbage Collection|MVCC]]** pick "all writes before time $t$". If clocks disagree, a snapshot can miss a write that had already been acknowledged. See [[Distributed Transactions]] and [[Consistency Models]].
 - **Leases** let one node act as leader "until time $t$". If the leader's clock runs slow, it can act after its lease has expired, while a new leader is already acting. See [[Coordination Services]].
 - **Debugging** means merging logs from many machines. Out-of-order timestamps make cause appear after effect.
 
@@ -456,3 +456,4 @@ Open problems worth tracking:
 - [[Clock Synchronization]] — How NTP, PTP and cloud time services produce the clocks and error bounds used here.
 - [[2. Design Overview|GFS: Design Overview]] — GFS's master grants chunk leases, a time-based mechanism.
 - [[Stream Processing]] — Event time versus processing time, watermarks, and Chandy-Lamport-style snapshots of running dataflows.
+- [[MVCC and Version Garbage Collection]] — Timestamps as version stamps, and why a time cap makes GC a local decision in Aurora DSQL.

@@ -333,3 +333,4 @@ Open problems worth tracking:
 - [[CRDTs]] — Convergence under causal and eventual consistency without coordination.
 - [[Deterministic Simulation Testing]] — Testing that a system really provides its claimed model.
 - [[Isolation Testing]] — How Elle and other checkers test isolation claims from observed histories.
+- [[MVCC and Version Garbage Collection]] — The versions behind snapshot isolation and how long they are kept.

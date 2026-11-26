@@ -350,7 +350,7 @@ RETURNING id, payload, lease_id;
 
 It is the same lease protocol by hand: the claim commits at once so the job is not held in an open transaction while it runs; completion is scoped to the worker's `lease_id` so a stale worker cannot mark a reclaimed job done (a [[Leases and Fencing|fencing token]] in all but name); expired leases are reclaimed. The big advantage is atomicity: the job row commits or rolls back with the business write, with no [[Change Data Capture|outbox]] needed.
 
-The costs are Postgres's own. Every claim and completion is an UPDATE that "writes a new row version", so a busy queue makes dead tuples fast; if autovacuum falls behind, "the partial index and the table grow and the claim query slows down", and long transactions elsewhere block vacuum and hurt the queue first. DBOS reports that without `SKIP LOCKED`, worker contention capped them at about 100 workflows per second; with it, plus READ COMMITTED isolation (REPEATABLE READ caused mostly serialization failures above about 1,000 dequeues per second) and partial indexes, they reached over 30,000 per second ([DBOS, June 2026](https://dbos.dev/blog/making-postgres-queues-scale)). Libraries such as River (Go), pg-boss and Graphile Worker (Node.js) package the pattern.
+The costs are Postgres's own. Every claim and completion is an UPDATE that "writes a new row version", so a busy queue makes dead tuples fast ([[MVCC and Version Garbage Collection]]); if autovacuum falls behind, "the partial index and the table grow and the claim query slows down", and long transactions elsewhere block vacuum and hurt the queue first. DBOS reports that without `SKIP LOCKED`, worker contention capped them at about 100 workflows per second; with it, plus READ COMMITTED isolation (REPEATABLE READ caused mostly serialization failures above about 1,000 dequeues per second) and partial indexes, they reached over 30,000 per second ([DBOS, June 2026](https://dbos.dev/blog/making-postgres-queues-scale)). Libraries such as River (Go), pg-boss and Graphile Worker (Node.js) package the pattern.
 
 ### Exactly-Once Processing on Top
 
@@ -470,3 +470,4 @@ On the producer side, the mirror problem (writing to the database and the queue 
 - [[Resource Fairness]] — Planned: fair sharing between tenants.
 - [[Diskless Streaming]] — Logs built on object storage.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: per-cell queues as an isolation boundary.
+- [[MVCC and Version Garbage Collection]] — Dead tuples, the xmin horizon and why long transactions starve a Postgres queue.

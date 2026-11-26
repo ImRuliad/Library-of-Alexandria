@@ -518,6 +518,6 @@ The common thread: durability is decided at the log, and everything downstream o
 - [[Coordination Services]] — etcd's WAL fsync latency as consensus latency.
 - [[Message Queues]] — NATS JetStream's timer-based fsync and Jepsen's findings.
 - [[Deterministic Simulation Testing]] — Checking that replicas agree on the WAL.
-- [[MVCC and Version Garbage Collection]] — Planned: old versions kept in place change what undo has to do.
+- [[MVCC and Version Garbage Collection]] — Old versions kept in place change what undo has to do; vacuum, purge and the xmin horizon.
 - [[Cloud-Native Database Storage]] — Planned: page servers and log tiers in depth.
 - [[Databases on Object Storage]] — Planned: commit-point designs on object storage.
