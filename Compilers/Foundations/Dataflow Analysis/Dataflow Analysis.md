@@ -485,7 +485,7 @@ Soufflé (CAV 2016) compiles Datalog to parallel C++; its authors report points-
 
 **Lifetime safety.** Google's Utkarsh Saxena presented a Polonius-style intraprocedural analysis at the October 2025 LLVM Developers' Meeting: *loans* (borrows of a location), *origins* (pointer-like values holding sets of loans, linked by subset constraints), and *liveness* of origins; a violation is a live origin holding an expired loan. It measured no regressions on many codebases, 2-3% on LLVM/Clang, and a worst case near 200% on generated code ([Saxena, LLVM Dev Mtg 2025](https://llvm.org/devmtg/2025-10/slides/technical_talks/saxena.pdf)). Clang 23 added `-Wlifetime-safety`, "a CFG-based intra-procedural analysis that detects use-after-free and related temporal safety bugs", with suggestion and dangling-field variants ([Clang 23 notes](https://releases.llvm.org/23.1.0/tools/clang/docs/ReleaseNotes.html)). The current docs describe it as "inspired by Polonius" but without Rust's exclusivity rule, recommend `-Wlifetime-safety-permissive` for initial adoption, and mark invalidation checks "highly experimental" ([Clang docs](https://clang.llvm.org/docs/LifetimeSafety.html)).
 
-Release context: LLVM 22.1.0 shipped February 24, 2026 ([LLVM Discourse](https://discourse.llvm.org/t/llvm-22-1-0-released/89950)); LLVM 23.1.0's release notes were built August 25, 2026 (exact release day not confirmed here).
+Release context: LLVM 22.1.0 shipped February 24, 2026 ([LLVM Discourse](https://discourse.llvm.org/t/llvm-22-1-0-released/89950)); LLVM 23.1.0 followed on August 25, 2026 ([llvm.org](https://llvm.org/)).
 
 ### MLIR
 
