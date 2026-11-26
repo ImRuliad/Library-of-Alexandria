@@ -403,7 +403,7 @@ flowchart LR
 - **Pebble** has a storage abstraction in which an SSTable or blob file can be local, *shared* (on remote storage, owned by one Pebble instance in the cluster and possibly used by several) or *external* (on remote storage, owned by none) ([Pebble objstorage docs](https://pkg.go.dev/github.com/cockroachdb/pebble/v2/objstorage@v2.1.0)).
 - **Neon** (serverless Postgres) is LSM-like rather than a textbook LSM: its pageserver stores *delta layers* (an indexed WAL) over *image layers* (materialized pages at an LSN), replays deltas into new images, and uploads layer files of about 128–256 MB to S3 ([Vanlightly, 2023](https://www.jack-vanlightly.com/analyses/2023/11/15/neon-serverless-postgresql-asds-chapter-3)).
 
-This is the storage side of [[Disaggregated Systems]]: compute nodes hold a cache, object storage holds the truth, and compaction becomes a job that can run anywhere.
+This is the storage side of [[Disaggregated Systems]]: compute nodes hold a cache, object storage holds the truth, and compaction becomes a job that can run anywhere. Commit protocols, request-cost math and safe garbage collection for these engines are in [[Databases on Object Storage]].
 
 ## ***Where It Is Now***
 ---
@@ -534,3 +534,4 @@ Open problems worth tracking:
 - [[Bloom and Range Filters]] — Point and range filters per SSTable, Ribbon, Chucky, and the range-filter line from SuRF to Memento.
 - [[Write-Ahead Logging]] — The log behind the memtable, group commit, and Tidehunter's WAL-as-storage design.
 - [[MVCC and Version Garbage Collection]] — GC windows, protected timestamps and GC in compaction filters.
+- [[Databases on Object Storage]] — SlateDB, turbopuffer and Lakebase compared: commit points, caches and GC on object storage.

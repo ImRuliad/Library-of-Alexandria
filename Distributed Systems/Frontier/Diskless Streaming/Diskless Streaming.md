@@ -452,4 +452,4 @@ This note found no Jepsen analysis of a diskless system since Bufstream 0.1.0 (N
 - [[Deterministic Simulation Testing]] — How Inkless was validated.
 - [[Lakehouse Table Formats]] — Planned: Iceberg and Delta, where Ursa writes.
 - [[Write-Ahead Logging]] — WAL tiers in front of object storage, and WAL-on-object-storage designs like SlateDB.
-- [[Databases on Object Storage]] — Planned: commit-point versus sequencer designs.
+- [[Databases on Object Storage]] — Commit-point versus sequencer designs for object-native engines.

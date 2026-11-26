@@ -473,6 +473,7 @@ Open problems worth tracking:
 - [[Leases and Fencing]] — FaRM's 10 ms leases; single-writer fencing over shared storage.
 - [[Logs and Streaming]] — "The log is the database"; storage tiers built around a replicated log.
 - [[Object Storage]] — The cheapest tier, under Snowflake and Neon.
+- [[Databases on Object Storage]] — Engines with no durable state but the object store, and how they commit.
 - [[LSM Trees]] — Immutable files and layers, as in Snowflake files and Neon's delta and image layers.
 - [[Partitioning]] — Page-server partitions and Snowflake's consistent hashing of files to workers.
 - [[Gray and Fail-Slow Failures]] — Slow shared storage or memory slows every attached node.

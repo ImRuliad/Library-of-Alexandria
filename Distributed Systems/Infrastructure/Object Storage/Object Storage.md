@@ -381,6 +381,8 @@ Two patterns stand out:
 
 *Worked example, SlateDB fencing.* Writer 1 runs with `writer_epoch = 4`. It pauses for a GC. Writer 2 starts, reads the manifest, CAS-writes a new manifest with epoch 5, then writes an empty WAL SST at the next WAL ID carrying epoch 5. Writer 1 wakes and tries to write that same WAL ID; the conditional write fails, it reads the slot, sees epoch 5 > 4, and halts. As the design doc says, "Writers will only detect that they've been fenced when they go to write" ([SlateDB manifest design](https://cljdoc.org/d/io.github.maxweber/slatedb/0.1.0/doc/manifest-design)).
 
+The full design space for engines built this way (commit points, batching and request costs, caches, garbage collection and logging to S3 Express One Zone) is in [[Databases on Object Storage]].
+
 ### Latency and Cost Profile
 
 *Object storage is cheap per gigabyte, expensive per request and slow per round trip. Systems built on it win by batching writes, caching reads and paying for requests deliberately; S3 Express One Zone trades zone redundancy for ten times lower latency.*
@@ -542,3 +544,4 @@ Open problems worth tracking:
 - [[Witness Replicas]] — Vote-only replicas, not to be confused with S3's cache witness.
 - [[Time and Clocks]] — Why lease timeouts still need bounded clock drift.
 - [[Stream Processing]] — Checkpoints and, since Flink 2.0, primary operator state kept in object storage.
+- [[Databases on Object Storage]] — Engines whose only durable state is in an object store: commit protocols, batching, caching and GC.
