@@ -6,7 +6,7 @@ tags:
   - scheduling
   - linux-kernel
   - frontier
-status: draft
+status: complete
 sources:
   - https://docs.kernel.org/core-api/real-time/differences.html
   - https://docs.kernel.org/core-api/real-time/architecture-porting.html
@@ -55,7 +55,7 @@ updated: 2026-11-26
 - **How.** Most spinlocks become sleeping, priority-inheriting locks; interrupt handlers and softirqs run in schedulable kernel threads; and the remaining code that can't be preempted is kept short ([kernel docs](https://docs.kernel.org/core-api/real-time/differences.html)).
 - **What you get.** On tuned hardware, worst-case wake-up latencies in the tens of microseconds, measured continuously by OSADL's test farm ([OSADL](https://www.osadl.org/Continuous-latency-monitoring.qa-farm-monitoring.0.html)), against milliseconds possible on a stock kernel under load.
 - **What it costs.** Throughput: more context switches, lock overhead and handler threads. It is a config option (`CONFIG_PREEMPT_RT`), not the default.
-- **Status, Nov 2026.** In mainline since **6.12** for x86, arm64 and RISC-V; **32-bit Arm** joined in **Linux 7.1** ([Phoronix](https://phoronix.com/news/linux-7.1-arm-rt)). Its by-products, lazy preemption among them, now shape every kernel: 7.0 made `PREEMPT_LAZY` the default.
+- **Status, Nov 2026.** In mainline since **6.12** for x86 (32- and 64-bit), arm64 and RISC-V; **32-bit Arm** joined in **Linux 7.1** ([Phoronix](https://phoronix.com/news/linux-7.1-arm-rt)). Its by-products, lazy preemption among them, now shape every kernel: 7.0 made `PREEMPT_LAZY` the default.
 
 ## ***The Problem***
 ---
@@ -110,6 +110,7 @@ timeline
     2006 : rt_mutex and PI futexes (2.6.18); high-res timers (2.6.16)
     2009 : Threaded interrupt handlers (2.6.30)
     2015 : Linux Foundation Real-Time Linux project funds the work
+    2021 : Linux 5.15 merges the rt_mutex-based locking core
     2022 : Intel acquires Linutronix (Thomas Gleixner's company)
     2024 : PREEMPT_RT merged in Linux 6.12 (Sep), x86, arm64, RISC-V
     2025 : 6.13 lazy preemption
@@ -118,7 +119,8 @@ timeline
 
 - **Spin-off features.** Many things now in every kernel started in the RT tree: high-resolution timers, `rt_mutex` and PI futexes, threaded interrupts, preemptible RCU, lockdep improvements, `NO_HZ`, and the latency tracers that grew into ftrace ([Wikipedia](https://en.wikipedia.org/wiki/PREEMPT_RT), [SUSE](https://www.suse.com/c/suse-contributions-real-time-linux-kernel)).
 - **Funding.** For years the patch survived on a few maintainers, chiefly Thomas Gleixner. The Linux Foundation's Real-Time Linux collaborative project (2015) funded the final upstreaming.
-- **The last blocker was printk.** Printing a kernel message to a slow serial console happened in whatever context called `printk()`, with locks held, which could stall a real-time task for milliseconds. The fix, *nbcon* consoles that print from their own threads or atomically on panic, took years. When enough was in, Linus merged the switch that enables `PREEMPT_RT` for **6.12** in September 2024 ([Phoronix](https://phoronix.com/news/Linux-6.12-Does-Real-Time), [heise](https://heise.de/-9935651)).
+- **The core went in early.** The RT locking core, spinlocks and rwlocks rebuilt on `rt_mutex`, merged in Linux 5.15 (2021), leaving only the switch that turns it on out of tree ([heise](https://heise.de/-9935651)).
+- **The last blocker was printk.** Printing a kernel message to a slow serial console happened in whatever context called `printk()`, with locks held, which could stall a real-time task for milliseconds. The fix, *nbcon* consoles that print from their own threads or atomically on panic, took years, and a 2022 attempt was reverted; John Ogness and Thomas Gleixner finished it. Gleixner handed Linus a printed pull request at Linux Plumbers in Vienna, and Linus merged the switch that enables `PREEMPT_RT` for **6.12** in September 2024 ([Phoronix](https://phoronix.com/news/Linux-6.12-Does-Real-Time), [heise](https://heise.de/-9935651)).
 
 ## ***How It Works***
 ---
@@ -209,7 +211,7 @@ System tuning does the rest: isolate CPUs for real-time work (`isolcpus`, cpuset
 ---
 *As of November 2026, PREEMPT_RT is two years into mainline life: architectures are still being added, its ideas have spread into the default preemption model, and the costs of that spread are being argued over.*
 
-- **Architectures.** At merge, x86, arm64 and RISC-V could select it. **Linux 7.1** (Jun 2026) added real-time support for **32-bit Arm** ([Phoronix](https://phoronix.com/news/linux-7.1-arm-rt)). The kernel now documents what an architecture needs to support PREEMPT_RT ([porting guide](https://docs.kernel.org/core-api/real-time/architecture-porting.html)).
+- **Architectures.** At merge, x86, arm64 and RISC-V could select it, while PowerPC and 32-bit Arm were still being discussed ([heise](https://heise.de/-9935651)). **Linux 7.1** (Jun 2026) added real-time support for **32-bit Arm** ([Phoronix](https://phoronix.com/news/linux-7.1-arm-rt)). The kernel's porting guide lists what an architecture needs: forced IRQ threading, POSIX CPU timers run as task work, softirq stack handling, careful FPU sections, nbcon consoles, and optionally lazy preemption ([porting guide](https://docs.kernel.org/core-api/real-time/architecture-porting.html)).
 - **The RT tree continues.** Out-of-tree `-rt` releases still track mainline for remaining pieces and testing, for example v7.0-rc1-rt1 alongside v6.19.3-rt1 and v6.18.13-rt4 in Feb 2026 ([announcement](https://lkml.iu.edu/2602.3/02843.html)).
 - **Lazy preemption for everyone.** RT's preemption model generalised into `PREEMPT_LAZY` (6.13). Peter Zijlstra's "further restrict the preemption modes" patch made lazy the default in **7.0**, keeping `PREEMPT_NONE` and `PREEMPT_VOLUNTARY` only for architectures that can't do better ([patch](https://patchew.org/linux/20251219101502.GB1132199@noisy.programming.kicks-ass.net)). That exposed throughput regressions: an AWS engineer reported PostgreSQL pgbench at about half speed on Graviton4 with 7.0, caused by a user-space spinlock holder being preempted ([Phoronix](https://phoronix.com/news/linux-7.0-aws-postgresql-drop), see [[CPU Scheduling]]).
 - **Priority inheritance generalised.** Proxy execution (6.17 onward) extends the inheritance idea beyond `rt_mutex` to ordinary mutexes and deadline tasks ([[Locks and Synchronization]]).
