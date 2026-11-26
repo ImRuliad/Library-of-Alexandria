@@ -6,7 +6,7 @@ tags:
   - scheduling
   - linux-kernel
   - hardware
-status: draft
+status: complete
 sources:
   - https://docs.kernel.org/admin-guide/mm/numa_memory_policy.html
   - https://docs.kernel.org/admin-guide/sysctl/kernel.html
@@ -21,6 +21,9 @@ sources:
   - https://lwn.net/Articles/956866/
   - https://arxiv.org/pdf/2203.00241
   - https://lwn.net/Articles/1092001/
+  - https://lwn.net/Articles/1054030/
+  - https://lwn.net/Articles/1079561/
+  - https://lwn.net/Articles/1093236/
 created: 2026-11-26
 updated: 2026-11-26
 ---
@@ -123,7 +126,7 @@ timeline
 
 - **cc-NUMA research** in the 1990s (Stanford DASH, SGI Origin) proved cache-coherent shared memory could scale by distributing memory, with directories to track sharers.
 - **Commodity NUMA.** AMD's Opteron (2003) integrated the memory controller, so every multi-socket x86 box became NUMA; Intel followed with Nehalem and QPI (2008).
-- **Linux.** NUMA policies (`mbind`, `set_mempolicy`, cpusets) came in the 2.6 series. After two competing designs (AutoNUMA by Andrea Arcangeli and Peter Zijlstra's sched/numa), Mel Gorman's balancing work merged the best of both in 3.8, with task placement and NUMA groups by 3.13 ([Oracle blog](https://blogs.oracle.com/linux/post/numa-balancing)).
+- **Linux.** NUMA policies (`mbind`, `set_mempolicy`, cpusets) came in the 2.6 series. After two competing designs (AutoNUMA by Andrea Arcangeli and Peter Zijlstra's sched/numa), Mel Gorman's balancing work merged the best of both in 3.8, with task placement and NUMA groups by 3.13. The [Oracle blog](https://blogs.oracle.com/linux/post/numa-balancing) walks through the mechanism: PTEs marked `PROT_NONE` (`MM_CP_PROT_NUMA`) turn the next access into a hinting fault, counted in `/proc/vmstat` as `numa_hint_faults`.
 - **Chiplets.** AMD EPYC's multi-die design (2017) made distances vary inside one socket; firmware options like **NPS1/2/4** (nodes per socket) let administrators expose that as 1, 2 or 4 nodes ([AMD white paper](https://www.amd.com/content/dam/amd/en/documents/epyc-business-docs/white-papers/AMD-Optimizes-EPYC-Memory-With-NUMA.pdf)). Intel calls the equivalent **sub-NUMA clustering (SNC)** ([Frank Denneman](https://frankdenneman.nl/2022/09/21/sub-numa-clustering)).
 
 ## ***How It Works***
@@ -214,10 +217,12 @@ $$L = (1 - r)\,L_{local} + r\,L_{remote}$$
 ---
 *As of November 2026, NUMA is everywhere and getting finer-grained: chiplet CPUs expose several nodes per socket, CPU-less nodes carry CXL and accelerator memory, and the balancing code is being reworked around those cases.*
 
-- **Within-socket NUMA is the norm.** Intel's Xeon 6 (Granite Rapids) defaults to sub-NUMA clustering with three nodes per socket (SNC3), alternatively one unified "HEX" node; Phoronix measured the trade-off on the 128-core Xeon 6980P ([Phoronix](https://phoronix.com/review/xeon-6980p-snc3-hex), [Chips and Cheese](https://chipsandcheese.com/p/a-look-into-intel-xeon-6s-memory)). AMD EPYC keeps NPS1/2/4 modes. More nodes help NUMA-aware software and hurt software that isn't.
+- **Within-socket NUMA is the norm.** Intel's Xeon 6 (Granite Rapids) defaults to sub-NUMA clustering with three nodes per socket (SNC3), one per compute die with its own L3 slice and four memory channels, or alternatively one unified "HEX" node; Phoronix measured the trade-off on the 128-core Xeon 6980P ([Phoronix](https://phoronix.com/review/xeon-6980p-snc3-hex), [Chips and Cheese](https://chipsandcheese.com/p/a-look-into-intel-xeon-6s-memory)). AMD EPYC keeps NPS1/2/4 modes. More nodes help NUMA-aware software and hurt software that isn't.
 - **CPU-less nodes.** CXL expanders, HBM in some CPUs, and GPU or accelerator memory exposed to the kernel all show up as nodes without CPUs, so mempolicies and NUMA balancing now serve tiering too ([[CXL and Memory Tiering]], [[Heterogeneous Memory and GPU Drivers]]).
 - **Balancing and tiering are being merged.** AMD's pghot series (v8, Jul 2026) moves NUMA balancing's promotion rate-limiting out of the scheduler, and its "precision mode" records which node touches each slow-tier page so it could take over some NUMA-balancing work; it remains unmerged ([LWN, Sep 2026](https://lwn.net/Articles/1092001/)).
-- **Scheduler.** Linux 7.2 added cache-aware scheduling that groups tasks sharing data within one last-level cache, a finer version of the same locality idea ([[CPU Scheduling]]).
+- **Scheduler.** Linux 7.2 added cache-aware scheduling that groups tasks sharing data within one last-level cache, a finer version of the same locality idea ([[CPU Scheduling]]). A June 2026 RFC from Hygon (Jianyong Wu) extends it to *topology-aware* scheduling across NUMA domains; on a Hygon server with six NUMA nodes per socket it reported up to 70% better MySQL point-select throughput ([RFC](https://lwn.net/Articles/1079561/)).
+- **Per-workload balancing.** Large fleets often switch automatic NUMA balancing off globally because of its overhead. A January 2026 RFC by Yafang Shao lets a BPF program turn it on and tune it per memory cgroup through a struct_ops hook ([RFC](https://lwn.net/Articles/1054030/)); compare [[sched_ext and Pluggable Scheduling]].
+- **Reclaim per node.** With more cores per node, one `kswapd` per node can fall behind. A September 2026 RFC from Intel (Ehab Ababneh) allows several per node; with eight threads, Cassandra throughput rose about 7% ([RFC](https://lwn.net/Articles/1093236/)).
 - **Locks.** NUMA-aware locking (CNA, HQ spinlock RFC) is still out of tree; futexes became NUMA-aware in 6.16 ([[Locks and Synchronization]]).
 
 ## ***Trade-offs & Open Problems***
@@ -262,6 +267,9 @@ $$L = (1 - r)\,L_{local} + r\,L_{remote}$$
 **Related reading**
 - [Weighted interleave](https://lwn.net/Articles/956866/): LWN.
 - [Recent work in memory tiering](https://lwn.net/Articles/1092001/): LWN, Sep 2026.
+- [BPF-based NUMA balancing](https://lwn.net/Articles/1054030/): Yafang Shao, RFC, Jan 2026.
+- [Topology-aware scheduling](https://lwn.net/Articles/1079561/): Jianyong Wu, RFC, Jun 2026.
+- [Multi-threaded kswapd](https://lwn.net/Articles/1093236/): Ehab Ababneh, RFC, Sep 2026.
 
 ## Related Notes
 
