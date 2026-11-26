@@ -58,7 +58,7 @@ updated: 2026-11-26
     - [[#Ownership Replaces Manual Cleanup|Ownership Replaces Manual Cleanup]]
     - [[#Safe and Unsafe|Safe and Unsafe]]
     - [[#Errors Are Values|Errors Are Values]]
-    - [[#Pinning: Objects That Must Not Move|Pinning: Objects That Must Not Move]]
+    - [[#Pinning — Objects That Must Not Move|Pinning — Objects That Must Not Move]]
 - [[#How We Got Here|How We Got Here]]
 - [[#How It Works|How It Works]]
     - [[#Bindings, Abstractions, Drivers|Bindings, Abstractions, Drivers]]
@@ -143,7 +143,7 @@ The kernel's rules ([coding guidelines](https://docs.kernel.org/rust/coding-guid
 
 The guidelines say a fallible approach "should be used, typically returning a `Result`" in almost all cases; panics should be rare ([coding guidelines](https://docs.kernel.org/rust/coding-guidelines.html)). That matters because a kernel panic takes down the machine. Allocation flags and the allocators behind them are covered in [[Memory Allocators]].
 
-### Pinning: Objects That Must Not Move
+### Pinning — Objects That Must Not Move
 
 *Many kernel objects are linked to by address, so moving one after initialisation corrupts every pointer to it. Rust moves values freely by default, so the kernel needs a way to say "this never moves".*
 

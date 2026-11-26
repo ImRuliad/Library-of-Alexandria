@@ -68,12 +68,12 @@ updated: 2026-11-26
     - [[#Four Tricks Every Bypass Uses|Four Tricks Every Bypass Uses]]
 - [[#How We Got Here|How We Got Here]]
 - [[#How It Works|How It Works]]
-    - [[#DPDK: Take the NIC Away From the Kernel|DPDK: Take the NIC Away From the Kernel]]
-    - [[#XDP: Run Code Before the Stack|XDP: Run Code Before the Stack]]
-    - [[#AF_XDP: A Fast Lane to User Space|AF_XDP: A Fast Lane to User Space]]
-    - [[#RDMA: Let the NIC Read and Write Memory|RDMA: Let the NIC Read and Write Memory]]
+    - [[#DPDK — Take the NIC Away From the Kernel|DPDK — Take the NIC Away From the Kernel]]
+    - [[#XDP — Run Code Before the Stack|XDP — Run Code Before the Stack]]
+    - [[#AF_XDP — A Fast Lane to User Space|AF_XDP — A Fast Lane to User Space]]
+    - [[#RDMA — Let the NIC Read and Write Memory|RDMA — Let the NIC Read and Write Memory]]
     - [[#User-Space Stacks and Dataplane OSes|User-Space Stacks and Dataplane OSes]]
-    - [[#Partial Bypass: Keep TCP, Skip the Copy|Partial Bypass: Keep TCP, Skip the Copy]]
+    - [[#Partial Bypass — Keep TCP, Skip the Copy|Partial Bypass — Keep TCP, Skip the Copy]]
     - [[#Choosing One|Choosing One]]
 - [[#Where It Is Now|Where It Is Now]]
 - [[#Trade-offs & Open Problems|Trade-offs & Open Problems]]
@@ -217,7 +217,7 @@ flowchart TB
     NIC -.->|"NIC DMAs straight into registered memory"| RDMAAPP
 ```
 
-### DPDK: Take the NIC Away From the Kernel
+### DPDK — Take the NIC Away From the Kernel
 
 *DPDK unbinds the NIC from its kernel driver, maps its registers and queues into a user process through VFIO, and drives it from a core that does nothing but poll.*
 
@@ -241,7 +241,7 @@ for (;;) {
 
 **In plain words:** ask the NIC's ring for up to 32 packets; it returns immediately, with zero if nothing arrived. Process them where the NIC put them, hand them back to the transmit ring, and free any the ring had no room for. The core runs at 100% even when idle; that is the price of never sleeping.
 
-### XDP: Run Code Before the Stack
+### XDP — Run Code Before the Stack
 
 *XDP runs a verified eBPF program in the driver "at the earliest possible moment" after a packet arrives, before an `sk_buff` exists, and lets it decide the packet's fate.*
 
@@ -270,7 +270,7 @@ int drop_udp(struct xdp_md *ctx) {
 
 **In plain words:** look at the raw packet bytes the NIC just wrote; every pointer must be checked against the end of the packet or the [[eBPF]] verifier refuses to load the program. Drop UDP, pass everything else. Load it with `ip link set dev eth0 xdp obj prog.o`. XDP needs no special hardware and works alongside the normal stack ([kernelnewbies 4.8](https://kernelnewbies.org/Linux_4.8)), so unmatched traffic keeps every kernel feature.
 
-### AF_XDP: A Fast Lane to User Space
+### AF_XDP — A Fast Lane to User Space
 
 *AF_XDP is the kernel's own DPDK-style path: an XDP program redirects selected packets into memory the application owns, and four shared rings pass buffer ownership back and forth without copies or per-packet system calls.*
 
@@ -303,7 +303,7 @@ sequenceDiagram
     App->>FILL: recycle the frame
 ```
 
-### RDMA: Let the NIC Read and Write Memory
+### RDMA — Let the NIC Read and Write Memory
 
 *RDMA moves the whole transport into the NIC: the application posts work requests describing memory to read or write, and the NIC moves the bytes, possibly into a remote machine's memory without its CPU noticing.*
 
@@ -341,7 +341,7 @@ while (ibv_poll_cq(cq, 1, &wc) == 0) ;         /* spin until the NIC reports don
 
 These are the [[Unikernels and Library OSes|library OS]] idea in practice: the OS sets up hardware, then the app links its own stack.
 
-### Partial Bypass: Keep TCP, Skip the Copy
+### Partial Bypass — Keep TCP, Skip the Copy
 
 *Newer Linux features keep the kernel's TCP and its tooling but stop copying payloads, by having the NIC split headers from data and steer the data straight to its final buffer.*
 
