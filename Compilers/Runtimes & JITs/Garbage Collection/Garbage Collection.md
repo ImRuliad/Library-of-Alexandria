@@ -6,7 +6,7 @@ tags:
   - runtimes
   - write-barriers
   - jit
-status: draft
+status: complete
 sources:
   - https://web.eecs.umich.edu/~weimerw/2014-4610/reading/bacon-garbage.pdf
   - https://people.cs.umass.edu/~emery/pubs/gcvsmalloc.pdf
@@ -32,7 +32,8 @@ sources:
   - https://openjdk.org/jeps/521
   - https://openjdk.org/jeps/522
   - https://openjdk.org/jeps/523
-  - https://phoronix.com/news/OpenJDK-27-Java-27
+  - https://infoq.com/news/2026/09/java27-released
+  - https://llvm.org/devmtg/2014-10/Slides/Reames-GarbageCollection.pdf
   - https://go.dev/blog/go15gc
   - https://go.dev/doc/gc-guide
   - https://github.com/golang/proposal/blob/master/design/17503-eliminate-rescan.md
@@ -96,7 +97,7 @@ updated: 2026-11-26
 - **Two families.** *Reference counting* (RC) frees an object when its count of incoming pointers hits zero; *tracing* finds everything reachable from the roots and frees the rest. Bacon, Cheng and Rajan showed they are duals: every practical collector is a hybrid of the two ([Bacon et al., OOPSLA 2004](https://web.eecs.umich.edu/~weimerw/2014-4610/reading/bacon-garbage.pdf)).
 - **The compiler's three jobs.** (1) *Stack maps* at *safepoints* so the collector can find (and, for a moving collector, update) every pointer in registers and stack slots; LLVM exposes this as `gc.statepoint`/`gc.relocate` ([LLVM docs](https://www.llvm.org/docs/Statepoints.html)). (2) *Barriers*: a few instructions on every pointer store (and, for concurrent compaction, every pointer load). (3) For RC languages, inserting and then optimizing away `retain`/`release` pairs (Swift ARC, Lean, Koka's Perceus).
 - **The modern design space.** Generational (most objects die young), concurrent (marking and even compaction run beside the program), region-based (G1, .NET regions, Immix). Low-latency collectors (Azul C4, Shenandoah, ZGC) move objects while the program runs by guarding loads with *load barriers*.
-- **The fixed cost.** GC trades memory for speed. Hertz and Berger measured that a good collector matched explicit `malloc`/`free` with **5x** the memory, ran 17% slower with 3x, and about 70% slower with 2x ([Hertz & Berger, OOPSLA 2005](https://people.cs.umass.edu/~emery/pubs/gcvsmalloc.pdf)).
+- **The fixed cost.** GC trades memory for speed. Hertz and Berger measured that a generational collector (GenMS) matched explicit `malloc`/`free` with **5x** as much memory, ran 17% slower on average with 3x, and nearly 70% slower with 2x ([Hertz & Berger, OOPSLA 2005](https://people.cs.umass.edu/~emery/pubs/gcvsmalloc.pdf)).
 - **As of November 2026.** ZGC is generational-only (JDK 24), generational Shenandoah is a product feature (JDK 25), G1 is the default in every environment (JDK 27, Sept 2026), Go 1.26 made the Green Tea collector default (Feb 2026), WasmGC is in all major browsers and in the Wasm 3.0 standard, and CPython rolled back its incremental cycle collector in 3.14.5.
 
 ## ***The Problem***
@@ -154,7 +155,7 @@ stateDiagram-v2
 A concurrent mutator can break marking only if **both** happen: it stores a pointer to a white object into a black object, **and** it destroys every other path to that white object from grey objects. Barriers break one of the two conditions:
 
 - **Strong invariant (Dijkstra, insertion barrier):** no black object ever points to a white one. On each pointer store, shade the *new* target grey.
-- **Weak invariant (Yuasa, deletion barrier, "snapshot at the beginning"):** any white object a black one points to is still reachable from some grey object. On each pointer store, shade the *old* value being overwritten, so everything reachable at the start of marking survives ([Yuasa, 1990](https://www.cs.kent.ac.uk/pubs/2007/2506/content.pdf)).
+- **Weak invariant (Yuasa, deletion barrier, "snapshot at the beginning"):** any white object a black one points to is still reachable from some grey object. On each pointer store, shade the *old* value being overwritten, so everything reachable at the start of marking survives (Yuasa, 1990, as described in [Jones's survey](https://www.cs.kent.ac.uk/pubs/2007/2506/content.pdf)).
 
 ### The Generational Hypothesis
 
@@ -172,7 +173,7 @@ $$
 \text{GC cost per allocated byte} \;\approx\; \frac{c \cdot L}{H/2 - L}
 $$
 
-**In plain English:** as the heap shrinks toward twice the live data, the denominator goes to zero and the collector runs constantly; as the heap grows, cost per byte falls toward zero. Hertz and Berger's measurements put numbers on this curve: parity with explicit freeing at 5x the live size, 17% slower at 3x, about 70% slower at 2x, and far worse once the heap no longer fits in RAM and pages ([Hertz & Berger, 2005](https://people.cs.umass.edu/~emery/pubs/gcvsmalloc.pdf)).
+**In plain English:** as the heap shrinks toward twice the live data, the denominator goes to zero and the collector runs constantly; as the heap grows, cost per byte falls toward zero. Hertz and Berger's measurements put numbers on this curve: parity with explicit freeing at 5x as much memory, 17% slower on average at 3x, nearly 70% slower at 2x, and an order of magnitude slower once physical memory is scarce and the system pages ([Hertz & Berger, 2005](https://people.cs.umass.edu/~emery/pubs/gcvsmalloc.pdf)).
 
 ## ***How We Got Here***
 ---
@@ -203,7 +204,7 @@ timeline
 ```
 
 - **1960s to 1970s.** McCarthy's Lisp used mark-sweep and Collins proposed RC, the two families Bacon et al. later unify ([Bacon et al.](https://web.eecs.umich.edu/~weimerw/2014-4610/reading/bacon-garbage.pdf)). Cheney's 1970 algorithm copied live data breadth-first using the to-space itself as the queue, with no recursion or extra stack ([Cheney, CACM 1970](https://cacmb4.acm.org/magazines/1970/11/12288-a-nonrecursive-list-compacting-algorithm)).
-- **Concurrency (1978 to 1990).** Dijkstra, Lamport and colleagues introduced the tri-color invariant for a collector running beside the mutator ([EWD496A](https://www.cs.utexas.edu/~EWD/transcriptions/EWD04xx/EWD496A.html)); Yuasa's deletion barrier gave the snapshot alternative ([Yuasa](https://www.cs.kent.ac.uk/pubs/2007/2506/content.pdf)).
+- **Concurrency (1978 to 1990).** Dijkstra, Lamport and colleagues introduced the tri-color invariant for a collector running beside the mutator ([EWD496A](https://www.cs.utexas.edu/~EWD/transcriptions/EWD04xx/EWD496A.html)); Yuasa's deletion barrier gave the snapshot alternative ([Jones's survey](https://www.cs.kent.ac.uk/pubs/2007/2506/content.pdf)).
 - **Uncooperative compilers (1988).** Boehm and Weiser showed C programs could be collected with no compiler help by treating any word that looks like a heap address as a pointer ([Boehm & Weiser](https://hboehm.info/spe_gc_paper)).
 - **Regions and pause targets (2004).** Garbage-First split the heap into equal regions, collected the ones with the most garbage first, and aimed for a user-set pause goal ([Detlefs et al., ISMM 2004](https://www.cs.williams.edu/~dbarowy/cs334s18/assets/p37-detlefs.pdf)).
 - **Concurrent compaction (2005 to 2011).** Azul's Pauseless used a hardware read barrier on its Vega processors ([Click, Tene & Wolf, VEE 2005](https://usenix.org/legacy/events/vee05/full_papers/p46-click.pdf)); C4 brought the idea to x86 and made both generations concurrent ([Tene, Iyengar & Wolf, ISMM 2011](https://www.azul.com/sites/default/files/images/c4_paper_acm.pdf)). Shenandoah (Red Hat, [JEP 189](https://openjdk.org/jeps/189)) and ZGC followed in OpenJDK.
@@ -264,7 +265,7 @@ Obj *forward(Obj *o, char **free) {
 }
 ```
 
-**Immix** divides the heap into 32 KB blocks of 128-byte lines. Marking records live lines; the allocator bump-allocates into runs of free lines; during a collection it copies objects out of only the most fragmented blocks ([Blackburn & McKinley, 2008](https://www.cs.williams.edu/~dbarowy/cs334s18/assets/immix-pldi-2008.pdf)). **LXR** (PLDI 2022) puts deferred, coalescing RC on top of an Immix heap, with a concurrent SATB trace only to reclaim cycles, and reported both lower latency and higher throughput than OpenJDK's concurrent collectors on their benchmarks ([Zhao, Blackburn & McKinley, 2022](https://arxiv.org/abs/2210.17175v1)).
+**Immix** divides the heap into 32 KB blocks of 128-byte lines. Marking records live lines; the allocator bump-allocates into runs of free lines; during a collection it copies objects out of only the most fragmented blocks ([Blackburn & McKinley, 2008](https://www.cs.williams.edu/~dbarowy/cs334s18/assets/immix-pldi-2008.pdf)). **LXR** (PLDI 2022) puts reference counting on top of an Immix heap, reclaiming most memory without copying and using a concurrent trace only as needed to find cyclic garbage; on the Lucene search engine with a generous heap it reported 6x higher throughput and 30x lower 99.9th-percentile latency than Shenandoah in its default configuration ([Zhao, Blackburn & McKinley, 2022](https://arxiv.org/abs/2210.17175v1)).
 
 ### Write Barriers and Remembered Sets
 
@@ -279,7 +280,7 @@ shr   rdi, 9                   ; card index = address / 512
 mov   byte [r12 + rdi], 0      ; r12 = card table base; 0 = dirty
 ```
 
-Three instructions, no branch: unconditional card marking trades precision (some cards are dirtied for no reason) for a tiny barrier. G1 uses a heavier, filtered post-barrier: it skips null stores and same-region stores, then dirties the card and logs it to a queue for refinement threads that maintain per-region remembered sets ([Detlefs et al., 2004](https://www.cs.williams.edu/~dbarowy/cs334s18/assets/p37-detlefs.pdf)). JDK 26's JEP 522 simplified that barrier by giving refinement a second card table to work on, so mutator and refinement threads no longer synchronize on the same table ([JEP 522](https://openjdk.org/jeps/522)).
+Three instructions, no branch: unconditional card marking trades precision (some cards are dirtied for no reason) for a tiny barrier. G1 uses a heavier, filtered post-barrier: it skips null stores and same-region stores, then dirties the card and logs it to a queue for refinement threads that maintain per-region remembered sets ([Detlefs et al., 2004](https://www.cs.williams.edu/~dbarowy/cs334s18/assets/p37-detlefs.pdf)). JDK 26's JEP 522 simplified that barrier by giving G1's background threads a second card table to work on, so application threads update the first table without synchronization; the x64 barrier shrank from about 50 instructions to 12, for a reported 5–15% throughput gain on reference-heavy applications ([JEP 522](https://openjdk.org/jeps/522)).
 
 The compiler's leverage: barriers can be **elided** when the stored value is null, when the target object was just allocated in the young generation (no old-to-young edge possible), or when the store is to a stack-allocated object after [[Escape Analysis|escape analysis]]. JIT compilers do all three; barrier elision is one of the payoffs of [[Classic Optimizations|classic optimizations]] like constant propagation.
 
@@ -302,7 +303,7 @@ void write_go(Obj **slot, Obj *ptr) {
 }
 ```
 
-The trade-off is subtle. An insertion barrier lets the collector finish with a re-scan of stacks (stack writes are not barriered, so stacks can go grey again), which before Go 1.8 meant a stop-the-world rescan. SATB needs no rescan but keeps everything alive at mark start, so it frees less per cycle. Go's hybrid combines both so that stacks, once scanned, stay black, eliminating the rescan ([Clements & Hudson, Go proposal 17503](https://github.com/golang/proposal/blob/master/design/17503-eliminate-rescan.md)). G1, Shenandoah and V8 use SATB-style marking barriers ([V8 concurrent marking](https://v8.dev/blog/concurrent-marking)); WebKit's Riptide uses a *retreating wavefront* barrier that turns a black object back to grey when it is stored into ([WebKit, 2017](https://webkit.org/blog/7122/)).
+The trade-off is subtle. An insertion barrier lets the collector finish with a re-scan of stacks (stack writes are not barriered, so stacks can go grey again), which before Go 1.8 meant a stop-the-world rescan. SATB needs no rescan but keeps everything alive at mark start, so it frees less per cycle. Go's hybrid combines both so that stacks, once scanned, stay black, eliminating the rescan ([Clements & Hudson, Go proposal 17503](https://github.com/golang/proposal/blob/master/design/17503-eliminate-rescan.md)). G1 and Shenandoah use SATB-style marking barriers, while V8 uses a Dijkstra-style insertion barrier that shades the newly written value ([V8 concurrent marking](https://v8.dev/blog/concurrent-marking)); WebKit's Riptide uses a *retreating wavefront* barrier that turns a black object back to grey when it is stored into ([WebKit, 2017](https://webkit.org/blog/7122/)).
 
 ### Load Barriers and Concurrent Compaction
 
@@ -328,21 +329,21 @@ ZGC stores GC state ("colors") in spare bits of each 64-bit pointer, so the chec
 
 A **safepoint** is a program point where the runtime may pause a thread for GC; a **stack map** lists, for that point, the locations of live references. Compilers place safepoints at calls, allocation sites, and polls on loop back-edges and function returns, so a long loop cannot delay a collection indefinitely. Between safepoints the compiler is free to hold derived pointers (`base + offset`) in registers, which is why the map must also say which base each derived pointer belongs to.
 
-LLVM's approach rewrites calls into **statepoints**. The `RewriteStatepointsForGC` pass finds GC pointers (by convention, in a non-zero address space), computes which are live across each call, and makes the possible relocation explicit in [[SSA Form|SSA]]: after the call, uses read a `gc.relocate` result, never the old value ([LLVM Statepoints](https://www.llvm.org/docs/Statepoints.html)).
+LLVM's approach rewrites calls into **statepoints**. The `RewriteStatepointsForGC` pass finds GC pointers (in the `statepoint-example` strategy, pointers in `addrspace(1)`; custom strategies can decide otherwise), computes which are live across each call, and makes the possible relocation explicit in [[SSA Form|SSA]]: after the call, uses read a `gc.relocate` result, never the old value ([LLVM Statepoints](https://www.llvm.org/docs/Statepoints.html)).
 
 ```llvm
 ; source: %obj (a GC pointer) is live across `call void @foo()`
 ; after RewriteStatepointsForGC:
-  %tok = call token (i64, i32, ptr, i32, i32, ...)
-         @llvm.experimental.gc.statepoint.p0(i64 0, i32 0,
+  %statepoint_token = call token (i64, i32, ptr, i32, i32, ...)
+         @llvm.experimental.gc.statepoint.p0(i64 2882400000, i32 0,
            ptr elementtype(void ()) @foo, i32 0, i32 0, i32 0, i32 0)
          [ "gc-live"(ptr addrspace(1) %obj) ]
   %obj.relocated = call coldcc ptr addrspace(1)
-         @llvm.experimental.gc.relocate.p1(token %tok, i32 0, i32 0)
+         @llvm.experimental.gc.relocate.p1(token %statepoint_token, i32 0, i32 0)
   ret ptr addrspace(1) %obj.relocated
 ```
 
-Because the relocation is an SSA def, later passes cannot accidentally keep using a stale address, and [[Register Allocation|register allocation]] decides where each live pointer sits; the backend then emits a stack-map section the runtime reads. The design came from Azul's work on an LLVM-based JIT for a moving collector; the older `gcroot` scheme instead forced every root to a stack slot. See [[LLVM]] and [[JIT Compilation]].
+Because the relocation is an SSA def, later passes cannot accidentally keep using a stale address, and [[Register Allocation|register allocation]] decides where each live pointer sits; the backend then emits a stack-map section the runtime reads. The LLVM docs say the mechanism has shipped in a commercial Java implementation with a fully relocating collector; it was presented by Philip Reames and Sanjoy Das of Azul Systems at the 2014 LLVM Developers' Meeting ([Reames, 2014](https://llvm.org/devmtg/2014-10/Slides/Reames-GarbageCollection.pdf)). The older `gcroot` intrinsic marks stack slots (allocas) as roots and is now mostly of historical interest apart from its shadow-stack support. See [[LLVM]] and [[JIT Compilation]].
 
 ### Precise vs Conservative Stack Scanning
 
@@ -350,7 +351,7 @@ Because the relocation is an SSA def, later passes cannot accidentally keep usin
 
 *Precise* scanning (HotSpot, .NET, Go, LLVM statepoints) needs compiler-emitted maps but can move any object. *Conservative* scanning needs nothing from the compiler, but every object referenced from the stack is pinned, and an integer that happens to look like an address keeps garbage alive.
 
-The Boehm-Demers-Weiser collector scans stacks, registers and (optionally) the heap conservatively, which is how C and C++ programs get GC without compiler support ([Boehm & Weiser](https://hboehm.info/spe_gc_paper)). WebKit's JavaScriptCore scans native stacks conservatively and keeps objects they reference in place, while still being generational and concurrent ([WebKit Riptide](https://webkit.org/blog/7122/)). Chromium's Oilpan (now V8's `cppgc` library) collects Blink's C++ objects, tracing across the C++/JavaScript boundary in a unified heap ([V8, 2020](https://v8.dev/blog/high-performance-cpp-gc)). Conservative scanning is attractive because handle bookkeeping in C++ is error-prone and slow; Andy Wingo's reviews of V8's collector discuss V8's own experiments with conservative stack scanning ([Wingo, 2023](https://wingolog.org/archives/2023/12/07/the-last-5-years-of-v8s-garbage-collector); [Wingo, Nov 2025](https://wingolog.org/archives/2025/11/13/the-last-couple-years-in-v8s-garbage-collector)).
+The Boehm-Demers-Weiser collector scans stacks, registers and (optionally) the heap conservatively, which is how C and C++ programs get GC without compiler support ([Boehm & Weiser](https://hboehm.info/spe_gc_paper)). WebKit's JavaScriptCore scans native stacks conservatively and keeps objects they reference in place, while still being generational and concurrent ([WebKit Riptide](https://webkit.org/blog/7122/)). Chromium's Oilpan (now V8's `cppgc` library) collects Blink's C++ objects, tracing across the C++/JavaScript boundary in a unified heap ([V8, 2020](https://v8.dev/blog/high-performance-cpp-gc)). Conservative scanning is attractive because handle bookkeeping in C++ is error-prone and slow; Andy Wingo's reviews of V8's collector discuss V8's own work toward conservative stack scanning, which as of late 2025 had still not shipped in V8 proper ([Wingo, 2023](https://wingolog.org/archives/2023/12/07/the-last-5-years-of-v8s-garbage-collector); [Wingo, Nov 2025](https://wingolog.org/archives/2025/11/13/the-last-couple-years-in-v8s-garbage-collector)).
 
 ### GC in WebAssembly
 
@@ -358,7 +359,7 @@ The Boehm-Demers-Weiser collector scans stacks, registers and (optionally) the h
 
 In core [[WebAssembly]], locals live in an engine-managed stack the program cannot inspect. A compiler targeting it (for Java, Kotlin, C# or Go) had to spill every root to a "shadow stack" in linear memory around each call and bundle its own collector into the module: bigger binaries, slower code, and no way to collect cycles that pass through JavaScript objects.
 
-The **WasmGC** proposal adds typed `struct` and `array` heap types (declared like `(type $Point (struct (field $x (mut f64))))` and allocated with `struct.new`), `i31ref`, and subtyping, all allocated and collected by the host engine's GC. The compiler's job changes from "emit a collector and root bookkeeping" to "map the source language's object model to Wasm struct types". Chrome enabled it by default in Chrome 119 (late 2023), citing Kotlin, Dart and Java toolchains ([Chrome, 2023](https://developer.chrome.com/blog/wasmgc)); Safari added it in December 2024 ([web.dev, Dec 2024](https://web.dev/blog/web-platform-12-2024?hl=en)); and the Wasm 3.0 standard, announced September 2025, includes it ([WebAssembly.org](https://webassembly.org/news/2025-09-17-wasm-3.0/)).
+The **WasmGC** proposal adds typed `struct` and `array` heap types (declared like `(type $Point (struct (field $x (mut f64))))` and allocated with `struct.new`), `i31ref`, and subtyping, all allocated and collected by the host engine's GC. The compiler's job changes from "emit a collector and root bookkeeping" to "map the source language's object model to Wasm struct types". Chrome enabled it by default in Chrome 119 (late 2023), citing Kotlin/Wasm and Dart/Flutter as early toolchains ([Chrome, 2023](https://developer.chrome.com/blog/wasmgc)); Safari 18.2 added it in December 2024, making it Baseline ([web.dev, Dec 2024](https://web.dev/blog/web-platform-12-2024?hl=en)); and the Wasm 3.0 standard, announced September 2025, includes it ([WebAssembly.org](https://webassembly.org/news/2025-09-17-wasm-3.0/)).
 
 ## ***Where It Is Now***
 ---
@@ -373,7 +374,7 @@ The **WasmGC** proposal adds typed `struct` and `array` heap types (declared lik
 | JDK 24 (Mar 2025) | Non-generational ZGC removed ([JEP 490](https://openjdk.org/jeps/490)); generational Shenandoah experimental ([JEP 404](https://openjdk.org/jeps/404)) |
 | JDK 25 LTS (Sept 2025) | Generational Shenandoah becomes a product feature, still opt-in via a mode flag ([JEP 521](https://openjdk.org/jeps/521)) |
 | JDK 26 (Mar 2026) | G1 throughput improved with a simpler post-write barrier ([JEP 522](https://openjdk.org/jeps/522)) |
-| JDK 27 (Sept 2026) | G1 is the default GC in all environments, replacing the Serial GC default on small machines ([JEP 523](https://openjdk.org/jeps/523); [Phoronix](https://phoronix.com/news/OpenJDK-27-Java-27)) |
+| JDK 27 (Sept 2026) | G1 is the default GC in all environments, replacing the Serial GC default on small machines ([JEP 523](https://openjdk.org/jeps/523); [InfoQ](https://infoq.com/news/2026/09/java27-released)) |
 
 ### Go and Green Tea
 
@@ -381,23 +382,23 @@ The **WasmGC** proposal adds typed `struct` and `array` heap types (declared lik
 
 Go's collector became concurrent in Go 1.5 (2015) ([Go blog](https://go.dev/blog/go15gc)) and is tuned with `GOGC` (heap growth target) and `GOMEMLIMIT` (soft memory limit) ([GC guide](https://go.dev/doc/gc-guide)). It is non-moving, so its compiler needs precise stack maps but no load barriers, and has no generations, relying on escape analysis to keep short-lived values on the stack.
 
-**Green Tea** changes how marking walks memory: instead of chasing individual objects in pointer order (poor cache locality), it queues small-object *spans* (pages) and scans the marked objects in each span together. The Go team described it as an experiment in Go 1.25 (`GOEXPERIMENT=greenteagc`) and reported 10% to 40% less GC CPU on GC-heavy programs, with further gains from vector instructions on recent x86 ([Go blog, Green Tea](https://go.dev/blog/greenteagc)). Go 1.26 (February 2026) made it the default ([Go 1.26 release notes](https://go.dev/doc/go1.26)).
+**Green Tea** changes how marking walks memory: instead of chasing individual objects in pointer order (poor cache locality), it queues whole small-object *pages* (spans, in the runtime's terms) and scans the marked objects in each page together. The Go team shipped it as an experiment in Go 1.25 (`GOEXPERIMENT=greenteagc`) and reported 10% to 40% less GC CPU in its benchmark suite, with about 10% as the typical gain ([Go blog, Green Tea](https://go.dev/blog/greenteagc)). Go 1.26 (February 2026) made it the default, expecting a 10–40% cut in GC overhead for GC-heavy programs plus roughly another 10% from vector instructions on Intel Ice Lake, AMD Zen 4 and newer; `GOEXPERIMENT=nogreenteagc` opts out ([Go 1.26 release notes](https://go.dev/doc/go1.26)).
 
 ### .NET
 
-.NET's GC is precise, generational and compacting; the JIT emits GC info (live-slot tables) for each method. .NET 7 switched the heap from large segments to **regions**, which can be moved between generations and returned to the OS individually ([.NET blog](https://devblogs.microsoft.com/dotnet/put-a-dpad-on-that-gc)). **DATAS** (Dynamic Adaptation To Application Sizes) lets Server GC grow and shrink its heap count with load and became the default for Server GC in .NET 9 ([Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/datas)); the GC team's October 2025 post prepares users moving to .NET 10 for its effects on memory and throughput ([.NET blog, 2025](https://devblogs.microsoft.com/dotnet/preparing-for-dotnet-10-gc/)).
+.NET's GC is precise, generational and compacting; the JIT emits GC info (live-slot tables) for each method. .NET 7 switched the heap from large segments to **regions**, which can be moved between generations and returned to the OS individually ([.NET blog](https://devblogs.microsoft.com/dotnet/put-a-dpad-on-that-gc)). **DATAS** (Dynamic Adaptation To Application Sizes) starts with one heap and grows or shrinks the number of GC heaps with load, up to the core count; it was opt-in in .NET 8 and is on by default in .NET 9 ([Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/datas)); the GC team's October 2025 post prepares users moving to .NET 10 for DATAS's effects on memory and throughput ([.NET blog, 2025](https://devblogs.microsoft.com/dotnet/preparing-for-dotnet-10-gc/)).
 
 ### JavaScript Engines
 
-V8's **Orinoco** project turned a mostly stop-the-world collector into one with a parallel young-generation scavenger, concurrent marking, and parallel compaction, with much of the work moved to helper threads and idle time ([V8, Trash talk](https://v8.dev/blog/trash-talk)). Blink's C++ objects are managed by Oilpan/`cppgc` in a unified heap with JavaScript objects ([V8, 2020](https://v8.dev/blog/high-performance-cpp-gc)); V8 has also experimented with a mark-sweep young generation and conservative stack scanning ([Wingo, 2023](https://wingolog.org/archives/2023/12/07/the-last-5-years-of-v8s-garbage-collector)). WebKit's Riptide is concurrent and generational with conservative stack scanning ([WebKit](https://webkit.org/blog/7122/)).
+V8's **Orinoco** project turned a mostly stop-the-world collector into one with a parallel young-generation scavenger, concurrent marking, and parallel compaction, with much of the work moved to helper threads and idle time ([V8, Trash talk](https://v8.dev/blog/trash-talk)). Blink's C++ objects are managed by Oilpan/`cppgc` in a unified heap with JavaScript objects ([V8, 2020](https://v8.dev/blog/high-performance-cpp-gc)); V8 has also experimented with a non-moving mark-sweep young generation, which by Wingo's 2025 account lost out to the copying nursery, and with conservative stack scanning, not yet shipped in V8 proper as of November 2025 ([Wingo, 2023](https://wingolog.org/archives/2023/12/07/the-last-5-years-of-v8s-garbage-collector); [Wingo, 2025](https://wingolog.org/archives/2025/11/13/the-last-couple-years-in-v8s-garbage-collector)). WebKit's Riptide is concurrent and generational with conservative stack scanning ([WebKit](https://webkit.org/blog/7122/)).
 
 ### Reference-Counted Languages
 
-- **CPython.** RC plus a generational cycle collector. Python 3.14 shipped an incremental cycle collector to cut pause times, but core developers reverted to the previous generational collector in 3.14.5 (release candidate May 2026) and in 3.15 ([discuss.python.org](https://discuss.python.org/t/reverting-the-incremental-gc-in-python-3-14-and-3-15/107014); [pydevtools](https://pydevtools.com/blog/python-3145-rolls-back-the-incremental-garbage-collector/)).
+- **CPython.** RC plus a generational cycle collector. Python 3.14.0 through 3.14.4 shipped an incremental cycle collector to cut pause times; after reports of significant memory pressure in production, the release team announced in April 2026 that 3.14 and 3.15 would return to 3.13's generational collector, and 3.14.5 shipped the revert on 10 May 2026, ahead of its planned June date ([discuss.python.org](https://discuss.python.org/t/reverting-the-incremental-gc-in-python-3-14-and-3-15/107014); [pydevtools](https://pydevtools.com/blog/python-3145-rolls-back-the-incremental-garbage-collector/)).
 
 ### MMTk and Research Collectors
 
-MMTk is a Rust library of collectors (Immix, generational Immix, LXR and others) with bindings for several runtimes. Ruby 3.4 (December 2024) added a modular GC interface with an experimental MMTk build ([Rails at Scale, Jan 2025](https://railsatscale.com/2025-01-08-new-for-ruby-3-4-modular-garbage-collectors-and-mmtk/)), and Julia's development docs describe building Julia with MMTk ([Julia devdocs](https://docs.julialang.org/en/v1.13-dev/devdocs/gc-mmtk/)). This is the first time a research GC toolkit is a supported option in mainstream language runtimes rather than a fork.
+MMTk is a Rust library of collectors (Immix, generational Immix, LXR and others) with bindings for several runtimes. Ruby 3.4 (December 2024) added a modular GC interface with an experimental MMTk build ([Rails at Scale, Jan 2025](https://railsatscale.com/2025-01-08-new-for-ruby-3-4-modular-garbage-collectors-and-mmtk/)), and Julia's development docs describe building Julia with MMTk ([Julia devdocs](https://docs.julialang.org/en/v1.13-dev/devdocs/gc-mmtk/)). Both are experimental, but they plug a research GC toolkit into the upstream runtimes rather than a fork.
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -419,7 +420,7 @@ MMTk is a Rust library of collectors (Immix, generational Immix, LXR and others)
 **Open problems.**
 
 - **Barrier cost vs pause time.** Load barriers make pauses nearly independent of heap size but tax every reference load; JEP 522 shows store-barrier cost still matters for G1 too.
-- **Memory footprint.** Hertz and Berger's 3x to 5x headroom is costly in containers billed by memory; .NET DATAS, Go's `GOMEMLIMIT` and JDK 27's G1-everywhere default all aim at smaller heaps.
+- **Memory footprint.** Hertz and Berger's 3x to 5x headroom is costly in containers billed by memory; .NET DATAS, Go's `GOMEMLIMIT` aim at smaller heaps, and JDK 27 dropped the Serial default on small machines because G1 now serves constrained environments too.
 - **RC without regressions.** LXR and Perceus show RC can compete with tracing, but CPython's 3.14 reversal shows how hard it is to change a mature collector without surprising users.
 - **Locality during marking.** Green Tea shows the mark phase's memory access pattern, not just its algorithmic work, dominates on modern CPUs.
 - **Wasm.** WasmGC gives languages the host's collector but not its features: no finalization hooks beyond what JS offers, and the language must fit its object model to Wasm struct types. Linear-memory languages (C, Rust) still bring their own allocators.
@@ -444,11 +445,12 @@ MMTk is a Rust library of collectors (Immix, generational Immix, LXR and others)
 
 **Compiler side**
 - [Garbage Collection Safepoints in LLVM](https://www.llvm.org/docs/Statepoints.html).
+- [Practical Fully Relocating Garbage Collection in LLVM](https://llvm.org/devmtg/2014-10/Slides/Reames-GarbageCollection.pdf): Reames and Das (Azul), LLVM Developers' Meeting 2014.
 - [ARC Optimization for Swift](https://apple-swift.readthedocs.io/en/latest/ARCOptimization.html).
 - [Go proposal: Eliminate STW stack re-scanning](https://github.com/golang/proposal/blob/master/design/17503-eliminate-rescan.md).
 
 **Runtimes and release notes**
-- JEPs [189](https://openjdk.org/jeps/189), [404](https://openjdk.org/jeps/404), [439](https://openjdk.org/jeps/439), [474](https://openjdk.org/jeps/474), [490](https://openjdk.org/jeps/490), [521](https://openjdk.org/jeps/521), [522](https://openjdk.org/jeps/522), [523](https://openjdk.org/jeps/523).
+- JEPs [189](https://openjdk.org/jeps/189), [404](https://openjdk.org/jeps/404), [439](https://openjdk.org/jeps/439), [474](https://openjdk.org/jeps/474), [490](https://openjdk.org/jeps/490), [521](https://openjdk.org/jeps/521), [522](https://openjdk.org/jeps/522), [523](https://openjdk.org/jeps/523); [Java 27 released (InfoQ)](https://infoq.com/news/2026/09/java27-released).
 - [Go GC guide](https://go.dev/doc/gc-guide), [Green Tea blog](https://go.dev/blog/greenteagc), [Go 1.26 notes](https://go.dev/doc/go1.26).
 - [.NET regions](https://devblogs.microsoft.com/dotnet/put-a-dpad-on-that-gc), [DATAS](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/datas), [Preparing for the .NET 10 GC](https://devblogs.microsoft.com/dotnet/preparing-for-dotnet-10-gc/).
 - [V8: Trash talk](https://v8.dev/blog/trash-talk), [Concurrent marking](https://v8.dev/blog/concurrent-marking), [cppgc](https://v8.dev/blog/high-performance-cpp-gc); Andy Wingo on V8's GC ([2023](https://wingolog.org/archives/2023/12/07/the-last-5-years-of-v8s-garbage-collector), [2025](https://wingolog.org/archives/2025/11/13/the-last-couple-years-in-v8s-garbage-collector)).
