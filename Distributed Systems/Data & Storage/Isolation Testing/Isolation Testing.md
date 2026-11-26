@@ -14,6 +14,9 @@ sources:
   - https://jepsen.io/consistency/phenomena
   - https://jepsen.io/consistency/phenomena/g-nonadjacent
   - https://arxiv.org/pdf/1908.04509
+  - https://www.lix.polytechnique.fr/%7Ecenea/papers/oopsla19.pdf
+  - https://jepsen.io/consistency/phenomena/g-single
+  - https://www.khoury.northeastern.edu/home/zhangjian3/attaches/eurosys23_final_version.pdf
   - https://www.usenix.org/conference/osdi20/presentation/tan
   - https://arxiv.org/pdf/2301.07313
   - https://hengxin.github.io/papers/2024-OOPSLA-Plume.pdf
@@ -95,7 +98,7 @@ A client knows what it sent (begin, read $x$, write $y = 5$, commit) and what ca
 Timeouts make this worse. A transaction that timed out may or may not have committed, so the checker must consider both cases. Jepsen records these as indeterminate operations.
 
 #### **Adya's Dependency Graph**
-Adya's thesis (MIT, 1999) and the ICDE 2000 paper with Liskov and O'Neil defined isolation without reference to locks, because lock-based "preventative" definitions rule out optimistic and multi-version designs ([Acolyer on Adya et al.](https://blog.acolyer.org/2016/02/25/generalized-isolation-level-definitions/), [Adya thesis](https://www.aphyr.com/data/posts/294/adya-phd.pdf)). The **direct serialization graph** (DSG) has one node per committed transaction and three kinds of edge:
+Adya's thesis (MIT, March 1999, *Weak Consistency: A Generalized Theory and Optimistic Implementations for Distributed Transactions*) and the ICDE 2000 paper with Liskov and O'Neil defined isolation without reference to locks, because lock-based "preventative" definitions rule out optimistic and multi-version designs ([Acolyer on Adya et al.](https://blog.acolyer.org/2016/02/25/generalized-isolation-level-definitions/), [Adya thesis](https://www.aphyr.com/data/posts/294/adya-phd.pdf)). The **direct serialization graph** (DSG) has one node per committed transaction and three kinds of edge:
 
 $$
 \begin{aligned}
@@ -116,7 +119,7 @@ $$
 Two extra edge kinds come from the clients rather than the data: **process** edges (one client's transactions in the order it ran them, for session guarantees) and **real-time** edges ($T_i$ finished before $T_j$ started, for [[Consistency Models#Serializable vs Strict Serializable|strict serializability]]) ([Elle](https://arxiv.org/abs/2003.10554)).
 
 #### **Phenomena as Cycle Shapes**
-Each Adya phenomenon is a pattern in the DSG, and each isolation level bans a set of them ([Acolyer](https://blog.acolyer.org/2016/02/25/generalized-isolation-level-definitions/), [Jepsen phenomena](https://jepsen.io/consistency/phenomena)):
+Each Adya phenomenon is a pattern in the DSG, and each isolation level bans a set of them ([Acolyer](https://blog.acolyer.org/2016/02/25/generalized-isolation-level-definitions/), [Jepsen phenomena](https://jepsen.io/consistency/phenomena), [Jepsen G-single](https://jepsen.io/consistency/phenomena/g-single)):
 
 | Phenomenon | Shape | Plain English | First level that bans it |
 |---|---|---|---|
@@ -124,7 +127,7 @@ Each Adya phenomenon is a pattern in the DSG, and each isolation level bans a se
 | G1a | Not a cycle | Read a write from a transaction that aborted | Read committed (PL-2) |
 | G1b | Not a cycle | Read an intermediate, not final, value of a transaction | Read committed (PL-2) |
 | G1c | Cycle of ww and wr only | Circular information flow: each saw the other | Read committed (PL-2) |
-| G-single | Cycle with exactly one rw | Read skew: saw part of a transaction's effects | Snapshot isolation |
+| G-single | Cycle with exactly one rw | Read skew: saw part of a transaction's effects | Consistent view (PL-2+), and so snapshot isolation |
 | G-nonadjacent | Cycle with rw edges, no two adjacent | Includes G-single and long fork | Snapshot isolation |
 | G2-item | Cycle with one or more item rw edges | Write skew and friends | Repeatable read (PL-2.99) |
 | G2 | Cycle with rw edges, including predicate reads | Phantoms | Serializable (PL-3) |
@@ -183,7 +186,7 @@ timeline
 |---|---|---|---|
 | 1999 to 2000 | **Adya's generalized isolation levels.** Levels defined as banned cycles in a dependency graph, independent of locking. | ANSI definitions were ambiguous and ruled out optimistic and multi-version designs. | [Acolyer](https://blog.acolyer.org/2016/02/25/generalized-isolation-level-definitions/) |
 | 2014 | **Hermitage.** Each test is a race between concurrent transactions translated from the anomaly literature; it passes if the database prevents it. | Comparing what isolation names actually mean across PostgreSQL, MySQL, Oracle and SQL Server. | [Kleppmann](https://martin.kleppmann.com/2014/11/25/hermitage-testing-the-i-in-acid.html) |
-| 2019 | **Complexity map and dbcop.** RC, RA and causal checkable in polynomial time; SI and serializability NP-complete but polynomial for bounded sessions. | Which checks can scale at all. | [Biswas and Enea, OOPSLA 2019](https://arxiv.org/pdf/1908.04509) |
+| 2019 | **Complexity map and dbcop.** RC, RA and causal checkable in polynomial time; SI and serializability NP-complete but polynomial for bounded sessions. | Which checks can scale at all. | [Biswas and Enea, OOPSLA 2019](https://www.lix.polytechnique.fr/%7Ecenea/papers/oopsla19.pdf) |
 | 2020 | **Elle.** Recoverable, traceable workloads (list-append) let the checker infer the version order; linear time, detects every Adya anomaly except predicate ones. | Earlier checkers (Knossos, Gretchen) choked after a few hundred transactions. | [Kingsbury and Alvaro](https://arxiv.org/abs/2003.10554) |
 | 2020 | **Cobra.** SMT solving with a new encoding, GPU-accelerated pruning and segmentation for continuous checking of serializability, at about 2,000 transactions per second. | Checking ordinary key-value workloads where the order isn't revealed. | [Tan et al., OSDI 2020](https://www.usenix.org/conference/osdi20/presentation/tan) |
 | 2023 | **PolySI.** Generalized polygraphs plus the MonoSAT solver give a sound and complete SI checker; found violations in Dgraph, MariaDB Galera and YugabyteDB. | No black-box SI checker scaled or explained its counterexamples. | [Huang et al., PVLDB 2023](https://arxiv.org/pdf/2301.07313) |
@@ -230,7 +233,7 @@ With those, Elle takes the longest committed read of each key as its version ord
 
 G1a and G1b need no cycle search: recoverability shows directly that a read returned an aborted or intermediate value. Elle also flags non-Adya problems like garbage reads, duplicate writes and a transaction not seeing its own writes ([Elle](https://arxiv.org/abs/2003.10554)).
 
-Elle also has an **rw-register** workload for systems that only offer plain overwriting registers. Its inferences are weaker: the initial empty value precedes all others, a transaction's write follows its own read, and real-time order applies on linearizable keys ([Elle](https://arxiv.org/abs/2003.10554)). The README reports 100 to 160,000 transactions per second of checking as "readily attainable" ([Elle README](https://github.com/jepsen-io/elle)).
+Elle also has an **rw-register** workload for systems that only offer plain overwriting registers. Its inferences are weaker: the initial empty value precedes all others, a transaction's write follows its own read, and real-time order applies on linearizable keys ([Elle](https://arxiv.org/abs/2003.10554)). The README says "100-160,000 transactions/sec is readily attainable on modern hardware" and that Elle has checked real-world histories of 22 million transactions ([Elle README](https://github.com/jepsen-io/elle)).
 
 The same idea, constraining the workload so checking is cheap, drives **mini-transactions** (MTC): transactions of at most four operations where every write follows a read of the same key and writes unique values. For such histories, strict serializability, serializability and SI check in linear or quadratic time, and the paper argues mini-transactions still express all 14 well-known anomalies ([Wei et al., 2025](https://arxiv.org/html/2504.02344v1)).
 
@@ -273,7 +276,7 @@ When the workload is ordinary reads and writes, many version orders fit the obse
 - **Polygraph:** a graph of known edges plus pairs of alternative edges ("either $T_i$ wrote $x$ before $T_j$ or after"). Serializable means some selection from each pair is acyclic.
 - **Cobra (OSDI 2020)** checks serializability with MonoSAT, prunes constraints on a GPU, and segments the history so it can check continuously at about 2,000 transactions per second, roughly 170 million a day ([Tan et al.](https://www.usenix.org/conference/osdi20/presentation/tan)).
 - **PolySI (PVLDB 2023)** generalizes polygraphs to snapshot isolation, prunes constraints that would make cycles with known edges, and turns the solver's raw cycle back into a minimal, readable counterexample. It reproduced 2,477 known anomalies and checked a million transactions over a billion keys in under 40 GB and at most 4 hours ([Huang et al.](https://arxiv.org/pdf/2301.07313)).
-- **Viper (EuroSys 2023)** is another SI checker in this family; Boomslang re-expressed its core logic in 281 lines ([Boomslang](https://arxiv.org/pdf/2604.20587)).
+- **Viper (EuroSys 2023)** checks snapshot isolation with a variant it calls BC-polygraphs plus heuristic pruning ([Zhang et al.](https://www.khoury.northeastern.edu/home/zhangjian3/attaches/eurosys23_final_version.pdf)); Boomslang later re-expressed its core logic in 281 lines ([Boomslang](https://arxiv.org/pdf/2604.20587)).
 
 The cost is that solver time can blow up with concurrency, which is why constrained workloads (list-append, mini-transactions) remain popular.
 
@@ -356,7 +359,8 @@ Open problems:
 
 **Primary papers**
 - [Generalized Isolation Level Definitions](https://blog.acolyer.org/2016/02/25/generalized-isolation-level-definitions/): Adya, Liskov and O'Neil, ICDE 2000 (Acolyer's summary). Full detail in [Adya's PhD thesis](https://www.aphyr.com/data/posts/294/adya-phd.pdf), MIT 1999.
-- [Elle: Inferring Isolation Anomalies from Experimental Observations](https://arxiv.org/abs/2003.10554): Kingsbury and Alvaro, PVLDB 14, 2020.
+- [Elle: Inferring Isolation Anomalies from Experimental Observations](https://arxiv.org/abs/2003.10554): Kingsbury and Alvaro, PVLDB 14(3), 2020.
+- [Viper: A Fast Snapshot Isolation Checker](https://www.khoury.northeastern.edu/home/zhangjian3/attaches/eurosys23_final_version.pdf): Zhang, Ji, Mu and Tan, EuroSys 2023.
 - [On the Complexity of Checking Transactional Consistency](https://arxiv.org/pdf/1908.04509): Biswas and Enea, OOPSLA 2019.
 - [Cobra: Making Transactional Key-Value Stores Verifiably Serializable](https://www.usenix.org/conference/osdi20/presentation/tan): Tan, Zhao, Mu and Walfish, OSDI 2020.
 - [Efficient Black-box Checking of Snapshot Isolation in Databases (PolySI)](https://arxiv.org/pdf/2301.07313): Huang et al., PVLDB 16, 2023.
