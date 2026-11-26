@@ -268,7 +268,7 @@ A `RewritePattern` matches a root op and edits through a `PatternRewriter` that 
 
 When a pattern changes a value's type (a `memref` becoming an LLVM struct), the framework bridges the gap with `builtin.unrealized_conversion_cast` ops, and `reconcile-unrealized-casts` removes them once both sides agree. Historically the driver could *roll back* patterns when a legalization got stuck; the docs now recommend the no-rollback mode (`ConversionConfig::allowPatternRollback = false`), since rollback "adds significant compile-time cost" and complicates debugging ([Dialect Conversion](https://mlir.llvm.org/docs/DialectConversion/)).
 
-Patterns are written in C++, the older TableGen DRR, or **PDLL**, a small language designed after the `pdl` dialect for both ahead-of-time and JIT pattern compilation ([PDLL](https://mlir.llvm.org/docs/PDLL/)):
+Patterns are written in C++, the older TableGen DRR, or **PDLL**, a small language designed after the `pdl` dialect for both ahead-of-time and [[JIT Compilation|JIT]] pattern compilation ([PDLL](https://mlir.llvm.org/docs/PDLL/)):
 
 ```pdll
 // transpose(transpose(x)) -> x

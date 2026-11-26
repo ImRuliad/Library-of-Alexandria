@@ -99,7 +99,7 @@ int f(int a) { return (a * 2) / 2; }
 
 Suppose the rules are strength reduction `x*2 → x<<1`, reassociation `(x*y)/z → x*(y/z)`, `x/x → 1` and `x*1 → x`. If strength reduction fires first, the program becomes `(a << 1) / 2`, and reassociation never matches again because there is no `*` left. If reassociation fires first, the chain `a*(2/2) → a*1 → a` finishes. Same rules, different answer, purely because of order. (Over machine integers `(a*2)/2` is not always `a`, since `a*2` can overflow and `x/x` needs `x ≠ 0`; the example treats the operators as exact arithmetic, as the egg paper's version does.)
 
-Real compilers face this at scale. GCC and LLVM run cleanup passes many times and tune their order by hand; picking orders automatically is its own research area ([[ML-Guided Optimization]]). The deeper issue: a greedy rewriter must decide *now* whether a rewrite is profitable, using only local information. Equality saturation defers that choice until every alternative is known ([Tate et al., 2009](https://arxiv.org/abs/1012.1802)).
+Real compilers face this at scale. GCC and [[LLVM]] run cleanup passes many times and tune their order by hand; picking orders automatically is its own research area ([[ML-Guided Optimization]]). The deeper issue: a greedy rewriter must decide *now* whether a rewrite is profitable, using only local information. Equality saturation defers that choice until every alternative is known ([Tate et al., 2009](https://arxiv.org/abs/1012.1802)).
 
 ## ***Foundations***
 ---
@@ -389,7 +389,7 @@ Cranelift proposed an e-graph mid-end in 2022 ([Bytecode Alliance RFC #27](https
 
 *Two directions: LLMs steering the search, and e-graphs checking or structuring what models produce.*
 
-- **LLM-guided saturation.** Peng, Ji and Xiong use an LLM to propose intermediate steps that guide saturation past blowup (EGRAPHS 2025; [arXiv 2511.00403](https://arxiv.org/abs/2511.00403v1)). *EggMind* has an LLM write reusable saturation *strategies* in a small DSL; on vectorization benchmarks it reports 45.1% lower final cost and 69.1% lower peak memory than full saturation ([Yin et al., Apr 2026](https://arxiv.org/abs/2604.17364)).
+- **LLM-guided saturation.** Peng, Ji and Xiong use an LLM to propose intermediate steps that guide saturation past blowup (EGRAPHS 2025; [arXiv 2511.00403](https://arxiv.org/abs/2511.00403v1)). *EggMind* has an LLM write reusable saturation *strategies* in a small DSL; on [[Vectorization|vectorization]] benchmarks it reports 45.1% lower final cost and 69.1% lower peak memory than full saturation ([Yin et al., Apr 2026](https://arxiv.org/abs/2604.17364)).
 - **Why the pairing fits.** An LLM is good at guessing a promising direction and bad at guaranteeing equivalence; an e-graph is the reverse. Every term in an e-graph is equal by construction, so a model's suggestions can only change *which* equal programs get explored. Learned guidance in general is covered in [[ML-Guided Optimization]].
 
 ## ***Trade-offs & Open Problems***
