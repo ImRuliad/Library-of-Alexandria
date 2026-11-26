@@ -165,7 +165,7 @@ flowchart LR
     Cmp -->|no| Bug[Bug with minimal reproducer]
 ```
 
-- **Reference models:** each component gets a simple Rust model with the same interface (a hash table standing in for the real LSM tree index). Developers maintain them alongside the code, and they double as mocks in unit tests.
+- **Reference models:** each component gets a simple Rust model with the same interface (a hash table standing in for the real [[LSM Trees|LSM tree]] index). Developers maintain them alongside the code, and they double as mocks in unit tests.
 - **Conformance by property-based testing:** apply the same operations to model and implementation and compare, with failure injection. Crash-consistency checks caught a bug that needed a specific ID, a chunk spilling onto a second page, and a crash losing only that page.
 - **Concurrency by stateless model checking:** Loom exhaustively checks small critical code like custom locks; Shuttle randomly explores interleavings of bigger harnesses.
 
