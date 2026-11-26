@@ -4,7 +4,7 @@ tags:
   - kernels-and-architecture
   - observability
   - tracing
-status: draft
+status: complete
 sources:
   - https://docs.kernel.org/trace/ftrace.html
   - https://docs.kernel.org/trace/tracepoints.html
@@ -28,6 +28,7 @@ sources:
   - https://www.brendangregg.com/blog/2024-03-17/the-return-of-the-frame-pointers.html
   - https://fedoraproject.org/wiki/Changes/fno-omit-frame-pointer
   - https://sourceware.org/binutils/wiki/sframe
+  - https://lwn.net/Articles/1073871/
   - https://github.com/open-telemetry/opentelemetry-ebpf-profiler
   - https://perfetto.dev/docs/
   - https://lttng.org/docs/
@@ -304,7 +305,7 @@ BTF type information means programs can read kernel structures by field name, an
 ---
 *As of November 2026, the kernel-side hooks are mature; the activity is in cheap user-space stacks, always-on fleet profiling, and making BPF-based tools the default way people look at production systems.*
 
-- **User-space stack unwinding.** With frame pointers back in Fedora and Ubuntu packages, profilers see user stacks again; the kernel's deferred user-unwind infrastructure is in place (present in 6.18-era kernels, as on this note's VM), and SFrame support across the GNU toolchain, distributions and the kernel is the path to cheap stacks even without frame pointers ([SFrame](https://sourceware.org/binutils/wiki/sframe)).
+- **User-space stack unwinding.** With frame pointers back in Fedora and Ubuntu packages, profilers see user stacks again; the kernel's deferred user-unwind infrastructure is in place (present in 6.18-era kernels, as on this note's VM), and SFrame support across the GNU toolchain, distributions and the kernel is the path to cheap stacks even without frame pointers ([SFrame](https://sourceware.org/binutils/wiki/sframe)). The kernel side is not merged yet: the series that teaches deferred unwinding to read SFrame V3 sections reached v15 in May 2026, posted against 7.1-rc4 and depending on binutils 2.46 ([LWN, May 2026](https://lwn.net/Articles/1073871/)).
 - **Continuous profiling is standard.** Elastic donated its eBPF-based whole-system profiler to OpenTelemetry in 2024, and it continues as the OpenTelemetry eBPF profiler, sampling every process on a host without instrumenting the applications ([repo](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)). Grafana Pyroscope and Parca take the same approach.
 - **BPF as the default front end.** `bpftrace` and BCC tools ship in mainstream distributions, and many performance teams treat a BPF-capable kernel (BTF enabled) as a baseline requirement ([[eBPF]]).
 - **Minimal kernels lose visibility.** MicroVM and appliance kernels often drop kprobes and fprobes, and VMs often hide the PMU, as this note's own test VM showed; observability in sandboxes and confidential VMs is a growing gap ([[MicroVMs and Sandboxing]], [[Confidential Computing]]).
@@ -349,7 +350,7 @@ Open problems:
 - [Google-Wide Profiling](https://research.google/pubs/google-wide-profiling-a-continuous-profiling-infrastructure-for-data-centers/): Ren et al., IEEE Micro 2010.
 
 **Current work**
-- [SFrame format](https://sourceware.org/binutils/wiki/sframe), [Fedora frame pointers change](https://fedoraproject.org/wiki/Changes/fno-omit-frame-pointer), [OpenTelemetry eBPF profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler).
+- [SFrame format](https://sourceware.org/binutils/wiki/sframe), [SFrame unwinding patch series v15](https://lwn.net/Articles/1073871/) (May 2026), [Fedora frame pointers change](https://fedoraproject.org/wiki/Changes/fno-omit-frame-pointer), [OpenTelemetry eBPF profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler).
 
 ## Related Notes
 
