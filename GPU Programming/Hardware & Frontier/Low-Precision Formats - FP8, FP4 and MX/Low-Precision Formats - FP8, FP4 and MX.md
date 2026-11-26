@@ -8,7 +8,7 @@ tags:
   - microscaling
 aliases:
   - "Low-Precision Formats: FP8, FP4 and MX"
-status: draft
+status: complete
 sources:
   - https://arxiv.org/abs/2209.05433
   - https://arxiv.org/abs/2310.10537
@@ -27,6 +27,7 @@ sources:
   - https://rocm.blogs.amd.com/ecosystems-and-partners/cdna5-helios/README.html
   - https://glennklockwood.com/garden/processors/R200
   - https://www.nvidia.com/en-us/data-center/h100/
+  - https://developer.nvidia.com/blog/boosting-matrix-multiplication-speed-and-flexibility-with-nvidia-cublas-12-9
 created: 2026-11-26
 updated: 2026-11-26
 ---
@@ -61,7 +62,7 @@ updated: 2026-11-26
 - **FP8** comes as E4M3 (max 448, more precision) and E5M2 (max 57,344, more range), standardised in 2022 by NVIDIA, Arm and Intel ([Micikevicius et al.](https://arxiv.org/abs/2209.05433)). Hopper was the first GPU with FP8 [[Tensor Cores]].
 - **Microscaling (MX)**, an Open Compute Project spec from 2023, groups 32 elements under one shared power-of-two (E8M0) scale: MXFP8, MXFP6, MXFP4 and MXINT8 ([Rouhani et al.](https://arxiv.org/abs/2310.10537)). **NVFP4** is NVIDIA's variant: 16-element blocks with an E4M3 scale plus a per-tensor FP32 scale ([NVIDIA](https://developer.nvidia.com/blog/introducing-nvfp4-for-efficient-and-accurate-low-precision-inference)).
 - **In hardware:** Blackwell's `tcgen05.mma` takes block-scaled FP8/FP6/FP4 operands and applies the scales inside the MMA; AMD's MI355X runs MXFP4/MXFP6 at 10 PFLOPS dense, twice its FP8 rate ([AMD MI350 docs](https://rocm.docs.amd.com/en/latest/reference/gpu-arch/mi350.html)).
-- **Where it is now (Nov 2026):** FP8 is the serving and increasingly the training baseline; 4-bit block formats are the frontier, with NVFP4 pretraining shown at 12B parameters on 10T tokens ([NVIDIA](https://arxiv.org/html/2509.25149v2)). Rubin (2H 2026) is rated at 50 PFLOPS of NVFP4, AMD's CDNA 5 adds an E5M3 format, and OCP published MX spec v1.1.0 in Oct 2026. The model-side story (PTQ, QAT, outliers) is in [[Quantization]].
+- **Where it is now (Nov 2026):** FP8 is the serving and increasingly the training baseline; 4-bit block formats are the frontier, with NVFP4 pretraining shown at 12B parameters on 10T tokens ([NVIDIA](https://arxiv.org/html/2509.25149v2)). Rubin (2H 2026) is rated at 50 PFLOPS of NVFP4 for inference, AMD's CDNA 5 adds an E5M3 scale format, and OCP published MX spec v1.1 on Oct 9, 2026. The model-side story (PTQ, QAT, outliers) is in [[Quantization]].
 
 ## ***The Problem***
 ---
@@ -74,7 +75,7 @@ Two costs scale with bits per value:
 | Memory traffic | Decode reads every weight per token; bytes per weight set the speed limit | 70B parameters: 140 GB in BF16, 70 GB in FP8, ~37 GB in MXFP4 |
 | Tensor-core throughput | A multiplier for narrower inputs is smaller, so more fit per SM | MI355X: 2.5 PFLOPS BF16, 5.0 FP8, 10 MXFP4 |
 
-The price is representable values. FP4 E2M1 can only express ±{0, 0.5, 1, 1.5, 2, 3, 4, 6}. Real tensors span many orders of magnitude and contain outliers, so one scale per tensor either clips the large values or crushes small ones to zero. Directly casting LLaMA-7B to MXFP4 raised WikiText perplexity from 9.49 to 27.2 ([Rouhani et al.](https://arxiv.org/abs/2310.10537)). Making these formats usable is a joint hardware, kernel and algorithm problem.
+The price is representable values. FP4 E2M1 can only express ±{0, 0.5, 1, 1.5, 2, 3, 4, 6}. Real tensors span many orders of magnitude and contain outliers, so one scale per tensor either clips the large values or crushes small ones to zero. Directly casting LLaMA-7B weights and activations to MXFP4 raised WikiText perplexity from 9.49 to 27.2, while MXFP4 weights with MXFP8 activations gave 11.5 ([Rouhani et al.](https://arxiv.org/abs/2310.10537), Table 6). Making these formats usable is a joint hardware, kernel and algorithm problem.
 
 ## ***Foundations***
 ---
@@ -112,7 +113,7 @@ title FP8 E4M3 (top) and FP4 E2M1 (bottom) bit layouts
 | FP8 E4M3 | 1/4/3 | 448 | Hopper, MI300 | Weights and activations |
 | FP6 E3M2 / E2M3 | 1/3/2, 1/2/3 | 28 / 7.5 | Blackwell, MI355X | MXFP6 |
 | FP4 E2M1 | 1/2/1 | 6 | Blackwell, MI355X | MXFP4, NVFP4 weights and activations |
-| E8M0 (scale only) | 0/8/0 | 2^127 | Blackwell, MI355X | MX block scales (powers of two) |
+| E8M0, renamed UE8M0 in MX v1.1 (scale only) | 0/8/0 | 2^127 | Blackwell, MI355X | MX block scales (powers of two) |
 
 Sources: [FP8 paper](https://arxiv.org/abs/2209.05433), [OCP MX v1.0 spec](https://opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf).
 
@@ -144,13 +145,13 @@ timeline
     2023 : OCP Microscaling v1.0 (MXFP8/6/4, MXINT8); MI300 FP8
     2024 : Blackwell announced, FP4/FP6 with block scaling; DeepSeek-V3 FP8 training
     2025 : NVFP4; MI355X MXFP4/MXFP6; gpt-oss ships in MXFP4; NVFP4 pretraining at 12B
-    2026 : Rubin NVFP4 Transformer Engine; CDNA 5 adds E5M3; OCP MX v1.1.0 (Oct)
+    2026 : Rubin NVFP4 Transformer Engine; CDNA 5 adds E5M3 scales (Aug); OCP MX v1.1 (Oct)
 ```
 
 - **2022, FP8.** NVIDIA, Arm and Intel proposed E4M3 and E5M2 and showed FP8 training matching 16-bit quality on models up to 175B with unchanged hyperparameters ([Micikevicius et al.](https://arxiv.org/abs/2209.05433)). Hopper shipped FP8 tensor cores at twice the FP16 rate, with Transformer Engine managing per-tensor scales.
 - **2023, MX.** AMD, Arm, Intel, Meta, Microsoft, NVIDIA and Qualcomm published the OCP Microscaling spec, defining block formats with a 32-element shared E8M0 scale ([OCP v1.0](https://opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf), [Rouhani et al.](https://arxiv.org/abs/2310.10537)).
 - **2024, block scaling in practice.** DeepSeek-V3 trained a 671B MoE in FP8 using 1×128 activation tiles and 128×128 weight blocks, each with its own scale, plus higher-precision accumulation ([DeepSeek-V3](https://arxiv.org/abs/2412.19437)).
-- **2025, FP4 arrives.** Blackwell's tensor cores consume MXFP4/MXFP6/MXFP8 and NVFP4 natively; MI355X added MXFP4 and MXFP6 at 10 PFLOPS. NVIDIA pretrained a 12B model in NVFP4 on 10T tokens with MMLU-Pro 62.58 vs 62.62 for FP8 ([NVIDIA](https://arxiv.org/html/2509.25149v2)). MXFP8 pretraining recipes showed parity with BF16 ([MXFP8 recipes](https://arxiv.org/html/2506.08027v2)).
+- **2025, FP4 arrives.** Blackwell's tensor cores consume MXFP4/MXFP6/MXFP8 and NVFP4 natively; MI355X added MXFP4 and MXFP6 at 10 PFLOPS. NVIDIA pretrained a 12B hybrid Mamba-Transformer in NVFP4 on 10T tokens, scoring 62.58% on MMLU-Pro against 62.62% for FP8 ([NVIDIA](https://arxiv.org/html/2509.25149v2)). MXFP8 pretraining recipes showed parity with BF16 ([MXFP8 recipes](https://arxiv.org/html/2506.08027v2)).
 
 ## ***How It Works***
 ---
@@ -187,11 +188,11 @@ On Blackwell (SM100), the [[Tensor Cores|tensor-core]] instruction family `tcgen
 - **Block size vs. K tile.** The K tile must be a multiple of the scale block (16 or 32), so each MMA step consumes whole blocks.
 - **Epilogue.** The FP32 result usually gets the per-tensor scale, then is re-quantized (computing new block scales) for the next layer, a natural place for [[Kernel Fusion|fusion]].
 
-[[CUTLASS and CuTe]] ships block-scaled GEMM examples for SM100 and SM12x ([CUTLASS Blackwell doc](https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/blackwell_functionality.md), [Colfax NVFP4 on SM12x](https://research.colfax-intl.com/cutlass-tutorial-nvfp4-blockscaled-gemm-on-nvidia-rtx-pro-blackwell-gpus-sm12x/)); a 2026 hand-written MXFP8 GEMM reached up to 99% of cuBLAS with CUDA and PTX ([Vega-Myhre, Mar 2026](https://danielvegamyhre.github.io/2026/03/29/mxfp8-gemm.html)).
+[[CUTLASS and CuTe]] ships block-scaled GEMM examples for SM100 and SM12x ([CUTLASS Blackwell doc](https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/blackwell_functionality.md), [Colfax NVFP4 on SM12x](https://research.colfax-intl.com/cutlass-tutorial-nvfp4-blockscaled-gemm-on-nvidia-rtx-pro-blackwell-gpus-sm12x/)); a 2026 hand-written MXFP8 GEMM in CUDA and inline PTX reached 87-99% of cuBLAS on B200 depending on shape ([Vega-Myhre, Mar 2026](https://danielvegamyhre.github.io/2026/03/29/mxfp8-gemm.html)).
 
 ### Accumulation and the Hopper FP8 Catch
 
-Narrow inputs are fine only if the running sum is wide. DeepSeek reported that Hopper's FP8 tensor-core GEMM keeps only about 14 bits of accumulation precision, which causes errors for long K. Their fix: every 128 elements along K, copy the partial sum out to CUDA cores and add it into a full FP32 accumulator, applying the block scales there ([DeepSeek-V3](https://arxiv.org/abs/2412.19437)). Blackwell's block-scaled MMA applies scales and accumulates in FP32 inside the instruction, removing that workaround.
+Narrow inputs are fine only if the running sum is wide. DeepSeek reported that "the accumulation precision of FP8 GEMM on NVIDIA H800 GPUs is limited to retaining around 14 bits," which causes errors for long K. Their fix: every 128 elements along K (four WGMMAs), copy the partial sum out to CUDA cores and add it into a full FP32 accumulator, applying the block scales there ([DeepSeek-V3](https://arxiv.org/abs/2412.19437)). Blackwell's block-scaled MMA applies scales and accumulates in FP32 inside the instruction, removing that workaround.
 
 ### What It Buys: Memory and FLOPs
 
@@ -212,13 +213,13 @@ In plain words: going from BF16 to 4-bit nearly quadruples the ceiling, and the 
 |---|---|---|---|
 | H100 SXM | ~0.99 PF | ~1.98 PF | — |
 | MI355X | 2.5 PF | 5.0 PF | 10 PF (MXFP4/MXFP6) |
-| Rubin (R200) | — | — | 50 PF NVFP4 (inference) |
+| Rubin (R200) | — | ~4 PF | 50 PF NVFP4 inference (likely with sparsity), 35 PF dense |
 
 Sources: [H100](https://www.nvidia.com/en-us/data-center/h100/), [MI350 docs](https://rocm.docs.amd.com/en/latest/reference/gpu-arch/mi350.html), [Rubin](https://glennklockwood.com/garden/processors/R200).
 
 ## ***Where It Is Now***
 ---
-*As of November 2026: FP8 is standard for serving and common in training; MXFP4 and NVFP4 ship in released models and run natively on Blackwell, Rubin and MI355X; new formats (E5M3) and a revised OCP MX spec are arriving.*
+*As of November 2026: FP8 is standard for serving and common in training; MXFP4 and NVFP4 ship in released models and run natively on Blackwell, Rubin and MI355X; new scale formats (E5M3) and a revised OCP MX spec are arriving.*
 
 ### Hardware Support
 
@@ -229,15 +230,15 @@ Sources: [H100](https://www.nvidia.com/en-us/data-center/h100/), [MI350 docs](ht
 | NVIDIA Rubin (2H 2026) | Yes | Yes | Yes | Yes | Yes | NVFP4 Transformer Engine, 50 PF NVFP4 |
 | AMD MI300 (CDNA 3) | Yes | No | No | No | No | FP8 variant differs from OCP on MI300 |
 | AMD MI355X (CDNA 4) | OCP FP8 | Yes | Yes | Yes | No | MXFP6 at FP4 rate |
-| AMD MI455X (CDNA 5) | Yes | Yes | Yes | Yes | — | Adds E5M3; 4-bit lookup instruction expands compressed weights |
+| AMD MI455X (CDNA 5) | Yes | Yes | Yes | Yes | — | Adds unsigned E5M3 as a scale format; a 4-bit lookup-table instruction expands 4-bit values to MX formats |
 
 Sources: [AMD MI350 docs](https://rocm.docs.amd.com/en/latest/reference/gpu-arch/mi350.html), [CDNA 5 blog](https://rocm.blogs.amd.com/ecosystems-and-partners/cdna5-helios/README.html), [CUTLASS Blackwell doc](https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/blackwell_functionality.md). See also [[Blackwell Architecture]] and [[ROCm and HIP]].
 
-The OCP published **Microscaling spec v1.1.0** in October 2026 ([OCP v1.1.0](https://www.opencompute.org/wp-content/uploads/2026/10/OCP_MicroXcaling_Spec_v1.1.0.pdf)), the first revision since 2023.
+The OCP published **MX spec v1.1** on Oct 9, 2026 ([OCP v1.1](https://www.opencompute.org/wp-content/uploads/2026/10/OCP_MicroXcaling_Spec_v1.1.0.pdf)), the first revision since 2023. It keeps the same formats (MXFP8, MXFP6, MXFP4, MXINT8, 32-element blocks) but renames E8M0 to UE8M0, refines conversion and rounding rules, and pins down NaN and out-of-range cases; Google joined the contributor list.
 
 ### Software and Models
 
-- **Libraries.** cuBLAS added block-scaled FP8/FP4 GEMMs for Blackwell in 12.9 (see [[cuBLAS and cuDNN]]); CUTLASS and CuTe DSL ship block-scaled kernels; [[Triton]] supports MXFP4 dot products on Blackwell; AMD's hipBLASLt covers MXFP4/MXFP8 on MI355X.
+- **Libraries.** cuBLAS 12.9 supports Blackwell's block-scaled FP4 (16-element, UE4M3 scales) and FP8 (32-element, UE8 scales) types and added DeepSeek-style 128-element and 128×128 block scaling for FP8 on Hopper ([cuBLAS 12.9](https://developer.nvidia.com/blog/boosting-matrix-multiplication-speed-and-flexibility-with-nvidia-cublas-12-9); see [[cuBLAS and cuDNN]]); CUTLASS and CuTe DSL ship block-scaled kernels; [[Triton]] supports MXFP4 dot products on Blackwell; AMD's hipBLASLt covers MXFP4/MXFP8 on MI355X.
 - **Models.** gpt-oss ships in MXFP4, DeepSeek-V4 uses FP4 experts with FP8 elsewhere, and NVIDIA's Nemotron 3 Super was pretrained in NVFP4 (details and sources in [[Quantization]]).
 - **Attention.** FP8 attention kernels (FlashAttention-3 on Hopper, FP4/FP8 paths on Blackwell) are covered in [[Low-Precision Attention]].
 
@@ -253,7 +254,7 @@ The OCP published **Microscaling spec v1.1.0** in October 2026 ([OCP v1.1.0](htt
 | Hardware applies scales inside the MMA | Formats differ by vendor (NVFP4 is NVIDIA-only; FP8 variants differed on MI300) |
 
 - **MX vs NVFP4.** NVFP4's smaller block and finer scale are more accurate; MX is an open multi-vendor standard. AMD's MI355X does not list NVFP4, so 4-bit checkpoints are not fully portable.
-- **Training below FP8.** NVFP4 pretraining works at 12B with careful recipes (random Hadamard transforms, stochastic rounding, some layers in higher precision); whether it holds at frontier scale without loss is still being tested.
+- **Training below FP8.** NVFP4 pretraining works at 12B with careful recipes (16×16 random Hadamard transforms on weight-gradient inputs, stochastic rounding of gradients, 16×16 2D weight scaling, and about 16% of linear layers kept in BF16); whether it holds at frontier scale without loss is still being tested.
 - **Scale overhead in kernels.** Loading, laying out and copying scale factors into Tensor Memory is extra work per K step; small GEMMs (decode, MoE experts) feel it most.
 - **Accumulation.** Hopper's limited FP8 accumulation precision forced software promotion; any future narrower accumulator would reopen the issue.
 - **Format sprawl.** E4M3, E5M2, E3M2, E2M3, E2M1, E8M0, UE4M3, now E5M3: every new format needs conversion instructions, library kernels and framework support on every vendor.
@@ -265,7 +266,7 @@ The OCP published **Microscaling spec v1.1.0** in October 2026 ([OCP v1.1.0](htt
 **Formats and specs**
 - [FP8 Formats for Deep Learning](https://arxiv.org/abs/2209.05433), Micikevicius et al., 2022.
 - [Microscaling Data Formats for Deep Learning](https://arxiv.org/abs/2310.10537), Rouhani et al., 2023.
-- [OCP Microscaling Formats v1.0](https://opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf) and [v1.1.0](https://www.opencompute.org/wp-content/uploads/2026/10/OCP_MicroXcaling_Spec_v1.1.0.pdf).
+- [OCP Microscaling Formats v1.0](https://opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf) and [v1.1](https://www.opencompute.org/wp-content/uploads/2026/10/OCP_MicroXcaling_Spec_v1.1.0.pdf) (Oct 2026).
 - [Introducing NVFP4](https://developer.nvidia.com/blog/introducing-nvfp4-for-efficient-and-accurate-low-precision-inference), NVIDIA, Jun 2025.
 
 **Training**
@@ -277,8 +278,9 @@ The OCP published **Microscaling spec v1.1.0** in October 2026 ([OCP v1.1.0](htt
 - [CUTLASS tcgen05 MMA programming guide](https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/mma_docs/tcgen05_programming.html).
 - [NVFP4 block-scaled GEMM on RTX Pro Blackwell](https://research.colfax-intl.com/cutlass-tutorial-nvfp4-blockscaled-gemm-on-nvidia-rtx-pro-blackwell-gpus-sm12x/), Colfax Research.
 - [MXFP8 GEMM: up to 99% of cuBLAS](https://danielvegamyhre.github.io/2026/03/29/mxfp8-gemm.html), Mar 2026.
+- [Boosting matrix multiplication with cuBLAS 12.9](https://developer.nvidia.com/blog/boosting-matrix-multiplication-speed-and-flexibility-with-nvidia-cublas-12-9), NVIDIA: block-scaled types in cuBLASLt.
 
-## Related Notes
+## ***Related Notes***
 
 - [[Tensor Cores]] — The units whose input formats this note describes.
 - [[Quantization]] — Model-side methods (PTQ, QAT, outliers) and released low-precision models.
