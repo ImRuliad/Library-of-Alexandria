@@ -257,7 +257,7 @@ The timeout was a false suspicion: L never crashed. Safety survives only because
 *As of November 2026, the classic models are settled and the field's attention is on failures that don't fit them: partial failures that detectors miss, slow-but-alive hardware, overload that sustains itself after the trigger is gone, and processors that silently compute wrong answers. AI training clusters made the last one impossible to ignore.*
 
 #### **Failures That Don't Fit the Textbook Models**
-- **Gray failure:** the system's own detector says healthy while applications see failure ("differential observability"). Examples from Microsoft Azure: a core switch silently dropping packets, a VM whose heartbeats arrive over a local path while its real network is broken, a storage server crashing in a loop because a reporting bug hid its capacity pressure ([Huang et al., 2017](https://pages.cs.wisc.edu/~ra/Classes/739-sp20/papers/grayfailure-hotos17.pdf)). The recommended fix is to monitor from the application's point of view, not only with heartbeats.
+- **[[Gray and Fail-Slow Failures|Gray failure]]:** the system's own detector says healthy while applications see failure ("differential observability"). Examples from Microsoft Azure: a core switch silently dropping packets, a VM whose heartbeats arrive over a local path while its real network is broken, a storage server crashing in a loop because a reporting bug hid its capacity pressure ([Huang et al., 2017](https://pages.cs.wisc.edu/~ra/Classes/739-sp20/papers/grayfailure-hotos17.pdf)). The recommended fix is to monitor from the application's point of view, not only with heartbeats.
 - **Fail-slow:** disks, SSDs, CPUs, memory and NICs that keep working at a fraction of their speed; faults convert from one form to another and cascade ([Gunawi et al., 2018](https://www.usenix.org/node/210509)). A crash-stop model treats a slow node as healthy, and one slow replica in a synchronous path slows everything.
 - **Partitions in practice:** most partition bugs are deterministic and need no special client input, so partition fault injection in tests catches the majority ([Alquraan et al.](https://www.usenix.org/conference/osdi18/presentation/alquraan)). See [[Deterministic Simulation Testing]].
 
@@ -285,7 +285,7 @@ Silent corruption is a Byzantine fault produced by hardware, not by an attacker.
 | Long timeouts | Fewer false suspicions | Slow failover; fail-slow nodes stay in the critical path |
 
 Open problems worth tracking:
-- **Detecting gray and fail-slow failures** without drowning in false positives, and agreeing on whose fault a failure is ([Huang et al.](https://pages.cs.wisc.edu/~ra/Classes/739-sp20/papers/grayfailure-hotos17.pdf)).
+- **Detecting [[Gray and Fail-Slow Failures|gray and fail-slow failures]]** without drowning in false positives, and agreeing on whose fault a failure is ([Huang et al.](https://pages.cs.wisc.edu/~ra/Classes/739-sp20/papers/grayfailure-hotos17.pdf)).
 - **Silent data corruption.** Fleet-wide testing is slow and online detection is workload-specific; general-purpose, low-overhead detection is open ([Meta](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/), [AEGIS](https://www.usenix.org/conference/osdi26/presentation/lei)).
 - **Composition.** Components that are each correct and stable can combine into metastable systems; proving the whole is safe is new territory ([Farahbakhsh et al.](https://arxiv.org/html/2606.00942v1)). See [[Formal Methods in Practice]].
 - **Models vs reality.** Many production bugs come from failures the chosen model excluded, not from protocol bugs; testing under injected faults is the practical check ([Alquraan et al.](https://www.usenix.org/conference/osdi18/presentation/alquraan)).
@@ -329,3 +329,4 @@ Open problems worth tracking:
 - [[Reliability Patterns]] — Timeouts, retries with backoff and load shedding, the defenses against metastable failure.
 - [[Deterministic Simulation Testing]] — Injecting crashes, partitions and clock faults to find bugs the model hides.
 - [[Formal Methods in Practice]] — Checking protocols against an explicit failure model.
+- [[Gray and Fail-Slow Failures]] — Components that are broken for their users but look healthy to the system, and hardware that runs slow without failing.

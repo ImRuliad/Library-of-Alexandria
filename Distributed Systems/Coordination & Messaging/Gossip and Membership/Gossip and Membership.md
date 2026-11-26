@@ -196,7 +196,7 @@ False positives fell to about 1.5% of plain SWIM, roughly 50x fewer, with median
 
 ### Rapid: Agree on the Membership
 
-Gossip gives each node its own view, and under gray failures those views can flip-flop. In Rapid's tests, Akka Cluster removed healthy processes while Memberlist and ZooKeeper stayed unstable for long periods. Rapid adds structure ([Murat Demirbas on Rapid](https://muratbuffalo.blogspot.com/2020/05/stable-and-consistent-membership-at.html)):
+Gossip gives each node its own view, and under [[Gray and Fail-Slow Failures|gray failures]] those views can flip-flop. In Rapid's tests, Akka Cluster removed healthy processes while Memberlist and ZooKeeper stayed unstable for long periods. Rapid adds structure ([Murat Demirbas on Rapid](https://muratbuffalo.blogspot.com/2020/05/stable-and-consistent-membership-at.html)):
 
 1. **K-ring monitoring:** each node is watched by $K$ observers on overlaid rings, so no single observer's bad link condemns it.
 2. **Multi-process cut detection:** a node is only proposed for removal once enough observers report it (above a high watermark), and Rapid waits until no node sits in the ambiguous zone between the low and high watermarks.
