@@ -110,6 +110,8 @@ This is not hypothetical. In 2015, Alglave et al. ran litmus tests on Fermi and 
 | Acq_rel | `atom.acq_rel.gpu` | Both, for read-modify-writes |
 | Volatile | `ld.volatile`, `st.volatile` | Legacy; ".volatile has the same memory synchronization semantics as .relaxed.sys" ([LLVM D50391, 2018](https://reviews.llvm.org/D50391?id=159776), paraphrasing the PTX ISA) |
 
+A source note: the PTX ISA's chapter 8 ("Memory Consistency Model") could not be read in full for this note, because the fetched page stopped before it. The definitions here come from NVIDIA's own formal papers (ASPLOS 2019, ISCA 2022) and the Tile IR model, fence versions from CCCL's PTX docs, and the volatile row from LLVM's paraphrase, which is unconfirmed against the ISA text.
+
 NVIDIA's Tile IR model, which is "derived from the PTX memory model", puts the weak case plainly: "Operations without a scope are called weak", and weak operations "cannot be used to communicate through memory between threads" ([Tile IR memory model](https://docs.nvidia.com/cuda/tile-ir/sections/memory_model.html)). A 2024 LLVM change lowers volatile global accesses to `.mmio.relaxed.sys` on PTX 8.2+ and `.volatile` before ([LLVM PR 98022, 2024](https://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20240708/1402997.html)).
 
 ### Scopes
@@ -163,8 +165,8 @@ A fence by itself synchronizes with nothing. It upgrades the relaxed operations 
 
 The equivalences are from the Programming Guide ([C++ language extensions](https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html)); the PTX column follows the ABI's seq_cst fence mapping below. The PTX fence family ([CCCL PTX fence](https://nvidia.github.io/cccl/unstable/libcudacxx/ptx/instructions/fence.html)):
 
-- `fence.sc` and `fence.acq_rel` at `.cta`, `.gpu`, `.sys`: PTX 6.0, `sm_70`. `fence.sc` additionally takes part in a global "Fence-SC" order that restores sequential consistency between fences.
-- Lighter `fence.acquire` and `fence.release` (all four scopes): PTX 8.6, `sm_90`.
+- `fence.sc` and `fence.acq_rel` at `.cta`, `.gpu`, `.sys`: PTX 6.0, `sm_70`; at `.cluster`: PTX 7.8, `sm_90` ([CCCL PTX docs](https://nvidia.github.io/cccl/unstable/libcudacxx/ptx/instructions/fence.html)). `fence.sc` additionally takes part in a global "Fence-SC" order that restores sequential consistency between fences; that description follows the PTX ISA's section titles and the ISCA 2022 paper, since chapter 8's text could not be read for this note.
+- Lighter `fence.acquire` and `fence.release` (all four scopes): PTX 8.6, `sm_90` ([CCCL PTX docs](https://nvidia.github.io/cccl/unstable/libcudacxx/ptx/instructions/fence.html)).
 - `membar` is the older spelling, documented alongside `fence` in the PTX ISA's "membar / fence" section. On `sm_80`, `__threadfence_system()` compiles to `MEMBAR.SC.SYS` and `fence.acq_rel.sys` to `MEMBAR.ALL.SYS`. NVIDIA's Jim Dinan: "They're equivalent in the current implementation and should have the same overhead" ([NVIDIA forums, Jun 2025](https://forums.developer.nvidia.com/t/can-threadfence-system-in-function-nvshmemi-barrier-threadgroup-changed-to-fence-acq-rel-sys/337127)).
 
 ### Mapping C++ to PTX

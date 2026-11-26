@@ -9,6 +9,8 @@ tags:
   - compilers
 status: complete
 sources:
+  - https://docs.nvidia.com/nsight-compute/OccupancyCalculatorPythonInterface/index.html
+  - https://leimao.github.io/blog/CUDA-Occupancy-Calculation
   - https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/compute-capabilities.html
   - https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html
   - https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html
@@ -107,7 +109,7 @@ Registers are 32 bits wide. A `double`, a 64-bit pointer or a `long long` takes 
 
 ### How Registers Are Handed Out
 
-The SM allocates registers per **warp**, in units of 256 registers. That is the per-thread count rounded up to a multiple of 8 (since $256 / 32 = 8$), then multiplied by 32. NVIDIA documents this unit in Nsight Compute's occupancy-calculator data rather than in the Programming Guide text; [[Occupancy and Latency Hiding]] covers the sources and the full occupancy formula.
+The SM allocates registers per **warp**, in fixed-size units. NVIDIA's own docs name the parameter without giving its value: Nsight Compute's occupancy calculator exposes a "register allocation unit size" and "warp register allocation granularities" ([Occupancy Calculator Python Interface](https://docs.nvidia.com/nsight-compute/OccupancyCalculatorPythonInterface/index.html)). The value usually quoted is **256 registers per warp**, from the deprecated Excel occupancy calculator's table for compute capability 7.0 ([Lei Mao](https://leimao.github.io/blog/CUDA-Occupancy-Calculation)). That is the per-thread count rounded up to a multiple of 8 (since $256 / 32 = 8$), then multiplied by 32. No NVIDIA page read for this note confirms 256 for Hopper or Blackwell, so treat it as unconfirmed there. [[Occupancy and Latency Hiding]] covers the full occupancy formula.
 
 $$
 \text{regs per warp} = 32 \times 8\left\lceil \frac{r}{8} \right\rceil
@@ -277,7 +279,7 @@ $$
 \left\lfloor \frac{65{,}536}{32{,}768} \right\rfloor = 2 \text{ blocks}
 $$
 
-Two blocks are 16 warps of 64, **25% occupancy**. Now let one more live value push the kernel to **129 registers**. Rounded up to the allocation unit that is 136, so a warp needs $32 \times 136 = 4{,}352$ registers and a block $34{,}816$; $\lfloor 65{,}536 / 34{,}816 \rfloor = 1$ block, **12.5% occupancy**. One register halved the warps on the SM. Going the other way, `__launch_bounds__(256, 2)` tells ptxas to stay at 128 or below, spilling the 129th value if it must. Whether that spill is cheaper than losing a block is exactly the question to measure.
+Two blocks are 16 warps of 64, **25% occupancy**. Now let one more live value push the kernel to **129 registers**. Rounded up to the (assumed) 256-register unit that is 136, so a warp needs $32 \times 136 = 4{,}352$ registers and a block $34{,}816$; $\lfloor 65{,}536 / 34{,}816 \rfloor = 1$ block, **12.5% occupancy**. The result does not depend on the unit: even unrounded, two blocks would need $2 \times 256 \times 129 = 66{,}048$ registers, more than the SM has. One register halved the warps on the SM. Going the other way, `__launch_bounds__(256, 2)` tells ptxas to stay at 128 or below, spilling the 129th value if it must. Whether that spill is cheaper than losing a block is exactly the question to measure.
 
 The same arithmetic over the whole range, for 256-thread blocks on H100 (warp-slot limit: 8 blocks):
 
@@ -334,7 +336,7 @@ Open problems:
 
 - **ptxas is a black box.** Register allocation, rematerialisation and spill placement happen in a closed-source assembler, and its heuristics change between releases and targets. In March 2026 a user reported that nvcc 13.2 compiled the same `__launch_bounds__(1024, 1)` kernel to 64 registers and no spills for `sm_90` but to "480 bytes stack frame, 1368 bytes spill stores, 1488 bytes spill loads" for `sm_120`, about 8x slower on an RTX 5090 than on an RTX 3090; compiling to PTX and letting the newer driver JIT it was the workaround ([NVIDIA forums, Mar 2026](https://forums.developer.nvidia.com/t/nvcc-13-2-spilling-many-registers-for-cc-120/364169)). The only defence is checking `--resource-usage` output per target in CI ([[PTX and SASS]]; [[Register Allocation]]).
 - **No good cost model.** Whether a spill to L1 is cheaper than losing a block depends on the access pattern, cache hit rate and what else is in flight. The triage guide's advice is to cap, re-measure, and back off if spills grow.
-- **Granularity is under-documented.** The 256-register allocation unit is in profiler data and forum posts, not the Programming Guide ([[Occupancy and Latency Hiding]]).
+- **Granularity is under-documented.** Nsight Compute names a register allocation unit but its docs give no value; the 256-register figure comes from the deprecated Excel calculator (compute capability 7.0) and is unconfirmed for newer GPUs ([[Occupancy and Latency Hiding]]).
 - **Portability.** A kernel tuned to 128 registers on H100 may spill on a different compiler version or architecture, and `setmaxnreg` and TMEM code does not run on consumer GPUs or AMD.
 - **Register file size has not grown.** 64K registers per SM has been fixed for over a decade while tensor throughput has grown many times. Hardware answers so far are offload (TMEM) rather than a bigger file.
 

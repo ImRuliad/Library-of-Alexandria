@@ -15,6 +15,7 @@ sources:
   - https://github.com/mirage-project/mirage
   - https://news.ycombinator.com/item?id=44321672
   - https://cohere.com/blog/megakernels
+  - https://cursor.com/hi/blog/mixture-of-kittens
   - https://lmsys.org/blog/2026-11-05-muse-spark-open-ultrafast/
   - https://www.together.ai/blog/road-to-together-compiler
   - https://github.com/msaroufim/megakernels-vs-cuda-graphs
@@ -356,9 +357,10 @@ ForgeMegakernel reproduced the Hazy Llama-1B kernel at 74.6% bandwidth utilizati
 *As of November 2026, megakernels are a proven technique for low-batch decode, with compilers, open-source production engines and agent generators. They are also contested: careful use of CUDA Graphs and PDL gets most of the benefit, and at least one team has abandoned them.*
 
 - **Production.** Cohere's open-source MoE decode engine (Sep 2026) and Meta's per-layer GB300 kernels for Muse Spark Open (Nov 2026), whose post says SGLang is moving toward megakernels. Baidu's Ada-MK embeds a megakernel as a TensorRT-LLM plugin for decode (prefill stays on native operators) in a commercial advertising system, the first industrial deployment by its own account; on an L20 it reports up to 23.6% over TensorRT-LLM and up to 50.2% over vLLM at small batch ([Ada-MK](https://arxiv.org/html/2605.11581v1)).
+- **Training, too.** Cursor's open-source Mixture-of-Kittens (Aug 2026) fuses MoE dispatch, expert FFNs and combine into one deterministic kernel for GB300 NVL72 racks. Cursor reports up to 2.37x faster MXFP8 forward MoE layers than the fastest public baseline and 1.41x more tokens per second per GPU end to end on 512 GPUs ([Mixture-of-Kittens](https://cursor.com/hi/blog/mixture-of-kittens)).
 - **Compilers.** MPK (OSDI 2026) is the reference compiler. The other generators (ForgeMegakernel, AutoMegaKernel, megakernel-zoo) use coding agents writing CUDA, not a tile language; ForgeMegakernel's megakernels also run inside SGLang for serving, with 1.11x geomean speedup on GSM8K ([[GPU Kernel Compilers]]).
 - **Granularity is loosening.** Muse Spark Open uses one kernel per layer (97 per step), not one per model, and still gets a 2.1x speedup. "Megakernel" now means "few, long-lived kernels with on-GPU dependencies" more than "exactly one".
-- **NVIDIA's tools.** No NVIDIA library in this survey ships megakernels; NVIDIA's own answers to launch gaps are [[CUDA Graphs]] and PDL. NVIDIA researchers co-author MPK, and Blackwell's Cluster Launch Control gives persistent kernels a hardware tile scheduler ([[Persistent Kernels and Stream-K]]).
+- **NVIDIA's tools.** Unconfirmed: searches of NVIDIA docs, TensorRT-LLM coverage and news (Nov 2026) turned up no NVIDIA library that ships megakernels, though that is an absence, not a statement from NVIDIA; NVIDIA's own answers to launch gaps are [[CUDA Graphs]] and PDL. NVIDIA researchers co-author MPK, and Blackwell's Cluster Launch Control gives persistent kernels a hardware tile scheduler ([[Persistent Kernels and Stream-K]]).
 - **Blackwell.** Hazy Research's B200 pass ran at about half its theoretical limit, with activation traffic between SMs as the main cost; newer work (Muse Spark Open) leans on clusters, L2 prefetch and code-size control ([[Blackwell Architecture]]).
 
 ### The Counter-Argument - CUDA Graphs Plus PDL
@@ -419,6 +421,7 @@ Open problems:
 
 **Practitioner**
 - [Cohere's North Mini Code Megakernel Serving Engine](https://cohere.com/blog/megakernels): Tong, Zhu, Wang (Cohere), Sep 2026.
+- [Mixture-of-Kittens](https://cursor.com/hi/blog/mixture-of-kittens): Cursor, Aug 2026; MoE training megakernel for GB300 NVL72, with paper arXiv 2609.36070.
 - [Muse Spark Open, ultrafast decode on GB300](https://lmsys.org/blog/2026-11-05-muse-spark-open-ultrafast/): Pranjal Shankhdhar, LMSYS blog, Nov 2026.
 - [We Bought the Whole GPU, So We're Damn Well Going to Use the Whole GPU](https://hazyresearch.stanford.edu/blog/2025-09-28-tp-llama-main): Hazy Research, Sep 2025.
 - [The road to Together Compiler](https://www.together.ai/blog/road-to-together-compiler): Lim, Abhyankar, Arora (Together AI), Nov 2026.

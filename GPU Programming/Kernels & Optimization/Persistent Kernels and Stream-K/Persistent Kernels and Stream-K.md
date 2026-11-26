@@ -9,6 +9,9 @@ tags:
   - load-balancing
 status: complete
 sources:
+  - https://ppopp23.sigplan.org/details/PPoPP-2023-papers/36/POSTER-Stream-K-Work-centric-Parallel-Decomposition-for-Dense-Matrix-Matrix-Multipl
+  - https://arxiv.org/abs/2408.11417
+  - https://arxiv.org/abs/2407.00044
   - https://users.aalto.fi/~laines9/publications/aila2009hpg_paper.pdf
   - https://research.nvidia.com/publication/2009-08_understanding-efficiency-ray-traversal-gpus
   - https://klasses.cs.uchicago.edu/archive/2016/winter/32001-1/papers/AStudyofPersistentThreadsStyleGPUProgrammingforGPGPUWorkloads.pdf
@@ -71,7 +74,7 @@ updated: 2026-11-26
 - **The idea:** instead of one thread block per output tile (a grid sized to the problem), launch about one block per SM, or occupancy × SMs, and let each block fetch tile after tile until the work runs out. The hardware block scheduler is replaced by a software **tile scheduler**.
 - **Why it exists:** it pays the per-block setup (barrier init, descriptor prefetch, pipeline fill) once instead of once per tile, lets the epilogue of one tile overlap the mainloop of the next, and lets the kernel choose an L2-friendly tile order. It also makes the **tail** of the grid something the kernel can manage.
 - **Wave quantization:** with 140 tiles on a 132-SM H100 SXM, a one-tile-per-block GEMM runs two waves, and the second wave keeps only 8 of 132 SMs (about 6%) busy. Overall efficiency is $140/264 = 53\%$.
-- **Decompositions:** **data-parallel** (one block per tile), **Split-K** (several blocks share a tile, split along K, then reduce), **Stream-K** (Osama, Merrill, Cecka, Garland, Owens, PPoPP 2023): every block gets an equal share of all MAC-loop iterations, and tiles that straddle two blocks are "fixed up" by adding partial sums. A **hybrid** runs most tiles data-parallel and uses Stream-K only for the tail.
+- **Decompositions:** **data-parallel** (one block per tile), **Split-K** (several blocks share a tile, split along K, then reduce), **Stream-K** (Osama, Merrill, Cecka, Garland, Owens; arXiv preprint and PPoPP 2023 poster): every block gets an equal share of all MAC-loop iterations, and tiles that straddle two blocks are "fixed up" by adding partial sums. A **hybrid** runs most tiles data-parallel and uses Stream-K only for the tail.
 - **History:** "persistent threads" come from Aila and Laine's ray tracer (HPG 2009) and were studied by Gupta, Stuart and Owens (InPar 2012).
 - **Where it is now (Nov 2026):** every fast Hopper and Blackwell GEMM in CUTLASS 4.x is persistent, with static, Stream-K or grouped schedulers. Blackwell adds **Cluster Launch Control (CLC)**, hardware work stealing that makes persistent scheduling dynamic. Triton has persistent matmul tutorials and CLC support, and FlashAttention-3 uses a dynamic persistent scheduler for causal attention. [[Megakernels]] apply the same loop to a whole model.
 
@@ -157,7 +160,7 @@ timeline
     title Persistent kernels and Stream-K
     2009 : Aila and Laine, persistent threads for ray traversal (HPG)
     2012 : Gupta, Stuart, Owens, study of persistent threads (InPar)
-    2023 : CUTLASS 3.0 warp-specialized persistent Hopper GEMMs (Jan) : Stream-K at PPoPP (Feb)
+    2023 : CUTLASS 3.0 warp-specialized persistent Hopper GEMMs (Jan) : Stream-K preprint (Jan) and PPoPP poster (Feb)
     2024 : FlashAttention-3 dynamic persistent scheduler : Colfax persistent and Stream-K tutorial
     2025 : Blackwell Cluster Launch Control (CC 10.0) : CUTLASS 4.0 CuTe DSL persistent GEMM : Triton persistent grouped GEMM for MoE
     2026 : CUTLASS 4.8 CLC dynamic persistent GEMM in CuTe DSL (Sep) : Triton persistent CLC
@@ -165,7 +168,7 @@ timeline
 
 - **2009, persistent threads.** Timo Aila and Samuli Laine (NVIDIA Research) found that the hardware work distributor was the main gap between simulated and measured ray-tracing speed on a GTX 285, because "long-running rays or warps keep distribution slots hostage". Their fix: launch only enough threads to fill the GPU once, and have warps pull batches of rays from a global pool with an atomic counter "until the pool is empty". A small per-warp local pool "reduces pressure from the atomic counter". Persistent packet traversal became 1.5–2.2× faster and within 10–20% of the simulated upper bound ([Aila & Laine, HPG 2009](https://users.aalto.fi/~laines9/publications/aila2009hpg_paper.pdf); [NVIDIA Research](https://research.nvidia.com/publication/2009-08_understanding-efficiency-ray-traversal-gpus)).
 - **2012, the study.** Gupta, Stuart and Owens formalized the style and measured when it helps (see [[#Four Reasons to Persist|above]]). They noted it "lacks native hardware and programming API support", which stayed true for a decade.
-- **2023, Hopper and Stream-K.** CUTLASS 3.0 introduced warp-specialized Hopper kernels, whose cooperative and ping-pong schedules run persistently ([[CUTLASS and CuTe]], [[Warp Specialization]]). In parallel, Muhammad Osama (UC Davis), Duane Merrill, Cris Cecka, Michael Garland (NVIDIA) and John Owens (UC Davis) published **Stream-K** at PPoPP 2023, which splits work by MAC-loop iterations ([Stream-K](https://ar5iv.labs.arxiv.org/html/2301.03598)).
+- **2023, Hopper and Stream-K.** CUTLASS 3.0 introduced warp-specialized Hopper kernels, whose cooperative and ping-pong schedules run persistently ([[CUTLASS and CuTe]], [[Warp Specialization]]). In parallel, Muhammad Osama (UC Davis), Duane Merrill, Cris Cecka, Michael Garland (NVIDIA) and John Owens (UC Davis) released **Stream-K** as an arXiv preprint on 9 January 2023 and presented it as a poster at PPoPP 2023 in Montreal on 26 February. It splits work by MAC-loop iterations ([Stream-K](https://ar5iv.labs.arxiv.org/html/2301.03598), [PPoPP 2023 program](https://ppopp23.sigplan.org/details/PPoPP-2023-papers/36/POSTER-Stream-K-Work-centric-Parallel-Decomposition-for-Dense-Matrix-Matrix-Multipl)).
 - **2024.** FlashAttention-3 shipped static and dynamic persistent tile schedulers for attention ([FA3 scheduler source](https://huggingface.co/kernels-community/flash-attn3/blob/f935a7486c4a0b4c146da2d6c7a1003948d5c370/flash-attn/tile_scheduler.hpp)). Colfax published the clearest public walkthrough of CUTLASS's persistent and Stream-K schedulers.
 - **2025.** Blackwell (compute capability 10.0) introduced **Cluster Launch Control**, letting a running block cancel a not-yet-launched one and take its work ([CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/cluster-launch-control.html)). CUTLASS 4.0 added a persistent dense GEMM with static scheduling to the CuTe DSL ([changelog](https://docs.nvidia.com/cutlass/4.8.0/CHANGELOG.html)). PyTorch published a persistent, cache-aware Triton grouped GEMM for MoE ([PyTorch, Aug 2025](https://pytorch.org/blog/accelerating-moes-with-a-triton-persistent-cache-aware-grouped-gemm-kernel/)).
 - **2026.** CUTLASS 4.8 (Sep 17, 2026) added a "CLC scheduler / dynamic persistent GEMM" to the CuTe DSL; Triton gained compiler-generated CLC persistent loops ([[Triton]]).
@@ -228,7 +231,7 @@ Triton calls the same idea grouped ordering (`GROUP_SIZE_M`), shown in [[Tiled M
 
 ### Data-Parallel, Split-K and Stream-K
 
-The Stream-K paper compares three ways to cut a GEMM into work for $g$ blocks ([Osama et al., PPoPP 2023](https://ar5iv.labs.arxiv.org/html/2301.03598)):
+The Stream-K paper compares three ways to cut a GEMM into work for $g$ blocks ([Osama et al., 2023](https://ar5iv.labs.arxiv.org/html/2301.03598)):
 
 | Decomposition | Unit of work | Who writes a tile | Tail behavior |
 |---|---|---|---|
@@ -367,7 +370,7 @@ In NVIDIA's own summary table CLC is the only option that is good at all three o
 - **Triton.** Persistent matmul and attention are standard tutorials; warp specialization is on by default for persistent matmul since Triton 3.5, and 3.9 (Oct 2026) added persistent CLC ([[Triton]]).
 - **Attention and MoE.** FlashAttention-3 uses static and dynamic persistent schedulers, the dynamic one for load balance on causal and local attention; persistent grouped GEMMs are the standard MoE expert kernel ([[FlashAttention]], [[Mixture of Experts]]).
 - **Whole models.** [[Megakernels]] push persistence to a full forward pass in one launch.
-- **Stream-K research continues.** Follow-ups explore tuning Stream-K's parameters ([Stream-K Optimization and Exploration](https://arxiv.org/pdf/2407.00044)) and selecting between Stream-K variants with Bloom filters ([Stream-K++](https://arxiv.org/pdf/2408.11417)).
+- **Stream-K research continues.** Stream-K++ (Sadasivan et al., with Osama among the authors) grows the scheduling policies from three to seven and uses Bloom filters to rule out unsuitable ones quickly, on MI250X ([Stream-K++](https://arxiv.org/abs/2408.11417), Aug 2024, revised Nov 2025). A smaller 2024 study (Rackley, Gonzalez, Morrison) found that zeroing padding gave a small speedup, while an unresolved block-mapping bug limited further tuning ([Stream-K Optimization and Exploration](https://arxiv.org/abs/2407.00044)).
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -397,7 +400,7 @@ Open problems and pitfalls:
 *Read Colfax's tutorial first for the CUTLASS view, then the Stream-K paper for the decompositions, then the CUDA Programming Guide's CLC chapter for where scheduling is going on Blackwell.*
 
 **Primary**
-- [Stream-K: Work-centric Parallel Decomposition for Dense Matrix-Matrix Multiplication on the GPU](https://ar5iv.labs.arxiv.org/html/2301.03598): Osama, Merrill, Cecka, Garland, Owens, PPoPP 2023 ([arXiv](https://arxiv.org/abs/2301.03598)).
+- [Stream-K: Work-centric Parallel Decomposition for Dense Matrix-Matrix Multiplication on the GPU](https://ar5iv.labs.arxiv.org/html/2301.03598): Osama, Merrill, Cecka, Garland, Owens; arXiv preprint, Jan 2023 ([arXiv](https://arxiv.org/abs/2301.03598)), shown as a [poster at PPoPP 2023](https://ppopp23.sigplan.org/details/PPoPP-2023-papers/36/POSTER-Stream-K-Work-centric-Parallel-Decomposition-for-Dense-Matrix-Matrix-Multipl).
 - [Work Stealing with Cluster Launch Control](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/cluster-launch-control.html): CUDA Programming Guide, NVIDIA.
 - [Blackwell Cluster Launch Control](https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/blackwell_cluster_launch_control.html) and [Grouped scheduler](https://docs.nvidia.com/cutlass/4.8.0/media/docs/cpp/grouped_scheduler.html): CUTLASS docs, NVIDIA.
 - [CUTLASS changelog](https://docs.nvidia.com/cutlass/4.8.0/CHANGELOG.html): NVIDIA, through 4.8.0 (Sep 2026).
