@@ -215,7 +215,7 @@ timeline
 
 *Move a computation to the preheader if its operands don't change in the loop and moving it can't change behavior.*
 
-An instruction can be hoisted if all its operands are defined outside the loop (or are themselves hoisted), and it is either safe to execute speculatively (no traps, no side effects) or guaranteed to execute whenever the loop is entered. A load also needs alias analysis to show no store in the loop can write the same address. LLVM's LICM "attempt[s] to remove as much code from the body of a loop as possible" ([LLVM Passes](https://llvm.org/docs/Passes.html)); it also promotes loop-invariant memory locations to registers and sinks code into exit blocks, and runs with MemorySSA for its memory queries ([PassBuilderPipelines.cpp](https://github.com/llvm/llvm-project/blob/main/llvm/lib/Passes/PassBuilderPipelines.cpp)).
+An instruction can be hoisted if all its operands are defined outside the loop (or are themselves hoisted), and it is either safe to execute speculatively (no traps, no side effects) or guaranteed to execute whenever the loop is entered. A load also needs [[Pointer and Alias Analysis|alias analysis]] to show no store in the loop can write the same address. LLVM's LICM "attempt[s] to remove as much code from the body of a loop as possible" ([LLVM Passes](https://llvm.org/docs/Passes.html)); it also promotes loop-invariant memory locations to registers and sinks code into exit blocks, and runs with MemorySSA for its memory queries ([PassBuilderPipelines.cpp](https://github.com/llvm/llvm-project/blob/main/llvm/lib/Passes/PassBuilderPipelines.cpp)).
 
 **Before** (rotated loop, `mul` recomputed every iteration):
 
@@ -345,7 +345,7 @@ Tiling is legal when the tiled loops are **fully permutable**, which holds when 
 
 *Overlap iterations so a new one starts every II cycles, before the previous one finishes, like a hardware pipeline built in software.*
 
-**Modulo scheduling** picks an *initiation interval* II and schedules one iteration so that the same schedule, repeated every II cycles, never oversubscribes a functional unit ([Rau, MICRO-27](https://american.cs.ucdavis.edu/Micro27/html/abst7.html)). The lower bound is
+**[[Instruction Scheduling|Modulo scheduling]]** picks an *initiation interval* II and schedules one iteration so that the same schedule, repeated every II cycles, never oversubscribes a functional unit ([Rau, MICRO-27](https://american.cs.ucdavis.edu/Micro27/html/abst7.html)). The lower bound is
 
 $$
 \text{II} \ge \text{MII} = \max\!\Big(\underbrace{\max_{r}\Big\lceil \tfrac{\text{uses}_r}{\text{units}_r} \Big\rceil}_{\text{ResMII}},\ \underbrace{\max_{\text{cycles } c}\Big\lceil \tfrac{\text{latency}(c)}{\text{distance}(c)} \Big\rceil}_{\text{RecMII}}\Big)
@@ -489,3 +489,5 @@ The pattern: keep the compiler's exact legality check (polyhedral dependence ana
 - [[Verified Compilers]] — Proving loop transformations correct.
 - [[FlashAttention]] — A hand-tiled, fused loop nest for attention.
 - [[AI Accelerators]] — Hardware whose memory hierarchy tiling targets.
+- [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
+- [[Instruction Scheduling]] — Ordering instructions for pipelines, including modulo scheduling.

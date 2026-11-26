@@ -399,7 +399,7 @@ Lower down the types get simpler but don't vanish: [[LLVM]] IR and [[MLIR]] valu
 
 ### Python Checkers Written in Rust
 
-*Two new checkers built around the language server, where incremental re-checking speed matters more than batch speed.*
+*Two new checkers built around the [[Language Servers and IDE Tooling|language server]], where incremental re-checking speed matters more than batch speed.*
 
 | | ty (Astral) | Pyrefly (Meta) |
 |---|---|---|
@@ -477,3 +477,4 @@ Open problems:
 - [[ML Compilers]] — Shape and dtype inference, related to Pyrefly's tensor-shape checking.
 - [[Formal Methods in Practice]] — Refinement types and SMT-backed verification.
 - [[Dependent and Refinement Types]] — Planned: Lean, Idris, Agda and LiquidHaskell in depth.
+- [[Language Servers and IDE Tooling]] — Incremental, error-tolerant front ends behind editors.

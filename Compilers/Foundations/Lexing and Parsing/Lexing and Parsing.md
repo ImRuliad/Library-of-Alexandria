@@ -484,7 +484,7 @@ The old lexer/parser split reappears exactly: regular token-level structure is p
 ### Research in 2025 and 2026
 
 - **Verified parsing by typing.** Dependent Lambek Calculus (PLDI 2025) writes grammars as linear types and parsers as linear terms, so a parser can only return valid parse trees; prototyped in Agda for regular and context-free grammars ([Schaefer et al.](https://pldi25.sigplan.org/details/pldi-2025-papers/32/Intrinsic-Verification-of-Parsers-and-Formal-Grammar-Theory-in-Dependent-Lambek-Calcu)). Relevant to [[Verified Compilers]].
-- **Grammars from ad hoc code.** PANINI (OOPSLA 2025) infers regular input grammars from unannotated string-munging parser code using refinement types and abstract interpretation, evaluated on 204 Python ad hoc parsers ([Schröder and Cito](https://2025.splashcon.org/details/OOPSLA/18/Static-Inference-of-Regular-Grammars-for-Ad-Hoc-Parsers)).
+- **Grammars from ad hoc code.** PANINI (OOPSLA 2025) infers regular input grammars from unannotated string-munging parser code using [[Dependent and Refinement Types|refinement type]]s and [[Abstract Interpretation|abstract interpretation]], evaluated on 204 Python ad hoc parsers ([Schröder and Cito](https://2025.splashcon.org/details/OOPSLA/18/Static-Inference-of-Regular-Grammars-for-Ad-Hoc-Parsers)).
 - **Pratt, again.** "A Simple Recipe for Writing Decent Recursive Descent Parsers" (ECOOP 2026) parses all of Caml Light with Pratt-style binding powers, derives default binding powers from an operator's first and last characters, and generates railroad diagrams and precedence tables from the parser's rules ([Cheng and Parreaux](https://drops.dagstuhl.de/storage/00lipics/lipics-vol372-ecoop2026/LIPIcs.ECOOP.2026.30/LIPIcs.ECOOP.2026.30.pdf)).
 - **Not found.** My searches turned up no parser rewrite in GCC 15 or 16 or in recent LLVM releases; the visible front-end change is language-level (C23 by default in GCC 15) ([GCC 15 porting](https://gcc.gnu.org/gcc-15/porting_to.html)). On the Swift forums in June 2026, a question about removing the C++ parser in favor of swift-syntax got no timeline or confirmed plan ([Swift forums, 2026](https://forums.swift.org/t/dropping-the-requirement-for-c-only-bootstrapping/87739/)).
 
@@ -551,3 +551,5 @@ The old lexer/parser split reappears exactly: regular token-level structure is p
 - [[Formal Methods in Practice]] — Proving grammar and parser properties.
 - [[Language Servers and IDE Tooling]] — Planned: LSP, rust-analyzer and how editors use incremental trees.
 - [[Grammar-Constrained Decoding]] — Planned: Earley and pushdown parsing for structured LLM output.
+- [[Abstract Interpretation]] — The general theory of sound static analysis over abstract domains.
+- [[Dependent and Refinement Types]] — Types that depend on values, and SMT-checked refinements.

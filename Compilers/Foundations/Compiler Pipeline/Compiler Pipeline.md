@@ -606,3 +606,4 @@ Open problems:
 - [[Compiler Testing and Fuzzing]] — Catching miscompiles across many stages.
 - [[AI Accelerators]] — Targets that drive the newest back ends.
 - [[The Boot Process]] — What loads and runs the linked executable.
+- [[Profile-Guided Optimization]] — Using run-time profiles to guide inlining, layout and splitting.

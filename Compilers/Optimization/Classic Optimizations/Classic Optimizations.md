@@ -411,7 +411,7 @@ int ugt(unsigned x) { return x + 1 > x; }
   ret i32 %conv
 ```
 
-Clang lowers C signed `+` to `add nsw`. Lee et al. show why the flag must produce *poison* rather than undef: with poison, `a + b > a` can become `b > 0`; with undef the rewrite is illegal ([PLDI 2017](https://www-old.cs.utah.edu/~regehr/papers/undef-pldi17.pdf)). The same reasoning lets the compiler widen a 32-bit `nsw` induction variable to 64 bits and drop a sign extension per iteration, worth up to 39% on one microbenchmark in their measurements. Lattner's examples are the classic list: signed overflow lets `for (i = 0; i <= N; ++i)` be assumed to run N+1 times; type-based alias analysis lets a float loop become `memset`; null dereference being UB lets side effects move freely ([LLVM blog, 2011](https://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html)).
+Clang lowers C signed `+` to `add nsw`. Lee et al. show why the flag must produce *poison* rather than undef: with poison, `a + b > a` can become `b > 0`; with undef the rewrite is illegal ([PLDI 2017](https://www-old.cs.utah.edu/~regehr/papers/undef-pldi17.pdf)). The same reasoning lets the compiler widen a 32-bit `nsw` induction variable to 64 bits and drop a sign extension per iteration, worth up to 39% on one microbenchmark in their measurements. Lattner's examples are the classic list: signed overflow lets `for (i = 0; i <= N; ++i)` be assumed to run N+1 times; type-based [[Pointer and Alias Analysis|alias analysis]] lets a float loop become `memset`; null dereference being UB lets side effects move freely ([LLVM blog, 2011](https://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html)).
 
 The paper's other finding is that the semantics must be *consistent across passes*. GVN wants "branch on poison is UB"; loop unswitching wanted "branch on poison is a nondeterministic choice". Both can't hold. The fix made branching on poison UB and had unswitching `freeze` the hoisted condition, at a measured cost within ±1.6% on SPEC CPU 2006 run time ([Lee et al.](https://www-old.cs.utah.edu/~regehr/papers/undef-pldi17.pdf); [Regehr's summary](https://blog.regehr.org/?p=1496)).
 
@@ -493,3 +493,4 @@ Open problems:
 - [[Verified Compilers]] — Proving transformations correct, from CompCert to Alive2.
 - [[Compiler Testing and Fuzzing]] — Finding miscompilations and missed optimizations.
 - [[Compiler, Assembler, Linker, and Loader]] — The owner's note on the C build stages around the optimizer.
+- [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.

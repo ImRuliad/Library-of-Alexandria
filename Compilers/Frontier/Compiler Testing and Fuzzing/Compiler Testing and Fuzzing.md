@@ -283,7 +283,7 @@ Orion's procedure ([Le, Afshari and Su, PLDI 2014](https://www.cs.ucdavis.edu/~s
 2. **Prune.** Randomly delete unexecuted statements (and their subtrees). Deleting dead code cannot change output on those inputs, and cannot add UB if the seed had none.
 3. **Test.** Compile each variant under each configuration; any output that differs from the reference is a miscompilation.
 
-Why does deleting *dead* code find bugs in *live* code? Because the optimizer does not know it is dead. Removing a statement changes what the compiler sees: which variables escape, how big a function is, whether inlining fires, what alias analysis concludes. The live code then flows through a different optimization path.
+Why does deleting *dead* code find bugs in *live* code? Because the optimizer does not know it is dead. Removing a statement changes what the compiler sees: which variables escape, how big a function is, whether inlining fires, what [[Pointer and Alias Analysis|alias analysis]] concludes. The live code then flows through a different optimization path.
 
 The follow-ups widen the mutation space:
 
@@ -543,3 +543,4 @@ Open problems as of late 2026:
 - [[Superoptimization]] — Finding missed optimizations, the flip side of finding wrong ones.
 - [[Deterministic Simulation Testing]] — The same generate-check-reduce loop applied to distributed systems.
 - [[MicroVMs and Sandboxing]] — Why miscompilations in Wasm compilers are security bugs.
+- [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.

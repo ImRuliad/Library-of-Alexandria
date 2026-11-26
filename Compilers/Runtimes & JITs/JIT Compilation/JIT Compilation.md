@@ -292,7 +292,7 @@ Kinds of speculation in production engines:
 
 *Deopt rebuilds the interpreter's view of a frame from optimized machine state; OSR moves a running loop between tiers without waiting for the function to return.*
 
-At every point where optimized code might exit (each guard), the compiler records a *frame state* (V8), *OSR exit* (JSC) or *scope descriptor* (HotSpot): which bytecode offset to resume at, and where each interpreter-visible variable now lives (a register, a stack slot, a constant, or "this object was never allocated; here are its fields", after escape analysis). Deopt runs that recipe backwards.
+At every point where optimized code might exit (each guard), the compiler records a *frame state* (V8), *OSR exit* (JSC) or *scope descriptor* (HotSpot): which bytecode offset to resume at, and where each interpreter-visible variable now lives (a register, a stack slot, a constant, or "this object was never allocated; here are its fields", after [[Escape Analysis|escape analysis]]). Deopt runs that recipe backwards.
 
 ```mermaid
 sequenceDiagram
@@ -469,3 +469,4 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[Verified Compilers]] — Formal models of speculation and deoptimization.
 - [[Profile-Guided Optimization]] — Planned: offline PGO, AutoFDO and BOLT versus a JIT's online profiles.
 - [[Sea of Nodes]] — Planned: the graph IR of HotSpot C2, Graal and (until 2025) TurboFan.
+- [[Escape Analysis]] — Removing heap allocations that never escape a method.

@@ -326,7 +326,7 @@ stateDiagram-v2
     TurboFan --> TurboFan : re-optimize with new feedback
 ```
 
-V8 compiles every function with Liftoff as the bytes stream in, counts execution with a budget per function, and recompiles hot functions with TurboFan in the background ([V8 compilation pipeline](https://v8.dev/docs/wasm-compilation-pipeline)). Until 2025 Wasm needed no deoptimization, because static types made speculation unnecessary for MVP code. Wasm GC and `call_ref` changed that: indirect calls through function references benefit from feedback-driven inlining, so V8 now collects call-target feedback in Liftoff and can deopt back ([V8, 2025](https://v8.dev/blog/wasm-speculative-optimizations)). V8 also moved its Wasm pipeline off the sea-of-nodes graph onto the CFG-based Turboshaft IR ([V8](https://v8.dev/blog/leaving-the-sea-of-nodes)). This is [[JIT Compilation]] with far less speculation than for JavaScript.
+V8 compiles every function with Liftoff as the bytes stream in, counts execution with a budget per function, and recompiles hot functions with TurboFan in the background ([V8 compilation pipeline](https://v8.dev/docs/wasm-compilation-pipeline)). Until 2025 Wasm needed no deoptimization, because static types made speculation unnecessary for MVP code. Wasm GC and `call_ref` changed that: indirect calls through function references benefit from feedback-driven inlining, so V8 now collects call-target feedback in Liftoff and can deopt back ([V8, 2025](https://v8.dev/blog/wasm-speculative-optimizations)). V8 also moved its Wasm pipeline off the [[Sea of Nodes|sea-of-nodes]] graph onto the CFG-based Turboshaft IR ([V8](https://v8.dev/blog/leaving-the-sea-of-nodes)). This is [[JIT Compilation]] with far less speculation than for JavaScript.
 
 AOT is the other end of the spectrum: Wasmtime can precompile modules with Cranelift (`wasmtime compile`) and load the native code later; WAMR's `wamrc` does the same with LLVM. Edge platforms favor AOT for predictable cold starts.
 
@@ -491,3 +491,4 @@ For a compiler, the component model adds a new linking layer above [[Linking and
 - [[Compiler Testing and Fuzzing]] — How engines hunt sandbox-escaping miscompiles.
 - [[Compiler, Assembler, Linker, and Loader]] — The native C build stages that wasm-ld and runtimes mirror.
 - [[Software Fault Isolation]] — Planned: NaCl, Wasm and hardware-assisted sandboxing compared.
+- [[Sea of Nodes]] — Click's graph IR used by HotSpot C2 and Graal.

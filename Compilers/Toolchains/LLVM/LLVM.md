@@ -181,7 +181,7 @@ A JIT like Julia's, a GPU compiler like Triton's, or a language like Rust links 
 - **Intrinsics.** Functions named `llvm.*` that the optimizer and back ends understand: `llvm.memcpy`, `llvm.smax`, `llvm.fshl`, `llvm.vector.reduce.add`, `llvm.lifetime.start`, target ones like `llvm.nvvm.*` and `llvm.amdgcn.*`. New operations usually start as intrinsics rather than instructions.
 - **Attributes.** Facts on functions, parameters and return values: `nounwind`, `noundef`, `nonnull`, `readonly`, `noalias`, `captures(none)`. Many optimizations are only legal because of them.
 - **Poison, undef and `freeze`.** An `add nsw` that overflows does not trap; it yields *poison*, which taints everything computed from it and becomes UB only at certain uses (a branch condition, a store address). Lee et al. showed LLVM's older `undef`/poison rules let GVN and loop unswitching contradict each other and proposed `freeze`, which turns poison into one arbitrary but fixed value; it is now an instruction and the long-term plan is to remove `undef` ([Lee et al., PLDI 2017](https://www-old.cs.utah.edu/~regehr/papers/undef-pldi17.pdf)). Worked through in [[Classic Optimizations]].
-- **Metadata.** Side information that must be safe to drop: debug info (`!dbg`), type-based alias analysis (`!tbaa`), loop hints (`!llvm.loop`), profile data (`!prof`). Dropping metadata may lose optimization or debug info but never changes meaning.
+- **Metadata.** Side information that must be safe to drop: debug info (`!dbg`), type-based [[Pointer and Alias Analysis|alias analysis]] (`!tbaa`), loop hints (`!llvm.loop`), profile data (`!prof`). Dropping metadata may lose optimization or debug info but never changes meaning.
 
 ### Opaque Pointers
 
@@ -497,3 +497,4 @@ The second round of area-team elections (members serve one-year terms) closed on
 - [[JIT Compilation]] — ORC, Julia and fast back ends that compete with LLVM's `-O0`.
 - [[GPU Kernel Compilers]] — Triton and other stacks that end in NVPTX or AMDGPU.
 - [[Compiler, Assembler, Linker, and Loader]] — The owner's note on the C build stages that Clang, the MC layer and LLD implement.
+- [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.

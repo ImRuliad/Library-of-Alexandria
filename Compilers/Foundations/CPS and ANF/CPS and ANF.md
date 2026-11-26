@@ -420,7 +420,7 @@ Contification is "a compiler optimization that turns a function that always retu
 - **Join points for call-by-push-value (OOPSLA 2026).** Chan, Gudin, Levy and Weirich define a *commuting conversion normal form* for CBPV, a single-pass translation into it, and adapt Maurer et al.'s explicit join points to avoid duplication; mechanized in Lean 4, a Distinguished Paper ([SPLASH 2026](https://2026.splashcon.org/details/oopsla-2026/11/Commuting-Conversions-and-Join-Points-for-Call-By-Push-Value)).
 - **"A Low-Level Look at A-Normal Form" (OOPSLA 2024).** Bowman argues "normalization of commuting conversions is hard", that monadic form should generally be the working IR, and that "A-normalization should only be done in a low-level imperative intermediate form", where it is local and needs no join points ([Bowman](https://williamjbowman.com/resources/wjb2024-anf-is-dead.pdf)).
 - **SSA without dominance for higher-order programs (2026).** Leißa and Griebler note that "Dominance is well-defined only for first-order control-flow graphs" and propose "an alternative foundation based on free variables": a nesting relation that implies dominance, implemented in MimIR. Their benchmarks scale log-linearly, though LLVM's dominance analysis is several times faster ([Leißa and Griebler](https://arxiv.org/pdf/2604.09961)).
-- **MimIR (2024).** Successor of the CPS graph IR Thorin, with direct style, dependent types and plugins, where "In CPS the φ-function becomes the parameter phi of continuation N" ([Leißa et al.](https://arxiv.org/pdf/2411.07443)).
+- **MimIR (2024).** Successor of the CPS graph IR Thorin, with direct style, [[Dependent and Refinement Types|dependent type]]s and plugins, where "In CPS the φ-function becomes the parameter phi of continuation N" ([Leißa et al.](https://arxiv.org/pdf/2411.07443)).
 - **Background still being built on.** Cong et al.'s λ½⊥ with a control operator `C` that exposes chosen continuations as second-class values, erased by a selective CPS translation ([ICFP 2019](https://www.cs.purdue.edu/~rompf/papers/cong-icfp19.pdf)); Flambda 2's design series from OCamlPro ([2024](https://ocamlpro.com/blog/2024_03_19_the_flambda2_snippets_1)).
 
 ## ***Trade-offs & Open Problems***
@@ -525,3 +525,4 @@ Open problems:
 - [[Garbage Collection]] — Heap-allocated continuation closures are the main runtime cost of naive CPS, and why native OCaml avoids it.
 - [[Compiler Pipeline]] — Where CPS or ANF conversion happens between the front end and closure conversion.
 - [[Sea of Nodes]] — Planned: Thorin and MimIR are higher-order CPS IRs in sea-of-nodes form.
+- [[Dependent and Refinement Types]] — Types that depend on values, and SMT-checked refinements.

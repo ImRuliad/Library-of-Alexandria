@@ -345,7 +345,7 @@ Cranelift proposed an e-graph mid-end in 2022 ([Bytecode Alliance RFC #27](https
 - **Acyclic by construction.** Nodes never change after creation; an e-class is a binary tree of append-only "union" nodes, so there are no parent pointers and no rebuild step. Rules fire eagerly as each node is created instead of saturating.
 - **Extraction.** A bottom-up dynamic program that ignores sharing.
 - **Numbers.** Average e-class size after rewriting is **1.13 e-nodes**. The aegraph pipeline gives about **2%** faster code than the classical pipeline (which repeating the classical passes didn't match) for about **7-8%** more compile time. Keeping multiple representations rather than picking one eagerly is worth only about **0.1%** run time; across about 4 million value nodes, eager choice picked a worse option twice.
-- **Verdict.** The sea-of-nodes-with-CFG design works, but the multi-representation part "may not (yet?) be pulling its weight", likely because Wasm input is already optimized and the rules omit associativity and commutativity. Planned next: sharing-aware extraction, rewriting the CFG skeleton itself, and folding backend lowering rules into the aegraph.
+- **Verdict.** The [[Sea of Nodes|sea-of-nodes]]-with-CFG design works, but the multi-representation part "may not (yet?) be pulling its weight", likely because Wasm input is already optimized and the rules omit associativity and commutativity. Planned next: sharing-aware extraction, rewriting the CFG skeleton itself, and folding backend lowering rules into the aegraph.
 
 ### Tools and Releases
 
@@ -381,7 +381,7 @@ Cranelift proposed an e-graph mid-end in 2022 ([Bytecode Alliance RFC #27](https
 *The EGRAPHS workshop at PLDI is where the field meets; its 2025 and 2026 programs show the agenda.*
 
 - **EGRAPHS 2025** (Seoul, 17 June 2025): 12 talks, including the MLIR eqsat dialect, destructive rewrites, incremental equality saturation, Oatlog, LLM- and ML-guided saturation, e-graphs modulo theories, and applications from FHE circuits to molecular dynamics ([program](https://pldi25.sigplan.org/program/program-egraphs-2025)).
-- **EGRAPHS 2026** (Boulder, 15 June 2026): 15 talks, including CERES (memory scaling), AC-aware saturation, Knuth-Bendix completion of rule sets, answer-set programming for extraction, relational e-matching in an SMT solver, predicate e-graphs, joint instruction scheduling and rewriting, and "Stochastic Search vs. EqSat" ([workshop page](https://pldi26.sigplan.org/home/egraphs-2026)).
+- **EGRAPHS 2026** (Boulder, 15 June 2026): 15 talks, including CERES (memory scaling), AC-aware saturation, Knuth-Bendix completion of rule sets, answer-set programming for extraction, relational e-matching in an SMT solver, predicate e-graphs, joint [[Instruction Scheduling|instruction scheduling]] and rewriting, and "Stochastic Search vs. EqSat" ([workshop page](https://pldi26.sigplan.org/home/egraphs-2026)).
 - **Optimism in Equality Saturation** (PLDI 2026): an optimistic e-class analysis for loops in SSA form, sound on well-formed cycles, that alternates with saturation and fully optimizes examples that GCC, Clang and pessimistic analyses can't; typically about three fixpoint iterations ([Arbore, Cheung & Willsey, 2026](https://arxiv.org/pdf/2511.20782)).
 - **AC in equality saturation** (Saarland, 2026): multiset e-nodes plus AC congruence closure; preliminary, still exponential in the worst case ([Rosin et al.](https://arxiv.org/pdf/2610.01198)).
 
@@ -461,3 +461,5 @@ Open problems as of late 2026:
 - [[Compiler Testing and Fuzzing]] — Finding unsound rules.
 - [[Formal Methods in Practice]] — Congruence closure in SMT solvers and proof assistants.
 - [[AI Accelerators]] — Targets for saturation-based instruction selection.
+- [[Sea of Nodes]] — Click's graph IR used by HotSpot C2 and Graal.
+- [[Instruction Scheduling]] — Ordering instructions for pipelines, including modulo scheduling.
