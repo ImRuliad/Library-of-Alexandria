@@ -527,3 +527,4 @@ Open problems as of late 2026:
 - [[Superoptimization]] — SMT-checked search for equivalent code, the same solver machinery as Alive2.
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
+- [[Proof Assistant Kernels]] — The trusted checkers under every verified compiler, and Candle, a kernel verified via CakeML.

@@ -569,3 +569,4 @@ Open problems:
 - [[ML Compilers]] — Tensor-level passes that mlir-tv validates.
 - [[Microkernels and seL4]] — Binary-level validation of a verified kernel.
 - [[Pointer and Alias Analysis]] — The optimizations Alive2's memory model has to justify.
+- [[Proof Assistant Kernels]] — Independent re-checking of proofs, the same per-run idea applied to proof assistants.

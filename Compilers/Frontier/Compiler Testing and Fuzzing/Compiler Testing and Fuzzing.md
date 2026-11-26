@@ -546,3 +546,4 @@ Open problems as of late 2026:
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
+- [[Proof Assistant Kernels]] — Differential testing of proof checkers: several Lean kernels and the Kernel Arena.
