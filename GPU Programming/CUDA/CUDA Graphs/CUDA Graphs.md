@@ -123,7 +123,7 @@ Nodes are operations; edges are dependencies. Supported node types ([CUDA Progra
 | Conditional | Run a body graph IF, WHILE or SWITCH on a GPU-set value |
 | Empty | A join point with no work |
 
-Because the whole graph is known in advance, the driver can see that two branches are independent and run them concurrently, without the programmer creating multiple streams. Edges can also carry *edge data* (since CUDA 12.3), whose main use is marking a programmatic edge so the second kernel may start early under Programmatic Dependent Launch (see [[Streams, Events and Async Execution#Priorities, PDL and Green Contexts|PDL]]).
+Because the whole graph is known in advance, the driver can see that two branches are independent and run them concurrently, without the programmer creating multiple streams. Edges can also carry *edge data* (since CUDA 12.3), whose main use is marking a programmatic edge so the second kernel may start early under [[Programmatic Dependent Launch]].
 
 ## ***How We Got Here***
 ---
@@ -318,6 +318,7 @@ Open problems:
 - [[Streams, Events and Async Execution]] — Graphs are captured from streams; PDL and events carry over.
 - [[CUDA Programming Model]] — Kernel launches, grids and blocks that graph nodes freeze.
 - [[Kernel Fusion]] — Fewer, bigger kernels: the other way to cut launch and gap overhead.
+- [[Programmatic Dependent Launch]] — Programmatic edges that let consecutive graph nodes overlap.
 - [[Unified Memory]] — Memory operations and prefetches that can sit in graphs.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Nsight Systems shows launch gaps and graph replays on the timeline.
 - [[Triton]] — Compiled kernels that `torch.compile` then wraps in CUDA graphs.

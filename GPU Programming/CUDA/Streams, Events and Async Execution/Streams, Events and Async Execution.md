@@ -296,7 +296,7 @@ Frameworks solved the same problem earlier with their own caching allocators (Py
 Three ways to say more than "these are independent":
 
 - **Priorities.** `cudaStreamCreateWithPriority(&s, flags, prio)`; lower numbers mean higher priority, and `cudaDeviceGetStreamPriorityRange` gives the range. The scheduler prefers pending blocks from high-priority streams, but priorities are hints: they do not preempt running blocks or guarantee order ([CUDA Programming Guide 2.5](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/asynchronous-execution.html)).
-- **Programmatic Dependent Launch (PDL).** Normally kernel B in a stream starts only after kernel A completely finishes and flushes memory, which leaves a gap. With PDL (compute capability 9.0+), A calls `cudaTriggerProgrammaticLaunchCompletion()` when B may start, B is launched with the `cudaLaunchAttributeProgrammaticStreamSerialization` attribute through `cudaLaunchKernelEx`, and B calls `cudaGridDependencySynchronize()` before reading A's output. B's prologue (zeroing buffers, loading constants) overlaps A's tail. The overlap is opportunistic: code must stay correct if it never happens ([PDL guide](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/programmatic-dependent-launch.html)).
+- **[[Programmatic Dependent Launch]] (PDL).** Normally kernel B in a stream starts only after kernel A completely finishes and flushes memory, which leaves a gap. With PDL (compute capability 9.0+), A calls `cudaTriggerProgrammaticLaunchCompletion()` when B may start, B is launched with the `cudaLaunchAttributeProgrammaticStreamSerialization` attribute through `cudaLaunchKernelEx`, and B calls `cudaGridDependencySynchronize()` before reading A's output. B's prologue (zeroing buffers, loading constants) overlaps A's tail. The overlap is opportunistic: code must stay correct if it never happens ([PDL guide](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/programmatic-dependent-launch.html)).
 - **Green contexts.** Split the GPU's SMs into fixed groups with `cudaDevSmResourceSplit`, create a green context per group, and create streams in it with `cudaExecutionCtxStreamCreate`. Kernels in those streams only use that group's SMs, with no kernel changes. The guide's example gives a latency-critical kernel 16 SMs and a long-running kernel 112 on an H100, so the critical one never waits for SMs to free up. Partitions do not guarantee concurrency (shared work queues can still serialize) and each kernel gets fewer SMs ([Green contexts guide](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/green-contexts.html)).
 
 ```mermaid
@@ -364,6 +364,7 @@ Open problems:
 
 - [[CUDA Programming Model]] — Kernels, grids and the host/device split that streams schedule.
 - [[CUDA Graphs]] — Capture a stream's work once and replay it with one launch.
+- [[Programmatic Dependent Launch]] — Letting the next kernel in a stream start before the current one ends.
 - [[Unified Memory]] — Prefetches and advice that run in stream order.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Nsight Systems shows whether streams actually overlap.
 - [[Occupancy and Latency Hiding]] — Why two concurrent kernels only overlap if both fit on the SMs.

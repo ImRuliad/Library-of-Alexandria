@@ -110,7 +110,7 @@ timeline
 - **Oct 2024:** the TK paper (Spector, Arora, Singhal, Fu, Ré; ICLR 2025) formalised the three-level design and benchmarked GEMM, attention, linear attention and state-space kernels on H100 ([paper](https://arxiv.org/abs/2410.20399)).
 - **Mar 2025:** TK added Blackwell support (`tcgen05`, Tensor Memory, 2-CTA MMA) ([TK on Blackwell](https://hazyresearch.stanford.edu/blog/2025-03-15-tk-blackwell)).
 - **2025:** Hazy built [[Megakernels|megakernels]] (whole-model persistent kernels for LLM decode) on TK, and ported the ideas to AMD as HipKittens. Others followed with their own tile DSLs (TileLang, Gluon, Helion, cuTile).
-- **Feb 2026:** ThunderKittens 2.0, by Stuart Sul and Chris Ré, added MXFP8 and NVFP4, cluster launch control scheduling and programmatic dependent launch ([blog](https://hazyresearch.stanford.edu/blog/2026-02-19-tk-2)).
+- **Feb 2026:** ThunderKittens 2.0, by Stuart Sul and Chris Ré, added MXFP8 and NVFP4, cluster launch control scheduling and [[Programmatic Dependent Launch|programmatic dependent launch]] ([blog](https://hazyresearch.stanford.edu/blog/2026-02-19-tk-2)).
 
 ## ***How It Works***
 ---

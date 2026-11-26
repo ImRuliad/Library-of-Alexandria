@@ -474,7 +474,7 @@ The Helion numbers (11 kernels × 3 shapes on B200): LFBO benchmarked about 546 
 - [[ThunderKittens and Tile DSLs]] — Helion and other DSLs with built-in autotuning.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Skipping warmup and autotuning launches when profiling.
 - [[Grouped GEMM and Ragged Batches]] — Selection for many GEMMs at once (planned).
-- [[Programmatic Dependent Launch]] — Overlapping GEMMs with their consumers (planned).
+- [[Programmatic Dependent Launch]] — Overlapping GEMMs with their consumers.
 - [[ML Compilers]] — AutoTVM, Ansor and compiler-side tuning.
 - [[ML-Guided Optimization]] — Learned cost models beyond GPUs.
 - [[LLM-Written Kernels]] — LLMs writing kernels, not only tuning them.

@@ -246,7 +246,7 @@ The key design choice is that Tile IR keeps **tile-level semantics** (a load of 
 | 13.1 | Dec 2025 | CUDA Tile model, Tile IR spec, cuTile Python 1.0 |
 | 13.2 | Mar 2026 | cuTile 1.2: Ampere and Ada support, `ct.scan` |
 | 13.3 | May 26, 2026 | CUDA Tile C++; cuTile 1.4: Hopper (CC 9.0), block-scaled MMA, JAX; CompileIQ |
-| 13.4 | Sep 2026 | cuTile 1.6: programmatic dependent launch, bounds checks on by default |
+| 13.4 | Sep 2026 | cuTile 1.6: [[Programmatic Dependent Launch]], bounds checks on by default |
 | 13.5 | Nov 4, 2026 | Vera Rubin GA; multi-GPU tile communication; Tile-SIMT interop preview; cuTile 1.8 |
 
 Sources: [13.1 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-1-powers-next-gen-gpu-programming-with-nvidia-cuda-tile-and-performance-gains/), [13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/), [13.5 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/), [Tile IR release notes](https://docs.nvidia.com/cuda/tile-ir/latest/sections/release_notes.html), [cuTile Python release notes](https://docs.nvidia.com/cuda/cutile-python/release_notes.html).

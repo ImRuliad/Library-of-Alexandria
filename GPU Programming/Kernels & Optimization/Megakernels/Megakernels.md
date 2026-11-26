@@ -138,7 +138,7 @@ sequenceDiagram
     GPU->>GPU: free SMs prefetch the next layer's weights
 ```
 
-[[CUDA Graphs]] remove most of the launch cost but none of the prologue and tail bubbles. Programmatic Dependent Launch (PDL, compute capability 9.0+) lets a dependent kernel start its preamble while the previous kernel is still running, but its `cudaGridDependencySynchronize()` still waits for the whole previous grid ([CUDA Programming Guide, PDL](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/programmatic-dependent-launch.html)). A megakernel removes the boundary itself.
+[[CUDA Graphs]] remove most of the launch cost but none of the prologue and tail bubbles. [[Programmatic Dependent Launch]] (PDL, compute capability 9.0+) lets a dependent kernel start its preamble while the previous kernel is still running, but its `cudaGridDependencySynchronize()` still waits for the whole previous grid ([CUDA Programming Guide, PDL](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/programmatic-dependent-launch.html)). A megakernel removes the boundary itself.
 
 ## ***Foundations***
 ---
@@ -442,6 +442,7 @@ Open problems:
 - [[Persistent Kernels and Stream-K]] — The one-block-per-SM loop that megakernels extend from one op to a whole model.
 - [[Kernel Fusion]] — Megakernels as the last step of fusion; launch overhead and fusion trade-offs.
 - [[CUDA Graphs]] — The main alternative for removing launch overhead, with PDL edges.
+- [[Programmatic Dependent Launch]] — Overlapping consecutive kernels' prologue and tail; the lighter alternative.
 - [[Cooperative Groups]] — Cooperative launch, co-residency and `grid.sync()`.
 - [[CUDA Memory Model and Atomics]] — Acquire/release counters that replace kernel boundaries.
 - [[Warp Specialization]] — Loader, consumer, storer and controller warps inside each megakernel block.
