@@ -246,6 +246,7 @@ Open problems:
 - [[Page Cache and Memory Reclaim]]: buffered and uncached I/O.
 - [[File Systems]]: what most io_uring reads and writes land on.
 - [[Block Layer and IO Schedulers]]: blk-mq queues, plugging and polling below io_uring's storage I/O.
+- [[NVMe and User-Space Storage]]: NVMe queues, `URING_CMD` passthrough, ublk and SPDK.
 - [[Processes and Threads]]: the thread-per-request model io_uring replaces.
 - [[Containers, Namespaces and cgroups]]: seccomp restrictions on io_uring.
 - [[Kernel Security Hardening]]: why io_uring is often disabled.

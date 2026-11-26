@@ -431,6 +431,7 @@ Drop rates from the [XDP paper](https://courses.grainger.illinois.edu/ece598hpn/
 ## Related Notes
 
 - [[Linux Networking Stack]] — The general-purpose path that bypass skips: sk_buff, NAPI, GRO/GSO, qdiscs.
+- [[NVMe and User-Space Storage]] — SPDK, the storage counterpart of DPDK.
 - [[eBPF]] — The verified in-kernel programs XDP runs.
 - [[io_uring]] — Asynchronous I/O and its zero-copy receive path.
 - [[Interrupts and Exceptions]] — The per-packet interrupt cost polling avoids.
