@@ -17,6 +17,8 @@ sources:
   - https://arxiv.org/pdf/2606.05792
   - https://public-6ecl.pages.dev/oswald
   - https://www.bitsxpages.com/p/protocols-for-transactional-usage
+  - https://arxiv.org/pdf/2610.30114
+  - https://software.imdea.org/news/2026/10-28-accord/
 created: 2026-11-26
 updated: 2026-11-26
 ---
@@ -196,6 +198,7 @@ At the top of the spectrum, the code itself is proven. IronFleet combined TLA-st
 - **LLMs and TLA+ from English (June 2026):** across 30 models, at most 26.6% of generated specs parsed and only 8.6% passed model checking; GPT-5 parsed all 26 tasks but passed TLC on 7. The authors conclude current LLMs "do not generate reliable TLA+ specifications without expert oversight" ([arXiv 2606.05792](https://arxiv.org/pdf/2606.05792)).
 - **LLMs modeling real systems (May 2026):** SysMoBench asks models to write TLA+ that conforms to traces from real systems like etcd Raft, ZooKeeper leader election and RedisRaft. Leading models average about 46% on conformance and 41% on invariants, and drop sharply on complex protocols; Claude Sonnet 4.6 scored 25% overall on RedisRaft and CURP. The authors report their agent Specula reaches full scores on the current tasks ([SIGOPS blog](https://www.cs.cmu.edu/~15712/papers/can-llms-model-real-world-systems-in-tla.pdf)).
 - **Object-store commit protocols (2025–2026):** protocols built only on S3 conditional writes are small enough to verify end to end. OSWALD, a write-ahead log on object storage, has a P specification, a TLA+ model by Jack Vanlightly (August 2026) and, in November 2026, AI-written TLAPS proofs of its safety invariants "for any number of writers and garbage collectors" ([OSWALD](https://public-6ecl.pages.dev/oswald)). SlateDB specifies its garbage-collection boundary protocol in Fizzbee ([Gavra, May 2026](https://www.bitsxpages.com/p/protocols-for-transactional-usage)). See [[Databases on Object Storage]].
+- **Agents that design and prove protocols (Oct 2026):** EPFL's AI-GREEMENT harness had a coding agent design a geo-replication protocol and prove its linearizability in Lean (about 98K lines for the final model); the failed proof attempts on reference protocols turned up four previously unreported safety bugs in EPaxos Revisited and Bodega. Verification took about 91% of the run's tokens ([Burgelin et al., arXiv Oct 2026](https://arxiv.org/pdf/2610.30114)). The same month, IMDEA reported formalizing a hand proof of Accord in Lean with AI ([IMDEA](https://software.imdea.org/news/2026/10-28-accord/)). See [[AI-Assisted Protocol Design]].
 
 ## ***Trade-offs & Open Problems***
 
@@ -245,3 +248,4 @@ Open problems:
 - [[Byzantine Fault Tolerance]] — BFT protocols are notoriously hard to get right without proofs
 - [[Isolation Testing]] — checking a running database's histories against its isolation claim, and a 2026 proof-based alternative
 - [[Databases on Object Storage]] — object-store log and GC protocols checked in P, TLA+, TLAPS and Fizzbee
+- [[AI-Assisted Protocol Design]] — agents that design protocols and prove them in Lean, and what their proofs found
