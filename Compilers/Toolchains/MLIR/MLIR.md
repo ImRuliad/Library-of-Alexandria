@@ -220,7 +220,7 @@ timeline
     2025 : Transform dialect paper at CGO (Mar)
          : Verification dialects paper at PLDI
          : CUDA Tile IR released with CUDA 13.1
-    2026 : LLVM 22.1 (Mar) and 23.1 (Aug)
+    2026 : LLVM 22.1 (Feb) and 23.1 (Aug)
          : Mojo 1.0 and open-source compiler (Aug)
          : ClangIR compiles all of LLVM (Sep)
 ```
