@@ -16,7 +16,7 @@ aliases:
   - cuSolverDx
   - cuRANDDx
   - nvCOMPDx
-status: draft
+status: complete
 sources:
   - https://docs.nvidia.com/cuda/mathdx/index.html
   - https://docs.nvidia.com/cuda/mathdx/release_notes.html
@@ -235,7 +235,7 @@ __global__ void gemm_relu(const __half* a, const __half* b, float* c) {
   auto a_g = cublasdx::make_tensor(a, GEMM::get_layout_gmem_a());
   auto b_g = cublasdx::make_tensor(b, GEMM::get_layout_gmem_b());
   auto c_g = cublasdx::make_tensor(c, GEMM::get_layout_gmem_c());
-  auto [a_s, b_s, c_s] = cublasdx::slice_shared_memory<GEMM>(smem);
+  auto [a_s, b_s] = cublasdx::slice_shared_memory_ab<GEMM>(smem);
   cublasdx::copy<GEMM, alignment::a>(a_g, a_s);
   cublasdx::copy<GEMM, alignment::b>(b_g, b_s);
   cublasdx::copy_wait();
@@ -249,10 +249,10 @@ __global__ void gemm_relu(const __half* a, const __half* b, float* c) {
 Line by line:
 
 - The descriptor is a 64×64×64 FP16 GEMM with FP32 accumulation for Hopper (`SM<900>`).
-- `extern __shared__`: shared memory sized at launch with `cublasdx::get_shared_storage_size<GEMM>()`, which "covers A, B, and C" including padding.
+- `extern __shared__`: shared memory sized at launch with `cublasdx::get_shared_storage_size_ab<GEMM>()`, which covers only A and B because C will live in registers (`get_shared_storage_size<GEMM>()` covers all three).
 - `make_tensor(ptr, GEMM::get_layout_gmem_*())`: wraps raw global pointers as CuTe tensors with the layout the descriptor expects ([[CUTLASS and CuTe]]).
-- `slice_shared_memory<GEMM>(smem)`: carves the shared buffer into A, B and C regions.
-- `copy<GEMM, ...>` is "a cooperative copy among all threads in the block"; `copy_wait()` "blocks until all in-flight asynchronous copies issued by this block have completed", so nobody reads a half-loaded tile.
+- `slice_shared_memory_ab<GEMM>(smem)`: carves the shared buffer into A and B regions (`slice_shared_memory` returns A, B and C for the shared-memory API).
+- `alignment_of<GEMM>` gives the alignment each copy may assume. `copy<GEMM, ...>` is "a cooperative copy among all threads in the block"; `copy_wait()` "blocks until all in-flight asynchronous copies issued by this block have completed", so nobody reads a half-loaded tile.
 - `GEMM().execute(a_s, b_s)` runs the multiply and returns an **accumulator**: the C tile, spread across the block's registers.
 - `get_results()` exposes this thread's fragment of C. The loop is the fusion: any per-element math (bias, activation, scaling, a dot product with another tile) runs on values that never left registers.
 - `partition_and_copy` writes each thread's fragment to the right place in global C.
