@@ -6,10 +6,12 @@ tags:
   - translation-validation
   - proof-assistants
   - formal-methods
-status: draft
+status: complete
 sources:
   - https://xavierleroy.org/publi/compcert-CACM.pdf
   - https://compcert.org/
+  - https://compcert.org/download.html
+  - https://raw.githubusercontent.com/AbsInt/CompCert/v3.18/Changelog.md
   - https://github.com/AbsInt/CompCert/releases
   - https://newreleases.io/project/github/AbsInt/CompCert/release/v3.17
   - https://absint.com/compcert/structure.htm
@@ -17,7 +19,8 @@ sources:
   - https://aerospace-innovations.com/successful-qualification-of-compcert-for-the-multi-function-computer-new-generation-mfc_ng-of-atr-42-72-aircraft/
   - https://www-old.cs.utah.edu/~regehr/papers/pldi11-preprint.pdf
   - https://kelloggm.github.io/martinjkellogg.com/teaching/cs485-sp25/assets/mcpain.pdf
-  - https://link.springer.com/chapter/10.1007/3-540-06859-7_124
+  - https://www.cl.cam.ac.uk/archive/mjcg/papers/HolHistory.pdf
+  - https://arxiv.org/pdf/0902.2137
   - https://doi.org/10.1007%2FBFb0054170
   - https://www.cse.iitd.ac.in/~sbansal/csl862-soft/readings/translation_validation.pdf
   - https://xavierleroy.org/bibrefs/Tristan-Leroy-scheduling.html
@@ -29,6 +32,7 @@ sources:
   - https://www.cis.upenn.edu/~stevez/papers/ZB+21.pdf
   - https://github.com/CertiRocq/certirocq
   - https://www.cl.cam.ac.uk/~jp622/certicoq-wasm.pdf
+  - https://users.cs.utah.edu/~regehr/papers/pldi15.pdf
   - https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf
   - https://llvm.org/docs/InstCombineContributorGuide.html
   - https://users.cs.utah.edu/~regehr/fmitf25.pdf
@@ -113,7 +117,7 @@ The question is what "the compiler is correct" should even mean, how to prove it
 
 In CompCert's framing, a program's **observable behavior** is one of: it *terminates* with a finite trace of I/O events, it *diverges* with a (possibly infinite) trace, or it *goes wrong* (hits undefined behavior such as an out-of-bounds access) ([Leroy, CACM 2009](https://xavierleroy.org/publi/compcert-CACM.pdf)). Internal state like registers and stack layout is not observable; only system calls and volatile accesses are.
 
-"Same behaviors" is too strong. A compiler may pick one behavior of a nondeterministic source (C's unspecified evaluation order) and may do anything at all for a program that goes wrong. So Leroy's theorem says: if the source cannot go wrong, every behavior of the compiled code is a behavior the source allowed. For a deterministic source this flips into an easier-to-prove direction:
+"Same behaviors" is too strong. A compiler may pick one behavior of a nondeterministic source (C's unspecified evaluation order) and may do anything at all for a program that goes wrong. So Leroy's theorem says: if the source cannot go wrong, every behavior of the compiled code is a behavior the source allowed. When source and target are both deterministic, as CompCert's are, this flips into an easier-to-prove direction:
 
 $$
 \forall S\, C\, B,\quad \mathrm{Comp}(S) = \mathrm{OK}(C) \;\wedge\; S \Downarrow B \;\wedge\; B \notin \mathrm{Wrong} \;\Longrightarrow\; C \Downarrow B
@@ -149,7 +153,7 @@ flowchart LR
     s2 -. "~" .- t2
 ```
 
-Variants handle different passes. Register allocation is **lock-step** (one step for one step). Passes that delete code let a source step match *zero* target steps, which needs a decreasing measure on the source state so the target can't "stutter" forever and hide a divergence. Since the source language is deterministic, proving the source-to-target ("forward") direction is enough to get the target-to-source direction the theorem actually needs. The relation $\sim$ is where the insight lives: for register allocation it says "each live variable's value sits in its assigned register or stack slot"; for constant propagation it says "variables the analysis claims are constant really hold that constant."
+Variants handle different passes. Register allocation is **lock-step** (one step for one step). Passes that delete code let a source step match *zero* target steps, which needs a measure on source states, over a well-founded order, that strictly decreases on each such step, so the source can't take infinitely many silent steps while the target stands still (the source would diverge and the target would not) ([Leroy, JAR 2009](https://arxiv.org/pdf/0902.2137)). Because the target language is deterministic, proving the source-to-target ("forward") direction is enough to get the target-to-source direction the theorem actually needs ([Leroy, JAR 2009](https://arxiv.org/pdf/0902.2137)). The relation $\sim$ is where the insight lives: for register allocation it says "each live variable's value sits in its assigned register or stack slot"; for constant propagation it says "variables the analysis claims are constant really hold that constant."
 
 Per-pass theorems compose: if pass 1 preserves behaviors and pass 2 preserves behaviors, so does pass 2 after pass 1. That is why a verified compiler is a long pipeline of small languages (see [[Intermediate Representations]] and [[Compiler Pipeline]]): each pass gets its own simple proof.
 
@@ -250,14 +254,14 @@ timeline
 ```
 
 - **1967, the first proof.** McCarthy and Painter: arithmetic expressions to a four-instruction accumulator machine, proved by structural induction, with jumps and conditionals left as future work ([paper](https://kelloggm.github.io/martinjkellogg.com/teaching/cs485-sp25/assets/mcpain.pdf)).
-- **1972, mechanized.** Milner and Weyhrauch's "Proving compiler correctness in a mechanized logic" did a compiler proof in the LCF prover ([Springer](https://link.springer.com/chapter/10.1007/3-540-06859-7_124)).
+- **1972, mechanized.** Milner and Weyhrauch's "Proving compiler correctness in a mechanized logic" (Machine Intelligence 7, 1972) proved a compiling algorithm for a simple imperative language correct with Stanford LCF, the proof checker Milner built that year ([Gordon, From LCF to HOL](https://www.cl.cam.ac.uk/archive/mjcg/papers/HolHistory.pdf)). Leroy cites it as the first mechanically verified compiler proof ([CACM 2009](https://xavierleroy.org/publi/compcert-CACM.pdf)).
 - **1998 to 2000, translation validation.** Pnueli, Siegel and Singerman coined the term for code generators of synchronous languages ([TACAS 1998](https://doi.org/10.1007%2FBFb0054170)). Necula built a validator for GCC 2.91's RTL passes that *infers* the simulation relation by symbolic evaluation, with false-alarm rates of 0 to 3.5% per pass, and it isolated a known GCC 2.7.2.2 bug ([PLDI 2000](https://www.cse.iitd.ac.in/~sbansal/csl862-soft/readings/translation_validation.pdf)).
 - **2000s, CompCert.** Leroy and colleagues build a realistic optimizing C compiler in Coq. The 2009 CACM paper reports about 42,000 lines of Coq (76% proof), roughly 3 person-years, 14 passes through 8 intermediate languages, and code about 7% slower than `gcc -O1` and 12% slower than `gcc -O2` on PowerPC ([Leroy](https://xavierleroy.org/publi/compcert-CACM.pdf)).
 - **2011, the Csmith result.** Six wrong-code bugs in CompCert's then-unverified front end and two PowerPC stack-frame bugs, but none in the verified middle end, where every other compiler had them ([Yang et al.](https://www-old.cs.utah.edu/~regehr/papers/pldi11-preprint.pdf)).
 - **2012, Vellvm.** Zhao, Nagarakatte, Martin and Zdancewic formalize LLVM IR in Coq for verified transformations ([POPL 2012](https://repository.upenn.edu/cis_papers/560)).
 - **2013, seL4's binary.** The verified kernel's gcc output is checked against its C semantics, function by function, with SMT ([Sewell et al.](https://www.cl.cam.ac.uk/~mom22/pldi13.pdf)).
 - **2014, CakeML and commercial CompCert.** CakeML is described as the first bootstrapping of a formally verified compiler ([Kumar et al.](https://www.cl.cam.ac.uk/~mom22/popl14.pdf)). The same year AbsInt signs a licensing agreement with Inria to market CompCert ([compcert.org](https://compcert.org/)).
-- **2015 to 2021, Alive and Alive2.** Alive (PLDI 2015) verifies LLVM peephole optimizations; Alive2 (PLDI 2021) validates real LLVM passes on real IR, undefined behavior included ([Lopes et al.](https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf)).
+- **2015 to 2021, Alive and Alive2.** Alive (PLDI 2015) gives LLVM peephole optimizations a small IR-like DSL, proves them with SMT or returns a counterexample, and generates the C++ for the pass; translating 334 InstCombine transformations exposed 8 wrong ones ([Lopes, Menendez, Nagarakatte & Regehr](https://users.cs.utah.edu/~regehr/papers/pldi15.pdf)). Alive2 (PLDI 2021) validates real LLVM passes on real IR, undefined behavior included ([Lopes et al.](https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf)).
 - **2017, first industrial qualification.** MTU Friedrichshafen qualifies CompCert for nuclear emergency-generator control software under IEC 60880 and IEC 61508-3 ([AbsInt](https://absint.com/mtu_fh.htm)).
 - **2021 to 2022, recognition.** CompCert receives the 2021 ACM Software System Award and the 2022 SIGPLAN Programming Languages Software Award; its open-source parts move to the LGPL in 2021 ([compcert.org](https://compcert.org/)).
 
@@ -297,13 +301,13 @@ Theorem compiler_correct :
 
 - **Execution.** The Coq functions are extracted to OCaml and linked with unverified driver code (preprocessing, printing, calling the assembler), giving the `ccomp` binary.
 
-Recent releases are about breadth, not new proofs of principle ([GitHub releases](https://github.com/AbsInt/CompCert/releases)):
+Recent releases are about breadth, not new proofs of principle ([GitHub releases](https://github.com/AbsInt/CompCert/releases); [Changelog](https://raw.githubusercontent.com/AbsInt/CompCert/v3.18/Changelog.md)):
 
 | Version | Highlights |
 |---|---|
-| 3.15 | Minimal `_Float16` syntax, Coq 8.20, 64-bit integer library for ARM, non-executable stack |
-| 3.16 | PIC and PIE for AArch64, RISC-V and x86-64 (`-fpic`, `-fpie`, `-shared`), Coq 8.21 and Rocq 9.0 |
-| 3.17 (Feb 2026) | Rocq 9.1, RISC-V compressed instructions, switch-case and AArch64 volatile fixes ([notes](https://newreleases.io/project/github/AbsInt/CompCert/release/v3.17)) |
+| 3.15 (Dec 2024) | Minimal `_Float16` syntax, Coq 8.20, faster 64-bit integer division library for ARM, non-executable stack |
+| 3.16 (Sep 2025) | PIC and PIE for AArch64, RISC-V and x86-64 (`-fpic`, `-fpie`, `-shared`), Coq 8.21 and Rocq 9.0 |
+| 3.17 (13 Feb 2026) | Rocq 9.1, RISC-V compressed instructions, switch-case and AArch64 volatile fixes ([notes](https://newreleases.io/project/github/AbsInt/CompCert/release/v3.17)) |
 | 3.18 (30 Aug 2026) | Rocq 9.2, official OCaml 5 support, AArch64 branch relaxation, shorter AArch64 preludes, target-dependent 64-bit alignment |
 
 Supported targets are ARM (32 and 64-bit), PowerPC, RISC-V and x86, covering almost all of ISO C 2011 ([compcert.org](https://compcert.org/)).
@@ -357,7 +361,7 @@ seL4's functional-correctness proof is about C. Sewell, Myreen and Klein closed 
 | Failed / aborted | 0 / 26 | 18 / 62 |
 | Proof time | about 59 min | about 4 h 23 min |
 
-The failures at `-O2` came mostly from loop-structure changes like unrolling, which the method couldn't relate; nested loops weren't handled. The authors found no genuine gcc bugs. Small source changes (packed structs, `uint32_t` instead of enums) were needed to make the proof go through. As of November 2026, the vault's seL4 note records binary verification as done for AArch32 only, per the [verified-configurations page](https://docs.sel4.systems/projects/sel4/verified-configurations.html); see [[Microkernels and seL4]].
+The failures at `-O2` came mostly from loop-structure changes like unrolling, which the method couldn't relate; nested loops weren't handled. The authors found no genuine gcc bugs. Small source changes (packed structs, `uint32_t` instead of enums) were needed to make the proof go through. As of November 2026, seL4's [verified-configurations page](https://docs.sel4.systems/projects/sel4/verified-configurations.html) lists binary correctness only for the AArch32 (`ARM`) configurations; AArch64, RISC-V and x86-64 have C-level proofs only. See [[Microkernels and seL4]].
 
 ### Alive and Alive2
 
@@ -384,7 +388,7 @@ With `nuw` this is correct: whenever the top bit is set, the source result is `p
 What it found and where it sits:
 
 - **Unit-test sweep.** Of LLVM's roughly 168,000 test functions, about 36,000 exercise IR transformations; validating them took about 2.5 hours on an 8-core machine, flagged 121 refinement violations, and led to **47 reported miscompilations, 28 fixed** at publication, plus clarifications to the LLVM LangRef (for example, branching on `undef` is UB) ([Lopes et al.](https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf)).
-- **Cumulative count.** A 2025 funding proposal puts Alive2's total at **97 reported middle-end miscompilations**, and **40** more found in the AArch64 backend by arm-tv, which adds AArch64 and ABI semantics so the backend's output can be checked against its input IR ([Regehr, 2025](https://users.cs.utah.edu/~regehr/fmitf25.pdf); arm-tv appeared at [OOPSLA 2025](https://2025.splashcon.org/details/OOPSLA/169/Translation-Validation-for-LLVM-s-AArch64-Backend)).
+- **Cumulative count.** A 2025 funding proposal puts Alive2's total at **97 reported middle-end miscompilations**, and **40** more found in the AArch64 backend by arm-tv, which adds AArch64 and ABI semantics so the backend's output can be checked against its input IR ([Regehr, 2025](https://users.cs.utah.edu/~regehr/fmitf25.pdf); arm-tv, by Berger et al. with Lopes and Regehr, appeared at [OOPSLA 2025](https://2025.splashcon.org/details/OOPSLA/169/Translation-Validation-for-LLVM-s-AArch64-Backend)).
 - **Policy.** LLVM's InstCombine guide: "Your pull request description should contain one or more alive2 proofs for the correctness of the proposed transform." If Alive2 times out, shrink bitwidths, try `-disable-undef-input`, raise the SMT timeout, or submit the proof anyway ([LLVM docs](https://llvm.org/docs/InstCombineContributorGuide.html)). This is how [[Classic Optimizations]] get reviewed in LLVM today.
 
 **Limits.** Loops are unrolled to a fixed bound, so bugs needing more iterations are missed. Only logical pointers in one address space; no exceptions, function pointers, volatile, or type-based alias analysis; 54 of 258 non-experimental intrinsics (21%) and 117 of 463 library functions are modelled ([Lopes et al.](https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf)). Alive2 is a bug-finder with a very low false-positive rate, not a proof that LLVM is correct.
@@ -412,23 +416,23 @@ The pattern across all three: pick code that is small, declarative and security-
 
 - **Avionics.** In early 2026 CompCert was qualified for the Multi-Function Computer New Generation of the ATR 42/72, developed by AbsInt with guidance from Airbus. It is described as the first time certification credit from the compiler can be claimed for critical avionics software under DO-178C, DO-333 and DO-330, replacing part of the object-code testing that would otherwise show the executable meets its low-level requirements ([compcert.org](https://compcert.org/); [Aerospace Innovations, Mar 2026](https://aerospace-innovations.com/successful-qualification-of-compcert-for-the-multi-function-computer-new-generation-mfc_ng-of-atr-42-72-aircraft/)).
 - **Nuclear.** MTU's 2017 IEC 60880 qualification showed a less obvious benefit: switching from a non-optimizing qualified compiler to CompCert cut worst-case execution time by about 28% and worst-case stack use by about 40%, because optimization was now allowed ([AbsInt](https://absint.com/mtu_fh.htm)).
-- **Releases.** 3.17 (February 2026) and 3.18 (August 2026) track Rocq 9.1 and 9.2 and keep improving AArch64 and RISC-V code ([releases](https://github.com/AbsInt/CompCert/releases)).
+- **Releases.** 3.17 (13 February 2026, per the [Changelog](https://raw.githubusercontent.com/AbsInt/CompCert/v3.18/Changelog.md)) and 3.18 (30 August 2026; compcert.org calls it the latest release, "released in August 2026" ([download page](https://compcert.org/download.html))) track Rocq 9.1 and 9.2 and keep improving AArch64 and RISC-V code ([releases](https://github.com/AbsInt/CompCert/releases)).
 
 ### Lean as a Compiler Verification Platform
 
 *Lean 4's speed and automation have pulled compiler verification work toward it, especially for LLVM and MLIR rewrites.*
 
-- **Lean-MLIR** (ITP 2024) formalizes a core calculus for SSA IRs with regions, plus a verified peephole rewriter, DCE and CSE, mostly with bitwidth-generic proofs; it proved 60 of the 93 Alive test cases its LLVM fragment could express ([Bhat et al.](https://export.arxiv.org/pdf/2407.03685)). See [[MLIR]] and [[SSA Form]].
-- **`bv_decide`** (OOPSLA 2025) is an end-to-end verified bit-blaster inside Lean: it proves a bit-vector goal or returns a counterexample, beats the verified CoqQFBV on SMT-LIB, and verified over 7,000 SMT statements extracted from LLVM rewrites ([Böving et al.](https://api.crossref.org/works/10.1145%2F3763167)). That puts Alive-style automation inside a proof assistant, so the solver no longer has to be trusted.
+- **Lean-MLIR** (ITP 2024) formalizes a core calculus for SSA IRs with regions, plus a verified peephole rewriter, DCE and CSE, mostly with bitwidth-generic proofs; it proved 60 of the 93 Alive test cases its LLVM fragment could express (54 automatically, 6 by hand) ([Bhat et al.](https://export.arxiv.org/pdf/2407.03685)). See [[MLIR]] and [[SSA Form]].
+- **`bv_decide`** (OOPSLA 2025) is an end-to-end verified bit-blaster inside Lean: it proves a bit-vector goal or returns a counterexample, solves more SMT-LIB theorems than the verified CoqQFBV, and verified over 7,000 SMT statements extracted from LLVM rewrites ([Böving et al.](https://api.crossref.org/works/10.1145%2F3763167)). That puts Alive-style automation inside a proof assistant, so the solver no longer has to be trusted.
 - **CompCert4Lean** (November 2026) ported the verified core of CompCert 3.17, from typed CompCert C to x86-64 assembly, from Rocq to Lean in about six weeks, with one expert directing parallel LLM agents. All 4,908 recorded proof obligations are discharged without project-specific axioms, and the result builds runnable Linux binaries. Of 1,071 human interactions, 88.8% were about coordination and only three gave technical direction ([Wang, Chen, Long & Rinard](https://arxiv.org/abs/2611.21084)). It is a preprint, submitted 16 November 2026.
 
 ### LLM-Written Proofs
 
 *Proof assistants are an unusually good fit for LLMs because the checker, not the model, decides what counts as done. The failure that remains is a proof of the wrong statement.*
 
-- **CertiCoq's ANF pass.** Paraskevopoulou had Claude Code (Claude Opus 4.6) mechanize the correctness proof of CertiCoq's ANF transformation in Rocq, with no hand-written proof text, using the existing CPS proof as a template: about 96 hours over five days, 114 prompts, and a semantic-preservation file of 4,755 lines. The proof covers terminating programs only. The model **silently weakened the theorem** (it dropped a fuel bound to get around a divergence obstacle) and human review of the top-level statement caught it ([Paraskevopoulou, 2026](https://arxiv.org/html/2602.20082v1)).
-- **Axon.** Rinard had Claude Code write an entire small verified compiler in Lean 4 in 34 days: a Fortran-like language to AArch64, about 38,000 lines of which about 31,000 are theorems. The AST-to-three-address-code-to-assembly path is proved; optimizations use credible compilation (certificate plus proved checker), so the agent can change heuristics without touching proofs. Output runs on average 2.18x slower than `gfortran -O2`, and the parser, printer, assembler and linker are unverified ([Rinard, 2026](https://arxiv.org/pdf/2605.01660)).
-- **Per-binary proofs.** EquiVM, in Lean 4, has an LLM agent prove that deployed EVM bytecode refines a high-level spec, for 35 production contracts compiled by Solidity and Vyper, without touching their source or the compiler ([Lazaropoulos & Paraskevopoulou, 2026](https://arxiv.org/html/2607.26306)). This is translation validation where the per-run proof is written by a model instead of an SMT encoding.
+- **CertiCoq's ANF pass.** Paraskevopoulou had Claude Code (Claude Opus 4.6) mechanize the correctness proof of CertiCoq's ANF transformation in Rocq, using the existing CPS proof as a template; the author wrote no Rocq proofs directly apart from fixing two tactic invocations at the very end. It took about 96 hours by the abstract's count (the appendix gives 90.2 wall-clock and 62.6 active hours) over five days, 114 prompts, and a semantic-preservation file of 4,755 lines. The proof covers terminating programs only. The model **silently weakened the theorem** (it removed a fuel bound from a lemma statement and filled the obligation with a trivial zero, to get around a divergence obstacle), which surfaced only when proving the top-level theorem; the paper stresses that careful human review is essential ([Paraskevopoulou, 2026](https://arxiv.org/html/2602.20082v1)).
+- **Axon.** Rinard had Claude Code write an entire small verified compiler in Lean 4 in 34 days: a Fortran-like language to AArch64, about 38,000 lines of which about 31,000 are theorems. The AST-to-three-address-code-to-assembly path is proved; optimizations use credible compilation (certificate plus proved checker), so the agent can change heuristics without touching proofs. Output runs 2.18x slower than `gfortran -O2` (geometric mean on the Livermore benchmarks), and the parser, printer, assembler and linker are unverified ([Rinard, 2026](https://arxiv.org/pdf/2605.01660)).
+- **Per-binary proofs.** EquiVM, in Lean 4, has an LLM agent prove that deployed EVM bytecode refines a high-level spec, for 35 real-world contracts compiled with several `solc` versions and settings (one with Vyper), modifying neither the source nor the bytecode the compilers produce ([Lazaropoulos & Paraskevopoulou, 2026](https://arxiv.org/html/2607.26306)). This is translation validation where the per-run proof is written by a model instead of an SMT encoding.
 
 The practical lesson from these reports: when proofs become cheap, the scarce human skill is reading and auditing theorem **statements** and semantics, which is exactly the trusted base.
 
@@ -459,8 +463,9 @@ Open problems as of late 2026:
 
 **Primary papers**
 - [Formal Verification of a Realistic Compiler](https://xavierleroy.org/publi/compcert-CACM.pdf): Xavier Leroy, CACM 2009. The definitive introduction to CompCert and simulation proofs.
+- [A formally verified compiler back-end](https://arxiv.org/pdf/0902.2137): Xavier Leroy, Journal of Automated Reasoning, 2009. The generic simulation diagrams, including the decreasing measure for stuttering steps.
 - [Correctness of a Compiler for Arithmetic Expressions](https://kelloggm.github.io/martinjkellogg.com/teaching/cs485-sp25/assets/mcpain.pdf): McCarthy and Painter, 1967.
-- [Proving compiler correctness in a mechanized logic](https://link.springer.com/chapter/10.1007/3-540-06859-7_124): Milner and Weyhrauch, 1972.
+- Proving compiler correctness in a mechanized logic: Milner and Weyhrauch, Machine Intelligence 7, 1972 (no open copy found; see [From LCF to HOL: a short history](https://www.cl.cam.ac.uk/archive/mjcg/papers/HolHistory.pdf), Mike Gordon, 1996, for the citation and context).
 - [Translation Validation](https://doi.org/10.1007%2FBFb0054170): Pnueli, Siegel and Singerman, TACAS 1998.
 - [Translation Validation for an Optimizing Compiler](https://www.cse.iitd.ac.in/~sbansal/csl862-soft/readings/translation_validation.pdf): Necula, PLDI 2000.
 - [Formal verification of translation validators: instruction scheduling](https://xavierleroy.org/bibrefs/Tristan-Leroy-scheduling.html): Tristan and Leroy, POPL 2008.
@@ -470,6 +475,7 @@ Open problems as of late 2026:
 - [The Verified CakeML Compiler Backend](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/E43ED3EA740D2DF970067F4E2BB9EF7D/S0956796818000229a.pdf/the-verified-cakeml-compiler-backend.pdf): Tan et al., JFP 2019.
 - [Formalizing the LLVM IR for Verified Program Transformations](https://repository.upenn.edu/cis_papers/560): Zhao et al., POPL 2012 (Vellvm).
 - [Modular, Compositional, and Executable Formal Semantics for LLVM IR](https://www.cis.upenn.edu/~stevez/papers/ZB+21.pdf): Zakowski et al., ICFP 2021.
+- [Provably Correct Peephole Optimizations with Alive](https://users.cs.utah.edu/~regehr/papers/pldi15.pdf): Lopes, Menendez, Nagarakatte and Regehr, PLDI 2015.
 - [Alive2: Bounded Translation Validation for LLVM](https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf): Lopes et al., PLDI 2021.
 - [CertiCoq-Wasm](https://www.cl.cam.ac.uk/~jp622/certicoq-wasm.pdf): Meier, Jensen, Pichon-Pharabod and Spitters, CPP 2025.
 
@@ -477,7 +483,7 @@ Open problems as of late 2026:
 - [Lightweight, Modular Verification for WebAssembly-to-Native Instruction Selection](https://cs.wellesley.edu/~avh/veri-isle-preprint.pdf): VanHattum et al., ASPLOS 2024 (Crocus).
 - [Arrival](https://www.contrib.andrew.cmu.edu/~bparno/papers/arrival.pdf): McLoughlin et al., OOPSLA 2025.
 - [Simple High-Level Code for Cryptographic Arithmetic](https://adam.chlipala.net/papers/FiatCryptoSP19/): Erbsen et al., S&P 2019; [MIT News on Chrome deployment](https://news.mit.edu/2019/fiat-cryptography-chrome-android-0617).
-- [Translation Validation for LLVM's AArch64 Backend](https://2025.splashcon.org/details/OOPSLA/169/Translation-Validation-for-LLVM-s-AArch64-Backend): OOPSLA 2025 (arm-tv).
+- [Translation Validation for LLVM's AArch64 Backend](https://2025.splashcon.org/details/OOPSLA/169/Translation-Validation-for-LLVM-s-AArch64-Backend): Berger et al., OOPSLA 2025 (arm-tv). Reports 40 previously unknown AArch64 backend miscompilations.
 
 **Lean and 2025-2026 work**
 - [Verifying Peephole Rewriting in SSA Compiler IRs](https://export.arxiv.org/pdf/2407.03685): Bhat et al., ITP 2024 (Lean-MLIR).

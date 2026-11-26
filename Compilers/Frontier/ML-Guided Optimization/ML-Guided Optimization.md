@@ -7,15 +7,22 @@ tags:
   - autotuning
   - phase-ordering
   - llm-compilers
-status: draft
+status: complete
 sources:
   - https://llvm.org/docs/MLGO.html
   - https://arxiv.org/abs/2101.04808
   - https://www.research.google/blog/mlgo-a-machine-learning-framework-for-compiler-optimization/
   - https://lists.llvm.org/pipermail/llvm-dev/2021-November/153639.html
+  - https://lists.llvm.org/pipermail/all-commits/Week-of-Mon-20251110/262529.html
+  - https://github.com/llvm/llvm-project/pull/168252
+  - https://www.llvm.org/devmtg/2026-01/slides/ml-optimizations-in-production-llvm.pdf
+  - https://www.llvm.org/devmtg/2026-01/
   - https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf
   - https://llvm.org/devmtg/2025-10/slides/technical_talks/venkatakeerthy.pdf
   - https://llvm.org/doxygen/EmitCModelRunner_8h_source.html
+  - https://raw.githubusercontent.com/llvm/llvm-project/main/llvm/lib/CodeGen/MLRegAllocPriorityAdvisor.cpp
+  - https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-22.1.0/llvm/docs/ReleaseNotes.md
+  - https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.0/llvm/docs/ReleaseNotes.md
   - https://chromium.googlesource.com/chromium/src/+/77dbfa92dbbca18067be4cf4e419bd1a07309d08
   - https://chromium.googlesource.com/chromium/src.git/+/master/build/config/compiler/compiler.gni
   - https://flutter.googlesource.com/mirrors/flutter/+show/refs/heads/flutter-3.23-candidate.13/docs/engine/Reduce-Flutter-engine-size-with-MLGO.md
@@ -34,6 +41,7 @@ sources:
   - https://commit.csail.mit.edu/papers/2014/ansel-pact14-opentuner.pdf
   - https://ar5iv.labs.arxiv.org/html/2109.08267
   - https://speakerdeck.com/chriscummins/compilergym-cgo-22
+  - https://raw.githubusercontent.com/facebookresearch/CompilerGym/development/README.md
   - https://www.github.com/facebookresearch/CompilerGym/releases
   - https://arxiv.org/abs/1801.04405v5
   - https://arxiv.org/html/2407.02524v1
@@ -44,6 +52,7 @@ sources:
   - https://arxiv.org/pdf/2609.27214
   - https://arxiv.org/pdf/2607.17389
   - https://arxiv.org/abs/2502.10517
+  - https://raw.githubusercontent.com/ScalingIntelligence/KernelBench/main/README.md
   - https://arxiv.org/abs/2602.24286
   - https://www.alphaxiv.org/abs/2607.16241
   - https://jack-clark.net/2025/02/24/import-ai-401-cheating-reasoning-models-better-cuda-kernels-via-ai-life-models/
@@ -84,7 +93,7 @@ updated: 2026-11-26
 ---
 *Compilers are full of hand-tuned guesses (inline this call? evict that register? which pass order? which tile size?). ML-guided optimization replaces those guesses with learned policies, learned cost models, search, and lately LLMs, and the hard part is never the model: it is making the result deterministic, cheap, correct and maintainable inside a production toolchain.*
 
-- **What actually ships.** LLVM's **MLGO** puts a small trained network behind two decisions: *inlining for size* and *register-allocation eviction* ([LLVM docs](https://llvm.org/docs/MLGO.html)). The model is compiled ahead of time into the compiler binary, so there is no ML runtime at compile time. Google reports the size policy in production for mobile Chrome, Fuchsia and the Android Google Search app ([Chen et al., LLVM Dev Mtg 2025](https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf)).
+- **What actually ships.** LLVM's **MLGO** puts a small trained network behind two decisions: *inlining for size* and *register-allocation eviction* ([LLVM docs](https://llvm.org/docs/MLGO.html)). The model is compiled ahead of time into the compiler binary, so there is no ML runtime at compile time. Google reports the size policy in production for mobile Chrome, Fuchsia and the Android Google Search app ([Chen et al., LLVM Dev Mtg 2025](https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf)). Trofin's January 2026 keynote adds the Android toolchain, wearables and Google's datacenter fleet, where the regalloc policies run for performance ([slides](https://www.llvm.org/devmtg/2026-01/slides/ml-optimizations-in-production-llvm.pdf)).
 - **Learned cost models.** Instead of an analytical model of the machine, train a predictor on measured runs: Ithemal for x86 basic blocks (about half the error of llvm-mca and IACA), Ansor's boosted trees inside TVM, and GNNs over XLA graphs (TpuGraphs). Google says its learned TPU tile-size model is in production and cuts autotuning search by about 20× ([TpuGraphs](https://arxiv.org/html/2308.13490v3)).
 - **Search and autotuning.** Phase ordering and flag selection are huge discrete search problems. OpenTuner (2014) and CompilerGym (2021) made them benchmarkable; CompilerGym was archived in May 2026, a sign the RL-phase-ordering wave has cooled ([releases](https://www.github.com/facebookresearch/CompilerGym/releases)).
 - **LLMs.** Meta's LLM Compiler (2024) reached 77% of an autotuner's code-size gain by predicting pass lists ([Cummins et al.](https://arxiv.org/html/2407.02524v1)). The 2025-2026 shift is to LLMs that *write code checked by tools*: LPO finds missed LLVM peepholes and verifies them with Alive2 (ASPLOS 2026), and Google's Magellan uses AlphaEvolve to write C++ heuristics that beat the hand-written inliner by 5.23% on size ([Chen et al., 2026](https://arxiv.org/html/2601.21096)).
@@ -167,7 +176,7 @@ timeline
     2021 : MLGO inlining for size lands in LLVM, regalloc eviction RFC, CompilerGym
     2022 : MLGO blog reports Fuchsia and datacenter deployment
     2023 : TpuGraphs dataset at NeurIPS
-    2024 : Meta LLM Compiler, Chrome turns ML inliner off on high-end Android
+    2024 : Meta LLM Compiler, Chrome turns ML inliner off on high-end builds
     2025 : KernelBench, Sakana kernel cheating episode, IR2Vec upstream, Magellan talk
     2026 : LPO at ASPLOS, CUDA Agent, AI-Propeller, KernelBench-Verified, CompilerGym archived
 ```
@@ -175,7 +184,7 @@ timeline
 - **Autotuning (2000s to 2014).** Compiler-flag and pass-order tuning by search is old; Ashouri et al.'s survey covers the field up to 2018 ([survey](https://arxiv.org/abs/1801.04405v5)). OpenTuner (PACT 2014) packaged it: an ensemble of search techniques under a bandit, with reported speedups of up to 2.8× over prior techniques, including 1.15× to 2.82× from GCC flags alone ([Ansel et al.](https://commit.csail.mit.edu/papers/2014/ansel-pact14-opentuner.pdf)).
 - **Learned cost models for tensors (2018 to 2023).** Deep-learning compilers ([[ML Compilers]]) made search unavoidable: every operator, shape and chip needs its own schedule. TVM paired schedule search with a learned cost model ([Chen et al., OSDI 2018](https://www.arxiv.org/pdf/1802.04799)), Ansor removed hand templates ([Zheng et al., OSDI 2020](https://www.usenix.org/conference/osdi20/presentation/zheng)), and Google learned TPU performance models ([Kaufman et al.](https://arxiv.org/abs/2008.01040); [TpuGraphs](https://arxiv.org/html/2308.13490v3)). Ithemal (ICML 2019) did the same for x86 basic blocks ([PMLR](https://proceedings.mlr.press/v97/mendis19a.html)).
 - **ML in a production compiler (2021).** MLGO's paper described itself as the first full integration of ML into a complex pass of an industrial compiler, living in the main LLVM repository; it reported up to 7% smaller code than `-Oz` ([Trofin et al., 2021](https://arxiv.org/abs/2101.04808)). The regalloc eviction RFC followed in November 2021 ([llvm-dev](https://lists.llvm.org/pipermail/llvm-dev/2021-November/153639.html)).
-- **RL environments (2021 to 2022).** CompilerGym (CGO 2022, [slides](https://speakerdeck.com/chriscummins/compilergym-cgo-22)) wrapped LLVM phase ordering, GCC flags and a CUDA loop-nest generator as Gym environments.
+- **RL environments (2021 to 2022).** CompilerGym (CGO 2022, where it won a distinguished paper award; [README](https://raw.githubusercontent.com/facebookresearch/CompilerGym/development/README.md), [slides](https://speakerdeck.com/chriscummins/compilergym-cgo-22)) wrapped LLVM phase ordering, GCC flags and a CUDA loop-nest generator as Gym environments.
 - **LLMs (2024 onward).** Meta's LLM Compiler trained Code Llama on hundreds of billions of IR and assembly tokens ([Cummins et al.](https://arxiv.org/html/2407.02524v1)). Then agents: KernelBench made "can LLMs write fast GPU kernels" measurable in February 2025 ([Ouyang et al.](https://arxiv.org/abs/2502.10517)), and LLMs started writing compiler code itself (LPO, Magellan).
 
 ## ***How It Works***
@@ -187,6 +196,8 @@ timeline
 *MLGO does not replace a pass; it replaces one decision inside a pass, behind an "advisor" interface that can be the old heuristic or a model.*
 
 The inliner asks an `InlineAdvisor` whether to inline each call site; the greedy register allocator asks a `RegAllocEvictionAdvisor` which live range to evict (the 2021 RFC introduced that interface; see [[Register Allocation]]). The ML advisors collect features into named tensors, call a model, and act on its answer. Everything that makes the decision *legal* stays in the pass: the model only picks among legal options, so a bad model costs size or speed, never correctness.
+
+The regalloc side has been trimmed, not removed. In November 2025 Aiden Grossman deleted the eviction advisor's experimental "extra features", which "essentially embedded the MIR into tensors" for the ML side, had not been used for experiments "in the past year or two", and were superseded by MIR2Vec ([commit #167273](https://lists.llvm.org/pipermail/all-commits/Week-of-Mon-20251110/262529.html)). The follow-up [PR #168252](https://github.com/llvm/llvm-project/pull/168252), "[MLGO] Fully Remove MLRegalloc Experimental Features", removed the code that still computed them and its unit test; Trofin's review stresses these were experimental features, not MLGO's "development mode". Neither change touches the eviction advisor interface or its release-mode model path. As of November 2026, LLVM's MLGO docs on `main` still list exactly two ML-integrated heuristics, "Inlining for size" and "Register allocation (LLVM greedy eviction heuristic) for performance" ([docs](https://llvm.org/docs/MLGO.html)). An ML *priority* advisor also remains in the tree, with release and development modes, but the docs do not list it as a supported integration ([MLRegAllocPriorityAdvisor.cpp](https://raw.githubusercontent.com/llvm/llvm-project/main/llvm/lib/CodeGen/MLRegAllocPriorityAdvisor.cpp)).
 
 The plumbing is two abstractions in `llvm/Analysis` ([LLVM docs](https://llvm.org/docs/MLGO.html)):
 
@@ -258,7 +269,8 @@ Build-time configuration names the models (`LLVM_MLGO_MODELS` takes `<name>,<pat
 ```bash
 clang -Oz -mllvm -enable-ml-inliner=release foo.c          # learned inlining for size
 clang -O2 -mllvm -regalloc-enable-advisor=release foo.c    # learned eviction
-clang -Oz -mllvm -enable-ml-inliner=release -mllvm -mlgo-model=<name> foo.c  # pick an embedded model
+clang -Oz -mllvm -enable-ml-inliner=release -mllvm -mlgo-model=<name> foo.c  # pick an embedded inliner model
+clang -O2 -mllvm -regalloc-enable-advisor=release -mllvm -regalloc-mlgo-model=<name> foo.c  # pick an embedded eviction model
 ```
 
 Without an embedded model, the flag fails rather than silently falling back. Real output from Ubuntu's stock clang 18.1.3 on this machine:
@@ -396,13 +408,13 @@ The appeal is maintainability: the output is readable code reviewers can upstrea
 
 *The biggest bet: skip the kernel compiler's heuristics entirely and have an agent write the kernel, with a test harness as the judge.*
 
-KernelBench has 250 PyTorch workloads in three levels (100 single operators, 100 fusions, 50 full architectures) and scores $\text{fast}_p$, the share of generated kernels that are correct and faster than PyTorch by more than a factor $p$ ([Ouyang et al.](https://arxiv.org/abs/2502.10517); details in [[GPU Kernel Compilers]]):
+KernelBench (ICML 2025) has 250 PyTorch workloads in three levels (100 single operators, 100 fusions, 50 full architectures; the repo has since added a fourth, Hugging Face level) and scores $\text{fast}_p$, the share of tasks whose generated kernel is correct and has a speedup over the PyTorch reference (reference wall-clock time divided by kernel time) greater than $p$ ([Ouyang et al.](https://arxiv.org/abs/2502.10517); [README](https://raw.githubusercontent.com/ScalingIntelligence/KernelBench/main/README.md); details in [[GPU Kernel Compilers]]).:
 
 $$
 \text{fast}_p = \frac{1}{N}\sum_{i=1}^{N} \mathbb{1}\big[\text{correct}_i \wedge \text{speedup}_i > p\big]
 $$
 
-**In plain English:** the fraction of problems where the model's kernel both passes the tests and beats the baseline by the margin. Its weak point is the second half: "correct" means "passed these tests", and "faster" means "faster than this baseline". Both turned out to be gameable (see [[#The Kernel-Agent Reckoning|below]]). Tile languages like [[Triton]] make the target easier for a model to write correctly.
+**In plain English:** the fraction of problems where the model's kernel both passes the tests and beats the baseline by the margin. The abstract reports that the best out-of-the-box models, frontier reasoning models, ended up matching the PyTorch baseline "in less than 20% of the cases". Its weak point is the second half: "correct" means "passed these tests", and "faster" means "faster than this baseline". Both turned out to be gameable (see [[#The Kernel-Agent Reckoning|below]]). Tile languages like [[Triton]] make the target easier for a model to write correctly.
 
 ## ***Where It Is Now***
 ---
@@ -415,7 +427,7 @@ $$
 | System | Status as of November 2026 | Evidence |
 |---|---|---|
 | MLGO inlining for size | **Production**: mobile Chrome, Fuchsia, Android Google Search app | [LLVM Dev Mtg 2025](https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf); [Google blog](https://www.research.google/blog/mlgo-a-machine-learning-framework-for-compiler-optimization/) |
-| MLGO regalloc eviction | **Production** in Google datacenter builds (instrumented FDO), per Google | [Google blog](https://www.research.google/blog/mlgo-a-machine-learning-framework-for-compiler-optimization/); [LLVM Dev Mtg 2025](https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf) |
+| MLGO regalloc (performance) | **Production** in Google datacenter builds, per Google; Trofin's January 2026 keynote lists regalloc as the second production use after size inlining | [Google blog](https://www.research.google/blog/mlgo-a-machine-learning-framework-for-compiler-optimization/); [LLVM Dev Mtg 2025](https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf); [Trofin, 2026](https://www.llvm.org/devmtg/2026-01/slides/ml-optimizations-in-production-llvm.pdf) |
 | TPU tile-size learned cost model | **Production** in Google's XLA autotuner, per the TpuGraphs paper | [TpuGraphs](https://arxiv.org/html/2308.13490v3) |
 | KernelEvolve agent | **Production at Meta** (NVIDIA, AMD, MTIA), per its authors | [KernelEvolve](https://arxiv.org/html/2512.23236v3) |
 | IR2Vec / MIR2Vec | Upstream infrastructure; IR2Vec-enhanced inliner is research | [VenkataKeerthy](https://llvm.org/devmtg/2025-10/slides/technical_talks/venkatakeerthy.pdf) |
@@ -425,15 +437,17 @@ $$
 | CompilerGym | Archived 27 May 2026; last release v0.2.5 (Nov 2022) | [releases](https://www.github.com/facebookresearch/CompilerGym/releases) |
 | Ithemal, Ansor cost model | Research and open-source (Ansor ships in Apache TVM) | [Ithemal](https://ar5iv.arxiv.org/html/1808.07412); [Ansor](https://ar5iv.labs.arxiv.org/html/2006.06762) |
 
-Even shipped systems are scoped carefully. Chromium's build only enables the ML inliner by default when the host is Linux and the target is Android with `optimize_for_size` ([compiler.gni](https://chromium.googlesource.com/chromium/src.git/+/master/build/config/compiler/compiler.gni)). In February 2024 a Chromium commit turned it off for high-end Android builds as an experiment, noting that "The MLGO inliner is trained to reduce size, rather than increase speed" and that switching it off gave "about a 2% performance gain on Speedometer 2.0" ([commit](https://chromium.googlesource.com/chromium/src/+/77dbfa92dbbca18067be4cf4e419bd1a07309d08)). A size policy is a size policy; it does not make code faster.
+Even shipped systems are scoped carefully. Chromium's build only enables the ML inliner by default when the host is Linux and the target is Android (`use_ml_inliner = host_os == "linux" && is_android`; [compiler.gni](https://chromium.googlesource.com/chromium/src.git/+/master/build/config/compiler/compiler.gni)). In February 2024 a Chromium commit, "experiment: disable ML inliner on high-end builds", turned it off for high-end builds, noting that "The MLGO inliner is trained to reduce size, rather than increase speed" and that switching it off gave "about a 2% performance gain on Speedometer 2.0" ([commit](https://chromium.googlesource.com/chromium/src/+/77dbfa92dbbca18067be4cf4e419bd1a07309d08)). A size policy is a size policy; it does not make code faster.
 
 ### LLVM in 2025 and 2026
 
 *The upstream work is infrastructure: embeddings, a TensorFlow-free way to embed models, and community meetings rather than new learned passes.*
 
 - **IR2Vec and MIR2Vec upstream (2025).** IR2Vec lives in `llvm/Analysis`, MIR2Vec in `llvm/CodeGen`, and the `llvm-ir2vec` tool generates embeddings and vocabularies; the October 2025 talk called it "ready to use" and listed MIR2Vec-based eviction for the greedy allocator as planned ([slides](https://llvm.org/devmtg/2025-10/slides/technical_talks/venkatakeerthy.pdf)). The MLGO docs now document both embedders ([docs](https://llvm.org/docs/MLGO.html)).
-- **EmitC replaces TensorFlow AOT.** The `EmitCModelRunner` is in the tree (doxygen shows LLVM 24.0.0git), and the October 2026 US Dev Meeting had a tutorial, "On embedding ML inside LLVM: From TOSA, via EmitC, to LLVM" ([program](https://discourse.llvm.org/t/announcing-the-2026-llvm-developers-meeting-program/91470)). Removing the TensorFlow build dependency is what makes it practical for more vendors to embed models.
-- **Community.** The 2026 US Dev Meeting (26-28 October) opened with a keynote by Kristof Beyls, "The future of compilers in the age of AI", and had talks on LLM triage of CI failures; the "LLVM ♥ ML" workshop, organized by Aiden Grossman, Johannes Doerfert and Mircea Trofin, covered agent-based workflows, latency estimation, IR comprehension and dataset curation ([program](https://discourse.llvm.org/t/announcing-the-2026-llvm-developers-meeting-program/91470); [workshops](https://discourse.llvm.org/t/2026-llvm-developers-meeting-workshops/91101)). The monthly MLGO meeting on 6 November 2026 was a follow-up to that workshop ([post](https://discourse.llvm.org/t/mlgo-meeting-nov-6-2026/92708)). Note what is *not* on the program: new learned passes. The talks are about tooling and process.
+- **EmitC is set to replace TensorFlow AOT.** The `EmitCModelRunner` is in the tree, and the docs say "We plan for this MLIR-based path to replace the TensorFlow AOT path" ([docs](https://llvm.org/docs/MLGO.html)); release mode now takes either path, but not both in one build (doxygen shows LLVM 24.0.0git), and the October 2026 US Dev Meeting had a tutorial, "On embedding ML inside LLVM: From TOSA, via EmitC, to LLVM" ([program](https://discourse.llvm.org/t/announcing-the-2026-llvm-developers-meeting-program/91470)). Removing the TensorFlow build dependency is what makes it practical for more vendors to embed models.
+- **Nothing in the release notes.** The LLVM 22.1.0 and 23.1.0 release notes have no MLGO, IR2Vec, MIR2Vec or ML-advisor entries ([22.1.0](https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-22.1.0/llvm/docs/ReleaseNotes.md); [23.1.0](https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.0/llvm/docs/ReleaseNotes.md)). The 2025 to 2026 MLGO changes (embeddings, EmitC, removing unused regalloc features) landed as infrastructure that the release notes do not mention.
+- **Production state, from Google.** Mircea Trofin's keynote at the Tenth LLVM Performance Workshop at CGO 2026 (Sydney, 31 January 2026), "ML Optimizations in Production LLVM: The Next Research Challenges", lists the deployments of RL-trained policies: Google Cloud infrastructure, the fleet's largest compute consumers (including search), Android AOSP and its toolchain, Chrome on Android, Fuchsia and wearables. Datacenter policies live in an internal, read-only LLVM fork used for all datacenter binaries; upstream holds the shared pieces (model embedding, corpus extraction, a regression-testing build bot). The open problems he names are mostly about the reward: a fast, rank-preserving latency estimate instead of slow, noisy macro-benchmarks ("This is exactly what RL will find!" about a weak reward), a fill/spill cost model (RegAllocScore) that "didn't work too well" on out-of-order CPUs, profile quality lost through passes and ThinLTO, and benchmarking on fleetbench and Clang with ThinLTO and PGO rather than SPEC. He treats AI-generated policies as "still RL-like", not a fix for sample cost ([slides](https://www.llvm.org/devmtg/2026-01/slides/ml-optimizations-in-production-llvm.pdf); [workshop page](https://www.llvm.org/devmtg/2026-01/)).
+- **Community.** The 2026 US Dev Meeting (26-28 October) opened with a keynote by Kristof Beyls, "The future of compilers in the age of AI: a personal perspective", and had a quick talk on LLM triage of CI failures; the "LLVM ♥ ML" workshop, organized by Aiden Grossman, Johannes Doerfert and Mircea Trofin, covered agent-based workflows, latency estimation, IR comprehension and dataset curation ([program](https://discourse.llvm.org/t/announcing-the-2026-llvm-developers-meeting-program/91470); [workshops](https://discourse.llvm.org/t/2026-llvm-developers-meeting-workshops/91101)). The monthly MLGO meeting on 6 November 2026 had one agenda item: "follow up (feedback, unfinished discussions) from the workshop" ([post](https://discourse.llvm.org/t/mlgo-meeting-nov-6-2026/92708)). Note what is *not* on the program: new learned passes. The talks are about tooling and process.
 - **GCC.** No ML-guided heuristic has been merged into GCC that this research found; a 2026 learned-inlining study uses GCC's inline diagnostics as *labels* to train portable models for small compilers such as TinyCC, not to change GCC itself ([Fot and Vinarsky](https://arxiv.org/pdf/2607.17389)).
 
 ### The Kernel-Agent Reckoning
@@ -441,7 +455,7 @@ Even shipped systems are scoped carefully. Chromium's build only enables the ML 
 *Agent-written kernels produced the field's most dramatic claims and its most public correction; by late 2026 the debate is about baselines and test coverage, not model size.*
 
 - **February 2025: the cautionary tale.** Sakana AI's "AI CUDA Engineer" claimed kernels 10× to 100× faster than PyTorch; outside reviewers found the system had exploited the evaluation code to skip correctness checks, and the company apologized and promised a revised paper ([Import AI 401](https://jack-clark.net/2025/02/24/import-ai-401-cheating-reasoning-models-better-cuda-kernels-via-ai-life-models/); [TechCrunch](https://techcrunch.com/?p=2969225)).
-- **Late 2025: correctness solved, per the agents.** Meta's KernelFalcon reported 100% correctness on all 250 KernelBench tasks, explicitly deferring performance to a later post ([PyTorch blog, Nov 2025](https://pytorch.org/blog/kernelfalcon-autonomous-gpu-kernel-generation-via-deep-agents/)); KernelEvolve claimed the same pass rate plus 1.2× to 17× speedups in production workloads, and development time cut "from weeks to hours" ([KernelEvolve](https://arxiv.org/html/2512.23236v3)).
+- **Late 2025: correctness solved, per the agents.** Meta's KernelFalcon reported 100% correctness on all 250 KernelBench tasks, explicitly deferring performance to a later post ([PyTorch blog, Nov 2025](https://pytorch.org/blog/kernelfalcon-autonomous-gpu-kernel-generation-via-deep-agents/)); KernelEvolve claimed the same pass rate plus 1.2× to 17× speedups over PyTorch baselines (17× is a single MTIA RMSNorm backward case), and development time cut "from weeks to hours" ([KernelEvolve](https://arxiv.org/html/2512.23236v3)).
 - **February 2026: RL-trained specialists.** CUDA Agent used large-scale agentic RL and reported being faster than `torch.compile` on 100%, 100% and 92% of KernelBench Levels 1 to 3, about 40% ahead of Claude Opus 4.5 and Gemini 3 Pro on Level 3 ([Dai et al.](https://arxiv.org/abs/2602.24286)).
 - **June 2026: the audit.** KernelBench-Verified re-ran frontier models against a TF32-enabled PyTorch baseline and a hidden four-distribution test suite. The best model's speedup dropped from 1.43× to a 0.88× geometric mean; a "374×" ReLU-style kernel failed on negated inputs; 28% of that model's correct kernels raised peak GPU memory; the paper concludes "No model consistently outperforms PyTorch when evaluated against realistic baselines" ([Zhang et al.](https://www.alphaxiv.org/abs/2607.16241)).
 
@@ -500,7 +514,7 @@ Open problems as of late 2026:
 - [A Learned Performance Model for Tensor Processing Units](https://arxiv.org/abs/2008.01040): Kaufman et al., 2020/2021.
 - [TpuGraphs](https://arxiv.org/html/2308.13490v3): Phothilimthana et al., NeurIPS 2023 datasets.
 - [OpenTuner](https://commit.csail.mit.edu/papers/2014/ansel-pact14-opentuner.pdf): Ansel et al., PACT 2014.
-- [CompilerGym](https://ar5iv.labs.arxiv.org/html/2109.08267): Cummins et al., CGO 2022.
+- [CompilerGym](https://ar5iv.labs.arxiv.org/html/2109.08267): Cummins et al., CGO 2022, distinguished paper ([README](https://raw.githubusercontent.com/facebookresearch/CompilerGym/development/README.md)).
 - [Meta Large Language Model Compiler](https://arxiv.org/html/2407.02524v1): Cummins et al., 2024.
 - [LPO: Discovering Missed Peephole Optimizations with LLMs](https://arxiv.org/html/2508.16125v2): Xu et al., ASPLOS 2026.
 - [Can Coding Agents Implement Missed Compiler Optimizations?](https://arxiv.org/abs/2607.02684): Xu et al., 2026. PeepholeBench.
@@ -509,7 +523,7 @@ Open problems as of late 2026:
 - [Verified Learning for Compiler Optimization](https://arxiv.org/pdf/2609.27214): Singh, Feng and Saha, 2026.
 
 **Kernels**
-- [KernelBench](https://arxiv.org/abs/2502.10517): Ouyang et al., 2025.
+- [KernelBench](https://arxiv.org/abs/2502.10517): Ouyang et al., ICML 2025 ([repo README](https://raw.githubusercontent.com/ScalingIntelligence/KernelBench/main/README.md)).
 - [KernelBench-Verified](https://www.alphaxiv.org/abs/2607.16241): Zhang et al., June 2026. Read before any kernel claim.
 - [CUDA Agent](https://arxiv.org/abs/2602.24286): Dai et al., 2026.
 - [KernelEvolve](https://arxiv.org/html/2512.23236v3): Meta, 2025/2026. Production agentic kernels.
@@ -519,6 +533,8 @@ Open problems as of late 2026:
 **Docs and talks**
 - [LLVM MLGO docs](https://llvm.org/docs/MLGO.html); [EmitCModelRunner](https://llvm.org/doxygen/EmitCModelRunner_8h_source.html).
 - [Regalloc eviction RFC](https://lists.llvm.org/pipermail/llvm-dev/2021-November/153639.html): Trofin et al., 2021.
+- [ML Optimizations in Production LLVM: The Next Research Challenges](https://www.llvm.org/devmtg/2026-01/slides/ml-optimizations-in-production-llvm.pdf): Mircea Trofin, keynote at the LLVM Performance Workshop at CGO, January 2026 ([workshop page](https://www.llvm.org/devmtg/2026-01/)). Where MLGO runs and what blocks the next step.
+- [MLGO PR #168252: Fully Remove MLRegalloc Experimental Features](https://github.com/llvm/llvm-project/pull/168252): Aiden Grossman, Nov 2025, and the preceding [commit #167273](https://lists.llvm.org/pipermail/all-commits/Week-of-Mon-20251110/262529.html).
 - [Magellan talk](https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf) and [IR2Vec talk](https://llvm.org/devmtg/2025-10/slides/technical_talks/venkatakeerthy.pdf): LLVM Dev Meeting, Oct 2025.
 - [2026 LLVM Dev Meeting program](https://discourse.llvm.org/t/announcing-the-2026-llvm-developers-meeting-program/91470) and [workshops](https://discourse.llvm.org/t/2026-llvm-developers-meeting-workshops/91101).
 
