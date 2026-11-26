@@ -125,7 +125,7 @@ Attention moves information between tokens; the FFN is where most of the paramet
 
 ## ***How We Got Here***
 ---
-*The Transformer appeared in 2017 as a translation model, split into encoder-only (BERT) and decoder-only (GPT) branches in 2018, and the decoder-only branch won once scaling laws showed bigger was predictably better. Since 2020 the work has been swapping better parts into the same skeleton.*
+*The Transformer appeared in 2017 as a translation model, split into encoder-only (BERT) and decoder-only (GPT) branches in 2018, and the decoder-only branch won once [[Scaling Laws|scaling laws]] showed bigger was predictably better. Since 2020 the work has been swapping better parts into the same skeleton.*
 
 ```mermaid
 timeline
@@ -257,7 +257,7 @@ N_{\text{non-embedding}} \approx 12\, L\, d^2
 \text{training FLOPs} \approx 6\, N\, D
 $$
 
-*In plain English: parameters grow with depth times width squared, and training costs about 6 floating-point operations per parameter per training token $D$ (2 for the forward pass, 4 for the backward pass), ignoring the attention-score term, which matters only at long context* ([Kaplan et al., 2020](https://arxiv.org/abs/2001.08361)).
+*In plain English: parameters grow with depth times width squared, and training costs about 6 floating-point operations per parameter per training token $D$ (2 for the forward pass, 4 for the backward pass), ignoring the attention-score term, which matters only at long context. See [[Scaling Laws]] for how budgets are split between $N$ and $D$* ([Kaplan et al., 2020](https://arxiv.org/abs/2001.08361)).
 
 **Worked example (GPT-2 small):** $L = 12$, $d = 768$, vocabulary 50,257.
 - Blocks: $12 \times 12 \times 768^2 \approx 85\text{M}$.
