@@ -7,7 +7,7 @@ tags:
   - transient-execution
   - address-space-isolation
   - kvm
-status: draft
+status: complete
 sources:
   - https://linuxasi.dev/
   - https://lwn.net/Articles/1064090/
@@ -59,7 +59,7 @@ updated: 2026-11-26
 
 - **The idea.** The Linux kernel maps all physical memory into its own address space (the *direct map*). ASI gives the kernel a second, *restricted* view that maps only memory it has marked non-sensitive, runs there by default, and switches to the full view only when it genuinely needs a sensitive page.
 - **Why it matters.** Today each [[Transient Execution Attacks and Mitigations|transient execution]] variant gets its own patch: buffer clears, predictor flushes, retpolines, and many of them run on every kernel entry. ASI attacks the common cause instead and could let many of those be turned off.
-- **Who's behind it.** Google, led by Brendan Jackman, builds on earlier Oracle, Amazon and Cisco work. A version runs on "a significant subset of Google's fleet" ([LWN, 2025](https://lwn.net/Articles/1016013/)), with Google reporting end-to-end overhead under 5% and often under 1% ([linuxasi.dev](https://linuxasi.dev/)).
+- **Who's behind it.** Google, led by Brendan Jackman, builds on earlier Oracle, Amazon and Cisco work. A version runs on "a significant subset of Google's fleet" ([LWN, 2025](https://lwn.net/Articles/1016013/)), and the project says its overheads "almost always stay below 1%" of whatever is measured, against about 5% for upstream SRSO mitigations alone ([linuxasi.dev](https://linuxasi.dev/)).
 - **Status, November 2026.** **Not in mainline.** Preparatory memory-management cleanups were merged in August 2026; the core pieces (`__GFP_UNMAPPED`, the "mermap" ephemeral mapping, guest_memfd direct-map removal) are still under review, and review has been slow.
 
 ## ***The Problem***
@@ -216,7 +216,7 @@ $$
 
 *In plain words: overhead is how often the kernel has to leave the restricted space in a period of time, multiplied by what each exit and its later flush cost.*
 
-Worked example (illustrative numbers): a server spends one second doing work and leaves the restricted space 20,000 times in it, each switch-plus-flush costing 2 µs. Then overhead ≈ 20,000 × 2 µs / 1 s = 4%. Halve the exits by marking more memory non-sensitive and it drops to 2%. That's why the FIO regression disappeared once the page cache stopped forcing exits, and why Google reports under 5% end-to-end and often under 1% ([linuxasi.dev](https://linuxasi.dev/)).
+Worked example (illustrative numbers): a server spends one second doing work and leaves the restricted space 20,000 times in it, each switch-plus-flush costing 2 µs. Then overhead ≈ 20,000 × 2 µs / 1 s = 4%. Halve the exits by marking more memory non-sensitive and it drops to 2%. That's why the FIO regression shrank once the page cache stopped forcing exits, and how the project can report overheads that "almost always stay below 1%" ([linuxasi.dev](https://linuxasi.dev/)).
 
 ### Cousins: memfd_secret and guest_memfd
 
