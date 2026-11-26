@@ -322,6 +322,8 @@ Pre-copy migration copies memory while the guest runs, re-copies pages it dirtie
 
 *Traditional virtualization protects the host from guests. Confidential computing adds the reverse: memory encryption and integrity checks that keep even a malicious hypervisor or cloud operator out of a guest.*
 
+The full design, attestation and guest-kernel side are covered in [[Confidential Computing]].
+
 | Technology | Vendor | Protects | Linux status |
 |---|---|---|---|
 | **SEV-SNP** | AMD (SEV 2016, SEV-ES 2017, SNP 2020) | Encrypted memory plus a Reverse Map Table that blocks the hypervisor from remapping, replaying or aliasing guest pages ([AMD](https://www.sas.com/content/dam/SAS/documents/marketing-whitepapers-ebooks/third-party-whitepapers/en/amd-sev-snp-strengthening-vm-isolation-with-integrity-protection-and-more.pdf)) | KVM host support in 6.11 (2024, [Phoronix](https://www.phoronix.com/news/Linux-6.11-KVM)) |
@@ -408,6 +410,7 @@ Recent changes:
 - [[Kernel Bypass Networking]] — SR-IOV and VFIO give VMs direct NIC access.
 - [[Transient Execution Attacks and Mitigations]] — L1TF, MDS and other cross-VM leaks.
 - [[Kernel Security Hardening]] — Defences inside the host kernel KVM relies on.
+- [[Confidential Computing]] — Guests protected from the hypervisor: SEV-SNP, TDX and Arm CCA.
 - [[Rust in the Linux Kernel]] — Rust is also the language of the newer VMMs.
 - [[Cluster Scheduling]] — Placing VMs and containers across a fleet.
 - [[GPU Cluster Infrastructure]] — GPUs passed through to VMs in AI clouds.
