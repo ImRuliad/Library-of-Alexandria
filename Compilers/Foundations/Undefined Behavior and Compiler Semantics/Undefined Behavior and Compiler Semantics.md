@@ -504,7 +504,7 @@ Either way the optimizer may not assume "no overflow". The LLVM IR shows it (rea
 | `-ftrivial-auto-var-init=zero` or `=pattern` | Uninitialized locals get a known value | Extra stores; C++26 makes this behavior standard-sanctioned |
 | `-fno-pointer-tbaa` (Clang 20+) | Pointer-typed objects share one alias tag | Loses Clang 20's stricter pointer TBAA |
 
-**UndefinedBehaviorSanitizer** (UBSan) instruments the program to check for UB at run time: signed overflow, oversized shifts, misaligned or null access, out-of-range enum and `bool` loads, unreachable code reached, and more ([Clang UBSan docs](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)). Real runs, with the overflow behind `argc` so it is not constant-folded:
+**UndefinedBehaviorSanitizer** (UBSan; see [[Sanitizers]] for how it and its siblings are implemented) instruments the program to check for UB at run time: signed overflow, oversized shifts, misaligned or null access, out-of-range enum and `bool` loads, unreachable code reached, and more ([Clang UBSan docs](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)). Real runs, with the overflow behind `argc` so it is not constant-folded:
 
 ```text
 $ gcc -O2 -fsanitize=undefined ov2.c && ./a.out
@@ -635,7 +635,7 @@ Open problems:
 - [[Classic Optimizations]] — InstCombine, `nsw` and poison in everyday folds; the Lee et al. story in more detail.
 - [[Pointer and Alias Analysis]] — Strict aliasing with real output, TBAA, Stacked and Tree Borrows, LLVM capture and provenance work.
 - [[Memory Models and Pointer Provenance]] — PNVI-ae-udi, C++29 provenance, LLVM's `ptrtoaddr` and byte type, Rust's strict provenance and CHERI in full.
-- [[Sanitizers]] — Planned: how UBSan, ASan, MSan and TSan are implemented.
+- [[Sanitizers]] — How UBSan, ASan, HWASan, MSan and TSan are implemented, with compiler output and measured costs.
 - [[Compiler Testing and Fuzzing]] — Why test programs must be UB-free; Csmith, Rustlantis and Miri as an oracle.
 - [[Verified Compilers]] — Refinement, CompCert's "goes wrong" behavior, Alive2.
 - [[Translation Validation]] — Planned: checking each compilation against a UB-aware semantics.

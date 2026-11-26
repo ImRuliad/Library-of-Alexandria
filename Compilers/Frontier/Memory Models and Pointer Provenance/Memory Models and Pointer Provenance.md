@@ -496,4 +496,4 @@ Open problems:
 - [[LLVM]] and [[Intermediate Representations]]: where the IR-level model is being written.
 - [[Garbage Collection]]: non-integral pointers and address spaces also serve GC'd languages.
 - [[Concurrency Memory Models]]: planned; the other meaning of "memory model".
-- [[Sanitizers]]: planned; run-time checking of memory errors.
+- [[Sanitizers]]: run-time checking of memory errors with shadow memory and pointer tags (ASan, HWASan, MSan, TSan, MTE).

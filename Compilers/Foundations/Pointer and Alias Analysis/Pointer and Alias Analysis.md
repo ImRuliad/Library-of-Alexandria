@@ -555,7 +555,7 @@ Numbers are from the [Tree Borrows paper](https://iris-project.org/pdfs/2025-pld
 - **Capture and provenance.** As of November 2026, LLVM distinguishes address captures from provenance captures; alias analysis checks only provenance captures and uses read-only captures, which let rustc mark non-mutable reference arguments as captured read-only, and `!captures` metadata on stores lets Rust say a store captures only read provenance (whether that is valid "depends on an open question in Rust's aliasing model") ([Popov, This year in LLVM 2025](https://www.npopov.com/2026/01/31/This-year-in-LLVM-2025.html), paraphrased).
 - **`ptrtoaddr` and the byte type.** LLVM 22 added `ptrtoaddr`, which returns only a pointer's address and "does not expose the provenance of the pointer", unlike `ptrtoint`, whose exposure side effect LLVM currently ignores. A formal specification working group is targeting provenance, with an IR byte type as the prerequisite (same source). LLVM 23's release notes already mention GlobalISel support for "the LLVM IR byte type (`bN`)" ([LLVM 23 notes](https://releases.llvm.org/23.1.0/docs/ReleaseNotes.html)).
 - **Lifetime markers.** Lifetime intrinsics may now only be used on allocas and lost their size argument; Popov notes remaining problems because it is hard to tell efficiently whether two allocas' lifetimes overlap ([Popov](https://www.npopov.com/2026/01/31/This-year-in-LLVM-2025.html)).
-- **Type-based facts.** Clang 20's pointer TBAA is now the default and a type sanitizer exists to catch violations ([Clang 20 notes](https://releases.llvm.org/20.1.0/tools/clang/docs/ReleaseNotes.html)).
+- **Type-based facts.** Clang 20's pointer TBAA is now the default and a [[Sanitizers|type sanitizer]] exists to catch violations ([Clang 20 notes](https://releases.llvm.org/20.1.0/tools/clang/docs/ReleaseNotes.html)).
 - **GCC** keeps its field-sensitive inclusion solver plus alias oracle and TBAA alias sets ([GCC internals](https://gcc.gnu.org/onlinedocs/gccint/Alias-analysis.html)).
 
 ### Rust's Aliasing Model
@@ -661,3 +661,4 @@ Open problems:
 - [[Escape Analysis]] — The capture question from the JIT and allocation side.
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
 - [[Memory Models and Pointer Provenance]] — The memory model behind NoAlias answers: exposure at casts, `ptrtoaddr`, Tree Borrows and CHERI.
+- [[Sanitizers]] — TypeSanitizer checks the type-based aliasing rules at run time.

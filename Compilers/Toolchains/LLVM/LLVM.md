@@ -375,7 +375,7 @@ The stages run in order: IR-level preparation (CodeGenPrepare), instruction sele
 | **Clang** | C, C++, Objective-C, OpenCL, CUDA, HIP front end and driver | Also clang-tidy, clangd, clang-format, the static analyzer |
 | **LLD** | Linker for ELF, Mach-O, COFF, Wasm | Rust made it the default linker on x86-64 Linux in 1.90 ([Rust Blog, 2025](https://blog.rust-lang.org/2025/09/01/rust-lld-on-1.90.0-stable)) |
 | **LLDB** | Debugger | Uses Clang to parse expressions in the debugged program's types |
-| **compiler-rt** | Runtime libraries | Builtins (soft-float, `__muldi3`), sanitizers (ASan, TSan, MSan, UBSan, HWASan), profiling, fuzzing (libFuzzer) |
+| **compiler-rt** | Runtime libraries | Builtins (soft-float, `__muldi3`), [[Sanitizers\|sanitizers]] (ASan, TSan, MSan, UBSan, HWASan), profiling, fuzzing (libFuzzer) |
 | **libc++, libc++abi, libunwind** | C++ standard library and ABI support | Default on Apple platforms; the only STL in Android's NDK since r18 ([Android NDK docs](https://developer.android.com/ndk/guides/cpp-support)) |
 | **[[MLIR]]** | Framework for multi-level IRs (dialects) | Base of Flang's FIR, ClangIR, Triton, Mojo, IREE, CIRCT |
 | **Flang** | Fortran front end | Lowers through MLIR (FIR, HLFIR) to LLVM IR ([Flang 23 notes](https://releases.llvm.org/23.1.0/tools/flang/docs/ReleaseNotes.html)) |
@@ -499,3 +499,4 @@ The second round of area-team elections (members serve one-year terms) closed on
 - [[Compiler, Assembler, Linker, and Loader]] — The owner's note on the C build stages that Clang, the MC layer and LLD implement.
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
+- [[Sanitizers]] — The compiler-rt runtimes and IR passes behind `-fsanitize=`.

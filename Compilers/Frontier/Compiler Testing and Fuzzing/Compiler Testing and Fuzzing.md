@@ -118,7 +118,7 @@ A unit test has an expected value written next to it. A fuzzer generates thousan
 - **Ground truth from the generator.** If the generator computes the result while it generates the program, it knows the answer. YARPGen v2 does this alongside differential checks ([Livinskii, Babokin and Regehr, PLDI 2023](https://www-old.cs.utah.edu/~regehr/pldi23.pdf)).
 - **Another implementation.** Compare GCC against Clang, `-O0` against `-O2`, or a JIT against an interpreter.
 - **A relation the output must satisfy.** Run the program and a transformed copy; they must agree.
-- **Implicit oracles.** Crashes, assertion failures, sanitizer reports, IR verifier failures and timeouts need no expected value at all.
+- **Implicit oracles.** Crashes, assertion failures, [[Sanitizers|sanitizer]] reports, IR verifier failures and timeouts need no expected value at all.
 
 Wrong-code bugs need one of the first three. Crash bugs only need the fourth, which is why crash-finding fuzzers are much easier to build and dominate many bug counts.
 
@@ -547,3 +547,4 @@ Open problems as of late 2026:
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
 - [[Proof Assistant Kernels]] — Differential testing of proof checkers: several Lean kernels and the Kernel Arena.
+- [[Sanitizers]] — How ASan, MSan, TSan and UBSan turn silent bugs into the crashes fuzzers look for.

@@ -562,3 +562,4 @@ It builds on **pointer compression**: V8 keeps heap pointers as 32-bit offsets i
 - [[eBPF]] — Static verification as an alternative to runtime guards.
 - [[Rust in the Linux Kernel]] — The language-safety alternative to Kage's driver sandboxing.
 - [[Memory Models and Pointer Provenance]] — CHERI capabilities make provenance a hardware property.
+- [[Sanitizers]] — ASan, HWASan and MTE: memory-error detection by shadow memory and tags, from testing to production.
