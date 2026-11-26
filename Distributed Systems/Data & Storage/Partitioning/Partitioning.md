@@ -456,6 +456,8 @@ The shared pattern is Vitess's: keep each shard an unmodified database, put a SQ
 
 ### Sharding as a Service
 
+*The [[Auto-Sharding]] note covers these services in depth.*
+
 - **Databricks Dicer (open-sourced Jan 13, 2026):** an auto-sharder in the Slicer and Shard Manager line. Keys hash into SliceKeys; an Assigner "dynamically splits, merges, replicates, and reassigns Slices" from load and health signals, and can give a hot key its own slice spread over several pods. Assignments are eventually consistent by design, trading strict ownership for availability; Databricks reports 90% to 95% cache hit rates for Unity Catalog with it ([Databricks, Jan 2026](https://www.databricks.com/blog/open-sourcing-dicer-databricks-auto-sharder)).
 - **Why services shard, not just databases:** in-memory state and caches need key affinity too. Shard Manager found planned container stops "≈1000 times more frequent than unplanned failures", so graceful shard migration around restarts mattered more than failover: without it, request success fell from about 100% to about 98%, and below 90% with neither mechanism ([Shard Manager, SOSP 2021](https://research.facebook.com/file/245575980870853/Shard-Manager-A-Generic-Shard-Management-Framework-for-Geo-distributed-Applications.pdf)). This is close to [[Cluster Scheduling]].
 - **Research on the hash functions continues.** A December 2025 single-author preprint, Local Rendezvous Hashing, runs rendezvous selection among 8 nearby ring candidates and reports balance close to multi-probe consistent hashing at about 6.8× its throughput, on prototype code ([Guan, Dec 2025](https://arxiv.org/pdf/2512.23434)). Treat it as a direction, not a result.
@@ -539,6 +541,7 @@ Open problems worth tracking:
 - [[LSM Trees]] — The per-node storage under most range-partitioned stores; TiDB X gives each Region its own.
 - [[Object Storage]] — Shared storage that turns rebalancing into a metadata change.
 - [[Disaggregated Systems]] — Separating compute from storage changes what "moving a partition" costs.
+- [[Auto-Sharding]] — Slicer, Shard Manager and Dicer: load-aware sharding as a shared service.
 - [[Cluster Scheduling]] — Placing shards of services alongside the scheduler's container moves.
 - [[Reliability Patterns]] — Request coalescing, caching and load shedding around hot keys.
 - [[CRDTs]] — Mergeable counters as an alternative to salting a hot write key.

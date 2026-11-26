@@ -256,3 +256,4 @@ Open problems:
 - [[Formal Methods in Practice]] — lease protocols are a classic place for subtle bugs
 - [[Replication]] — primary-backup failover needs exactly one primary, which leases and fencing provide
 - [[3. System Interactions|GFS: System Interactions]] — GFS's master grants chunk leases
+- [[Auto-Sharding]] — Centrifuge and Slicer lease key ranges to the servers that own them

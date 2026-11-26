@@ -238,3 +238,4 @@ Open problems and lessons:
 - [[Byzantine Fault Tolerance]] — coordination services assume crash faults only
 - [[Reliability Patterns]] — retry storms and failover handling the Chubby team saw
 - [[Distributed SQL]] — the larger NewSQL stores etcd compares itself against
+- [[Auto-Sharding]] — Slicer holds its ownership leases in Chubby locks; Shard Manager keeps state in ZooKeeper

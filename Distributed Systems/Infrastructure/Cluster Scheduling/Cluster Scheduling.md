@@ -543,3 +543,4 @@ Open problems worth tracking:
 - [[Silent Data Corruption]] — Bad devices the scheduler must learn to avoid.
 - [[Reliability Patterns]] — Load shedding, priorities and retry storms in the jobs a scheduler runs.
 - [[Disaggregated Systems]] — Separating compute from storage changes what a scheduler must co-locate.
+- [[Auto-Sharding]] — Shard Manager's TaskController negotiates container restarts with Twine.
