@@ -139,5 +139,5 @@ Thus, we generally become compute-bound when our per-replica batch size is great
 
 ## Related Notes
 
-- [[AI & ML/How to Scale Your Model/2 - How To Think About TPUs (NOT DONE).md|2 - How To Think About TPUs (NOT DONE)]] — The TPU note explains the accelerator hardware and matrix units behind the compute and memory limits discussed here.
-- [[AI & ML/How to Scale Your Model/7 - All About Transformer Inference (NOT DONE).md|7 - All About Transformer Inference (NOT DONE)]] — The inference note applies compute and communication trade-offs to transformer generation and KV-cache use.
+- [[AI & ML/Sources/How to Scale Your Model/2 - How To Think About TPUs (NOT DONE).md|2 - How To Think About TPUs (NOT DONE)]] — The TPU note explains the accelerator hardware and matrix units behind the compute and memory limits discussed here.
+- [[AI & ML/Sources/How to Scale Your Model/7 - All About Transformer Inference (NOT DONE).md|7 - All About Transformer Inference (NOT DONE)]] — The inference note applies compute and communication trade-offs to transformer generation and KV-cache use.

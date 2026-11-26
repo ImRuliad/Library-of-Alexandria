@@ -172,5 +172,5 @@ If the load from HBM to VMEM is slower than the FLOPs in the Vector Unit (or MXU
 
 ## Related Notes
 
-- [[AI & ML/How to Scale Your Model/1 - All About Rooflines (NOT DONE).md|1 - All About Rooflines (NOT DONE)]] — Roofline analysis explains the balance between TPU compute throughput and memory bandwidth.
-- [[AI & ML/How to Scale Your Model/7 - All About Transformer Inference (NOT DONE).md|7 - All About Transformer Inference (NOT DONE)]] — The inference note covers transformer workloads that run on accelerators such as TPUs.
+- [[AI & ML/Sources/How to Scale Your Model/1 - All About Rooflines (NOT DONE).md|1 - All About Rooflines (NOT DONE)]] — Roofline analysis explains the balance between TPU compute throughput and memory bandwidth.
+- [[AI & ML/Sources/How to Scale Your Model/7 - All About Transformer Inference (NOT DONE).md|7 - All About Transformer Inference (NOT DONE)]] — The inference note covers transformer workloads that run on accelerators such as TPUs.

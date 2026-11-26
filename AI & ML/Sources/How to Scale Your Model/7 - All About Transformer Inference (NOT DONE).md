@@ -82,8 +82,8 @@ We also append the KV activations for that new token to the KV cache. We repeat 
 
 ## Related Notes
 
-- [[AI & ML/How to Scale Your Model/2 - How To Think About TPUs (NOT DONE).md|2 - How To Think About TPUs (NOT DONE)]] — The TPU note describes accelerator hardware used to run transformer inference.
-- [[AI & ML/How to Scale Your Model/1 - All About Rooflines (NOT DONE).md|1 - All About Rooflines (NOT DONE)]] — Roofline concepts help explain compute, memory bandwidth, and KV-cache costs during inference.
+- [[AI & ML/Sources/How to Scale Your Model/2 - How To Think About TPUs (NOT DONE).md|2 - How To Think About TPUs (NOT DONE)]] — The TPU note describes accelerator hardware used to run transformer inference.
+- [[AI & ML/Sources/How to Scale Your Model/1 - All About Rooflines (NOT DONE).md|1 - All About Rooflines (NOT DONE)]] — Roofline concepts help explain compute, memory bandwidth, and KV-cache costs during inference.
 - [[Attention]] — Explains the dot-product attention whose keys and values the KV cache stores.
 - [[KV Cache]] — Overview note on what the cache stores, how big it gets, and how 2026 serving stacks shrink, page and move it.
 - [[Transformer]] — The architecture being sampled from here: blocks of attention and feed-forward layers on a residual stream.
