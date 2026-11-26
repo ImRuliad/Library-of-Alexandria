@@ -5,12 +5,11 @@ tags:
   - indexing
   - partitioning
   - data-and-storage
-status: draft
+status: complete
 sources:
   - https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch06.html
   - https://muratbuffalo.blogspot.com/2024/09/ddia-chp-6-partitioning.html
   - https://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf
-  - https://courses.cs.washington.edu/courses/csep552/13sp/lectures/6/megastore.pdf
   - https://research.google/pubs/online-asynchronous-schema-change-in-f1/
   - https://docs.cloud.google.com/spanner/docs/secondary-indexes
   - https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SecondaryIndexes.html
@@ -29,6 +28,7 @@ sources:
   - https://phoenix.apache.org/secondary_indexing.html
   - https://engineering.salesforce.com/the-design-of-strongly-consistent-global-secondary-indexes-in-apache-phoenix-part-2-392c57ec6633/
   - https://www.usenix.org/biblio/slik-scalable-low-latency-indexes-key-value-store
+  - https://www.usenix.org/conference/atc16/technical-sessions/presentation/kejriwal
   - https://www.cs.ucr.edu/~vagelis/publications/LSM-secondary-indexing-sigmod2018.pdf
   - https://vitess.io/docs/reference/features/vindexes
   - https://planetscale.com/blog/vitess-consistent-lookup-vindex
@@ -68,7 +68,7 @@ updated: 2026-11-26
 
 - **Local (document-partitioned) index.** Each partition indexes only its own rows. Writes stay on one partition and the index is always in step with the data, but a lookup by the indexed value has to ask every partition and wait for the slowest. Cassandra's indexes, MongoDB, Elasticsearch, Citus and DynamoDB's LSIs work this way.
 - **Global (term-partitioned) index.** The index is its own partitioned table, keyed by the indexed value. A lookup goes to one partition, but a write to the base row may also have to change one or two index partitions somewhere else.
-- **Keeping a global index correct** takes one of three routes: write it in the same [[Distributed Transactions|distributed transaction]] as the row (Spanner, CockroachDB, TiDB, YugabyteDB, Phoenix's strong indexes), update it asynchronously and accept stale reads (DynamoDB GSIs, Megastore's global indexes, Cassandra materialized views), or order the writes so that a stale index entry is only ever a harmless hint that reads double-check (SLIK, Vitess consistent lookup vindexes).
+- **Keeping a global index correct** takes one of three routes: write it in the same [[Distributed Transactions|distributed transaction]] as the row (Spanner, CockroachDB, TiDB, YugabyteDB), update it asynchronously and accept stale reads (DynamoDB GSIs, Megastore's global indexes, Cassandra materialized views), or order the writes so that a stale index entry is only ever a harmless hint that reads double-check (SLIK, Vitess consistent lookup vindexes, and Phoenix's strong indexes, which add read repair).
 - **Uniqueness is the sharpest edge.** A `UNIQUE` constraint on a column that isn't the partition key needs a global view of that column, so systems with only local indexes forbid it unless the partition key is part of the constraint.
 - **Where it is now (Nov 2026).** Transactional global indexes are standard in [[Distributed SQL]]; TiDB added global indexes for partitioned tables; DynamoDB GSIs took multi-attribute keys (Nov 2025); Cassandra 5.0 replaced its old local indexes with Storage-Attached Indexes, while its materialized views, the one built-in global option, are still marked experimental and the community is debating how to make them repairable.
 
@@ -186,26 +186,26 @@ timeline
     2014-2016 : HBase research and Phoenix indexes, Diff-Index, SLIK, Cassandra SASI
     2015-2017 : Cassandra materialized views ship, then are marked experimental
     2018-2019 : ScyllaDB global indexes on materialized views, then local indexes
-    2019-2021 : Phoenix strongly consistent global indexes
+    2019-2020 : Phoenix 4.15 and 5.1 rewrite global indexes to be strongly consistent
     2024 : Cassandra 5.0 SAI, TiDB global indexes for partitioned tables
     2025 : DynamoDB multi-attribute GSI keys, Aurora DSQL async index builds
 ```
 
 **No indexes at all (2006).** Bigtable offered one sorted key and nothing else; applications kept their own index tables and lived with the gaps. HBase inherited the same model, which is why so much of the early research on distributed indexes is about HBase.
 
-**Megastore names the trade-off (2011).** Google's Megastore ([Baker et al., CIDR 2011](https://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf)) partitioned data into *entity groups* (say, one user's mail). A **local index** lived inside an entity group and was updated atomically with it; a **global index** spanned entity groups and was explicitly not guaranteed to reflect recent writes. That is the same split every later system makes.
+**Megastore names the trade-off (2011).** Google's Megastore ([Baker et al., CIDR 2011](https://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf)) partitioned data into *entity groups* (say, one user's mail). A **local index** lived inside an entity group, and its entries were "updated atomically and consistently with the primary entity data"; a **global index** spanned entity groups, and its scans "are not guaranteed to reflect all recent updates." In the paper's summary, local indexes "obey ACID semantics; those across entity groups have looser consistency." That is the same split every later system makes.
 
 **Cassandra goes local (2011).** Cassandra 0.7 added secondary indexes stored on each node beside the data they index, so a query on an indexed column fans out across the cluster. Later rewrites (SASI in 3.4, SAI in 5.0) improved the per-node index structure but kept it local.
 
-**Spanner and F1 make global indexes transactional (2012–2013).** In Spanner an index is a table keyed by the indexed columns, written in the same transaction as the row, so it is always consistent ([Spanner docs](https://docs.cloud.google.com/spanner/docs/secondary-indexes)). F1, Google's ads database on Spanner, then had to answer how to *add* such an index to a live, globally distributed table without stopping writes. Its answer, a sequence of intermediate schema states, became the model for online index builds ([Rae et al., VLDB 2013](https://research.google/pubs/online-asynchronous-schema-change-in-f1/); see [[#Building an Index on a Live Table|below]]).
+**Spanner and F1 make global indexes transactional (2012–2013).** In Spanner an index is a table keyed by the indexed columns, updated in the same transaction as the row, so it is always consistent ([Spanner docs](https://docs.cloud.google.com/spanner/docs/secondary-indexes)). F1, Google's ads database on Spanner, then had to answer how to *add* such an index to a live, globally distributed table without stopping writes. Its answer, a sequence of intermediate schema states, became the model for online index builds ([Rae et al., VLDB 2013](https://research.google/pubs/online-asynchronous-schema-change-in-f1/); see [[#Building an Index on a Live Table|below]]).
 
 **DynamoDB productizes both (2013).** DynamoDB launched local secondary indexes in spring 2013 and global secondary indexes in December 2013. Its documentation still states the trade-off most plainly: LSIs support strongly consistent reads but are confined to one partition key value; GSIs span all partitions but support eventually consistent reads only ([AWS docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SecondaryIndexes.html)).
 
-**The HBase research wave (2014–2016).** IBM's Diff-Index (EDBT 2014) offered several maintenance schemes on HBase, from fully synchronous to asynchronous, to let applications pick their point on the latency/consistency curve. SLIK ([Kejriwal et al., USENIX ATC 2016](https://www.usenix.org/biblio/slik-scalable-low-latency-indexes-key-value-store)) built global indexes on the RAMCloud key-value store that stay consistent *without* distributed transactions, by ordering writes and treating index entries as hints. A 2018 comparison ([Qader, Cheng and Hristidis, SIGMOD 2018](https://www.cs.ucr.edu/~vagelis/publications/LSM-secondary-indexing-sigmod2018.pdf)) measured embedded versus stand-alone (eager, lazy, composite) index designs inside LSM-tree stores.
+**The HBase research wave (2014–2016).** IBM's Diff-Index (EDBT 2014) offered several maintenance schemes on HBase, from fully synchronous to asynchronous, to let applications pick their point on the latency/consistency curve. SLIK ([Kejriwal et al., USENIX ATC 2016](https://www.usenix.org/biblio/slik-scalable-low-latency-indexes-key-value-store)) partitioned indexes "independently of the data in tables" on the RAMCloud key-value store and kept them consistent with "a lightweight ordered write approach" instead of distributed transactions, at 11 µs per indexed read and 30 µs per write. A 2018 comparison ([Qader, Cheng and Hristidis, SIGMOD 2018](https://www.cs.ucr.edu/~vagelis/publications/LSM-secondary-indexing-sigmod2018.pdf)) measured embedded versus stand-alone (eager, lazy, composite) index designs inside LSM-tree stores.
 
-**Materialized views as global indexes (2015–2019).** Cassandra 3.0 shipped materialized views, a server-maintained copy of a table repartitioned by another column, which is exactly an asynchronous global index. Edge cases left views silently out of sync with their base tables, and the project marked them experimental and disabled them by default ([Azure managed Cassandra docs](https://learn.microsoft.com/en-us/azure/managed-instance-apache-cassandra/materialized-views)). ScyllaDB built its global secondary indexes on its own materialized-view implementation, and in 2019 added local indexes so users could choose ([ScyllaDB, July 2019](https://Scylladb.com/2019/07/23/global-or-localsecondary-indexes-in-scylla-the-choice-is-now-yours/)).
+**Materialized views as global indexes (2015–2019).** Cassandra 3.0 shipped materialized views, a server-maintained copy of a table repartitioned by another column, which is exactly an asynchronous global index. Edge cases left views out of sync with their base tables, and the project marked them experimental and disabled them by default. Microsoft's managed-Cassandra docs (updated Aug 2026) still say "there's no way to determine if a materialized view is out of sync with its base table" and that the only fix for a diverged view is to drop and re-create it ([Azure managed Cassandra docs](https://learn.microsoft.com/en-us/azure/managed-instance-apache-cassandra/materialized-views)). ScyllaDB built its global secondary indexes on its own materialized-view implementation, and in ScyllaDB Open Source 3.1 (October 2019) added local indexes so users could choose ([ScyllaDB, July 2019](https://Scylladb.com/2019/07/23/global-or-localsecondary-indexes-in-scylla-the-choice-is-now-yours/)).
 
-**Distributed SQL makes it the default.** CockroachDB, YugabyteDB and TiDB all store indexes as ordinary key ranges written in the row's transaction, so the user never chooses "local or global" at all; the database chooses global and pays the transaction cost ([[Distributed SQL]]). Apache Phoenix, the SQL layer on HBase, moved to strongly consistent global indexes using a multi-phase write with read repair ([Salesforce Engineering](https://engineering.salesforce.com/the-design-of-strongly-consistent-global-secondary-indexes-in-apache-phoenix-part-2-392c57ec6633/)).
+**Distributed SQL makes it the default.** CockroachDB, YugabyteDB and TiDB all store indexes as ordinary key ranges written in the row's transaction, so the user never chooses "local or global" at all; the database chooses global and pays the transaction cost ([[Distributed SQL]]). Apache Phoenix, the SQL layer on HBase, "completely rewrote" its global indexing for versions 4.15 and 5.1 to make it strongly consistent, using a three-phase write with read repair (see [[#Ordered Writes Without Two-Phase Commit|below]]) ([Phoenix docs](https://phoenix.apache.org/secondary_indexing.html); [Salesforce Engineering](https://engineering.salesforce.com/the-design-of-strongly-consistent-global-secondary-indexes-in-apache-phoenix-part-2-392c57ec6633/)).
 
 ## ***How It Works***
 ---
@@ -215,7 +215,7 @@ timeline
 
 *A local index is simple to keep correct and expensive to query. Systems that use them work hard to avoid the full fan-out.*
 
-- **Cassandra SAI (5.0).** Storage-Attached Indexes are built per SSTable and memtable on each node, so they are flushed and compacted with the data and need no separate index table ([Cassandra blog](https://cassandra.apache.org/_/blog/Apache-Cassandra-5.0-Features-Storage-Attached-Indexes.html)). A query that also restricts the partition key hits one replica set; one that doesn't is sent to token ranges across the cluster by the coordinator. SAI supports several indexes in one query and range predicates, which the original 2i handled poorly.
+- **Cassandra SAI (5.0).** Storage-Attached Indexes are "attached to the normal Memtable/SSTable lifecycle," so "the index data mimics the structure/locality of backing table data" and needs no separate index table ([Cassandra blog, Nov 2023](https://cassandra.apache.org/_/blog/Apache-Cassandra-5.0-Features-Storage-Attached-Indexes.html)). Compared with the original indexes, whose storage grew linearly with the number of indexed columns and whose queries "often required full scans," SAI shares index structures per SSTable and supports numeric range, prefix/suffix and boolean queries. Because the index is per node, a query that also restricts the partition key hits one replica set; one that doesn't has to be sent across the token ring by the coordinator.
 - **MongoDB.** Each shard indexes its own documents. A query that includes the shard key is routed to one shard; one that doesn't is broadcast by `mongos` to every shard ([MongoDB docs](https://www.mongodb.com/docs/manual/core/sharding-shard-key-indexes/)).
 - **Elasticsearch** is the textbook document-partitioned search engine: each shard holds a full inverted index for its documents, and every search is a query-then-fetch over all shards.
 - **Citus and most sharded Postgres.** Indexes are created per shard by ordinary Postgres, so a predicate without the distribution column runs on every shard ([[Sharded Postgres]]).
@@ -241,7 +241,7 @@ sequenceDiagram
     Note over B,N: all three become visible at one commit timestamp
 ```
 
-- **Spanner.** An index is a table whose key is the indexed columns plus the base table's primary key. "Spanner automatically updates" every index in the same transaction as the base write ([Spanner docs](https://docs.cloud.google.com/spanner/docs/secondary-indexes)), using its usual [[Paxos]] groups and two-phase commit across them.
+- **Spanner.** An index is a table whose key is the indexed columns plus the base table's primary key. "When you update a row in a table, Spanner must also update its secondary indexes," inside the same transaction, and the docs warn that for a global index this can mean a distributed two-phase commit across [[Paxos]] groups ([Spanner docs](https://docs.cloud.google.com/spanner/docs/secondary-indexes)).
 - **CockroachDB.** Indexes live in the same key-value space and are split into ranges like data; "new values have to be written for both the table *and* the index" ([CockroachDB docs](https://docs.cockroachlabs.com/docs/stable/indexes.md)). Its parallel commits protocol lets the commit acknowledge after one round of replicated writes when all intents succeed.
 - **TiDB and YugabyteDB.** Same idea: index key-values written in the row's [[Distributed Transactions|Percolator-style]] or provisional-record transaction ([TiDB docs](https://docs.pingcap.com/tidb/dev/global-indexes/); [YugabyteDB docs](https://docs.yugabyte.com/stable/explore/ysql-language-features/indexes-constraints/secondary-indexes-ysql/)).
 
@@ -251,9 +251,9 @@ The cost scales with how many indexes a table has and how often indexed columns 
 
 *The cheap-write answer: commit the base row, then propagate index changes in the background. Lookups are fast, but an index read can miss a just-written row or return one that no longer matches.*
 
-- **DynamoDB GSI.** Writes to the table are copied to each GSI asynchronously; queries against a GSI are eventually consistent only. A GSI has its own capacity, and if it can't keep up, DynamoDB throttles writes to the *base table* so the backlog doesn't grow without bound ([AWS GSI docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html)). The asynchronous index is not free; its back-pressure lands on the writer.
+- **DynamoDB GSI.** Indexes "are updated asynchronously, using an eventually consistent model," normally "within a fraction of a second" but with "longer propagation delays" possible in failures, and applications must "anticipate and handle" stale results. A GSI has its own write capacity, and if it is too low, "the write activity on the table will be throttled"; AWS advises giving each GSI at least the base table's write capacity ([AWS GSI docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html)). The asynchronous index is not free; its back-pressure lands on the writer.
 - **Megastore global indexes** (2011) and **Cassandra materialized views** work the same way: the replica that applies a base write computes the view update and sends it to the view's partition.
-- **Phoenix eventually consistent global indexes** (the older mode, still available) wrote index rows from a server-side hook after the data write ([Phoenix docs](https://phoenix.apache.org/secondary_indexing.html)).
+- **Phoenix `CONSISTENCY=EVENTUAL` global indexes** take index maintenance off the data write path for write-heavy tables that can tolerate a bounded staleness window ([Phoenix docs](https://phoenix.apache.org/secondary_indexing.html)).
 
 The hard part is *what happens on failure.* If the base write commits and the index update is lost, the index has a missing entry; if a stale update is applied late, it can resurrect an old value. Fixing that needs a repair process that compares base and index, and because they are partitioned by different keys, the comparison is a join across the whole cluster rather than a range-by-range Merkle tree as in normal [[Anti-Entropy and Repair]]. That is exactly the problem that kept Cassandra's materialized views experimental.
 
@@ -292,8 +292,9 @@ sequenceDiagram
 
 *Worked example:* the writer crashes after step 2. A query `city = 'Lisbon'` finds `Lisbon/42`, fetches row 42, sees `Porto`, and drops it: correct. A query `city = 'Porto'` finds `Porto/42` and returns the row: correct. No failure point loses the row from the `Porto` index.
 
-- **SLIK** used this scheme on RAMCloud to get consistent global indexes with low latency and no distributed transactions ([Kejriwal et al., ATC 2016](https://www.usenix.org/biblio/slik-scalable-low-latency-indexes-key-value-store)).
-- **Vitess lookup vindexes** keep a lookup table (value → keyspace ID) in its own keyspace. The *consistent* lookup vindex writes lookup rows and base rows on separate connections in a careful order and commits the lookup side first, so failures leave orphan lookup rows that later reads and writes detect and reclaim, avoiding two-phase commit ([PlanetScale](https://planetscale.com/blog/vitess-consistent-lookup-vindex); [Vitess docs](https://vitess.io/docs/reference/features/vindexes)).
+- **SLIK** used this "lightweight ordered write approach" on RAMCloud, storing each index as B+ tree nodes in the key-value store itself, with indexed reads in 11 µs and writes in 30 µs ([Kejriwal et al., ATC 2016](https://www.usenix.org/conference/atc16/technical-sessions/presentation/kejriwal)).
+- **Apache Phoenix (4.15 and 5.1+)** does a variant: (1) write new index rows marked *unverified* and mark the old ones unverified, (2) write the data row, (3) delete old index rows and mark new ones *verified*. A reader that meets an unverified row repairs it from the data table ([Phoenix docs](https://phoenix.apache.org/secondary_indexing.html)). This gives strong consistency on reads, at the cost of a read-repair round when a write was interrupted.
+- **Vitess lookup vindexes** keep a lookup table (value → keyspace ID) in its own keyspace. The *consistent* lookup vindex uses three connections committed in order, *Pre*, *Main*, *Post*: new lookup rows go on Pre, the user row on Main, and lookup deletes on Post, so an update is a Post delete plus a Pre insert. A failure can leave an orphan lookup row, which points at a shard where the row no longer exists, so queries still return correct results, and a later insert of the same value reuses it. In the authors' words, it uses "careful locking and transaction sequences to guarantee consistency without using 2PC" ([PlanetScale, Apr 2024](https://planetscale.com/blog/vitess-consistent-lookup-vindex); [Vitess docs](https://vitess.io/docs/reference/features/vindexes)).
 
 The catch: it guarantees "no missed rows" for point reads, not a consistent snapshot. A scan over the index can still see a row that changed mid-query, and it doesn't give you `UNIQUE` without more work.
 
@@ -303,7 +304,7 @@ The catch: it guarantees "no missed rows" for point reads, not a consistent snap
 
 | System | Rule |
 |---|---|
-| MongoDB | A unique index on a sharded collection must have the shard key as a prefix (the `_id` index is unique per shard only, unless `_id` is the shard key) ([MongoDB docs](https://www.mongodb.com/docs/manual/tutorial/maintain-uniqueness-in-sharded-clusters/)) |
+| MongoDB | "A sharded cluster enforces a unique constraint across shards only when the unique index is on the shard key or includes the shard key as a prefix"; the `_id` index is unique "per shard" unless `_id` is the shard key ([MongoDB docs](https://www.mongodb.com/docs/manual/tutorial/maintain-uniqueness-in-sharded-clusters/)) |
 | Citus | Unique and primary-key constraints must include the distribution column ([Citus FAQ](https://docs.citusdata.com/en/v12.0/faq/faq.html)) |
 | TiDB partitioned tables (before global indexes), MySQL | Every unique key must include all partitioning columns |
 | Spanner, CockroachDB, YugabyteDB | Any unique index; enforced through the global index in the write transaction |
@@ -311,7 +312,7 @@ The catch: it guarantees "no missed rows" for point reads, not a consistent snap
 
 The usual workaround with local-only indexes is a separate "uniqueness table" partitioned by the unique value, written in the same transaction or with the ordered-write trick above. That is a hand-built global index.
 
-Multi-region databases add a twist. In a CockroachDB `REGIONAL BY ROW` table, each row's home region is a hidden column that prefixes every index, which makes indexes effectively local to a region. A unique constraint on `email` then needs a check in *every* region on insert. CockroachDB skips the check when the constraint includes the region column or the key is a randomly generated UUID, and its *locality-optimized search* tries the local region first before fanning out ([CockroachDB blog](https://www.cockroachlabs.com/blog/regional-by-row/); [Taft et al., VLDB 2022](https://vldb.org/pvldb/vol15/p3610-taft.pdf)).
+Multi-region databases add a twist. In a CockroachDB `REGIONAL BY ROW` table, each row's home region is a hidden column that prefixes every index, which makes indexes effectively local to a region. A unique constraint on `email` then needs a check in *every* region on insert. These checks run as extra queries in the same transaction and may visit every region. CockroachDB skips them when the column defaults to `gen_random_uuid()` (collisions are vanishingly unlikely), when the region is a computed column derived from the key, or when you ask only for per-region uniqueness with `UNIQUE (crdb_region, col)`. Its *locality-optimized search* looks for a unique row in the local region first and skips the remote scan if it finds it ([CockroachDB blog](https://www.cockroachlabs.com/blog/regional-by-row/); [Taft et al., VLDB 2022](https://vldb.org/pvldb/vol15/p3610-taft.pdf)).
 
 ### Building an Index on a Live Table
 
@@ -332,14 +333,14 @@ stateDiagram-v2
 - **Why delete-only first:** if a server in write-only state adds an entry and a server still in absent state deletes the row, the entry would be orphaned. Delete-only servers clean up such entries, so the two adjacent states can safely overlap.
 - **Why the backfill is safe:** by the time it runs, every server maintains the index for new writes, so the backfill only has to cover rows that existed before.
 
-CockroachDB, TiDB and YugabyteDB use variants of this protocol for online `CREATE INDEX`. Aurora DSQL exposes the background build directly: `CREATE INDEX ASYNC` starts a job and returns, and the index becomes usable when the job finishes ([AWS docs](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/working-with-create-index-async.html)).
+CockroachDB, TiDB and YugabyteDB use variants of this protocol for online `CREATE INDEX`. Spanner backfills in the background without taking the database offline, and warns that "index creation can take from several minutes to many hours" depending on data size and load ([Spanner docs](https://docs.cloud.google.com/spanner/docs/secondary-indexes)). Aurora DSQL exposes the background build directly: `CREATE INDEX ASYNC` "immediately returns a `job_id`," doesn't lock or block the base table, and a migration can call `sys.wait_for_job` before using the index. A failed build leaves the index `INVALID` until you drop it, for example when a unique index finds duplicates ([AWS docs](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/working-with-create-index-async.html)).
 
 ### Covering, Interleaving and Locality
 
 *Three knobs reduce the cost of a global index lookup: copy columns into the index, place index entries near related data, and pin index partitions near the readers.*
 
 - **Covering (`STORING`, projections).** Spanner and CockroachDB let an index store extra columns so a query never fetches the base row; DynamoDB GSIs choose a projection (`KEYS_ONLY`, `INCLUDE`, `ALL`). Each stored column is written on every update of that column, so storage and write cost rise ([Spanner docs](https://docs.cloud.google.com/spanner/docs/secondary-indexes)).
-- **Interleaving.** Spanner lets an index be `INTERLEAVE IN` a parent table, so all index entries for one parent (one customer's orders by date) sit in the parent's split. This turns a global index into a local one by design when every query names the parent.
+- **Interleaving.** Spanner indexes "can be interleaved with other tables in order to colocate index rows with those of another table"; the parent's primary key must prefix the index key, so all index entries for one parent (one customer's orders by date) sit with the parent row. This turns a global index into a local one by design when every query names the parent.
 - **Multi-attribute keys.** DynamoDB GSIs, since November 2025, accept up to four attributes each in the partition and sort key, so an index on `(tenant, status)` no longer needs a synthetic concatenated attribute maintained by the application ([AWS, Nov 2025](https://aws.amazon.com/about-aws/whats-new/2025/11/amazon-dynamodb-multi-attribute-composite-keys-global-secondary-indexes)).
 - **Region placement.** In multi-region SQL, an index can be pinned (or duplicated) per region so reads stay local; duplicating it multiplies write cost by the number of copies ([[Replication]], [[CAP and PACELC]]).
 
@@ -356,12 +357,12 @@ CockroachDB, TiDB and YugabyteDB use variants of this protocol for online `CREAT
 | ScyllaDB | Global (on materialized views) | Local indexes on request | Eventual |
 | MongoDB, Elasticsearch, Citus | Local | Application-managed | — |
 | Vitess | Local per shard | Lookup vindexes | Ordered writes, orphans tolerated |
-| Phoenix on HBase | Global or local | Strongly consistent global (default in newer releases) | Multi-phase write with read repair |
+| Phoenix on HBase | Global or local | Strongly consistent global (default for new tables since 4.15/5.1) | Three-phase write with read repair |
 
 Notable recent moves (dates from each vendor's own docs or announcements):
 
 - **Cassandra 5.0 (GA Sep 2024)** made SAI the recommended index type, replacing the original 2i and SASI for most uses ([Cassandra blog](https://cassandra.apache.org/_/blog/Apache-Cassandra-5.0-Features-Storage-Attached-Indexes.html)). Materialized views are still disabled by default. In 2025 the dev list debated an enhancement proposal for first-class materialized views with a real repair mechanism, and discussion centered on how to compare two copies partitioned by different keys; with [[Leaderless Consensus|Accord]] transactions arriving, transactionally maintained views are now plausible but not shipped.
-- **TiDB** added global indexes for partitioned tables, lifting MySQL's rule that every unique key must include the partitioning columns ([TiDB docs](https://docs.pingcap.com/tidb/dev/global-indexes/)).
+- **TiDB** added global indexes for partitioned tables as an experimental feature in v8.3.0 and made them generally available in v8.4.0 (both 2024). Before them, "primary keys and unique keys had to include all the partition keys"; a `GLOBAL` index lifts that rule ([TiDB docs](https://docs.pingcap.com/tidb/dev/global-indexes/)).
 - **DynamoDB (Nov 2025)** added multi-attribute GSI keys; the eventual-consistency and back-pressure model is unchanged.
 - **Aurora DSQL** builds indexes asynchronously with `CREATE INDEX ASYNC`, fitting its disaggregated, OCC-based design ([[Distributed SQL]]).
 - **Sharded Postgres** (Citus, Neki, PgDog, Multigres) still offers only per-shard local indexes; global lookups mean a hand-maintained lookup table, the gap noted in [[Sharded Postgres]].
@@ -395,9 +396,9 @@ Open problems:
 - [DDIA chapter 6 notes](https://muratbuffalo.blogspot.com/2024/09/ddia-chp-6-partitioning.html) — Murat Demirbas, Sep 2024.
 
 **Papers**
-- [Megastore: Providing Scalable, Highly Available Storage for Interactive Services](https://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf) — Baker et al., CIDR 2011 ([lecture slides](https://courses.cs.washington.edu/courses/csep552/13sp/lectures/6/megastore.pdf)).
+- [Megastore: Providing Scalable, Highly Available Storage for Interactive Services](https://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf) — Baker et al., CIDR 2011.
 - [Online, Asynchronous Schema Change in F1](https://research.google/pubs/online-asynchronous-schema-change-in-f1/) — Rae et al., VLDB 2013.
-- [SLIK: Scalable Low-Latency Indexes for a Key-Value Store](https://www.usenix.org/biblio/slik-scalable-low-latency-indexes-key-value-store) — Kejriwal et al., USENIX ATC 2016.
+- [SLIK: Scalable Low-Latency Indexes for a Key-Value Store](https://www.usenix.org/conference/atc16/technical-sessions/presentation/kejriwal) — Kejriwal et al., USENIX ATC 2016.
 - [A Comparative Study of Secondary Indexing Techniques in LSM-based NoSQL Databases](https://www.cs.ucr.edu/~vagelis/publications/LSM-secondary-indexing-sigmod2018.pdf) — Qader, Cheng, Hristidis, SIGMOD 2018.
 - [Multi-Region in CockroachDB](https://vldb.org/pvldb/vol15/p3610-taft.pdf) — Taft et al., VLDB 2022.
 
@@ -410,7 +411,7 @@ Open problems:
 - [Cassandra 5.0: Storage-Attached Indexes](https://cassandra.apache.org/_/blog/Apache-Cassandra-5.0-Features-Storage-Attached-Indexes.html); [materialized views status (Azure managed Cassandra)](https://learn.microsoft.com/en-us/azure/managed-instance-apache-cassandra/materialized-views).
 - [ScyllaDB: global or local secondary indexes](https://Scylladb.com/2019/07/23/global-or-localsecondary-indexes-in-scylla-the-choice-is-now-yours/); [ScyllaDB global index docs](https://docs.scylladb.com/manual/master/features/secondary-indexes.md).
 - [Apache Phoenix secondary indexing](https://phoenix.apache.org/secondary_indexing.html); [Strongly consistent global indexes in Phoenix, part 2](https://engineering.salesforce.com/the-design-of-strongly-consistent-global-secondary-indexes-in-apache-phoenix-part-2-392c57ec6633/) (Salesforce Engineering).
-- [Vitess vindexes](https://vitess.io/docs/reference/features/vindexes); [Vitess consistent lookup vindex](https://planetscale.com/blog/vitess-consistent-lookup-vindex) (PlanetScale).
+- [Vitess vindexes](https://vitess.io/docs/reference/features/vindexes); [Vitess consistent lookup vindex](https://planetscale.com/blog/vitess-consistent-lookup-vindex) (PlanetScale, Apr 2024).
 - [MongoDB shard key indexes](https://www.mongodb.com/docs/manual/core/sharding-shard-key-indexes/); [uniqueness in sharded clusters](https://www.mongodb.com/docs/manual/tutorial/maintain-uniqueness-in-sharded-clusters/).
 - [Citus FAQ (unique constraints)](https://docs.citusdata.com/en/v12.0/faq/faq.html).
 
