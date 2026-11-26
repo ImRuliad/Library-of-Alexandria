@@ -311,7 +311,7 @@ Howard and Mortier rewrote Paxos in Raft's terms and compared them ([Paxos vs Ra
 Open problems worth tracking:
 - **Correct fast paths.** EPaxos and CURP both shipped with recovery bugs that took years to find ([Ryabinin et al.](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.OPODIS.2025.22), [Demirbas](https://muratbuffalo.blogspot.com/2026/09/jetpack-consensus-made-generally-fast.html)). Model checking and proofs are becoming the price of entry; see [[Formal Methods in Practice]].
 - **The engineering gap.** Membership changes, snapshots, disk corruption and [[Gray and Fail-Slow Failures|gray failures]] are still where real implementations break ([Paxos Made Live](https://www.andrew.cmu.edu/course/15-440/assets/READINGS/paxos-made-live.pdf); see [[Failure Models]]).
-- **Wide-area latency.** A majority across regions means a cross-region round trip per write. Witness replicas, flexible quorums and fast paths each shave some of it; see [[CAP and PACELC]].
+- **Wide-area latency.** A majority across regions means a cross-region round trip per write. [[Witness Replicas]], flexible quorums and fast paths each shave some of it; see [[CAP and PACELC]].
 - **Byzantine faults.** Paxos assumes nodes fail by stopping. Silent data corruption on modern hardware blurs that line; see [[Byzantine Fault Tolerance]] and [[Silent Data Corruption]].
 
 ## ***Resources***
@@ -348,3 +348,4 @@ Open problems worth tracking:
 - [[Coordination Services]] — Chubby, ZooKeeper and etcd, consensus as a service.
 - [[Deterministic Simulation Testing]] — Paxos Made Live's randomized testing, grown up.
 - [[Formal Methods in Practice]] — TLA+ and proofs for consensus protocols.
+- [[Witness Replicas]] — Cheap voters in Spanner and DynamoDB groups, and Cheap Paxos.

@@ -276,7 +276,7 @@ The linearizability row comes from a lower bound by Attiya and Welch: if message
 *A CP system doesn't go fully down in a partition. Only the minority side does, and with three regions the majority keeps both consistency and availability for clients that can reach it.*
 
 Marc Brooker describes how Aurora DSQL handles a region split ([Brooker, Dec 2024](https://brooker.co.za/blog/2024/12/06/inside-dsql-cap/)):
-- A multi-region cluster has two full regions and a third **witness** region that holds only a copy of the transaction journal.
+- A multi-region cluster has two full regions and a third **witness** region that holds only a copy of the transaction journal (see [[Witness Replicas]]).
 - If a full region is cut off, its endpoint becomes unavailable for reads and writes. The majority side's endpoint stays available and strongly consistent, as long as the minority side accepts no writes.
 - If the witness is cut off, clients see no outage, only slightly higher commit latency in some setups. Normal replication is a 2-of-3 quorum; after a region is lost it becomes 2-of-2, so every commit waits for the slowest remaining link.
 
@@ -355,3 +355,4 @@ Open problems worth tracking:
 - [[CRDTs]] — Data types that merge automatically after a partition, for PA/EL designs.
 - [[Distributed SQL]] — Spanner, CockroachDB and Aurora DSQL, the PC/EC systems of today.
 - [[Distributed Transactions]] — The extra round trips strong consistency costs across shards.
+- [[Witness Replicas]] — The third region that votes without a full copy, in DSQL, DynamoDB MRSC and Spanner.
