@@ -223,7 +223,7 @@ flowchart TB
 
 - **Poll-mode drivers (PMDs)** read and write the NIC's descriptor rings directly, with no interrupts except for link changes. Each RX queue is polled by exactly one core ("lcore"), so the API is lock-free; calls are burst-oriented to spread overhead ([DPDK ethdev guide](https://doc.dpdk.org/guides-25.11/prog_guide/ethdev/ethdev.html)).
 - **Two app models:** *run-to-completion* (one core receives, processes, transmits) or *pipeline* (cores pass packets to each other over rings).
-- **Hugepages** (2 MB or 1 GB) back the packet buffer pools so the NIC's DMA targets and the app's accesses hit few TLB entries; pages are reserved per NUMA node, ideally at boot ([DPDK system requirements](https://doc.dpdk.org/guides-20.11/linux_gsg/sys_reqs.html)).
+- **Hugepages** (2 MB or 1 GB) back the packet buffer pools so the NIC's DMA targets and the app's accesses hit few TLB entries; pages are reserved per [[NUMA]] node, ideally at boot ([DPDK system requirements](https://doc.dpdk.org/guides-20.11/linux_gsg/sys_reqs.html)).
 - **`rte_ring`** is a fixed-size lockless FIFO that needs one 32-bit compare-and-swap per operation (a linked-list queue needs several), with single- and multi-producer/consumer modes ([ring library](https://doc.dpdk.org/guides/prog_guide/ring_lib.html)). It also backs the buffer pool (mempool).
 
 The heart of every DPDK app is a loop like this:

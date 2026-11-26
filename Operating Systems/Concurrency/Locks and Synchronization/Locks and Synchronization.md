@@ -61,7 +61,7 @@ updated: 2026-11-26
 - **Spinlocks** busy-wait. They're right for very short critical sections and for contexts that can't sleep (interrupt handlers). Linux's spinlock is a **qspinlock**, a 32-bit compressed MCS queue lock where each waiter spins on its own cache line ([LWN](https://lwn.net/Articles/590243/)).
 - **Sleeping locks** (mutexes, semaphores, reader-writer semaphores) put waiters to sleep. Linux mutexes spin briefly first, then sleep.
 - **Futexes** let user space take an uncontended lock with a single atomic instruction and only enter the kernel when there's contention. Every `pthread_mutex` on Linux is built on them ([Franke, Russell, Kirkwood 2002](https://kernel.org/doc/ols/2002/ols2002-pages-479-495.pdf)).
-- **The hard parts** aren't mutual exclusion itself but fairness, cache-line traffic under contention, NUMA, priority inversion and deadlock.
+- **The hard parts** aren't mutual exclusion itself but fairness, cache-line traffic under contention, [[NUMA]], priority inversion and deadlock.
 - **Now (Nov 2026):** PREEMPT_RT is in mainline since Linux 6.12, turning most kernel spinlocks into sleeping, priority-inheriting locks on real-time builds ([Phoronix](https://phoronix.com/news/Linux-6.12-Does-Real-Time)); proxy execution (6.17) generalizes priority inheritance for mutexes ([6.17 pull](https://lkml.indiana.edu/hypermail/linux/kernel/2507.3/04050.html)); futexes got per-process hash tables and NUMA awareness in 6.16; BPF got a deadlock-detecting "resilient" spinlock in 6.15; and NUMA-aware queued spinlocks are again being proposed for mainline.
 
 ## ***The Problem***

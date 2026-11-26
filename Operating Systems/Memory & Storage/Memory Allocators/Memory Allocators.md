@@ -65,7 +65,7 @@ updated: 2026-11-26
 - **Speed:** allocation is on almost every hot path. glibc's developers found the arena lock alone "turned out to be quite expensive compared to the cost of doing the allocation itself" ([Red Hat](https://developers.redhat.com/blog/2017/03/02/malloc-internals-and-you)).
 - **Scalability:** one global free list is one global lock; cache lines bounce between CPUs (see [[Locks and Synchronization]]).
 - **Footprint:** every cached-but-free object is memory nobody can use. SLAB's per-CPU and per-node queues on a 1,000-CPU machine tied up "several gigabytes" just in pointers to cached objects ([Lameter, 2007](https://lwn.net/Articles/223411)).
-- **Hardware fit:** objects should be cache-aligned, NUMA-local, and packed into memory that the [[Virtual Memory and Paging|TLB]] can cover with huge pages.
+- **Hardware fit:** objects should be cache-aligned, [[NUMA]]-local, and packed into memory that the [[Virtual Memory and Paging|TLB]] can cover with huge pages.
 
 ## ***Foundations***
 

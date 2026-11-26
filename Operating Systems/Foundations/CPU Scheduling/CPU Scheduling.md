@@ -419,7 +419,7 @@ Linux keeps a **run queue per CPU** (a global queue would be a lock-contention h
 | SMT | Hyperthreads of one core | Almost free; caches shared |
 | Cluster / MC | Cores sharing an L2 or last-level cache | Small |
 | Package | All cores of a socket | Lose private caches |
-| NUMA | All sockets | Lose caches and memory locality |
+| [[NUMA]] | All sockets | Lose caches and memory locality |
 
 - Each domain is split into **groups**, and balancing compares groups as units: find the busiest group, then the busiest run queue in it, then migrate the imbalance.
 - The tick raises `SCHED_SOFTIRQ`; `sched_balance_domains()` walks up from the smallest domain and balances each one whose interval has expired. Lower levels balance often, higher levels rarely.

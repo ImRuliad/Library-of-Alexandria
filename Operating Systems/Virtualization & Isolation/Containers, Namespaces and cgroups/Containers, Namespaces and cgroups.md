@@ -180,7 +180,7 @@ The main knobs:
 | memory | `memory.oom.group` | Kill the whole cgroup together on OOM |
 | io | `io.max` / `io.weight` | Bandwidth/IOPS caps per device; relative share |
 | pids | `pids.max` | Cap on processes; `fork()` beyond it fails with `EAGAIN` |
-| cpuset | `cpuset.cpus` | Which CPUs (and NUMA nodes) it may use |
+| cpuset | `cpuset.cpus` | Which CPUs (and [[NUMA]] nodes) it may use |
 | (all) | `cpu/memory/io.pressure` | Pressure stall information: how long tasks waited |
 
 Memory protection and reclaim interact with the kernel's [[Page Cache and Memory Reclaim]]; CPU weight and quota are enforced by the [[CPU Scheduling|scheduler]].

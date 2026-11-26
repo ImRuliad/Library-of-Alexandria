@@ -140,7 +140,7 @@ flowchart LR
 
 | Actor | When | Effect on the program |
 |---|---|---|
-| **kswapd** (one kernel thread per NUMA node) | Free memory falls below a low watermark | Background; the program doesn't wait |
+| **kswapd** (one kernel thread per [[NUMA]] node) | Free memory falls below a low watermark | Background; the program doesn't wait |
 | **Direct reclaim** | An allocation finds too little free memory | The allocating task does reclaim itself and stalls |
 | **OOM killer** | Reclaim cannot free enough | A process is killed ([OSTEP](https://www.ece.villanova.edu/~rperry/os/ostep/Chapters/22-vm-beyondphys-policy.pdf)) |
 
