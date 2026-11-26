@@ -195,7 +195,7 @@ The one point both sides agree on is that a lock service by itself cannot stop a
 | Aurora DSQL adjudicators | Time ranges of authority over key ranges | A new adjudicator sets a time-based fence that blocks older ones, instead of Paxos leader election ([Murat Demirbas](https://muratbuffalo.blogspot.com/2025/01/use-of-time-in-distributed-databases_14.html)) |
 | [[Object Storage\|S3]] conditional writes | Lock files with validity timeouts | Increasing lock IDs; create only succeeds if the file does not exist (`If-None-Match`) ([Willison on Morling](https://www.simonwillison.net/2024/Aug/30/leader-election-with-s3-conditional-writes)) |
 
-DSQL leans on bounded clocks: correctness breaks only if a clock goes wrong *and* the ClockBound API keeps reporting high confidence instead of widening its bounds ([Murat Demirbas](https://muratbuffalo.blogspot.com/2025/01/use-of-time-in-distributed-databases_14.html)). See [[Time and Clocks]].
+DSQL leans on bounded clocks: correctness breaks only if a clock goes wrong *and* the ClockBound API keeps reporting high confidence instead of widening its bounds ([Murat Demirbas](https://muratbuffalo.blogspot.com/2025/01/use-of-time-in-distributed-databases_14.html)). See [[Time and Clocks]] and [[Clock Synchronization]].
 
 ## ***Where It Is Now***
 
@@ -246,6 +246,7 @@ Open problems:
 
 - [[Coordination Services]] — the lock services that hand out leases
 - [[Time and Clocks]] — why lease safety depends on clock rate and bounded uncertainty
+- [[Clock Synchronization]] — where the clock-rate and error bounds behind leases come from
 - [[Failure Models]] — a paused process looks dead but is not
 - [[Raft]] — terms work like fencing tokens; LeaseGuard builds leases into the log
 - [[Paxos]] — ballot numbers are fencing for proposers

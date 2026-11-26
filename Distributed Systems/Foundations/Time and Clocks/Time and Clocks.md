@@ -97,7 +97,7 @@ Why it matters: many core mechanisms quietly depend on ordering events.
 Model the system as a set of **processes** (nodes, servers). Each process does a sequence of **events**: a local step, sending a message, or receiving a message. Processes share nothing except messages, and messages take an unknown, unbounded time to arrive. That model is the setting of Lamport's paper and of [[Failure Models]].
 
 #### **Physical Clocks Drift**
-A computer's clock counts oscillations of a quartz crystal. Temperature and manufacturing variation change the rate, so each clock has a small **rate error**, usually quoted in µs per second or parts per million (ppm). A synchronization protocol (NTP over the network, or PTP with hardware timestamps) periodically measures the offset to a reference and corrects it.
+A computer's clock counts oscillations of a quartz crystal. Temperature and manufacturing variation change the rate, so each clock has a small **rate error**, usually quoted in µs per second or parts per million (ppm). A synchronization protocol (NTP over the network, or PTP with hardware timestamps) periodically measures the offset to a reference and corrects it; see [[Clock Synchronization]].
 
 Two numbers describe a clock:
 
@@ -453,4 +453,5 @@ Open problems worth tracking:
 - [[Coordination Services]] — Leases and fencing tokens.
 - [[Reliability Patterns]] — Timeouts and retries, measured with monotonic clocks.
 - [[Deterministic Simulation Testing]] — Injecting clock skew and jumps on purpose.
+- [[Clock Synchronization]] — How NTP, PTP and cloud time services produce the clocks and error bounds used here.
 - [[2. Design Overview|GFS: Design Overview]] — GFS's master grants chunk leases, a time-based mechanism.
