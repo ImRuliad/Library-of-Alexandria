@@ -7,7 +7,7 @@ tags:
   - kafka-share-groups
   - dead-letter-queues
   - at-least-once
-status: draft
+status: complete
 sources:
   - https://docs.aws.amazon.com/en_us/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
   - https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html
