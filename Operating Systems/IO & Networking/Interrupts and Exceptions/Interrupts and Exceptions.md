@@ -310,7 +310,7 @@ The **top half** is the hard IRQ handler. Everything that can wait a little goes
 | Softirq | Right after hard IRQs exit, or in `ksoftirqd` | No | The same softirq can run on several CPUs at once | Fixed set of 10, not for drivers |
 | Tasklet | Inside the `TASKLET`/`HI` softirqs | No | "strictly serialized wrt itself, but not wrt another tasklets" ([interrupt.h](https://raw.githubusercontent.com/torvalds/linux/master/include/linux/interrupt.h)) | Being converted away |
 | BH workqueue (`WQ_BH`) | Softirq context of the queueing CPU, in queue order | No | Per-CPU | Added in Linux 6.9 as the tasklet replacement |
-| Threaded IRQ | A kernel thread per handler | Yes | Scheduled like a task | Since 2.6.30; all handlers threaded on PREEMPT_RT |
+| Threaded IRQ | A kernel thread per handler | Yes | Scheduled like a task | Since 2.6.30; all handlers threaded on [[PREEMPT_RT and Real-Time Linux|PREEMPT_RT]] |
 | Workqueue | `kworker` threads | Yes | Configurable | General-purpose deferred work |
 
 Rule of thumb: if it must run soon and never sleeps, a BH workqueue or NAPI; if it may sleep or needs a mutex, a threaded handler or an ordinary workqueue.

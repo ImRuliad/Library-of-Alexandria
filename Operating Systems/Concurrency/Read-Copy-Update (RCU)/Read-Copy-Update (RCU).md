@@ -198,7 +198,7 @@ sequenceDiagram
 
 | Variant | Why it exists |
 |---|---|
-| **Preemptible RCU** | For real-time kernels: readers can be preempted, so the kernel tracks preempted readers explicitly instead of inferring from context switches ([Requirements](https://docs.kernel.org/next/RCU/Design/Requirements/Requirements.html)) |
+| **Preemptible RCU** | For real-time kernels ([[PREEMPT_RT and Real-Time Linux]]): readers can be preempted, so the kernel tracks preempted readers explicitly instead of inferring from context switches ([Requirements](https://docs.kernel.org/next/RCU/Design/Requirements/Requirements.html)) |
 | **SRCU (sleepable RCU)** | Readers may sleep, which ordinary RCU forbids; each user gets its own domain so one slow reader doesn't stall everyone |
 | **Tiny RCU** | Single-CPU, small-memory systems where "memory footprint is critically important" |
 | **Tasks RCU family** | Waits for whole tasks to pass a voluntary context switch rather than for CPUs, so code such as tracing trampolines can be freed safely |
