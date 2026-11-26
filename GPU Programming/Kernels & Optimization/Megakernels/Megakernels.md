@@ -337,7 +337,7 @@ MPK (Mirage Persistent Kernel), from CMU with Tsinghua, NVIDIA and others, is "t
 - The decode step went from about 1,450 kernels (12.9 ms) to 97 (5.9 ms): 517 to 1,109 tokens/s at batch 1, 2.1x.
 - Warp 0 prefetches the next operation's weights into a shared-memory ring; other weights go to L2 with an evict-first hint.
 - Cross-GPU handoffs are fence-free: receive buffers are pre-filled with a sentinel value (all bits set) and the consumer polls until real data replaces it.
-- The roughly 128 KB per-SM instruction cache became a bottleneck, so the authors shrank code and warmed L2 with the kernel's own code.
+- The roughly 128 KB per-SM instruction cache became a bottleneck, so the authors shrank code and warmed L2 with the kernel's own code ([[Instruction Cache and Code Size on GPUs]]).
 - Profiling uses `globaltimer` timestamps written by each block, because a profiler sees one long kernel ([[Profiling with Nsight Compute and Nsight Systems]]).
 
 ### Agent-Generated Megakernels
@@ -392,7 +392,7 @@ The two views fit together. The *launch* bubble is mostly solved by Graphs plus 
 | Register pressure | The whole kernel gets the registers of its hungriest op; spills hurt every op | OptiX 2010 noted register use is set by the largest program; Hazy's 70B kernel has spills ([[Register Pressure and Spilling]]) |
 | One launch configuration | Block size, warps and shared memory are fixed for all ops, so GEMMs lose their best tiles | Together: some GEMMs 1.2 to 1.5x slower |
 | Shared memory | Ops must share it across instruction boundaries | Paging (Hazy, MPK) vs static per-opcode layouts (Cohere, which found paging error-prone) |
-| Instruction cache | Many op bodies in one binary exceed the per-SM instruction cache | Muse Spark Open shrank code and warmed L2; Together saw refetches |
+| Instruction cache | Many op bodies in one binary exceed the per-SM instruction cache ([[Instruction Cache and Code Size on GPUs]]) | Muse Spark Open shrank code and warmed L2; Together saw refetches |
 | Deadlock | Miscounted barriers or bad per-SM order hang silently | Cohere: "Barrier accounting needs explicit invariants and careful testing"; AutoMegaKernel adds a static checker, MPK has none |
 | Debugging and profiling | One kernel, so Nsight shows one bar; races are timing-dependent | `globaltimer` instrumentation (about 2.8% overhead in Muse Spark Open); [[Debugging with compute-sanitizer and cuda-gdb]] |
 | Numerics | Different reduction orders than the reference | Hazy kernel failed msaroufim's FP32 fidelity check |
@@ -458,3 +458,4 @@ Open problems:
 - [[Mixture of Experts]] — Dynamic routing that megakernels handle with in-kernel work stealing.
 - [[Work Stealing and Dynamic Load Balancing]] — Static vs dynamic task scheduling, global work queues and CLC.
 - [[Forward Progress and Inter-Block Synchronization]] — The progress rules behind co-residency and dependency-counter waits.
+- [[Instruction Cache and Code Size on GPUs]] — Why 200-300 KB megakernels refetch code, and how to warm L2 with it.

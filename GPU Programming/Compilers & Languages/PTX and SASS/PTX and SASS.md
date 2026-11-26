@@ -416,3 +416,4 @@ Open problems:
 - [[CUDA Tile and cuTile]] — Tile IR, the tile counterpart of PTX.
 - [[Register Pressure and Spilling]] — Reading ptxas register counts and spill reports.
 - [[CUDA Memory Model and Atomics]] — PTX's scopes, fences and memory orderings.
+- [[Instruction Cache and Code Size on GPUs]] — 16-byte SASS instructions, kernel size from `cuobjdump`, and fatbin size.

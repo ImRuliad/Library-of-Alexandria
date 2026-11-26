@@ -451,3 +451,4 @@ Open problems:
 - [[ThunderKittens and Tile DSLs]] — TK's LCSF template packages producer/consumer warpgroups.
 - [[Persistent Kernels and Stream-K]] — The persistent tile loop warp-specialized GEMMs run in.
 - [[Register Pressure and Spilling]] — `setmaxnreg` and the register budget each role gets.
+- [[Instruction Cache and Code Size on GPUs]] — An "instruction-cache warm" warp role in Meta's GB300 megakernels.

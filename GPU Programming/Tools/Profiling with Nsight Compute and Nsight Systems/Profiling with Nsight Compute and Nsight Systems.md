@@ -334,3 +334,4 @@ Open problems:
 - [[Tensor Cores]] — Tensor-core rooflines and pipe utilization in Nsight Compute.
 - [[Multi-GPU Communication - NVLink and NCCL]] — What the NCCL kernels on a multi-GPU timeline are doing.
 - [[GPU Fault Tolerance in Production]] — The other operations toolbox: DCGM health watches and diagnostics.
+- [[Instruction Cache and Code Size on GPUs]] — "No Instruction" stalls and the `sm__icc_*` metrics.

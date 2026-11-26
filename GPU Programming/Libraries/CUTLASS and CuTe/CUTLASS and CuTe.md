@@ -376,3 +376,4 @@ It is the same vocabulary as the C++ version, without template instantiation. NV
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — Block-scaled formats in CUTLASS GEMMs.
 - [[Persistent Kernels and Stream-K]] — CUTLASS's persistent and Stream-K tile schedulers.
 - [[GEMM Autotuning and Kernel Selection]] — nvMatmulHeuristics ranking and `cutlass_profiler` tuning.
+- [[Instruction Cache and Code Size on GPUs]] — Template instantiation, kernel filters and binary size.

@@ -326,7 +326,7 @@ A kernel's register count is normally one number for every thread. In a [[Warp S
 |---|---|---|
 | More registers per thread | Bigger tiles, more ILP, no spills | Fewer warps per SM; occupancy cliffs at allocation boundaries |
 | Cap registers (`__launch_bounds__`, `__maxnreg__`) | More resident warps | Spills or extra recomputation instructions |
-| Unroll loops | Constant indices, fewer branches, more ILP | More live values; larger code (instruction-cache misses) |
+| Unroll loops | Constant indices, fewer branches, more ILP | More live values; larger code (instruction-cache misses, see [[Instruction Cache and Code Size on GPUs]]) |
 | Rewrite dynamic indexing as conditionals | Array stays in registers | More compare/select instructions |
 | Shared-memory spilling | ~10x lower spill latency than L2 | Uses shared memory other blocks or stages could use; not with dynamic smem or `setmaxnreg` |
 | `setmaxnreg` role split | Accumulator warps get up to 232+ registers | Arch-specific (`sm_90a`+), needs full launch bounds, complex code |
@@ -386,3 +386,4 @@ Open problems:
 - [[Triton]] — Autotuning `num_warps` and tile sizes is a search over register pressure.
 - [[ROCm and HIP]] — AMD's VGPR/AGPR split and the same occupancy trade.
 - [[FlashAttention]] — An attention kernel shaped by register limits on Hopper and TMEM on Blackwell.
+- [[Instruction Cache and Code Size on GPUs]] — The other cost of unrolling and inlining: code that no longer fits the instruction cache.
