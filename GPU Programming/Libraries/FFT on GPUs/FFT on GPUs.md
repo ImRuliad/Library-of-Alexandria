@@ -5,7 +5,7 @@ tags:
   - fft
   - cufft
   - signal-processing
-status: draft
+status: complete
 sources:
   - https://docs.nvidia.com/cuda/cufft/index.html
   - https://docs.nvidia.com/cuda/archive/13.4.2/pdf/CUDA_Toolkit_Release_Notes.pdf
@@ -28,8 +28,10 @@ sources:
   - https://merthidayetoglu.github.io/Accelerating_Fourier_and_Number_Theoretic_Transforms_using_Tensor_Cores_and_Warp_Shuffles.pdf
   - https://arxiv.org/html/2504.11681v1
   - https://arxiv.org/abs/2603.27569
-  - https://www.emergentmind.com/papers/2606.23698
+  - https://arxiv.org/abs/2606.23698
   - https://www.microsoft.com/en-us/research/?p=159516
+  - https://www.microsoft.com/en-us/research/?p=153228
+  - https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-2008-62.pdf
   - https://www.nvidia.com/en-us/data-center/h100/
 created: 2026-11-26
 updated: 2026-11-26
@@ -130,9 +132,9 @@ FFTW's benchmark pages use exactly this, "5 N log2(N)" for complex and "2.5 N lo
 
 ### In-Place vs Stockham
 
-The textbook iterative Cooley-Tukey is **in place**: it overwrites the input array stage by stage, but its natural output is in *bit-reversed* order (output $k$ lands at the index whose binary digits are $k$'s reversed), so it needs a separate scattered reordering pass.
+The textbook iterative Cooley-Tukey is **in place**: it overwrites the input array stage by stage, but one end of the computation is in *bit-reversed* order (index $k$ stored at the index whose binary digits are $k$'s reversed). In Lloyd, Boyd and Govindaraju's words, "For the DIT, the input must be in bit-reversed order", while the DIF variant "starts with the input in natural order, but produces bit-reversed output" ([MSR-TR-2008-62](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-2008-62.pdf)). Either way a separate, scattered reordering pass is needed.
 
-The **Stockham** formulation instead works **out of place**, reading from one buffer and writing to another ("ping-pong") with the reordering folded into each stage's indexing. Output comes out in natural order and every stage's reads and writes are regular. On GPUs that trade (2x memory for regular access and no bit-reversal pass) is almost always worth it; AMD's rocFFT generates "tiled (row/column) + strided + batched Stockham kernels for arbitrary factorization" ([rocFFT codegen](https://rocm.docs.amd.com/projects/rocFFT/en/latest/design/codegen.html)), and recent GPU FFT papers build on radix-8 Stockham kernels ([Bergach, 2026](https://arxiv.org/abs/2603.27569)). Inside shared memory the distinction blurs: a block can do the passes in place in shared memory and only touch global memory out of place.
+The **Stockham** formulation "reorders the dataflow in order to eliminate the need for the bit-reversal", at the price that it "does not perform the FFT in-place" and so needs twice the memory ([MSR-TR-2008-62](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-2008-62.pdf)): each stage reads one buffer and writes another ("ping-pong"), with the reordering folded into its indexing. On GPUs that trade is the usual choice. The SC08 Microsoft paper ran its hierarchical FFTs in shared memory "through a Stockham formulation" ([Govindaraju et al.](https://www.microsoft.com/en-us/research/?p=159516)); AMD's rocFFT generates "tiled (row/column) + strided + batched Stockham kernels for arbitrary factorization" ([rocFFT codegen](https://rocm.docs.amd.com/projects/rocFFT/en/latest/design/codegen.html)), and recent GPU FFT papers build on radix-8 Stockham kernels ([Bergach, 2026](https://arxiv.org/abs/2603.27569)). Inside shared memory the distinction blurs: in rocFFT, once data is in LDS "a singly strided device function performs an interleaved, in-place FFT entirely within LDS", while global memory is read and written out of place.
 
 ### Why FFTs Are Bandwidth-Bound
 
@@ -161,7 +163,7 @@ So even a perfect one-pass FFT is about 3x memory-bound, and a two-pass version 
 ```mermaid
 timeline
     title GPU FFT milestones
-    2008 : Govindaraju et al. GPU DFT paper (SC08)
+    2008 : Microsoft Stockham GPU FFTs (TR-2008-62, SC08)
     2021 : tcFFT and PACT FFTs on Tensor Cores : cuFFTMp early access (Nov)
     2023 : FlashFFTConv (Nov), Monarch FFT on Tensor Cores
     2024 : cuFFT LTO callbacks (CUDA 12.6 Update 2)
@@ -169,7 +171,7 @@ timeline
     2026 : CUDA 13.1-13.4 device API and wider LTO : MathDx 26.06 : rocFFT 1.0.41 : CUDA 13.5 (Nov)
 ```
 
-- **Early GPU FFTs.** Microsoft Research's "High Performance Discrete Fourier Transforms on Graphics Processors" (Govindaraju, Lloyd, Dotsenko, Smith, Manferdelli; SC08) is the classic early study of mapping FFTs onto GPU memory levels ([MSR](https://www.microsoft.com/en-us/research/?p=159516)). Volkov's 2010 talk used CUFFT as an example of "faster codes run at lower occupancy": 45 to 93 Gflop/s while occupancy fell from 33% to 17% (see [[Occupancy and Latency Hiding]]).
+- **Early GPU FFTs.** A Microsoft Research DirectX 9 library (Lloyd, Boyd, Govindaraju; MSR-TR-2008-62) used a radix-2 Stockham FFT that "avoids costly bit reversals" on a GeForce 8800 GTX, noted that its "performance ... is mostly bandwidth limited", and found CUFFT faster for complex power-of-two sizes but its own code "significantly out-performs CUFFT" on real data ([MSR page](https://www.microsoft.com/en-us/research/?p=153228), [TR](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-2008-62.pdf)). The follow-up in CUDA, "High Performance Discrete Fourier Transforms on Graphics Processors" (Govindaraju, Lloyd, Dotsenko, Smith, Manferdelli; SC08), used hierarchical mixed-radix Stockham FFTs in shared memory, merged transposes into a block-based multi-FFT, handled other sizes with Bluestein, and reported up to 300 GFlops, typically 2-4x faster than CUFFT for large sizes ([MSR](https://www.microsoft.com/en-us/research/?p=159516)). Volkov's 2010 talk used CUFFT as an example of "faster codes run at lower occupancy": 45 to 93 Gflop/s while occupancy fell from 33% to 17% (see [[Occupancy and Latency Hiding]]).
 - **cuFFT matures.** Batched and strided ("advanced layout") plans, half and bfloat16 transforms, multi-GPU through `cufftXt` (up to 16 GPUs on one node), and callbacks for fusing loads and stores. Legacy callbacks were deprecated in CUDA 11.4 ([cuFFT docs](https://docs.nvidia.com/cuda/cufft/index.html)).
 - **2021: Tensor Cores and multi-node.** tcFFT (Shanghai Jiao Tong) and a PACT 2021 paper by Durrani et al. showed half-precision FFTs on Tensor Cores beating cuFFT by up to about 1.9x and 1.5x ([tcFFT](https://arxiv.org/pdf/2104.11471), [Durrani et al.](https://merthidayetoglu.github.io/Accelerating_Fourier_and_Number_Theoretic_Transforms_using_Tensor_Cores_and_Warp_Shuffles.pdf)). cuFFTMp's first early-access release came in November 2021 ([cuFFTMp](https://docs.nvidia.com/cuda/cufftmp)).
 - **2023: FFTs for long-sequence ML.** FlashFFTConv put exact FFT convolutions on Tensor Cores for Hyena-style models ([Hazy Research](https://hazyresearch.stanford.edu/blog/2023-11-13-flashfftconv)); VkFFT's white paper made the cross-platform library citable ([IEEE Access](https://ieeexplore.ieee.org/document/10036080)).
@@ -220,7 +222,7 @@ $$
 F_N = P\,(I_{N_2} \otimes F_{N_1})\,D\,P^{-1}\,(I_{N_1} \otimes F_{N_2})\,P
 $$
 
-*In plain English: do $N_1$ independent FFTs of size $N_2$, multiply every element by a twiddle factor ($D$ is diagonal), transpose ($P$ is a permutation), then do $N_2$ FFTs of size $N_1$* ([Fu et al.](https://arxiv.org/pdf/2311.05908)). This is the classic "four-step" (or Bailey "six-step", with explicit transposes) algorithm.
+*In plain English: do $N_1$ independent FFTs of size $N_2$, multiply every element by a twiddle factor ($D$ is diagonal), transpose ($P$ is a permutation), then do $N_2$ FFTs of size $N_1$* ([Fu et al.](https://arxiv.org/pdf/2311.05908)). This is the "four-step" approach, which "computes a single, large 1D FFT by computing FFTs along the rows and columns of its wrapped representation" ([MSR-TR-2008-62](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-2008-62.pdf)); Bailey's "six-step" variant, used by the 2026 FP8 FFT work below, organizes the same idea around explicit transposes ([Matsuoka](https://arxiv.org/abs/2606.23698)).
 
 ```mermaid
 flowchart LR
@@ -303,8 +305,8 @@ A distributed FFT splits the array across GPUs, does local FFTs along the axes e
 
 | Decomposition | Split | Exchanges | Limit |
 |---|---|---|---|
-| Slab (1D) | Along one axis | One all-to-all among all GPUs | At most $N$ GPUs for an $N^3$ grid |
-| Pencil (2D) | Along two axes | Two all-to-alls, each within a row or column of GPUs | Scales to $N^2$ GPUs |
+| Slab (1D) | Along one axis | One all-to-all among all GPUs | Each GPU needs at least one plane, so an $N^3$ grid can use at most $N$ GPUs |
+| Pencil (2D) | Along two axes | Two all-to-alls, each among one row or column of the GPU grid | Each GPU needs at least one line, so up to $N^2$ GPUs |
 
 - **cuFFTXt** handles up to 16 GPUs on one node: `cufftXtSetGPUs`, `cufftXtMalloc`, `cufftXtMemcpy`, then execute ([cuFFT docs](https://docs.nvidia.com/cuda/cufft/index.html)).
 - **cuFFTMp** is the multi-process, multi-node library, with slab and pencil decompositions with arbitrary block sizes, a standalone reshape API, and NVSHMEM or NCCL communication backends; version 12.6.0 is current ([cuFFTMp docs](https://docs.nvidia.com/cuda/cufftmp)). See [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]] and [[GPUDirect RDMA and Storage]].
@@ -350,7 +352,7 @@ FlashFFTConv also adds two sparse variants: **partial convolutions** (zero the t
 - **Distributed.** cuFFTMp 12.6.0 is current, with NVSHMEM or NCCL backends; NVSHMEM ABI compatibility within a major version since 11.2.6, and nvmath-python exposes it from Python ([cuFFTMp](https://docs.nvidia.com/cuda/cufftmp), [NVIDIA blog](https://developer.nvidia.com/blog/how-to-scale-fast-fourier-transforms-to-exascale-on-modern-nvidia-gpu-architectures/)).
 - **AMD.** rocFFT 1.0.34 to 1.0.36 shipped with ROCm 7.0 to 7.2. The ROCm Core SDK 10.2.0 release (Nov 18, 2026) brings rocFFT 1.0.41: just-in-time load/store callbacks now work on multi-GPU transforms, deprecated function-pointer callbacks no longer do, and 64-bit indexing is chosen automatically for transforms that overflow 32-bit addressing ([ROCm 10.2.0 notes](https://rocm.docs.amd.com/en/latest/release.html), [ROCm 7.2.4 changelog](https://rocm.docs.amd.com/en/docs-7.2.4/release/changelog.html)). Like NVIDIA, AMD is moving callbacks to JIT linking.
 - **Research, 2025-2026.**
-    - **FP64 FFTs from FP8 Tensor Cores.** Blackwell Ultra (B300) cut FP64 vector throughput to about 1.3 TFLOP/s. A May 2026 preprint by Satoshi Matsuoka proposes emulating FP64 3D FFTs with the Ozaki scheme (split numbers into low-precision slices, multiply on FP8 Tensor Cores, reconstruct exactly), Bailey's six-step FFT and an INT32 Kulisch accumulator. For a $1024^3$ FFT on B300 it *projects* about 18 ms against a 12.9 ms memory roof, with at most 2 ulps of error; the precision results come from a small Python prototype and the speed is not measured ([arXiv 2606.23698](https://www.emergentmind.com/papers/2606.23698)). See [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]].
+    - **FP64 FFTs from FP8 Tensor Cores.** Blackwell Ultra (B300) cuts FP64 vector throughput about 30x. Satoshi Matsuoka's preprint "FP8 is All You Need (Part 2): Full-FP64 3-D FFT on FP8-Generation Tensor Cores" (May 28, 2026; v3 Sep 8, 2026) designs a full-FP64 $1024^3$ 3D FFT with no FP64 arithmetic: a Bailey six-step FFT whose GEMMs run with the Ozaki Scheme II on FP8 Tensor Cores, followed by integer (CRT) reconstruction. It finds that per-output integer epilogue, not floating point, is the bottleneck, and *projects* 63-87 ms on B300 against a 12.9 ms memory roof, or 16.0-23.5 ms with minor hardware changes. "All figures are projected floors, not measurements" ([arXiv 2606.23698](https://arxiv.org/abs/2606.23698)). See [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]].
     - **Other platforms.** A March 2026 radix-8 Stockham FFT for Apple GPUs reports 138 GFLOP/s at $N = 4096$, 29% faster than Apple's vDSP, with a four-step decomposition beyond the 32 KiB threadgroup memory ([Bergach, 2026](https://arxiv.org/abs/2603.27569)).
     - **Fusion for ML.** FNO kernels like TurboFNO, and long-convolution models built on FlashFFTConv, keep pushing FFTs into larger fused kernels instead of library calls.
 
@@ -394,12 +396,13 @@ FlashFFTConv also adds two sparse variants: **partial convolutions** (zero the t
 - [FFTW benchmark methodology](https://fftw.org/speed/method.html): where the $5N\log_2 N$ convention comes from.
 
 **Papers**
-- [High Performance Discrete Fourier Transforms on Graphics Processors](https://www.microsoft.com/en-us/research/?p=159516): Govindaraju et al., SC08.
+- [Fast Computation of General Fourier Transforms on GPUs](https://www.microsoft.com/en-us/research/?p=153228): Lloyd, Boyd, Govindaraju, MSR-TR-2008-62. Stockham vs bit reversal, four-step, bandwidth limits.
+- [High Performance Discrete Fourier Transforms on Graphics Processors](https://www.microsoft.com/en-us/research/?p=159516): Govindaraju et al., SC08. Hierarchical Stockham FFTs in shared memory, 2-4x over CUFFT.
 - [tcFFT](https://arxiv.org/pdf/2104.11471): Li, Cheng, Lin, 2021. Half-precision FFT on Tensor Cores.
 - [Accelerating Fourier and Number Theoretic Transforms using Tensor Cores and Warp Shuffles](https://merthidayetoglu.github.io/Accelerating_Fourier_and_Number_Theoretic_Transforms_using_Tensor_Cores_and_Warp_Shuffles.pdf): Durrani et al., PACT 2021.
 - [FlashFFTConv](https://arxiv.org/pdf/2311.05908): Fu, Kumbong, Nguyen, Ré, ICLR 2024. Monarch FFT convolutions.
 - [TurboFNO](https://arxiv.org/html/2504.11681v1): Wu et al., 2025. Fused FFT-GEMM-iFFT.
-- [FP8 is All You Need (Part 2)](https://www.emergentmind.com/papers/2606.23698): Matsuoka, May 2026. FP64 FFT emulation on FP8 Tensor Cores (projected).
+- [FP8 is All You Need (Part 2)](https://arxiv.org/abs/2606.23698): Matsuoka, May 2026 (v3 Sep 2026). Full-FP64 3D FFT on FP8 Tensor Cores; projected, not measured.
 - [Beating vDSP: a radix-8 Stockham FFT on Apple Silicon](https://arxiv.org/abs/2603.27569): Bergach, Mar 2026.
 
 ## Related Notes
