@@ -313,3 +313,4 @@ Open problems worth tracking:
 - [[Formal Methods in Practice]] — TLA+ models of commit protocols.
 - [[Isolation Testing]] — How Jepsen checks isolation claims.
 - [[CRDTs]] — Avoiding coordination altogether for data that can merge.
+- [[Sharded Postgres]] — 2PC over stock Postgres shards, and the fractured reads it leaves without a global snapshot.

@@ -287,3 +287,4 @@ Open problems worth tracking:
 - [[LSM Trees]] — The storage engines underneath.
 - [[Coordination Services]] — Chubby and etcd, consensus as a service rather than per range.
 - [[Isolation Testing]] — How Jepsen checks these databases' isolation claims.
+- [[Sharded Postgres]] — The alternative that keeps stock Postgres on every shard and coordinates above it.

@@ -444,6 +444,8 @@ The design rule that DynamoDB's story illustrates: a routing cache is fine, but 
 
 ### Sharded Postgres Arrives
 
+The systems below are covered in depth in [[Sharded Postgres]].
+
 | Project | Status (date) | Approach |
 |---|---|---|
 | **Aurora PostgreSQL Limitless** | GA Oct 31, 2024 | Routers plus shards; hash sharding on a shard key; collocated tables; reference tables copied to every shard; shard split as a management operation ([AWS, Oct 2024](https://aws.amazon.com/blogs/aws/amazon-aurora-postgresql-limitless-database-is-now-generally-available); [AWS docs](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/limitless-architecture.html)) |
@@ -550,3 +552,4 @@ Open problems worth tracking:
 - [[Formal Methods in Practice]] — Checking ownership-transfer and metadata protocols.
 - [[Deterministic Simulation Testing]] — Testing splits, moves and cutovers under faults.
 - [[Failure Models]] — Why correlated failures make vnode spread a double-edged choice.
+- [[Sharded Postgres]] — Citus, Aurora Limitless, Neki, PgDog and Multigres: routers in front of unmodified Postgres shards.

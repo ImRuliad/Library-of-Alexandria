@@ -384,6 +384,7 @@ The same idea now hides inside managed systems. Elasticsearch Serverless (Decemb
 - [[Coordination Services]] — Chubby, ZooKeeper and etcd as the home for leases and assignment state.
 - [[Cluster Scheduling]] — Twine, Borg and Kubernetes, which move containers under the sharder.
 - [[Distributed SQL]] — Databases that auto-split and move ranges internally.
+- [[Sharded Postgres]] — Postgres sharding, where shard moves are mostly operator-driven.
 - [[Replication]] — Primary-secondary shard roles and how replicas of a shard are placed.
 - [[Gossip and Membership]] — The hash-ring membership that auto-sharders replace with an authoritative map.
 - [[Consistency Models]] — What "eventually consistent assignments" do and don't promise.
