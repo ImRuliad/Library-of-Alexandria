@@ -82,7 +82,7 @@ Real workloads need variations:
 |---|---|
 | GEMM + bias + activation + quantize in one pass | Each extra op is another kernel and HBM round trip ([[Kernel Fusion]]) |
 | New number formats (FP8, MXFP4, NVFP4) | Need new block-scaled kernels, often before libraries support them |
-| GEMM-like kernels that aren't GEMMs | Attention, convolution, MoE grouped GEMMs |
+| GEMM-like kernels that aren't GEMMs | Attention, convolution, MoE grouped GEMMs ([[Grouped GEMM and Ragged Batches]]) |
 | Each new GPU generation | Every generation changes the Tensor Core instruction, copy engine and pipelining style |
 
 CUTLASS's original pitch (2017): decompose GEMM into reusable C++ templates at each level of the thread hierarchy, so that a custom kernel reaches cuBLAS-class speed. The 2017 post reported scalar CUTLASS GEMMs within "a few percent" of cuBLAS on V100 ([NVIDIA, Dec 2017](https://developer.nvidia.com/blog/cutlass-linear-algebra-cuda)).
@@ -360,6 +360,7 @@ It is the same vocabulary as the C++ version, without template instantiation. NV
 
 - [[Tiled Matrix Multiplication (GEMM)]] — The algorithm CUTLASS implements at every level.
 - [[Tensor Cores]] — What CuTe's MMA atoms drive.
+- [[Grouped GEMM and Ragged Batches]] — The grouped scheduler, ptr-array and MoE (example 92) kernels.
 - [[TMA and Asynchronous Copies]] — What CuTe's copy atoms drive on Hopper and Blackwell.
 - [[Warp Specialization]] — The producer/consumer schedules described above.
 - [[Shared Memory and Bank Conflicts]] — Why CuTe layouts include swizzles.

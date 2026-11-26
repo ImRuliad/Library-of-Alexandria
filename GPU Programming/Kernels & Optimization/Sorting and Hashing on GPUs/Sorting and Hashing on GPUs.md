@@ -465,6 +465,7 @@ Open problems:
 
 - [[Parallel Reduction and Scan]] — Radix sort is histogram + scan + scatter; Onesweep reuses decoupled look-back.
 - [[CUDA Memory Model and Atomics]] — CAS, memory ordering, and why concurrent hash tables are hard to get right.
+- [[Grouped GEMM and Ragged Batches]] — Where the MoE permutation's counting sort feeds the expert GEMMs.
 - [[Warp Divergence and Warp-Level Primitives]] — Ballot and shuffle drive local ranking and cooperative probing.
 - [[Cooperative Groups]] — Thread-block tiles are how cuCollections sizes its probing groups.
 - [[Memory Coalescing]] — Why radix scatter and hash probes are the hard access patterns.

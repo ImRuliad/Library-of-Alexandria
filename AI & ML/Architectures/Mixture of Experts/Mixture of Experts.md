@@ -411,7 +411,7 @@ The pattern: returns from sparsity are real but diminishing (1.69x, then 1.39x, 
 | Sparsity | More capacity per FLOP | Memory and network traffic grow with total params | Active ratios of 3 to 5%; floor set by infrastructure ([Kimi K2](https://arxiv.org/abs/2507.20534)) |
 | Load balancing | Experts all learn; no hot chips | Aux losses fight the main loss; strict per-sequence balance blocks specialization | Bias balancing plus global-batch or tiny sequence losses ([DeepSeek-AI](https://arxiv.org/abs/2412.19437), [Qiu et al.](https://arxiv.org/abs/2501.11873)) |
 | Capacity factor | Static shapes, bounded memory | Dropped tokens or padding waste | Dropless training is common on GPUs |
-| Fine granularity | Sharper specialization, more combinations | Smaller, less efficient GEMMs; more routing traffic | 128 to 896 experts; grouped and fused kernels |
+| Fine granularity | Sharper specialization, more combinations | Smaller, less efficient GEMMs; more routing traffic | 128 to 896 experts; grouped and fused kernels ([[Grouped GEMM and Ragged Batches]]) |
 | Expert parallelism | Fits huge models; spreads bandwidth load | Two all-to-alls per layer; network-sensitive | Rack-scale NVLink domains, node-limited routing |
 | Serving | Cheap per-token compute | Needs large batches and many GPUs to be efficient; small deployments waste most of the saving | Wide EP for providers; CPU offloading for local use |
 

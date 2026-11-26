@@ -145,7 +145,7 @@ Gupta, Stuart and Owens (UC Davis, InPar 2012) gave the first systematic study o
 | Use case | What persistence buys | GEMM-era example |
 |---|---|---|
 | CPU-GPU synchronization | No host round-trip when the next launch depends on this one's output | Device-side grouped GEMM scheduling |
-| Load balancing of irregular work | A software queue hands out work as blocks free up | Causal attention, MoE grouped GEMM |
+| Load balancing of irregular work | A software queue hands out work as blocks free up | Causal attention, MoE grouped GEMM ([[Grouped GEMM and Ragged Batches]]) |
 | Producer-consumer locality | Results passed on chip instead of through DRAM | Epilogue overlapping the next mainloop; [[Megakernels]] |
 | Global synchronization | Barriers across blocks without relaunching | Stream-K fix-up flags; [[Cooperative Groups]] grid sync |
 
@@ -439,6 +439,7 @@ Open problems and pitfalls:
 - [[MIG and MPS - Sharing a GPU]] — Why a kernel that assumes it owns every SM can misbehave when shared.
 - [[TMA and Asynchronous Copies]] — The deep pipelines that make per-tile setup expensive enough to amortize.
 - [[Mixture of Experts]] — Persistent grouped GEMMs for expert layers.
+- [[Grouped GEMM and Ragged Batches]] — Grouped tile schedulers, offsets and device-side sizes for MoE.
 - [[cuBLAS and cuDNN]] — Library kernel selection per shape.
 - [[GEMM Autotuning and Kernel Selection]] — Choosing the decomposition, tile and cluster per shape by model or measurement.
 - [[Work Stealing and Dynamic Load Balancing]] — The general picture: static vs dynamic balancing, queues, stealing and plan-then-run schedules.

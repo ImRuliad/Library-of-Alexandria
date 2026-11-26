@@ -448,7 +448,7 @@ The pattern across all four: dynamic queues pay off when task times are data-dep
 - [[Memory Coalescing]] — Keeping chunked claims coalesced.
 - [[ROCm and HIP]] — Where software queues remain the portable option.
 - [[Forward Progress and Inter-Block Synchronization]] — Why spin-waiting queues can deadlock (planned).
-- [[Grouped GEMM and Ragged Batches]] — Balancing MoE expert GEMMs (planned).
+- [[Grouped GEMM and Ragged Batches]] — Balancing MoE expert GEMMs.
 - [[Deterministic and Batch-Invariant Kernels]] — Reproducibility under dynamic schedules (planned).
 - [[Green Contexts and SM Partitioning]] — Reserving SMs, the opposite of stealing them (planned).
 - [[FlashAttention]] — Longest-first dynamic scheduling for causal attention.

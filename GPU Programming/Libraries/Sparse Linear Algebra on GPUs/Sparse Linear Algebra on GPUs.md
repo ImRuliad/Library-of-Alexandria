@@ -341,7 +341,7 @@ Iterative solvers call SpMV hundreds of times per solve, so a 10% SpMV win is a 
 | Use | Sparse pattern | How it runs on GPUs today |
 |---|---|---|
 | **Pruned weights** | Unstructured or 2:4 | 2:4 through cuSPARSELt or CUTLASS sparse GEMMs; unstructured through research kernels (Sputnik, Flash-LLM) |
-| **[[Mixture of Experts]]** | Block-sparse (each token touches a few experts) | MegaBlocks expressed MoE as block-sparse matmuls to avoid dropping tokens ([arXiv:2211.15841](https://arxiv.org/abs/2211.15841)); today grouped GEMM is more common ([[CUTLASS and CuTe]]) |
+| **[[Mixture of Experts]]** | Block-sparse (each token touches a few experts) | MegaBlocks expressed MoE as block-sparse matmuls to avoid dropping tokens ([arXiv:2211.15841](https://arxiv.org/abs/2211.15841)); today grouped GEMM is more common ([[Grouped GEMM and Ragged Batches]]) |
 | **[[Sparse Attention]]** | Block masks or per-query top-k keys | Gather the selected keys into dense tiles and run dense attention kernels; cuDNN's frontend ships a DeepSeek Sparse Attention (DSA) API ([cuDNN docs](https://docs.nvidia.com/deeplearning/cudnn/latest/fe-oss-apis/dsa.html)) |
 | **Graph neural networks** | Graph adjacency (power-law) | Message passing is SpMM (aggregate) plus SDDMM (edge scores); SparseTIR reports 1.20–2.34x over vendor libraries on GNN operators ([arXiv:2207.04606](https://arxiv.org/abs/2207.04606)) |
 | **Recommenders, embeddings** | Sparse lookups | Gathers and segmented reductions rather than sparse BLAS |
