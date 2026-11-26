@@ -576,6 +576,7 @@ Open problems:
 - [[CPS and ANF]] — LCNF is an A-normal form with join points.
 - [[Intermediate Representations]] — Why LCNF gives up being fully typed while GHC Core stays typed.
 - [[Garbage Collection]] — Lean's reference counting with reuse as the alternative to tracing.
+- [[Reference Counting and Reuse]] — Counting Immutable Beans in depth: reset/reuse, borrow inference, and how Perceus refined them.
 - [[Abstract Interpretation]] — Predicate abstraction behind liquid inference.
 - [[E-Graphs and Equality Saturation]] — The entailment solver in Scala's refinement types.
 - [[Compiler Testing and Fuzzing]] — Multiple independent kernels as differential testing for proof checkers.

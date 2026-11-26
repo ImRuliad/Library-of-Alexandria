@@ -663,6 +663,7 @@ quadrantChart
 - [[JIT Compilation]] — C2, Graal and V8 run escape analysis after inlining and rely on deopt to be optimistic.
 - [[Sea of Nodes]] — The IR C2 and Graal run escape analysis on; memory slices make field replacement easy.
 - [[Garbage Collection]] — What escape analysis saves: allocation rate, GC frequency, write barriers.
+- [[Reference Counting and Reuse]] — The RC alternative: reuse a dying cell in place instead of proving it never escapes.
 - [[Deoptimization and Speculation]] — Rematerializing scalar-replaced objects and relocking on deopt.
 - [[Dataflow Analysis]] — The escape lattice is a monotone dataflow problem.
 - [[Abstract Interpretation]] — PEA and JSC's allocation sinking are abstract interpreters over virtual objects.

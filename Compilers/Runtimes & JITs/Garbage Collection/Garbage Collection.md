@@ -227,7 +227,7 @@ func area(_ s: Shape) -> Double {
 // After ARC optimization: no retain/release; `s` is borrowed for the call.
 ```
 
-Functional languages go further. Lean 4 marks parameters as *borrowed* (no count change) when inferred safe, and reuses a dead cell's memory for a new cell of the same shape ("reset/reuse") ([Ullrich & de Moura, IFL 2019](https://arxiv.org/abs/1908.05647v3)). Koka's **Perceus** inserts precise `dup`/`drop` so each object is freed at its last use, not at scope end, making the program *garbage free*; with reuse analysis, a `match` that consumes a uniquely owned list cell can build the new cell in the same memory, so functional updates become in-place updates ([Reinking et al., PLDI 2021](https://www.microsoft.com/en-us/research/publication/perceus-garbage-free-reference-counting-with-reuse-2/)).
+Functional languages go further (see [[Reference Counting and Reuse]]). Lean 4 marks parameters as *borrowed* (no count change) when inferred safe, and reuses a dead cell's memory for a new cell of the same shape ("reset/reuse") ([Ullrich & de Moura, IFL 2019](https://arxiv.org/abs/1908.05647v3)). Koka's **Perceus** inserts precise `dup`/`drop` so each object is freed at its last use, not at scope end, making the program *garbage free*; with reuse analysis, a `match` that consumes a uniquely owned list cell can build the new cell in the same memory, so functional updates become in-place updates ([Reinking et al., PLDI 2021](https://www.microsoft.com/en-us/research/publication/perceus-garbage-free-reference-counting-with-reuse-2/)).
 
 RC still needs a cycle answer. CPython uses RC plus a separate tracing cycle detector over container objects; Swift has none and relies on `weak`/`unowned` references; Perceus relies on Koka's types making most data acyclic.
 
@@ -468,7 +468,8 @@ MMTk is a Rust library of collectors (Immix, generational Immix, LXR and others)
 - [[Classic Optimizations]] — Barrier elision and retain/release pair removal.
 - [[WebAssembly]] — Linear memory vs WasmGC.
 - [[Type Systems and Inference]] — Types that make data acyclic or unique, which Perceus exploits.
+- [[Reference Counting and Reuse]] — The RC family in depth: Perceus, Lean's reset/reuse, borrowing, biased RC, trial deletion, LXR.
 - [[Compiler Pipeline]] — Where GC lowering sits in a compiler.
 - [[Closure Conversion and Defunctionalization]] — Heap closures and their environments, and why linked environments retain dead data.
-- [[Escape Analysis]] — Planned: stack allocation and barrier removal for objects that never escape.
+- [[Escape Analysis]] — Stack allocation and barrier removal for objects that never escape.
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages, a world without a collector.
