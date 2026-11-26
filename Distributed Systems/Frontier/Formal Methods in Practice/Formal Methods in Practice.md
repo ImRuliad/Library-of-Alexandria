@@ -240,3 +240,4 @@ Open problems:
 - [[Reliability Patterns]] — the emergent performance failures that specs struggle to model
 - [[Failure Models]] — specs make the assumed failures explicit
 - [[Byzantine Fault Tolerance]] — BFT protocols are notoriously hard to get right without proofs
+- [[Isolation Testing]] — checking a running database's histories against its isolation claim, and a 2026 proof-based alternative

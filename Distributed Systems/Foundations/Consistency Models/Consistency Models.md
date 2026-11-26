@@ -275,7 +275,7 @@ The cost of the strong side is latency, not only availability: across two US reg
 - **MariaDB Galera Cluster 12.1.2 (Mar 2026):** claimed isolation "between Serializable and Repeatable Read" and "no lost transactions". Jepsen found lost updates and G-single cycles in healthy clusters, stale reads every few minutes, and lost committed writes under crashes, and judged it "weaker than Read Uncommitted" given the lost writes ([Jepsen](https://jepsen.io/analyses/mariadb-galera-cluster-12.1.2)).
 - **ParticleDB (Oct 2026):** a new multi-model database for AI workloads that advertised "Full ACID" and TLA+ proofs; Jepsen reported 96 issues including lost committed writes in the default mode, G-single and lost updates under `serializable`, and stale reads under `strict-serializable`. Most were fixed during the engagement ([Jepsen](https://jepsen.io/analyses/particledb-1.1.4)).
 
-The pattern: isolation names in documentation are claims, and Elle-style history checking is how you find out what a system actually does ([Kingsbury and Alvaro](https://arxiv.org/abs/2003.10554)).
+The pattern: isolation names in documentation are claims, and Elle-style history checking ([[Isolation Testing]]) is how you find out what a system actually does ([Kingsbury and Alvaro](https://arxiv.org/abs/2003.10554)).
 
 #### **Strong Consistency as the Default**
 - Brooker argues eventual consistency pushes complexity onto every client (retry loops, routing reads to the primary) and that replicas are only useful for read-modify-write if reads are strongly consistent. In Aurora DSQL every read is strongly consistent: a query picks a start timestamp and a replica either serves data as of that timestamp or waits until it has caught up ([Brooker, Nov 2025](https://brooker.co.za/blog/2025/11/18/consistency)).
@@ -332,3 +332,4 @@ Open problems worth tracking:
 - [[Distributed SQL]] — Spanner, CockroachDB, YugabyteDB and Aurora DSQL and the isolation each offers.
 - [[CRDTs]] — Convergence under causal and eventual consistency without coordination.
 - [[Deterministic Simulation Testing]] — Testing that a system really provides its claimed model.
+- [[Isolation Testing]] — How Elle and other checkers test isolation claims from observed histories.
