@@ -109,7 +109,7 @@ $$
 C \approx 6ND \ \text{FLOPs}
 $$
 
-*In plain English: every token does 2 FLOPs per parameter in the forward pass (one multiply, one add) and about 4 in the backward pass (gradients for activations and for weights). The attention-score term is left out; it matters only at long context* ([Kaplan et al., 2020](https://arxiv.org/abs/2001.08361)).
+*In plain English: every token does 2 FLOPs per parameter in the forward pass (one multiply, one add) and about 4 in the backward pass (gradients for activations and for weights). The attention-score term is left out; it matters only at [[Long Context|long context]]* ([Kaplan et al., 2020](https://arxiv.org/abs/2001.08361)).
 
 **Example:** Chinchilla, 70B parameters on 1.4T tokens: $6 \times 7{\times}10^{10} \times 1.4{\times}10^{12} \approx 5.9 \times 10^{23}$ FLOPs, matching the paper's $5.76 \times 10^{23}$. For a [[Mixture of Experts]] model, $N$ is the *active* parameters per token, not the total.
 
@@ -250,7 +250,7 @@ Two independent explanations, both now accepted:
 - **Learning-rate schedules.** Kaplan used one cosine schedule length for all runs and read losses off partway through. A cosine schedule only reaches its best loss at its end, so short runs looked worse than they were, which made data look less valuable than it is. Chinchilla set each run's schedule to its own length ([Hoffmann et al., 2022](https://arxiv.org/abs/2203.15556)).
 - **What counts as a parameter, and scale.** Kaplan counted non-embedding parameters and fit on small models, where the embedding table is a large share of the total. Simulating Chinchilla's analysis under those conditions reproduces Kaplan's biased exponent ([Pearce & Song, 2024](https://arxiv.org/abs/2406.12907)).
 
-One more twist: Chinchilla's own Method 3 was flawed. Epoch AI reconstructed the data from the paper's figures and found the published fit was cut short by the optimizer, that rounding $\beta$ to 0.28 biases predictions, and that the reported confidence intervals were implausibly narrow. Their corrected fit implies about 20 tokens per parameter, agreeing with Methods 1 and 2 rather than the roughly 70 that the published Method 3 fit implies ([Besiroglu et al., 2024](https://arxiv.org/abs/2404.10102)).
+One more twist: Chinchilla's own Method 3 was flawed. Epoch AI reconstructed the data from the paper's figures and found the published fit was cut short by the [[Optimizers|optimizer]], that rounding $\beta$ to 0.28 biases predictions, and that the reported confidence intervals were implausibly narrow. Their corrected fit implies about 20 tokens per parameter, agreeing with Methods 1 and 2 rather than the roughly 70 that the published Method 3 fit implies ([Besiroglu et al., 2024](https://arxiv.org/abs/2404.10102)).
 
 #### **How Labs Actually Fit a Scaling Law**
 
@@ -296,7 +296,7 @@ Once a quantity can be swept, someone fits a law to it. The ones that change des
 
 | Law | Finding | Source |
 |---|---|---|
-| Precision | Training in lower precision acts like having fewer parameters. Post-training [[Quantization]] hurts more the more data a model saw, so past some point extra pretraining data makes the quantized model *worse*. | [Kumar et al., 2024](https://arxiv.org/abs/2411.04330) (ICLR 2025) |
+| Precision | Training in lower precision acts like having fewer parameters. Post-training [[Quantization]] hurts more the more data a model saw, so past some point extra [[Pretraining Data\|pretraining data]] makes the quantized model *worse*. | [Kumar et al., 2024](https://arxiv.org/abs/2411.04330) (ICLR 2025) |
 | [[Mixture of Experts]] | Joint laws over active parameters, data and expert count; with the right configuration, MoE can beat dense models at a fixed *memory* budget, not only a fixed compute budget. | [Ludziejewski et al., 2025](https://arxiv.org/abs/2502.05172) (ICML 2025) |
 | RL post-training | Sigmoid in compute; ceiling vs efficiency separated. | [Khatri et al., 2025](https://arxiv.org/abs/2510.13786) |
 | Pretraining + test-time | Joint optimum is heavily overtrained. | [Roberts et al., 2026](https://arxiv.org/abs/2604.01411) |

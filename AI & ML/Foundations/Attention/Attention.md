@@ -57,13 +57,13 @@ updated: 2026-11-25
 
 ## ***TL;DR***
 ---
-*Attention lets every token build its representation as a weighted average of other tokens, where the weights come from how well they match. It is the core operation of the [[Transformer]], and most current architecture work is about making it cheaper at long context.*
+*Attention lets every token build its representation as a weighted average of other tokens, where the weights come from how well they match. It is the core operation of the [[Transformer]], and most current architecture work is about making it cheaper at [[Long Context|long context]].*
 
 - **What it does:** each position asks a question (query), every position advertises what it holds (key) and what it would hand over (value). Matching queries to keys gives weights; the output is the weighted sum of values.
 - **The equation:** $\text{softmax}(QK^\top/\sqrt{d_k})\,V$. One matrix multiply to score, a softmax to turn scores into weights, a second matrix multiply to mix.
 - **Why it won:** any token can reach any other token in one step, and the whole sequence is processed in parallel, unlike an RNN that walks it one token at a time ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)).
 - **What it costs:** compute and memory grow with the square of sequence length during training and prefill, and the [[KV Cache]] grows linearly with every generated token.
-- **Where it is now (Nov 2026):** almost no frontier model runs plain multi-head attention on every layer. They share keys and values (GQA, MLA), compress or sparsify what each query looks at (DeepSeek-V4's CSA/HCA, MiniMax Sparse Attention), or replace most layers with linear-time layers and keep a few full attention layers (Qwen3.5, Kimi Linear, Nemotron 3).
+- **Where it is now (Nov 2026):** almost no frontier model runs plain multi-head attention on every layer. They share keys and values (GQA, MLA), compress or sparsify what each query looks at (DeepSeek-V4's CSA/HCA, MiniMax [[Sparse Attention]]), or replace most layers with linear-time layers and keep a few full attention layers (Qwen3.5, Kimi Linear, Nemotron 3).
 
 ## ***The Problem***
 ---
@@ -144,7 +144,7 @@ timeline
 | 2022 | [[FlashAttention]]: exact attention, tiled so the $n \times n$ score matrix never goes to slow GPU memory. | Attention was memory-bandwidth bound (see [[1 - All About Rooflines (NOT DONE)\|Rooflines]]). | [Dao et al.](https://arxiv.org/abs/2205.14135) |
 | 2023 | Grouped-query attention: groups of query heads share a K/V head. | MQA lost quality; MHA was slow to decode. | [Ainslie et al.](https://arxiv.org/abs/2305.13245) |
 | 2024 | Multi-head latent attention: cache a small compressed latent instead of full K/V. | K/V cache size at long context. | [DeepSeek-V2](https://arxiv.org/abs/2405.04434) |
-| 2025 to 2026 | Sparse, compressed and hybrid attention (details below). | Million-token context and agent workloads. | See [[#Where It Is Now\|Where It Is Now]] |
+| 2025 to 2026 | Sparse, compressed and [[Hybrid Attention\|hybrid attention]] (details below). | Million-token context and agent workloads. | See [[#Where It Is Now\|Where It Is Now]] |
 
 The thread to notice: after 2017 the math of attention barely changed. What changed is **what gets stored and what gets read**, because generation speed is set by memory traffic (see [[KV Cache]] and [[7 - All About Transformer Inference (NOT DONE)|Transformer Inference]]).
 
@@ -291,7 +291,7 @@ Linear attention rewrites attention so a fixed-size state is updated per token, 
 Softmax weights must sum to 1, so a head with nothing useful to read still has to put its weight somewhere. Models learn to dump it on the first token ("attention sink"), which causes huge activations and instability.
 
 - **Learned sink:** gpt-oss adds a learned bias to each head's softmax denominator so a head can attend to nothing ([OpenAI model card](https://arxiv.org/abs/2508.10925)).
-- **Gated attention:** a head-specific sigmoid gate on the attention output. Tested on 30+ variants (15B MoE and 1.7B dense models, 3.5T tokens), it improved quality, training stability and long-context extrapolation and removed attention sinks. NeurIPS 2025; used in Qwen3-Next and Qwen3.5 ([Qiu et al.](https://proceedings.neurips.cc/paper_files/paper/2025/hash/904e89bb4e632e75fb47f093b620b257-Abstract-Conference.html)).
+- **[[Attention Sinks and Gated Attention|Gated attention]]:** a head-specific sigmoid gate on the attention output. Tested on 30+ variants (15B MoE and 1.7B dense models, 3.5T tokens), it improved quality, training stability and long-context extrapolation and removed attention sinks. NeurIPS 2025; used in Qwen3-Next and Qwen3.5 ([Qiu et al.](https://proceedings.neurips.cc/paper_files/paper/2025/hash/904e89bb4e632e75fb47f093b620b257-Abstract-Conference.html)).
 
 #### **Who Uses What**
 *Open-weight models only; closed labs don't publish their attention design.*

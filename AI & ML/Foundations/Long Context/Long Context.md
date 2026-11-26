@@ -254,7 +254,7 @@ Take Llama 3.1 8B: 32 layers, model width 4,096 (32 query heads of size 128), 8 
 
 Readings:
 
-- **128x the input costs about 2,000x the compute.** At an assumed sustained 500 TFLOP/s on one accelerator (a round number for illustration), prefill takes about 0.3 s at 8K, 13 s at 128K and 10 minutes at 1M.
+- **128x the input costs about 2,000x the compute.** At an assumed sustained 500 TFLOP/s on one [[AI Accelerators|accelerator]] (a round number for illustration), prefill takes about 0.3 s at 8K, 13 s at 128K and 10 minutes at 1M.
 - **The cache outgrows the model.** The 8B model's BF16 weights are about 16 GB; one 128K conversation's cache is the same size, and a 1M conversation's cache is eight times it. Every decoded token must read the whole cache, so at 1M each generated token streams 128 GiB from memory.
 - **This is why architecture matters at 1M.** DeepSeek-V4-Pro, a 1.6T-parameter MoE, reports needing 27% of DeepSeek-V3.2's per-token FLOPs and 10% of its KV cache at 1M tokens, and about 2% of an 8-head GQA BF16 cache, by compressing and sparsifying attention ([Hugging Face, Apr 2026](https://huggingface.co/blog/deepseekv4)). See [[Sparse Attention]] and [[Hybrid Attention]].
 

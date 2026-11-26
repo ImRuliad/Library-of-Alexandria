@@ -128,7 +128,7 @@ sequenceDiagram
 #### **Memory-Bound, Not Compute-Bound**
 A chip has a fixed ratio between how fast it can multiply and how fast it can read memory. A job is *compute-bound* when it does many operations per byte it reads and *memory-bound* when it does few; the dividing line is the chip's roofline (see [[1 - All About Rooflines (NOT DONE)|Rooflines]]).
 
-Decode attention does very few operations per byte. Each cached number is read once and used in roughly one multiply-add against the new token's query (a few more with [[#The Five Levers|grouped-query attention]], where several query heads share one cached head). Modern accelerators can do hundreds of operations in the time it takes to read one byte, so the arithmetic units sit mostly idle while the cache streams in ([How to Scale Your Model, ch. 7](https://jax-ml.github.io/scaling-book/inference/)).
+Decode attention does very few operations per byte. Each cached number is read once and used in roughly one multiply-add against the new token's query (a few more with [[#The Five Levers|grouped-query attention]], where several query heads share one cached head). Modern [[AI Accelerators|accelerators]] can do hundreds of operations in the time it takes to read one byte, so the arithmetic units sit mostly idle while the cache streams in ([How to Scale Your Model, ch. 7](https://jax-ml.github.io/scaling-book/inference/)).
 
 Batching does not rescue attention the way it rescues the weight matrices. Many requests can share one read of the weights, but each request has its *own* cache, so a bigger batch means proportionally more cache to read. This is why the cache, not the weights, becomes the limit at long context.
 

@@ -272,7 +272,7 @@ Paged caches fit the same picture: the kernel reads key and value blocks through
 
 ## ***Where It Is Now***
 ---
-*As of Nov 2026, FlashAttention-4 is the reference attention kernel for Blackwell, PyTorch's FlexAttention can compile custom attention variants onto it, and the frontier has moved to low-precision attention for training and to kernels that skip work rather than only moving it faster.*
+*As of Nov 2026, FlashAttention-4 is the reference attention kernel for Blackwell, PyTorch's FlexAttention can compile custom attention variants onto it, and the frontier has moved to [[Low-Precision Attention|low-precision attention]] for training and to kernels that skip work rather than only moving it faster.*
 
 #### **FlashAttention-4 on Blackwell**
 Blackwell doubled tensor-core throughput over Hopper (B200: 2.25 PFLOPs/s dense BF16 vs about 1 on H100) but left the exponential units (16 per clock per SM) and shared-memory bandwidth (128 bytes per clock per SM) the same. For a typical tile, the exponentials now take as long as the matrix multiplies, and shared memory is close behind; in the backward pass shared memory is the main limit ([Zadouri et al., 2026](https://arxiv.org/abs/2603.05451); [Dao's FA4 post](https://tridao.me/blog/2026/flash4/)).

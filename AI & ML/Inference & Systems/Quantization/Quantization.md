@@ -376,7 +376,7 @@ Rotations survived into training: NVIDIA's NVFP4 pretraining recipe applies 16×
 
 #### **Quantizing the KV Cache**
 
-At long context the [[KV Cache]] can outgrow the weights, and it is re-read every decode step, so its bytes per number matter as much as the weights'. The patterns differ from weights:
+At [[Long Context|long context]] the [[KV Cache]] can outgrow the weights, and it is re-read every decode step, so its bytes per number matter as much as the weights'. The patterns differ from weights:
 
 - **Keys have per-channel outliers, values do not.** KIVI therefore quantizes keys per channel and values per token, reaching 2-bit caches without tuning, with 2.6x less peak memory ([Liu et al., 2024](https://arxiv.org/abs/2402.02750)).
 - **FP8 is the default.** vLLM supports FP8 E4M3 and E5M2 caches with per-tensor scales, or per-head scales with calibration ([vLLM docs](https://docs.vllm.ai/en/latest/features/quantization/quantized_kvcache/)).
@@ -446,7 +446,7 @@ $$
 
 | Paper | Finding |
 |---|---|
-| [Kumar et al., Nov 2024](https://arxiv.org/abs/2411.04330) (ICLR 2025) | PTQ damage grows with training data, "eventually making additional pretraining data actively harmful"; compute-optimal training precision is about 7 to 8 bits for integer types; going below 4 bits would need models more than 4x larger. Fits on 465+ runs up to 1.7B. |
+| [Kumar et al., Nov 2024](https://arxiv.org/abs/2411.04330) (ICLR 2025) | PTQ damage grows with training data, "eventually making additional [[Pretraining Data\|pretraining data]] actively harmful"; compute-optimal training precision is about 7 to 8 bits for integer types; going below 4 bits would need models more than 4x larger. Fits on 465+ runs up to 1.7B. |
 | [Sun et al., Jan 2025](https://arxiv.org/abs/2501.02423) | For float formats, exponent bits matter slightly more than mantissa; optimal precision grows with compute; best cost-performance between 4 and 8 bits. |
 | [Castro et al., 2025](https://arxiv.org/html/2505.14669v2) (Quartet) | With a good recipe, fully MXFP4 training of all linear layers can be compute-optimal versus FP8 and BF16; up to about 1.8x end-to-end speedup over FP8 on an RTX 5090. |
 | [Dremov et al., Sep 2025](https://arxiv.org/abs/2509.22935) (ICLR 2026) | The optimal share of training spent in QAT grows with compute. |

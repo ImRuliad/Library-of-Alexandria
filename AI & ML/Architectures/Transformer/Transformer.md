@@ -69,7 +69,7 @@ updated: 2026-11-25
 - **What it is:** a neural network that turns a sequence of token vectors into a sequence of better token vectors, one block at a time. The last layer predicts the next token.
 - **The block:** $h = x + \text{Attn}(\text{Norm}(x))$, then $y = h + \text{FFN}(\text{Norm}(h))$. Attention mixes information *across* positions; the FFN transforms each position *independently*; the "$x +$" residual keeps a running sum that every layer reads from and adds to.
 - **Why it won:** no recurrence, so a whole sequence trains in parallel on GPUs, and any token reaches any other in one step. It beat the best translation systems in 2017 at a fraction of their training cost ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)), then scaled predictably with more data and compute ([Kaplan et al., 2020](https://arxiv.org/abs/2001.08361)).
-- **Where it is now (Nov 2026):** the skeleton is unchanged since GPT-2 ([Raschka, 2025 to 2026](https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison)). What changed: RMSNorm placed before (and sometimes after) each sub-layer, SwiGLU feed-forwards, RoPE positions, cheaper [[Attention]], and the FFN replaced by [[Mixture of Experts]]. The newest experiments touch the skeleton itself: DeepSeek-V4 widened the residual stream (mHC) and Z.ai's GLM-5.4 runs part of its stack twice (a looped Transformer).
+- **Where it is now (Nov 2026):** the skeleton is unchanged since GPT-2 ([Raschka, 2025 to 2026](https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison)). What changed: RMSNorm placed before (and sometimes after) each sub-layer, SwiGLU feed-forwards, RoPE positions, cheaper [[Attention]], and the FFN replaced by [[Mixture of Experts]]. The newest experiments touch the skeleton itself: DeepSeek-V4 widened the [[Residual Stream and Normalization|residual stream]] (mHC) and Z.ai's GLM-5.4 runs part of its stack twice (a [[Looped Transformers|looped Transformer]]).
 
 ## ***The Problem***
 ---
@@ -257,7 +257,7 @@ N_{\text{non-embedding}} \approx 12\, L\, d^2
 \text{training FLOPs} \approx 6\, N\, D
 $$
 
-*In plain English: parameters grow with depth times width squared, and training costs about 6 floating-point operations per parameter per training token $D$ (2 for the forward pass, 4 for the backward pass), ignoring the attention-score term, which matters only at long context. See [[Scaling Laws]] for how budgets are split between $N$ and $D$* ([Kaplan et al., 2020](https://arxiv.org/abs/2001.08361)).
+*In plain English: parameters grow with depth times width squared, and training costs about 6 floating-point operations per parameter per training token $D$ (2 for the forward pass, 4 for the backward pass), ignoring the attention-score term, which matters only at [[Long Context|long context]]. See [[Scaling Laws]] for how budgets are split between $N$ and $D$* ([Kaplan et al., 2020](https://arxiv.org/abs/2001.08361)).
 
 **Worked example (GPT-2 small):** $L = 12$, $d = 768$, vocabulary 50,257.
 - Blocks: $12 \times 12 \times 768^2 \approx 85\text{M}$.
@@ -272,7 +272,7 @@ During generation the cost profile flips: each new token reuses cached keys and 
 A decoder-only Transformer is trained on next-token prediction: for every position, the loss is the negative log-probability it assigned to the token that actually came next. The causal mask lets one forward pass produce a prediction at every position at once, so a 4,096-token document gives 4,096 training examples in a single parallel step.
 
 Training details from the original that still matter ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)):
-- **Adam** optimizer ($\beta_2 = 0.98$) with a learning rate that rises linearly for 4,000 warmup steps, then decays.
+- **Adam** [[Optimizers|optimizer]] ($\beta_2 = 0.98$) with a learning rate that rises linearly for 4,000 warmup steps, then decays.
 - **Dropout** 0.1 and **label smoothing** 0.1 (frontier pre-training today usually drops dropout, since it sees each token about once).
 - **Embeddings scaled** by $\sqrt{d_{model}}$ and **tied** with the output layer.
 
@@ -336,8 +336,8 @@ On Nov 23, 2026, Z.ai announced **GLM-5.4**, which it calls its first loop-Trans
 
 | Model | Date | Block changes beyond the LLaMA recipe |
 |---|---|---|
-| Qwen3.5-397B-A17B | Feb 2026 | 3:1 Gated DeltaNet : gated attention hybrid, MoE, multimodal |
-| GLM-5 | Feb 2026 | MLA + DeepSeek Sparse Attention; layers cut 92 → 78 for latency |
+| Qwen3.5-397B-A17B | Feb 2026 | 3:1 Gated DeltaNet : [[Attention Sinks and Gated Attention\|gated attention]] hybrid, MoE, multimodal |
+| GLM-5 | Feb 2026 | MLA + DeepSeek [[Sparse Attention]]; layers cut 92 → 78 for latency |
 | Cohere Tiny Aya | Feb 2026 | Parallel attention + FFN, no QK-Norm, dense 3.35B |
 | Gemma 4 31B / 26B-A4B | Apr 2026 | 5:1 sliding-window : global, pre+post RMSNorm, QK-Norm, 256K context, MTP drafter |
 | DeepSeek-V4-Pro / Flash | Apr 2026 | CSA/HCA compressed attention, mHC residuals, MoE, 1M context |

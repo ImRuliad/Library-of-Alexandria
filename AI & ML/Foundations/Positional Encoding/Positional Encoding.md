@@ -217,7 +217,7 @@ Pair $i$ completes a full turn every $2\pi/\theta_i$ tokens, its *wavelength*. W
 
 The fast pairs act like a fine ruler for nearby tokens. The slow pairs barely rotate within the context, so they behave almost like no position at all and are free to carry meaning. A study of Gemma 7B found exactly that split: the highest frequencies build sharp positional patterns (attend to the previous token, for example), while the lowest frequencies are used mostly for semantic matching ([Barbero et al., 2024](https://arxiv.org/abs/2410.06205)).
 
-This is why the base matters for long context. If the slowest wavelength is shorter than the context, far-apart tokens wrap around and look close. Raising the base before long-context training helped a lot: at 64K, Llama-3-8B's original base of 500K scored 29.1 on a long-context average, versus 54.6 with a base of 8 million ([Gao et al., 2024](https://arxiv.org/abs/2410.02660)).
+This is why the base matters for [[Long Context|long context]]. If the slowest wavelength is shorter than the context, far-apart tokens wrap around and look close. Raising the base before long-context training helped a lot: at 64K, Llama-3-8B's original base of 500K scored 29.1 on a long-context average, versus 54.6 with a base of 8 million ([Gao et al., 2024](https://arxiv.org/abs/2410.02660)).
 
 #### **ALiBi and Learned Biases**
 ALiBi adds no position to queries or keys. It subtracts a penalty from each attention score, growing linearly with distance ([Press et al., 2021](https://arxiv.org/abs/2108.12409)):
@@ -311,7 +311,7 @@ The most common pattern pairs short-range layers that use RoPE with full-range l
 | Partial RoPE | Frees features for content; smaller cos/sin tables. | Weaker positional signal; best fraction is still tuned by hand. |
 | ALiBi / learned bias | Extrapolates by design; simple. | Built-in recency bias hurts long-range retrieval. |
 | NoPE | Nothing to extrapolate; strong length generalization in studies. | Slower convergence; position must be inferred, which is fuzzy over long distances in pure attention stacks. |
-| YaRN on top | Cheap extension, ~0.1% of pretraining data. | Static factor hurts short prompts; compresses semantic frequencies (DroPE's critique). |
+| YaRN on top | Cheap extension, ~0.1% of [[Pretraining Data\|pretraining data]]. | Static factor hurts short prompts; compresses semantic frequencies (DroPE's critique). |
 
 Open problems:
 - **Is RoPE a training aid rather than a feature?** DroPE suggests models may not need it after pretraining. Whether that holds at frontier scale is untested in public.

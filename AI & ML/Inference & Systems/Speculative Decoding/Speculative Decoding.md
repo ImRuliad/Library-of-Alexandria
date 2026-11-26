@@ -126,7 +126,7 @@ The catch: those extra FLOPs are only free while the hardware is memory-bound. R
 - **Cost coefficient** $c$: time for one draft step divided by time for one target step. Leviathan et al. used T5-small (77M) as a draft for T5-XXL (11B) ([Leviathan et al., 2022](https://arxiv.org/abs/2211.17192)).
 - **Acceptance rate** $\alpha$: the expected probability that the target accepts a drafted token. It measures how well $q$ imitates $p$.
 
-The draft and target must share a tokenizer, or acceptance collapses ([TensorRT-LLM docs](https://nvidia.github.io/TensorRT-LLM/latest/features/speculative-decoding.html)).
+The draft and target must share a [[Tokenization and Embeddings|tokenizer]], or acceptance collapses ([TensorRT-LLM docs](https://nvidia.github.io/TensorRT-LLM/latest/features/speculative-decoding.html)).
 
 #### **Greedy and Sampled Decoding**
 
@@ -379,7 +379,7 @@ Three responses, all in production engines by late 2026:
 
 - **Turn it down as batches grow.** TensorRT-LLM's `draft_len_schedule` lowers draft length by batch size and disables speculation above a threshold; an acceptance-rate cutoff can also switch it off ([TensorRT-LLM docs](https://nvidia.github.io/TensorRT-LLM/latest/features/speculative-decoding.html)). The gpt-oss EAGLE3 "throughput" head drafts a single token for the same reason ([NVIDIA model card](https://huggingface.co/nvidia/gpt-oss-120b-Eagle3-throughput)).
 - **Verify adaptively per request.** DSpark's `compact` mode verifies only each request's predicted-survivable window; the gain is small at batch 1 and grows as throughput plateaus, more so on low-acceptance workloads ([LMSYS, Jul 2026](https://www.lmsys.org/blog/2026-07-06-dspark-sglang)). vLLM's adaptive verification sizes the budget from per-request confidence with "one configuration covering batch sizes 1 to 256" (Aug 2026), and an Oct 2026 variant fits the acceptance estimate online from the drafter's own logits ([vLLM blog](https://vllm.ai/blog/tags/speculative-decoding)).
-- **Long context changes the bottleneck back.** At long sequence lengths the per-request [[KV Cache]] dominates memory traffic even at large batch, so decode stays memory-bound and speculation helps throughput again. MagicDec used a sparse-KV draft to get up to 2.51x on Llama3.1-8B at batch sizes 32 to 256 ([Sadhukhan et al., 2024](https://arxiv.org/abs/2408.11049)).
+- **[[Long Context|Long context]] changes the bottleneck back.** At long sequence lengths the per-request [[KV Cache]] dominates memory traffic even at large batch, so decode stays memory-bound and speculation helps throughput again. MagicDec used a sparse-KV draft to get up to 2.51x on Llama3.1-8B at batch sizes 32 to 256 ([Sadhukhan et al., 2024](https://arxiv.org/abs/2408.11049)).
 
 See [[LLM Serving]] for how this interacts with continuous batching and prefill/decode disaggregation.
 

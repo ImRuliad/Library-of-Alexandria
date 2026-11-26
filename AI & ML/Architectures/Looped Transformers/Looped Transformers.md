@@ -95,7 +95,7 @@ A standard decoder spends roughly $2N$ FLOPs per token, where $N$ is its paramet
 | Want | Standard fix | Side effect |
 |---|---|---|
 | More computation on hard tokens | More layers | More parameters to store, train and move from memory every step |
-| More sequential reasoning steps | Write a longer chain of thought ([[Reasoning Models]]) | Every step is a token: slow decoding, long contexts, a growing [[KV Cache]] |
+| More sequential reasoning steps | Write a longer chain of thought ([[Reasoning Models]]) | Every step is a token: slow decoding, [[Long Context\|long contexts]], a growing [[KV Cache]] |
 | Smaller deployed model | Fewer layers | Less depth, so worse at multi-step problems |
 
 Theory says depth is the scarce resource for multi-step reasoning: a $k$-layer looped model run $L$ times nearly matches a $kL$-layer model on addition, multi-hop induction and math, and $T$ loops can simulate $T$ chain-of-thought steps without emitting a token ([Saunshi et al., 2025](https://arxiv.org/abs/2502.17416)). Looping asks whether that depth can come from reusing weights instead of adding them.
@@ -237,7 +237,7 @@ The model must work at whatever loop count it gets at inference, so training can
 - **Randomize the count.** Huginn samples $r$ per step from a log-normal Poisson with mean 32: most steps are shallow, with a heavy tail of very deep ones ([Geiping et al.](https://arxiv.org/html/2502.05171)).
 - **Truncate backprop.** Gradients flow only through Huginn's last $k = 8$ passes, so memory and backward cost do not grow with $r$. The price: a 2026 scaling study finds truncation saves about 30% of training FLOPs but makes the loop less effective (its recurrence-worth exponent drops from 0.46 to 0.38) ([Schwethelm et al.](https://arxiv.org/html/2604.21106v3)).
 - **Rescale residuals for revisits.** Standard residual scaling assumes each branch has its own weights. A shared block collects gradients from every visit, so DeepLoop sets DeepNorm's constants from the *unrolled* depth $N$: $\alpha = (2N)^{1/2}$, $\beta = (8N)^{-1/2}$, which improves loss once blocks are revisited ([Li et al., Jul 2026](https://arxiv.org/abs/2607.13491)).
-- **Start from a trained model.** Relaxed Recursive Transformers initialize the loop from a pretrained model's layers and add small per-depth LoRA modules; a recursive Gemma 1B beat TinyLlama 1.1B, Pythia 1B and distillation baselines and recovered most of Gemma 2B's quality ([Bae et al., 2024](https://arxiv.org/abs/2410.20672)). GLM-5.4 likewise came from continued training of the GLM-5 base ([Z.ai docs](https://docs.z.ai/guides/llm/glm-5.4.md)), while Nanbeige found training from scratch beat upcycling (per [Raschka](https://magazine.sebastianraschka.com/p/gpt-6-astra-looped-transformers-and)).
+- **Start from a trained model.** Relaxed Recursive Transformers initialize the loop from a pretrained model's layers and add small per-depth LoRA modules; a recursive Gemma 1B beat TinyLlama 1.1B, Pythia 1B and [[Distillation|distillation]] baselines and recovered most of Gemma 2B's quality ([Bae et al., 2024](https://arxiv.org/abs/2410.20672)). GLM-5.4 likewise came from continued training of the GLM-5 base ([Z.ai docs](https://docs.z.ai/guides/llm/glm-5.4.md)), while Nanbeige found training from scratch beat upcycling (per [Raschka](https://magazine.sebastianraschka.com/p/gpt-6-astra-looped-transformers-and)).
 
 #### **Deciding How Many Loops**
 

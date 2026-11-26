@@ -26,7 +26,7 @@ Source: https://jax-ml.github.io/scaling-book/tpus/
 
 #### **Computation**
 A deep learning model is a bunch of matrix multiplications, each composed of floating-point multiplication and addition operations (FLOPs).
-Accelerator speed determines how long these take to compute.
+[[AI Accelerators|Accelerator]] speed determines how long these take to compute.
 
 $$
 T_{math} = \frac{computation\;FLOPs}{Acceleration\;FLOPs/s}

@@ -98,7 +98,7 @@ The [[Transformer]]'s attention compares each query with every earlier key. For 
 | Decode memory traffic | $O(n)$ bytes per new token per layer: the whole KV cache is read | Decode is memory-bound, so time per token rises linearly with context |
 | KV cache capacity | $O(n)$ bytes per sequence | Long contexts shrink the batch that fits on a GPU, cutting throughput |
 
-Agents and reasoning models made all three worse at once: long tool transcripts, long chains of thought and many concurrent sessions. [[Long Context]] is only useful if the per-token price stays low. Sparse attention attacks the first two costs directly (fewer keys scored, fewer bytes read). Some variants also attack the third by caching fewer or compressed entries (sliding windows, DeepSeek-V4's compression).
+Agents and [[Reasoning Models|reasoning models]] made all three worse at once: long tool transcripts, long chains of thought and many concurrent sessions. [[Long Context]] is only useful if the per-token price stays low. Sparse attention attacks the first two costs directly (fewer keys scored, fewer bytes read). Some variants also attack the third by caching fewer or compressed entries (sliding windows, DeepSeek-V4's compression).
 
 The catch: attention is useful precisely because any token can reach any other. A sparsity rule that drops the one token the answer depends on breaks the model. The history of the field is the search for rules that save most of the cost while almost never dropping what matters.
 

@@ -88,7 +88,7 @@ If the load from HBM to VMEM is slower than the FLOPs in the Vector Unit (or MXU
 
 ![](https://jax-ml.github.io/scaling-book/assets/img/tpu-bandwidth.png)
 
-**A TPU Chip (Typically) consists of Two TPU cores which share memory and can be thought of as one large accelerator**
+**A TPU Chip (Typically) consists of Two TPU cores which share memory and can be thought of as one large [[AI Accelerators|accelerator]]**
 - v4, v5, v6 TPUs have two TPU cores and twice the FLOPs (known as Megacore)
 - TPU v7 removes the megacore and instead has a high-bandwidth link between the two cores
 - Older TPU chips (v3 and older) have separate memory and are considered two separate accelerators
