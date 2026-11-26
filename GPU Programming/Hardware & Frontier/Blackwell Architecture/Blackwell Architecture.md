@@ -271,7 +271,7 @@ Sources: [NVIDIA, May 2025](https://developer.nvidia.com/blog/nvidia-blackwell-a
 ---
 *Blackwell is a bet that AI workloads will keep moving toward low precision and rack-scale systems. That bet costs scientific computing, portability and power.*
 
-- **FP64 is fading.** B300 has "essentially no FP64 performance" (about 1.2 TF versus 37 TF on B200) ([Lockwood](https://glennklockwood.com/garden/processors/b300)). HPC codes must stay on B200, move to emulated FP64, or look elsewhere.
+- **FP64 is fading.** B300 has "essentially no FP64 performance" (about 1.2 TF versus 37 TF on B200) ([Lockwood](https://glennklockwood.com/garden/processors/b300)). HPC codes must stay on B200, move to emulated FP64 (see [[Floating-Point Emulation on Tensor Cores]]), or look elsewhere.
 - **Two programming models in one generation.** Data-center Blackwell uses `tcgen05` and TMEM; consumer Blackwell uses warp-level `mma.sync`. A kernel tuned on a workstation teaches little about B200.
 - **Harder to program.** TMEM allocation, CTA pairs, scale-factor staging and single-thread issue make a hand-written GEMM a pipeline-design exercise; the move to Python DSLs ([[CUTLASS and CuTe]], [[CUDA Tile and cuTile]]) is partly a response.
 - **Compute outran everything else.** The Tensor Core doubled but exponentials, shared-memory bandwidth and HBM did not keep pace ([FlashAttention-4](https://arxiv.org/html/2603.05451v1)). Kernels now hide softmax and data movement behind the MMA instead of the reverse.
@@ -305,6 +305,8 @@ Sources: [NVIDIA, May 2025](https://developer.nvidia.com/blog/nvidia-blackwell-a
 ## ***Related Notes***
 ---
 *The pieces of Blackwell each have their own note; these are the ones to read next.*
+
+- [[Floating-Point Emulation on Tensor Cores]] — How FP64 work survives B300's FP64 cut.
 
 - [[Tensor Cores]] — `tcgen05`, TMEM and the instruction-level history.
 - [[TMA and Asynchronous Copies]] — How tiles reach shared memory fast enough to feed TMEM.

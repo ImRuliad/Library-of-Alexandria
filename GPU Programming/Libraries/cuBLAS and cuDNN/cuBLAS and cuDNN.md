@@ -205,7 +205,7 @@ The math mode and compute type decide which hardware a call may use, and therefo
 
 **TF32** rounds FP32 inputs to 10 mantissa bits and accumulates in FP32 ([PyTorch CUDA notes](https://docs.pytorch.org/docs/2.2/_sources/notes/cuda.rst.txt); bit layout in [[Tensor Cores]]). On the H100 example above, enabling it moves an FP32 GEMM off the 67 TFLOPS FP32 pipe and onto Tensor Cores, which is why frameworks expose it as a switch (see [[#How PyTorch Calls Them|How PyTorch Calls Them]]).
 
-**Emulation** goes the other way: it gets *higher* precision out of *lower*-precision Tensor Cores. Blackwell and Rubin offer far more low-precision Tensor Core throughput than FP64 throughput, so cuBLAS can often compute FP64 faster by emulating it:
+**Emulation** goes the other way: it gets *higher* precision out of *lower*-precision Tensor Cores (the algorithms in depth: [[Floating-Point Emulation on Tensor Cores]]). Blackwell and Rubin offer far more low-precision Tensor Core throughput than FP64 throughput, so cuBLAS can often compute FP64 faster by emulating it:
 
 - **BF16x9** emulates FP32 matmuls on Blackwell's BF16 Tensor Cores; NVIDIA reports it can emulate all normal and subnormal FP32 values, with up to 3x over native FP32 on GB200 NVL72 ([NVIDIA, Oct 2025](https://developer.nvidia.com/blog/unlocking-tensor-core-performance-with-floating-point-emulation-in-cublas/)).
 - **Ozaki-I** splits FP64 numbers into 8-bit slices and multiplies them on INT8 Tensor Cores; the number of GEMMs grows with the square of the slice count. Matching FP64 accuracy needs at least 53 mantissa bits, and the bit count required depends on the data ([NVIDIA, Oct 2025](https://developer.nvidia.com/blog/unlocking-tensor-core-performance-with-floating-point-emulation-in-cublas/)).
@@ -439,6 +439,7 @@ In PyTorch, `torch.use_deterministic_algorithms(True)` makes PyTorch use determi
 ## Related Notes
 
 - [[Tiled Matrix Multiplication (GEMM)]] — The algorithm inside every cuBLAS GEMM kernel.
+- [[Floating-Point Emulation on Tensor Cores]] — BF16x9, Ozaki-I, Ozaki-II and ADP explained.
 - [[CUTLASS and CuTe]] — The open template library for kernels cuBLAS doesn't ship.
 - [[Tensor Cores]] — The hardware math modes and compute types decide whether to use.
 - [[Kernel Fusion]] — What cuBLASLt epilogues and cuDNN graphs provide.

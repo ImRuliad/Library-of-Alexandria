@@ -369,7 +369,7 @@ FlashFFTConv also adds two sparse variants: **partial convolutions** (zero the t
 | Stockham out-of-place | Regular access, natural order | 2x memory footprint |
 | Bluestein for awkward sizes | Any $N$ works | More work per output point and lower accuracy than Cooley-Tukey (cuFFT docs) |
 
-- **Precision.** Half-precision FFTs lose accuracy (tcFFT and cuFFT both show about 1.8% average relative error at FP16) and the sum in the first output can overflow. FP64 is the scientific default, and it is getting scarcer on AI-oriented GPUs, hence the Ozaki-style emulation work. Twiddle-factor accuracy alone separates libraries in double precision (VkFFT's FP128 tables).
+- **Precision.** Half-precision FFTs lose accuracy (tcFFT and cuFFT both show about 1.8% average relative error at FP16) and the sum in the first output can overflow. FP64 is the scientific default, and it is getting scarcer on AI-oriented GPUs, hence the Ozaki-style emulation work (see [[Floating-Point Emulation on Tensor Cores]]). Twiddle-factor accuracy alone separates libraries in double precision (VkFFT's FP128 tables).
 - **Small sizes.** A single 64- or 256-point FFT cannot fill a GPU; launch overhead dominates. Batch, use [[CUDA Graphs]], or fuse with cuFFTDx.
 - **Non-power-of-two sizes.** Sizes with large prime factors fall back to Rader or Bluestein, with more work and less accuracy. cuFFT's coverage of LTO and callbacks for these sizes only became complete in 13.3, and cuFFT 13.4 added a property to force Bluestein for testing.
 - **Fusion across passes.** Fusing works within one block-sized FFT. A large FFT needs global synchronization between passes (the transpose), so fusing the whole thing with neighbouring ops needs persistent kernels, cooperative launches or clusters (see [[Persistent Kernels and Stream-K]], [[Thread Block Clusters and Distributed Shared Memory]]). How far distributed shared memory on Hopper and Blackwell can stretch the "one pass" size is an open engineering question; this note found no public cuFFT documentation of cluster use.
@@ -408,6 +408,7 @@ FlashFFTConv also adds two sparse variants: **partial convolutions** (zero the t
 ## Related Notes
 
 - [[Roofline Model and Arithmetic Intensity]] — Why the FFT sits on the memory side of the roof.
+- [[Floating-Point Emulation on Tensor Cores]] — Ozaki-II and the FP8 route to FP64 FFTs.
 - [[Shared Memory and Bank Conflicts]] — Power-of-two radix strides and how padding or swizzling fixes them.
 - [[Memory Coalescing]] — First and last FFT passes must read and write contiguous runs.
 - [[GPU Memory Hierarchy]] — Registers, shared memory and HBM map onto FFT sizes.

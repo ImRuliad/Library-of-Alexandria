@@ -294,3 +294,4 @@ The OCP published **MX spec v1.1** on Oct 9, 2026 ([OCP v1.1](https://www.openco
 - [[Kernel Fusion]] — Fusing quantization into epilogues.
 - [[Roofline Model and Arithmetic Intensity]] — The bandwidth arithmetic above.
 - [[AI Accelerators]] — Low-precision support beyond GPUs.
+- [[Floating-Point Emulation on Tensor Cores]] — Using these formats to emulate FP64 and FP32.
