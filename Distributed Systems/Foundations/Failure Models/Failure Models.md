@@ -60,7 +60,7 @@ updated: 2026-11-26
 - **The central impossibility:** in a fully asynchronous system, no deterministic consensus protocol can guarantee it finishes if even one process might crash ([FLP, 1985](https://groups.csail.mit.edu/tds/papers/Lynch/jacm85.pdf)), because a crashed node and a slow node look the same.
 - **The escape hatch:** assume timing bounds hold "eventually" (partial synchrony, [Dwork, Lynch, Stockmeyer, 1988](https://groups.csail.mit.edu/tds/papers/Lynch/jacm88.pdf)). Protocols like [[Paxos]] and [[Raft]] stay safe always and make progress once the network behaves.
 - **The price in nodes:** tolerating $f$ crash failures needs $2f+1$ nodes; tolerating $f$ Byzantine failures needs $3f+1$ ([Lamport, Shostak, Pease, 1982](https://www.andrew.cmu.edu/course/15-440-sp15/assets/READINGS/lamport1982.pdf)).
-- **Where it is now (Nov 2026):** the hard failures in production are the ones between the textbook categories: gray failures, fail-slow hardware, metastable overload, and silent data corruption, which Meta now sees in about one in a thousand AI accelerators ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)).
+- **Where it is now (Nov 2026):** the hard failures in production are the ones between the textbook categories: gray failures, fail-slow hardware, metastable overload, and [[Silent Data Corruption|silent data corruption]], which Meta now sees in about one in a thousand AI accelerators ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)).
 
 ## ***The Problem***
 ---
@@ -263,7 +263,7 @@ The timeout was a false suspicion: L never crashed. Safety survives only because
 
 #### **Silent Data Corruption in AI Clusters**
 - **Mercurial cores:** Google reported CPU cores that pass manufacturing tests yet occasionally compute wrong results, with no crash; it called for software that detects and isolates such cores ([Hochschild et al., 2021](https://research.google/pubs/pub50337/)).
-- **Rate in 2025:** Meta says soft-error bitflips were historically about one per million devices, while silent data corruption now occurs in about **one per thousand** AI accelerators because of higher silicon density. Its fleet tools include Fleetscanner (full sweep every 45 to 60 days), Ripple (tests alongside workloads, fleet coverage in days) and Hardware Sentinel, which Meta says beats testing-based detection by 41% ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)).
+- **Rate in 2025:** Meta says soft-error bitflips were historically about one per million devices, while [[Silent Data Corruption|silent data corruption]] now occurs in about **one per thousand** AI accelerators because of higher silicon density. Its fleet tools include Fleetscanner (full sweep every 45 to 60 days), Ripple (tests alongside workloads, fleet coverage in days) and Hardware Sentinel, which Meta says beats testing-based detection by 41% ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)).
 - **Online detection, 2026:** ByteDance and Tsinghua's AEGIS detects SDC during LLM training with a cheap sensing stage and a separate verification stage, at about 0.86% overhead. Over 35 million GPU hours it caught 18 real SDC incidents and 13 faulty GPUs ([OSDI '26](https://www.usenix.org/conference/osdi26/presentation/lei)).
 
 Silent corruption is a Byzantine fault produced by hardware, not by an attacker. Most data systems still assume crash faults, so the 2026 answer is detection and isolation rather than full [[Byzantine Fault Tolerance]].
@@ -286,7 +286,7 @@ Silent corruption is a Byzantine fault produced by hardware, not by an attacker.
 
 Open problems worth tracking:
 - **Detecting [[Gray and Fail-Slow Failures|gray and fail-slow failures]]** without drowning in false positives, and agreeing on whose fault a failure is ([Huang et al.](https://pages.cs.wisc.edu/~ra/Classes/739-sp20/papers/grayfailure-hotos17.pdf)).
-- **Silent data corruption.** Fleet-wide testing is slow and online detection is workload-specific; general-purpose, low-overhead detection is open ([Meta](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/), [AEGIS](https://www.usenix.org/conference/osdi26/presentation/lei)).
+- **[[Silent Data Corruption|Silent data corruption]].** Fleet-wide testing is slow and online detection is workload-specific; general-purpose, low-overhead detection is open ([Meta](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/), [AEGIS](https://www.usenix.org/conference/osdi26/presentation/lei)).
 - **Composition.** Components that are each correct and stable can combine into metastable systems; proving the whole is safe is new territory ([Farahbakhsh et al.](https://arxiv.org/html/2606.00942v1)). See [[Formal Methods in Practice]].
 - **Models vs reality.** Many production bugs come from failures the chosen model excluded, not from protocol bugs; testing under injected faults is the practical check ([Alquraan et al.](https://www.usenix.org/conference/osdi18/presentation/alquraan)).
 
@@ -330,3 +330,4 @@ Open problems worth tracking:
 - [[Deterministic Simulation Testing]] — Injecting crashes, partitions and clock faults to find bugs the model hides.
 - [[Formal Methods in Practice]] — Checking protocols against an explicit failure model.
 - [[Gray and Fail-Slow Failures]] — Components that are broken for their users but look healthy to the system, and hardware that runs slow without failing.
+- [[Silent Data Corruption]] — Hardware that computes or stores wrong values without raising an error, now a fleet-scale problem in AI clusters.
