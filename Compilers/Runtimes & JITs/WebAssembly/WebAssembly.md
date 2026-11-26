@@ -8,7 +8,7 @@ tags:
   - sandboxing
   - wasi
   - baseline-compilers
-status: draft
+status: complete
 sources:
   - https://research.google/pubs/bringing-the-web-up-to-speed-with-webassembly/
   - https://www.cs.tufts.edu/~nr/cs257/archive/andreas-rossberg/wasm-cacm.pdf
@@ -17,8 +17,10 @@ sources:
   - https://developer.mozilla.org/en-US/docs/Games/Tools/asm.js
   - https://www.w3.org/press-releases/2019/wasm
   - https://webassembly.org/news/2025-09-17-wasm-3.0/
-  - https://www.w3.org/TR/2026/CRD-wasm-web-api-2-20260831/
-  - https://www.w3.org/2026/06/webassembly-wg.html
+  - https://www.w3.org/news/2022/webassembly-2-0-first-public-working-drafts/
+  - https://www.w3.org/TR/wasm-core-2/
+  - https://www.w3.org/groups/wg/wasm/activity/2026/
+  - https://github.com/WebAssembly/proposals
   - https://v8.dev/blog/liftoff
   - https://v8.dev/docs/wasm-compilation-pipeline
   - https://v8.dev/blog/wasm-dynamic-tiering
@@ -32,7 +34,7 @@ sources:
   - https://bytecodealliance.org/articles/wasmtime-27.0
   - https://bytecodealliance.org/articles/wasmtime-lts
   - https://docs.wasmtime.dev/stability-wasm-proposals.html
-  - https://newreleases.io/project/github/bytecodealliance/wasmtime/release/v49.0.0
+  - https://newreleases.io/project/github/bytecodealliance/wasmtime/release/v51.0.0
   - https://thehackernews.com/2026/10/two-critical-wasmtime-flaws-could-let.html
   - https://www.cfallin.org/blog/2026/04/09/aegraph
   - https://spidermonkey.dev/blog/2025/01/15/is-memory64-actually-worth-using.html
@@ -41,6 +43,8 @@ sources:
   - https://webkit.org/blog/16301/webkit-features-in-safari-18-2/
   - https://web.dev/blog/wasmgc-wasm-tail-call-optimizations-baseline
   - https://caniuse.com/wf-wasm-memory64
+  - https://caniuse.com/wasm-threads
+  - https://web.dev/coop-coep
   - https://developer.chrome.com/release-notes/137
   - https://github.com/WebAssembly/stack-switching
   - https://cs.au.dk/~birke/papers/2026-pldi-iris-wasmfx.pdf
@@ -57,8 +61,10 @@ sources:
   - https://dart.dev/web/wasm
   - https://flutter.dev/blog/landing-flutter-3-22-and-dart-3-4-at-google-i-o-2024
   - https://web.dev/case-studies/google-sheets-wasmgc
+  - https://bytecodealliance.org/articles/WASI-0.2
   - https://bytecodealliance.org/articles/WASI-0.3
   - https://wasi.dev/releases/wasi-p3
+  - https://component-model.bytecodealliance.org/design/migrating-to-p3.html
   - https://wasi.dev/roadmap
   - https://component-model.bytecodealliance.org/design/async.html
   - https://bytecodealliance.org/articles/the-road-to-component-model-1-0
@@ -104,7 +110,7 @@ updated: 2026-11-26
 - **Two compiler roles.** As a *target*, it sits at the end of LLVM, Emscripten, rustc, Go, Kotlin, Dart and others. As a *source*, every engine is itself a compiler, from interpreters (WAMR, wasm3) to single-pass baseline JITs (V8 Liftoff, Wasmtime Winch) to optimizing JITs (TurboFan, SpiderMonkey Ion, Cranelift) and ahead-of-time compilers.
 - **The design trick.** Types are known at every instruction and every branch target is lexically scoped, so validation is one linear pass and a baseline compiler can emit machine code while decoding, with no IR, no CFG construction and no type feedback ([V8, Liftoff](https://v8.dev/blog/liftoff)).
 - **Safety model.** Code can only touch its own linear memory, call functions through typed tables and reach the outside world through imports. On 64-bit hosts, 32-bit memories can use virtual-memory guard regions so most loads need no explicit bounds check; `memory64` loses that trick ([SpiderMonkey, Jan 2025](https://spidermonkey.dev/blog/2025/01/15/is-memory64-actually-worth-using.html)).
-- **Where it is.** Wasm 3.0 (announced 17 September 2025) folded in GC, 64-bit memory, tail calls, exception handling, relaxed SIMD and more ([WebAssembly CG, Sep 2025](https://webassembly.org/news/2025-09-17-wasm-3.0/)). Outside browsers, WASI 0.2 brought the Component Model and WIT, and the Bytecode Alliance has announced WASI 0.3 with native async ([Bytecode Alliance](https://bytecodealliance.org/articles/WASI-0.3)).
+- **Where it is.** Wasm 3.0 (announced 17 September 2025) folded in GC, 64-bit memory, tail calls, exception handling, relaxed SIMD and more ([WebAssembly CG, Sep 2025](https://webassembly.org/news/2025-09-17-wasm-3.0/)). Outside browsers, WASI 0.2 brought the Component Model and WIT, and WASI 0.3 with native async launched on 11 June 2026 ([Bytecode Alliance](https://bytecodealliance.org/articles/WASI-0.3)).
 
 ## ***The Problem***
 ---
@@ -187,18 +193,18 @@ timeline
          : Chrome deprecates PNaCl
     2018 : V8 Liftoff baseline compiler
     2019 : W3C Recommendation for Wasm 1.0
-    2022 : Wasm 2.0 feature set with SIMD and reference types
+    2022 : Wasm 2.0 drafts with SIMD and reference types
     2023 : Wasm GC on by default in Chrome 119 and Firefox 120
     2024 : WASI 0.2 with Component Model and WIT
          : Safari 18.2 adds GC and tail calls
     2025 : JSPI in Chrome 137
          : Wasm 3.0 announced in September
-    2026 : WASI 0.3 with native async
+    2026 : WASI 0.3 with native async in June
 ```
 
 - **1.0 to Recommendation.** The W3C made the WebAssembly Core Specification, JavaScript Interface and Web API official Recommendations in December 2019, describing Wasm as the fourth language to run natively in browsers after HTML, CSS and JavaScript ([W3C, Dec 2019](https://www.w3.org/press-releases/2019/wasm)).
-- **Wasm 2.0** collected the first post-MVP batch: sign-extension ops, non-trapping float-to-int, multi-value, bulk memory, reference types and 128-bit SIMD.
-- **Wasm 3.0** (17 September 2025) collected the second: 64-bit address space, multiple memories, typed function references, garbage collection, tail calls, exception handling with `exnref`, relaxed SIMD, a deterministic profile, a custom-annotation syntax for the text format, and JS string builtins ([WebAssembly CG](https://webassembly.org/news/2025-09-17-wasm-3.0/)).
+- **Wasm 2.0** collected the first post-MVP batch: sign-extension ops, non-trapping float-to-int, multi-value, bulk memory, reference types and 128-bit SIMD; the W3C published its First Public Working Drafts in April 2022 ([W3C, 2022](https://www.w3.org/news/2022/webassembly-2-0-first-public-working-drafts/)).
+- **Wasm 3.0** (17 September 2025) collected the second: 64-bit address space, multiple memories, typed function references, garbage collection, tail calls, exception handling with `exnref`, relaxed SIMD, a deterministic profile and a custom-annotation syntax for the text format, plus JS string builtins as an extension of the JS API ([WebAssembly CG](https://webassembly.org/news/2025-09-17-wasm-3.0/)). Threads are not part of 3.0: that proposal is still at Phase 4 ([WebAssembly proposals](https://github.com/WebAssembly/proposals)).
 
 ## ***How It Works***
 ---
@@ -224,7 +230,7 @@ flowchart LR
 - **Restructuring control flow** is the classic hard part. Emscripten's *Relooper* algorithm turned arbitrary CFGs into loops and multi-way branches for asm.js; Ramsey's "Beyond Relooper" gives a simpler recursive translation based on dominator trees for reducible CFGs ([Ramsey, ICFP 2022](https://icfp22.sigplan.org/details/icfp-2022-papers/1/Beyond-Relooper-Recursive-Translation-of-Unstructured-Control-Flow-to-Structured-Con)). Irreducible loops need node splitting or a dispatch variable.
 - **wasm-ld** is LLD's Wasm port; it links Wasm object files, resolves symbols, lays out data segments in linear memory and builds the function table. See [[Linking and LTO]] and [[Compiler, Assembler, Linker, and Loader]].
 - **Binaryen** is a Wasm-to-Wasm optimizer and compiler infrastructure; `wasm-opt` runs size and speed passes (inlining, dead-code removal, local coalescing, GC-type refinement) and is used as the back end or post-pass of Emscripten, AssemblyScript, J2Wasm and other toolchains ([Binaryen README](https://chromium.googlesource.com/external/github.com/WebAssembly/binaryen/+show/refs/heads/docs/README.md)).
-- **Languages.** Rust has `wasm32-unknown-unknown`, `wasm32-wasip1` and `wasm32-wasip2` (tier 2 since November 2024) ([Rust Blog, 2024](https://blog.rust-lang.org/2024/11/26/wasip2-tier-2/)), and a `wasm32-wasip3` target now appears in the rustc platform list ([rustc book](https://doc.rust-lang.org/rustc/platform-support/wasm32-wasip3.html)). Go added a `wasip1` port in Go 1.21 ([Go Blog, Sep 2023](https://go.dev/blog/wasi)) and `//go:wasmexport` in Go 1.24 ([Go Blog, 2025](https://go.dev/blog/wasmexport)); Go ships its own collector and uses its own compiler back end, not LLVM. Kotlin/Wasm ([Kotlin docs](https://kotlinlang.org/docs/wasm-overview.html)), Dart's `dart2wasm` ([Dart docs](https://dart.dev/web/wasm)) and Google's J2CL-based J2Wasm for Java target **Wasm GC**, so the browser's collector manages their objects.
+- **Languages.** Rust has `wasm32-unknown-unknown`, `wasm32-wasip1` and `wasm32-wasip2` (tier 2 since November 2024) ([Rust Blog, 2024](https://blog.rust-lang.org/2024/11/26/wasip2-tier-2/)), and a tier 2 `wasm32-wasip3` target now appears in the rustc platform list ([rustc book](https://doc.rust-lang.org/rustc/platform-support/wasm32-wasip3.html)). Go added a `wasip1` port in Go 1.21 ([Go Blog, Sep 2023](https://go.dev/blog/wasi)) and `//go:wasmexport` in Go 1.24 ([Go Blog, 2025](https://go.dev/blog/wasmexport)); Go ships its own collector and uses its own compiler back end, not LLVM. Kotlin/Wasm ([Kotlin docs](https://kotlinlang.org/docs/wasm-overview.html)), Dart's `dart2wasm` ([Dart docs](https://dart.dev/web/wasm)) and Google's J2CL-based J2Wasm for Java target **Wasm GC**, so the browser's collector manages their objects.
 
 Targeting Wasm GC changes the compiler's job: instead of laying objects out in linear memory and shipping a collector, the compiler emits `struct` and `array` types with subtyping, and uses `ref.cast` and `br_on_cast` for downcasts. Google Sheets moved its calculation worker from JavaScript to WasmGC through J2Wasm and reported it ran about twice as fast as the JS version ([web.dev case study, 2024](https://web.dev/case-studies/google-sheets-wasmgc)). See [[Garbage Collection]].
 
@@ -306,7 +312,7 @@ Two things to notice. First, the operand stack and the `local`s have vanished in
 
 | Engine | Interpreter / baseline | Optimizing tier | Notes |
 |---|---|---|---|
-| **V8** (Chrome, Node, Deno, Workers) | Liftoff, a single-pass compiler | TurboFan, with a Turboshaft CFG backend | Dynamic tiering since Chrome 96 ([V8](https://v8.dev/blog/wasm-dynamic-tiering)); speculative inlining with deopts added for Wasm in 2025 ([V8](https://v8.dev/blog/wasm-speculative-optimizations)) |
+| **V8** (Chrome, Node, Deno, Workers) | Liftoff, a single-pass compiler | TurboFan, with a Turboshaft CFG backend | Dynamic tiering, first offered for testing (flag and origin trial) in Chrome 96 ([V8](https://v8.dev/blog/wasm-dynamic-tiering)); speculative inlining with deopts added for Wasm in Chrome 137 in 2025 ([V8](https://v8.dev/blog/wasm-speculative-optimizations)) |
 | **SpiderMonkey** (Firefox) | Wasm baseline compiler | Ion | Compared with other baselines in [Titzer, CGO 2024](https://conf.researchr.org/details/cgo-2024/cgo-2024-main-conference/39/Whose-Baseline-Compiler-Is-It-Anyway-) |
 | **Wasmtime** | Winch, a single-pass baseline | Cranelift | Winch gained AArch64 in Wasmtime 35 ([Bytecode Alliance](https://bytecodealliance.org/articles/winch-aarch64-support)); Cranelift is the default |
 | **WAMR** | Classic and "fast" interpreters | LLVM-based JIT and AOT (`wamrc`) | Fast interpreter pre-compiles to a register-style internal code ([Intel](https://www.intel.com/content/www/us/en/developer/articles/technical/webassembly-interpreter-design-wasm-micro-runtime.html)) |
@@ -348,7 +354,7 @@ What makes this possible is the design, not clever engineering:
 4. **Functions are independent.** The code section gives each function's size, so functions can be compiled in parallel as soon as their bytes arrive (`WebAssembly.compileStreaming`).
 5. **Validation and compilation fuse.** One decoder loop validates and emits code at once.
 
-The cost is code quality: values are spilled at every merge and call, and there is no global register allocation. Titzer's comparison of baseline compilers in V8, SpiderMonkey, JavaScriptCore and Wizard discusses these trade-offs in detail ([Titzer, CGO 2024](https://conf.researchr.org/details/cgo-2024/cgo-2024-main-conference/39/Whose-Baseline-Compiler-Is-It-Anyway-)), and Andy Wingo's survey explains why throughput in bytes per second, not code quality, decides baseline design ([Wingo, 2020](https://wingolog.org/archives/2020/04/14/understanding-webassembly-code-generation-throughput)).
+The cost is code quality: values are spilled at every merge and call, and there is no global register allocation. Titzer's comparison of six baseline compilers (Wizard's, V8's Liftoff, SpiderMonkey's, wazero's, Wasmer's single-pass and the research WasmNow) discusses these trade-offs in detail ([Titzer, CGO 2024](https://conf.researchr.org/details/cgo-2024/cgo-2024-main-conference/39/Whose-Baseline-Compiler-Is-It-Anyway-)), and Andy Wingo's survey explains why throughput in bytes per second, not code quality, decides baseline design ([Wingo, 2020](https://wingolog.org/archives/2020/04/14/understanding-webassembly-code-generation-throughput)).
 
 ### Bounds Checks Guard Pages vs Explicit Checks
 
@@ -359,7 +365,7 @@ The cost is code quality: values are spilled at every merge and call, and there 
 | **Guard regions** | Reserve $2^{32}$ bytes of address space plus a guard (several GiB), map only the live memory, let out-of-range accesses fault and turn the signal into a trap | Nearly zero per access; costs virtual address space, which limits how many instances fit in one process |
 | **Explicit checks** | Compare $ea + N$ against the current size before each access, branch to a trap | A compare and branch per access, partly removable by check elimination |
 | **Masking** | Clamp the index with `and` (used for Spectre hardening) | Cheap, but changes semantics unless combined with traps |
-| **Hardware tagging** | Use memory-tagging hardware (Arm MTE) to enforce bounds | Research; "Cage" proposes this for Wasm ([Cage, arXiv 2024](https://arxiv.org/abs/2408.11456)) |
+| **Hardware tagging** | Use memory-tagging hardware (Arm MTE) to enforce bounds | Research; "Cage" proposes this for Wasm ([Cage, arXiv 2024; CGO 2025](https://arxiv.org/abs/2408.11456)) |
 
 The guard trick works because a 32-bit index plus a modest constant offset can never exceed the reservation:
 
@@ -369,7 +375,7 @@ $$
 
 **In plain English:** if you reserve 4 GiB plus enough slack for the largest offset you expect, every possible address either hits real memory or a page that faults. Offsets larger than the guard still get an explicit check.
 
-With `memory64` the index is 64 bits, so no reservation can cover it and every access needs an explicit check. SpiderMonkey's analysis found that this makes memory64 code measurably slower than the same code in a 32-bit memory and recommends using it only when you truly need more than 4 GiB ([SpiderMonkey, Jan 2025](https://spidermonkey.dev/blog/2025/01/15/is-memory64-actually-worth-using.html)). In browsers, a 64-bit memory is still capped well below its theoretical size (reportedly 16 GiB on the web, per coverage of the 3.0 announcement that I could not open directly).
+With `memory64` the index is 64 bits, so no reservation can cover it and every access needs an explicit check. SpiderMonkey's analysis found memory64 code running roughly 10% to over 100% slower than the same code in a 32-bit memory, depending on the workload, and recommends using it only when you truly need more than 4 GiB ([SpiderMonkey, Jan 2025](https://spidermonkey.dev/blog/2025/01/15/is-memory64-actually-worth-using.html)). In browsers, a 64-bit memory is still capped far below its theoretical size: the JS API limits it to 16 GiB on the web ([WebAssembly CG](https://webassembly.org/news/2025-09-17-wasm-3.0/); [SpiderMonkey](https://spidermonkey.dev/blog/2025/01/15/is-memory64-actually-worth-using.html)).
 
 ### Post-MVP Features
 
@@ -378,15 +384,15 @@ With `memory64` the index is 64 bits, so no reservation can cover it and every a
 | Feature | What it adds for compilers | Status (Nov 2026) |
 |---|---|---|
 | Bulk memory, reference types, multi-value, SIMD-128 | `memory.copy/fill`, `externref`/`funcref`, multiple results, `v128` ops | Wasm 2.0, shipped everywhere |
-| Threads and atomics | Shared memories, atomic ops, `wait`/`notify` | Shipped in browsers (needs cross-origin isolation); standardized separately from 3.0 as far as I could confirm |
+| Threads and atomics | Shared memories, atomic ops, `wait`/`notify` | Shipped since Chrome 74, Firefox 79 and Safari 14.1 ([caniuse](https://caniuse.com/wasm-threads)), with shared memory needing cross-origin isolation ([web.dev](https://web.dev/coop-coep)); the proposal is at Phase 4 and not part of 3.0 ([proposals](https://github.com/WebAssembly/proposals)) |
 | Tail calls | `return_call`, `return_call_indirect` for functional languages and CPS | Wasm 3.0; Baseline across browsers since Safari 18.2 ([web.dev](https://web.dev/blog/wasmgc-wasm-tail-call-optimizations-baseline)) |
 | Exception handling (`exnref`) | `try_table`, `throw`, `throw_ref`; zero-cost C++ and Kotlin exceptions | Wasm 3.0; the earlier `try`/`catch` design is legacy |
 | Typed function refs and GC | `struct`, `array`, `i31ref`, subtyping, casts | Wasm 3.0; Chrome 119 ([Chrome](https://developer.chrome.com/blog/wasmgc)), Firefox 120, Safari 18.2 ([WebKit](https://webkit.org/blog/16301/webkit-features-in-safari-18-2/)) |
-| Memory64, multiple memories | 64-bit indices; several memories per module | Wasm 3.0; browser support uneven, check [caniuse](https://caniuse.com/wf-wasm-memory64) |
+| Memory64, multiple memories | 64-bit indices; several memories per module | Wasm 3.0; memory64 in Chrome 133 and Firefox 134 but not yet Safari ([caniuse](https://caniuse.com/wf-wasm-memory64)), capped at 16 GiB on the web |
 | Relaxed SIMD | Faster SIMD ops whose results may differ by platform (FMA, swizzle) | Wasm 3.0; a *deterministic profile* pins one behavior |
 | JS string builtins | Import JS string operations that engines can inline | Wasm 3.0 |
 | JSPI | Suspend Wasm while awaiting a JS promise, so synchronous C code can call async web APIs | Shipped in Chrome 137 ([Chrome](https://developer.chrome.com/release-notes/137); [V8](https://v8.dev/blog/jspi)) |
-| Stack switching | First-class continuations (`cont.new`, `resume`, `suspend`) for green threads, generators, effect handlers | In progress ([proposal repo](https://github.com/WebAssembly/stack-switching)); a separation-logic semantics appeared at PLDI 2026 ([Iris-WasmFX](https://cs.au.dk/~birke/papers/2026-pldi-iris-wasmfx.pdf)) |
+| Stack switching | First-class continuations (`cont.new`, `resume`, `suspend`) for green threads, generators, effect handlers | Phase 3, not part of 3.0 ([proposals](https://github.com/WebAssembly/proposals); [proposal repo](https://github.com/WebAssembly/stack-switching)); Wasmtime has an experimental x86-64 Linux implementation ([Wasmtime docs](https://docs.wasmtime.dev/stability-wasm-proposals.html)); a separation-logic semantics appeared at PLDI 2026 ([Iris-WasmFX](https://cs.au.dk/~birke/papers/2026-pldi-iris-wasmfx.pdf)) |
 
 Wasmtime keeps a per-proposal table of what it supports and at what tier ([Wasmtime docs](https://docs.wasmtime.dev/stability-wasm-proposals.html)); Wasmtime 27 completed Wasm GC support ([Bytecode Alliance](https://bytecodealliance.org/articles/wasmtime-27.0)).
 
@@ -395,7 +401,7 @@ Wasmtime keeps a per-proposal table of what it supports and at what tier ([Wasmt
 *WASI gives Wasm a system interface outside the browser. Its second generation replaced a POSIX-like ABI with typed, language-neutral components described in WIT.*
 
 - **Preview 1 (`wasi_snapshot_preview1`)** was a flat set of POSIX-flavored imports (`fd_read`, `path_open`) over integers and pointers into linear memory. It is what Go's `wasip1` and Rust's `wasm32-wasip1` target ([Go Blog](https://go.dev/blog/wasi)).
-- **WASI 0.2 (2024)** rebuilt everything on the **Component Model**. A component wraps core modules and declares typed imports and exports in **WIT** (records, variants, lists, strings, resources). The *canonical ABI* defines how those types are lowered into and lifted out of linear memory, so a Rust component and a Python component can call each other without sharing a memory or a language runtime.
+- **WASI 0.2 (January 2024)** ([Bytecode Alliance](https://bytecodealliance.org/articles/WASI-0.2)) rebuilt everything on the **Component Model**. A component wraps core modules and declares typed imports and exports in **WIT** (records, variants, lists, strings, resources). The *canonical ABI* defines how those types are lowered into and lifted out of linear memory, so a Rust component and a Python component can call each other without sharing a memory or a language runtime.
 - **WASI 0.3** adds native async to the Component Model: `stream<T>` and `future<T>` types, async functions in WIT and runtime-managed concurrency, so components no longer need the poll-based `wasi:io` pattern of 0.2 ([component model docs](https://component-model.bytecodealliance.org/design/async.html); [WASI 0.3 release page](https://wasi.dev/releases/wasi-p3)).
 
 ```wit
@@ -420,19 +426,19 @@ For a compiler, the component model adds a new linking layer above [[Linking and
 
 - **Edge compute.** Fastly's Compute platform runs customer code in Wasmtime, and Fastly is a major Wasmtime contributor ([Fastly](https://fastly.com/blog/how-fastly-and-developer-community-invest-in-webassembly-ecosystem)). Cloudflare Workers run in V8 isolates and accept Wasm modules alongside JavaScript ([Cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/webassembly/index.md)).
 - **Commerce extensions.** Shopify Functions run merchant logic as Wasm modules with a hard instruction-count budget, so Shopify can meter untrusted code deterministically ([Shopify docs](https://shopify.dev/docs/apps/build/functions/optimize-instruction-counts)).
-- **Plugin systems and embedding.** Wasmtime's adopters list includes databases, proxies, editors and serverless platforms that load third-party code as Wasm ([Wasmtime ADOPTERS](https://docs.rs/crate/wasmtime-cli/41.0.3/source/ADOPTERS.md)).
+- **Plugin systems and embedding.** Wasmtime's adopters list includes edge and serverless platforms (Fastly, Fermyon), a database (SingleStore), streaming data transforms (Redpanda, InfinyOn), Shopify and a blockchain (DFINITY), all running third-party code as Wasm ([Wasmtime ADOPTERS](https://docs.rs/crate/wasmtime-cli/41.0.3/source/ADOPTERS.md)).
 - **Blockchains.** Several smart-contract platforms use Wasm because validation is deterministic and execution can be metered; relaxed SIMD and NaN bits are why the 3.0 *deterministic profile* matters there.
 
 ## ***Where It Is Now***
 ---
-*As of November 2026, Wasm 3.0 is the current feature set and is shipping in all major browsers to varying degrees, WASI 0.3 has launched with async, Wasmtime ships monthly with Cranelift and Winch, and GC languages (Kotlin, Dart, Java) target Wasm GC in production.*
+*As of November 2026, Wasm 3.0 is the current feature set and is shipping in the major browsers to varying degrees (Safari still lacks memory64), WASI 0.3 has launched with async, Wasmtime ships monthly with Cranelift and Winch, and GC languages (Kotlin, Dart, Java) target Wasm GC in production.*
 
-- **Wasm 3.0 status.** The Community Group declared Wasm 3.0 complete on 17 September 2025 ([WebAssembly CG](https://webassembly.org/news/2025-09-17-wasm-3.0/)). On the W3C side, I found a steady run of 2026 Candidate Recommendation Drafts for the WebAssembly Web API 2 (latest seen dated 31 August 2026) ([W3C TR](https://www.w3.org/TR/2026/CRD-wasm-web-api-2-20260831/)) and a proposed new Working Group charter from June 2026 ([W3C](https://www.w3.org/2026/06/webassembly-wg.html)); I could not confirm that the 3.0 core spec has reached full W3C Recommendation.
-- **WASI 0.3.** The Bytecode Alliance has published "WASI 0.3 Launched" and a migration guide from 0.2 ([Bytecode Alliance](https://bytecodealliance.org/articles/WASI-0.3); [WASI.dev releases](https://wasi.dev/releases/wasi-p3)). The WASI roadmap points next to a 1.0 release ([WASI roadmap](https://wasi.dev/roadmap)). I could not open the announcement to confirm its exact date.
-- **Component model adoption.** Rust lists Wasm components as a 2026 project goal ([Rust Project Goals 2026](https://goals.rust-lang.org/2026/wasm-components.html)), alongside the `wasm32-wasip2` (tier 2) and `wasm32-wasip3` targets. Spin, wasmCloud and jco (JavaScript) build on components.
-- **Wasmtime and Cranelift.** Wasmtime releases monthly with long-term-support branches ([Bytecode Alliance](https://bytecodealliance.org/articles/wasmtime-lts)); the newest release I could confirm from an index was v49.0.0 ([newreleases.io](https://newreleases.io/project/github/bytecodealliance/wasmtime/release/v49.0.0)), so the current version is likely a little higher. Winch now covers x86-64 and AArch64 ([Bytecode Alliance](https://bytecodealliance.org/articles/winch-aarch64-support)). Chris Fallin published a retrospective on Cranelift's acyclic e-graph (ægraph) mid-end in April 2026 ([Fallin, 2026](https://www.cfallin.org/blog/2026/04/09/aegraph)). Security work continues: an October 2026 report described two critical Wasmtime flaws ([The Hacker News, Oct 2026](https://thehackernews.com/2026/10/two-critical-wasmtime-flaws-could-let.html)), a reminder that the compiler is part of the trusted base; verification of Cranelift's lowering rules is covered in [[Instruction Selection]].
+- **Wasm 3.0 status.** The Community Group declared Wasm 3.0 complete on 17 September 2025 ([WebAssembly CG](https://webassembly.org/news/2025-09-17-wasm-3.0/)). On the W3C side, the Core Specification "Release 3.0" is published as a Candidate Recommendation Draft (under the `wasm-core-2` shortname, latest dated 24 November 2026), not yet a Recommendation ([W3C TR](https://www.w3.org/TR/wasm-core-2/)); every 2026 publication of the Working Group so far, including the JS API and Web API, is a CR Draft, and a new WG charter took effect on 20 August 2026, running to August 2028 ([W3C WG activity](https://www.w3.org/groups/wg/wasm/activity/2026/)).
+- **WASI 0.3.** WASI 0.3.0 launched on 11 June 2026; Wasmtime 46 was due to ship it with Component Model async on by default, and jco supports it ([Bytecode Alliance](https://bytecodealliance.org/articles/WASI-0.3); [WASI.dev releases](https://wasi.dev/releases/wasi-p3)). The component model book has a migration guide from 0.2 ([Component Model book](https://component-model.bytecodealliance.org/design/migrating-to-p3.html)). The WASI roadmap schedules 0.3.x patch releases every two months through 2027 and leaves 1.0 undated ([WASI roadmap](https://wasi.dev/roadmap)).
+- **Component model adoption.** Rust lists Wasm components as a 2026 project goal ([Rust Project Goals 2026](https://goals.rust-lang.org/2026/wasm-components.html)), alongside the `wasm32-wasip2` and `wasm32-wasip3` targets, both tier 2 ([rustc book](https://doc.rust-lang.org/rustc/platform-support/wasm32-wasip3.html)). Spin, wasmCloud and jco (JavaScript) build on components.
+- **Wasmtime and Cranelift.** Wasmtime releases monthly with long-term-support branches ([Bytecode Alliance](https://bytecodealliance.org/articles/wasmtime-lts)); the latest is v51.0.0, released 20 November 2026 ([newreleases.io](https://newreleases.io/project/github/bytecodealliance/wasmtime/release/v51.0.0)). Winch now covers x86-64 and AArch64 ([Bytecode Alliance](https://bytecodealliance.org/articles/winch-aarch64-support)). Chris Fallin published a detailed write-up of Cranelift's acyclic e-graph (ægraph) mid-end in April 2026 ([Fallin, 2026](https://www.cfallin.org/blog/2026/04/09/aegraph)). Security work continues: an October 2026 report described two critical Wasmtime flaws ([The Hacker News, Oct 2026](https://thehackernews.com/2026/10/two-critical-wasmtime-flaws-could-let.html)), a reminder that the compiler is part of the trusted base; verification of Cranelift's lowering rules is covered in [[Instruction Selection]].
 - **GC languages.** Compose Multiplatform for web (Kotlin/Wasm) reached Beta in version 1.9.0 in September 2025 ([JetBrains](https://blog.jetbrains.com/kotlin/2025/09/compose-multiplatform-1-9-0-compose-for-web-beta/)). Flutter has had stable Wasm builds since Flutter 3.22 ([Flutter, 2024](https://flutter.dev/blog/landing-flutter-3-22-and-dart-3-4-at-google-i-o-2024)). Google Sheets runs Java business logic compiled to WasmGC ([web.dev](https://web.dev/case-studies/google-sheets-wasmgc)).
-- **Next proposals.** Stack switching is being prototyped in engines and now has a formal program logic ([Iris-WasmFX, PLDI 2026](https://cs.au.dk/~birke/papers/2026-pldi-iris-wasmfx.pdf)); JSPI covers the common async-interop case meanwhile.
+- **Next proposals.** Stack switching is at Phase 3 (implementation) with an experimental implementation in Wasmtime, and now has a formal program logic ([Iris-WasmFX, PLDI 2026](https://cs.au.dk/~birke/papers/2026-pldi-iris-wasmfx.pdf)); JSPI covers the common async-interop case meanwhile.
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -463,7 +469,7 @@ For a compiler, the component model adds a new linking layer above [[Linking and
 - Google: [Sheets on WasmGC](https://web.dev/case-studies/google-sheets-wasmgc), [WasmGC in Chrome](https://developer.chrome.com/blog/wasmgc), [Goodbye PNaCl](https://blog.chromium.org/2017/05/goodbye-pnacl-hello-webassembly.html).
 
 **Specs, docs and status**
-- [Wasm 3.0 announcement](https://webassembly.org/news/2025-09-17-wasm-3.0/), Sep 2025; [W3C Recommendation press release](https://www.w3.org/press-releases/2019/wasm), Dec 2019.
+- [Wasm 3.0 announcement](https://webassembly.org/news/2025-09-17-wasm-3.0/), Sep 2025; [W3C Recommendation press release](https://www.w3.org/press-releases/2019/wasm), Dec 2019; [W3C Core Specification 3.0 draft](https://www.w3.org/TR/wasm-core-2/); [proposal phases](https://github.com/WebAssembly/proposals); [WASI roadmap](https://wasi.dev/roadmap).
 - LLVM: [WebAssembly backend README](https://llvm.googlesource.com/llvm/+/master/lib/Target/WebAssembly/README.txt); [Binaryen README](https://chromium.googlesource.com/external/github.com/WebAssembly/binaryen/+show/refs/heads/docs/README.md).
 - Languages: [Rust wasip2 tier 2](https://blog.rust-lang.org/2024/11/26/wasip2-tier-2/), [Go WASI](https://go.dev/blog/wasi), [Go wasmexport](https://go.dev/blog/wasmexport), [Kotlin/Wasm](https://kotlinlang.org/docs/wasm-overview.html), [Dart Wasm](https://dart.dev/web/wasm).
 
