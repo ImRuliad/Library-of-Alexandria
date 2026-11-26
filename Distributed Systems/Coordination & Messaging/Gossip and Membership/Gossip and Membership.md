@@ -200,7 +200,7 @@ Gossip gives each node its own view, and under gray failures those views can fli
 
 1. **K-ring monitoring:** each node is watched by $K$ observers on overlaid rings, so no single observer's bad link condemns it.
 2. **Multi-process cut detection:** a node is only proposed for removal once enough observers report it (above a high watermark), and Rapid waits until no node sits in the ambiguous zone between the low and high watermarks.
-3. **Consensus on the change:** a leaderless Fast Paxos round commits the whole batch of changes when about three-quarters agree, falling back to classic [[Paxos]] otherwise.
+3. **Consensus on the change:** a leaderless [[Leaderless Consensus|Fast Paxos]] round commits the whole batch of changes when about three-quarters agree, falling back to classic [[Paxos]] otherwise.
 
 Everyone moves through the same sequence of membership views, which gossip alone cannot promise.
 

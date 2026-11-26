@@ -131,7 +131,7 @@ timeline
 
 **The engineering gap (2007).** Google's Chubby team replaced a commercial replicated database with Multi-Paxos and found that a page of pseudocode became several thousand lines of C++, with leases, snapshots, membership changes and disk corruption all left unspecified by the papers ([Chandra, Griesemer, Redstone, 2007](https://www.andrew.cmu.edu/course/15-440/assets/READINGS/paxos-made-live.pdf)).
 
-**Variants (2005 to 2016).** Researchers attacked each cost: Fast Paxos and Generalized Paxos cut round trips, EPaxos removed the leader bottleneck, and Flexible Paxos showed the quorums could be resized. [[Raft]] (2014) repackaged leader-based consensus around understandability and became the common choice for new open-source systems.
+**Variants (2005 to 2016).** Researchers attacked each cost: Fast Paxos and Generalized Paxos cut round trips, EPaxos removed the leader bottleneck ([[Leaderless Consensus]]), and Flexible Paxos showed the quorums could be resized. [[Raft]] (2014) repackaged leader-based consensus around understandability and became the common choice for new open-source systems.
 
 **Re-examination (2020 to now).** Howard and Mortier showed Paxos and Raft differ mainly in leader election ([Paxos vs Raft](https://ar5iv.labs.arxiv.org/html/2004.05074)). Work since then mostly fixes and generalizes earlier protocols rather than inventing new ones.
 
@@ -281,7 +281,7 @@ From [Paxos Made Live](https://www.andrew.cmu.edu/course/15-440/assets/READINGS/
 
 ### Fast Paths and Leaderless Protocols
 
-*The research frontier is cutting the second round trip in wide-area deployments without making the protocol unverifiable. The recurring problem is that the fast-path recovery logic is where the bugs live.*
+*The research frontier is cutting the second round trip in wide-area deployments without making the protocol unverifiable. The recurring problem is that the fast-path recovery logic is where the bugs live. [[Leaderless Consensus]] covers these protocols in depth.*
 
 - **Accord (Cassandra 6).** A leaderless transaction protocol: any node can coordinate any transaction, it commits in one round trip under normal conditions, and it orders conflicting transactions by [[Time and Clocks|hybrid logical clock]] timestamps with a short reorder buffer to absorb clock skew. Existing Paxos-based lightweight transactions keep working; developers opt in with `BEGIN TRANSACTION` ([Instaclustr, Apr 2026](https://www.instaclustr.com/blog/apache-cassandra-6-accord-transactions-what-you-need-to-know/)).
 - **EPaxos, fixed (OPODIS 2025).** Ryabinin, Gotsman and Sutra found the original EPaxos hard to follow, underspecified and buggy. Their EPaxos* has a simpler recovery algorithm with a proof, and works for any $n \ge \max(2e + f - 1,\ 2f + 1)$, which they show is optimal ([Ryabinin et al., Jan 2026](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.OPODIS.2025.22)).
@@ -338,6 +338,7 @@ Open problems worth tracking:
 - [[Time and Clocks]] — Leases depend on bounded clock drift; TrueTime and hybrid logical clocks in Spanner and Accord.
 - [[Consistency Models]] — A Paxos log gives you linearizability.
 - [[CAP and PACELC]] — Why the minority side of a Paxos group can't serve writes, and the latency cost of quorums.
+- [[Leaderless Consensus]] — Fast Paxos, Generalized Paxos, EPaxos and Accord: Paxos without a single leader.
 - [[Raft]] — The same idea with a different leader election.
 - [[Replication]] — Where consensus fits among primary-backup, chain and leaderless replication.
 - [[Byzantine Fault Tolerance]] — Consensus when nodes can lie, not just stop.
