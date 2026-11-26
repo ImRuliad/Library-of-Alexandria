@@ -441,4 +441,5 @@ The pattern: wins and losses of a few points by task, not systematic loss. Multi
 - [[Positional Encoding]] — Local and global layers use different RoPE bases in Gemma.
 - [[Low-Precision Attention]] — FP8 and FP4 indexers and caches in DSA and V4.
 - [[LLM Serving]] — vLLM and SGLang integration, batching and offload of sparse caches.
+- [[Top-k and Sampling Kernels]] — The GPU kernels behind DSA's per-query top-2048 selection.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — The memory-bandwidth arithmetic behind decode cost.

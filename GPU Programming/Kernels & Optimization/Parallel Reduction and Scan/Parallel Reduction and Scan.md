@@ -461,3 +461,4 @@ Open problems:
 - [[Thread Block Clusters and Distributed Shared Memory]] — Cross-block reductions through distributed shared memory.
 - [[Cooperative Groups]] — Grid-wide sync and tiled partitions for reductions.
 - [[CUDA Memory Model and Atomics]] — Fences, scopes and atomics behind single-pass reductions and scans.
+- [[Top-k and Sampling Kernels]] — Radix select's histograms and inverse-transform sampling's block scans.

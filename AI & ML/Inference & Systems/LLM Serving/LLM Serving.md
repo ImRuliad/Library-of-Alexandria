@@ -387,5 +387,6 @@ Open problems:
 - [[Sparse Attention]] — Compressed sparse attention shrinks the cache and the attention work per decode step.
 - [[Hybrid Attention]] — Fixed-size recurrent state removes the growing cache from most layers but complicates prefix caching.
 - [[FlashAttention]] — The fused attention kernels that serving engines run for prefill and paged decode.
+- [[Top-k and Sampling Kernels]] — The GPU kernels behind the sampling step: top-k, top-p, min-p without sorting.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Prefill vs decode costs and batching math, from How to Scale Your Model.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why decode is memory-bound: arithmetic intensity against the chip's roofline.
