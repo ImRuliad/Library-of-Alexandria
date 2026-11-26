@@ -333,3 +333,4 @@ Open problems:
 - [[GPU Memory Hierarchy]] — The L1, L2 and DRAM levels in memory workload analysis.
 - [[Tensor Cores]] — Tensor-core rooflines and pipe utilization in Nsight Compute.
 - [[Multi-GPU Communication - NVLink and NCCL]] — What the NCCL kernels on a multi-GPU timeline are doing.
+- [[GPU Fault Tolerance in Production]] — The other operations toolbox: DCGM health watches and diagnostics.

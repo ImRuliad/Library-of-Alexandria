@@ -471,3 +471,4 @@ HSA_XNACK=1 ./mini
 - [[Register Pressure and Spilling]] — Why `-G` and compile-time instrumentation change resource use.
 - [[ROCm and HIP]] — AMD's toolchain, ROCgdb and GPU ASan.
 - [[Silent Data Corruption]] — Wrong answers no software tool catches.
+- [[GPU Fault Tolerance in Production]] — When the fault is the hardware: Xids, ECC, row remapping and DCGM.

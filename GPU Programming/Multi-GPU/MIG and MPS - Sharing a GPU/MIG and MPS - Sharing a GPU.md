@@ -338,3 +338,4 @@ Sources: [GPU Operator sharing](https://docs.nvidia.com/datacenter/cloud-native/
 - [[Cluster Scheduling]] — Placing fractional-GPU jobs across a cluster.
 - [[Containers, Namespaces and cgroups]] — The OS-level isolation that MIG mirrors in hardware.
 - [[Virtualization and Hypervisors]] — vGPU and VMs on MIG slices.
+- [[GPU Fault Tolerance in Production]] — How Xid responses differ with MIG on, and DCGM in production.

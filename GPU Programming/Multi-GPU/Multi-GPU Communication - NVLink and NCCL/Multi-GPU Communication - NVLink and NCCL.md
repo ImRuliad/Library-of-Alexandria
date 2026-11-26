@@ -292,7 +292,7 @@ ncclCommDestroy(comm);
 - **Two very different networks.** Inside NVL72: TB/s per GPU, load/store. Outside: 100 GB/s per GPU over NICs. Model parallelism plans have to respect that 10-18x cliff.
 - **Tuning is a guess.** NCCL's cost model picks algorithm and protocol from message size and topology; when it guesses wrong, users set `NCCL_ALGO`/`NCCL_PROTO` by hand, and forks (NCCLX, MSCCL++) exist partly to fix that.
 - **Lock-in.** NVLink, NVSwitch and NCCL's device API are NVIDIA-only. RCCL mirrors the API, UALink offers an open fabric, but code written against NVLS or multimem PTX does not port.
-- **Failures.** One hung rank stalls every collective. `ncclCommAbort`, `ncclCommShrink` and IB port recovery are recent and still evolving; see [[GPU Cluster Infrastructure#Failures at Scale|GPU Cluster Infrastructure]].
+- **Failures.** One hung rank stalls every collective. `ncclCommAbort`, `ncclCommShrink` and IB port recovery are recent and still evolving; see [[GPU Cluster Infrastructure#Failures at Scale|GPU Cluster Infrastructure]] and, for the device side, [[GPU Fault Tolerance in Production]].
 
 ## ***Resources***
 ---
@@ -337,3 +337,4 @@ ncclCommDestroy(comm);
 - [[Cooperative Groups]] — Grid-wide sync, the single-GPU counterpart of a barrier across ranks.
 - [[ROCm and HIP]] — AMD's stack, with RCCL in place of NCCL.
 - [[GPU Architecture Basics]] — SMs, the resource NCCL kernels borrow.
+- [[GPU Fault Tolerance in Production]] — NVLink Xids, NCCL timeouts and recovering jobs when a GPU fails.
