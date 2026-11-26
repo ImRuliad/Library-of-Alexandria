@@ -294,7 +294,7 @@ His team's 2026 paper on DSQL argues that changes in hardware, networking and ti
 | Latency | Lower | Higher; depends on inter-Region round trip |
 | RPO | Replication lag | Zero |
 | Regions | Any | Exactly three (replicas, or two replicas plus a witness) |
-| Gaps | Transactions aren't atomic across Regions | No transactions, TTL or local secondary indexes |
+| Gaps | Transactions aren't atomic across Regions | No transactions, TTL or local [[Secondary Indexes\|secondary indexes]] |
 
 Sources: [AWS docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/V2globaltables_HowItWorks.html), [GA announcement](https://aws.amazon.com/about-aws/whats-new/2025/06/amazon-dynamo-db-global-tables-multi-region-strong-consistency-generally-available). The mode is fixed when the table is created and can't be mixed within a table.
 

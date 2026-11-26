@@ -393,7 +393,7 @@ Open problems:
 - [[Logs and Streaming]] — The WAL streams that resharding copies from.
 - [[Disaggregated Systems]] — Aurora-style shared storage under each shard.
 - [[Tail Latency and Hedging]] — Planned: why scatter-gather queries get slow.
-- [[Secondary Indexes]] — Planned: local vs global indexes when lookups miss the shard key.
+- [[Secondary Indexes]] — Local vs global indexes when lookups miss the shard key.
 - [[Cluster Metadata and Routing]] — Planned: how routers learn the shard map.
 - [[Change Data Capture]] — Planned: the WAL-based catch-up stream used in resharding.
 - [[Hot Keys and Cache Stampedes]] — Planned: tenants too big for one shard.

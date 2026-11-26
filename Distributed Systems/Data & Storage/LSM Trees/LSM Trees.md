@@ -528,3 +528,4 @@ Open problems worth tracking:
 - [[CRDTs]] — Another place tombstones must outlive every replica that might resurrect data.
 - [[Formal Methods in Practice]] — TLA+ for LSM-Raft, verified fencing in SlateDB.
 - [[Coordination Services]] — Bigtable's master election via Chubby, above its LSM storage.
+- [[Secondary Indexes]] — Index maintenance needs the old value, turning blind LSM writes into read-modify-writes.

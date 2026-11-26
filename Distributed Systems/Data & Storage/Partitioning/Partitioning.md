@@ -378,6 +378,8 @@ $$
 
 *An index on anything other than the partition key has to be partitioned too. Partition it with the data (local) and every index read asks every partition; partition it by the indexed value (global) and every write may touch another partition.*
 
+Full note: [[Secondary Indexes]].
+
 | | Local (document-partitioned) | Global (term-partitioned) |
 |---|---|---|
 | Where index entries live | With the rows they index, on the same partition | In their own partitions, split by the indexed value |
@@ -553,3 +555,4 @@ Open problems worth tracking:
 - [[Deterministic Simulation Testing]] — Testing splits, moves and cutovers under faults.
 - [[Failure Models]] — Why correlated failures make vnode spread a double-edged choice.
 - [[Sharded Postgres]] — Citus, Aurora Limitless, Neki, PgDog and Multigres: routers in front of unmodified Postgres shards.
+- [[Secondary Indexes]] — Local vs global indexes, transactional and asynchronous maintenance, uniqueness and online index builds.

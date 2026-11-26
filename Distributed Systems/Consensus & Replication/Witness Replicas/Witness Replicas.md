@@ -301,7 +301,7 @@ Sources: [Spanner replication](https://docs.cloud.google.com/spanner/docs/replic
 - **Why a third region at all.** Google puts it plainly: with replicas in only two regions "you cannot construct a majority quorum that could survive the loss of either region", so a witness goes in a third. It is typically placed close to one read-write region so that region plus the witness can commit quickly.
 - **Spanner dual-region is different.** Its quorum "requires two replicas from both regions", so there the witnesses add votes inside each region rather than breaking a tie between them (our reading of the docs, which don't spell out region-loss behavior for dual-region).
 - **DSQL in a partition.** Normal commits are a 2-of-3 quorum across regions; if the witness is cut off, "nothing customer-observable happens (except a small increase in `COMMIT` latency for some configurations)"; after losing a region it's 2-of-2, so every commit waits for the slowest remaining link ([Brooker, Dec 2024](https://brooker.co.za/blog/2024/12/06/inside-dsql-cap/), [[CAP and PACELC]]).
-- **What MRSC gives up** (not because of the witness, but alongside it): no transactions, no TTL, no local secondary indexes, and the replica set can't be changed after creation ([DynamoDB docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/V2globaltables_HowItWorks.html)).
+- **What MRSC gives up** (not because of the witness, but alongside it): no transactions, no TTL, no local [[Secondary Indexes|secondary indexes]], and the replica set can't be changed after creation ([DynamoDB docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/V2globaltables_HowItWorks.html)).
 
 ### Open-Source Systems
 

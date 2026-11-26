@@ -288,3 +288,4 @@ Open problems worth tracking:
 - [[Coordination Services]] — Chubby and etcd, consensus as a service rather than per range.
 - [[Isolation Testing]] — How Jepsen checks these databases' isolation claims.
 - [[Sharded Postgres]] — The alternative that keeps stock Postgres on every shard and coordinates above it.
+- [[Secondary Indexes]] — Why indexes here are global and written in the row's transaction, and what that costs.
