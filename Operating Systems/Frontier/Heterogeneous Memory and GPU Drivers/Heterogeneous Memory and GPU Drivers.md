@@ -8,7 +8,7 @@ tags:
   - device-drivers
   - linux-kernel
   - frontier
-status: draft
+status: complete
 sources:
   - https://docs.kernel.org/mm/hmm.html
   - https://docs.kernel.org/gpu/rfc/gpusvm.html
@@ -90,7 +90,7 @@ Hardware coherence is faster and simpler for software, but needs a coherent link
 
 ### struct page for Memory the CPU Can't Touch
 
-Linux's memory management works on `struct page`. To let the generic migration code move pages into VRAM, the driver registers VRAM as **ZONE_DEVICE** memory of type `MEMORY_DEVICE_PRIVATE`: each VRAM page gets a `struct page`, but the CPU can't map it. A process page that lives in VRAM is represented in the CPU page table by a special *device-private swap entry*; if the CPU touches it, the fault handler calls back into the driver to migrate it home. AMD added `MEMORY_DEVICE_COHERENT` (Linux 6.0) for device memory the CPU *can* access coherently ([kernel docs](https://docs.kernel.org/mm/hmm.html)).
+Linux's memory management works on `struct page`. To let the generic migration code move pages into VRAM, the driver registers VRAM as **ZONE_DEVICE** memory of type `MEMORY_DEVICE_PRIVATE`: each VRAM page gets a `struct page`, but the CPU can't map it. A process page that lives in VRAM is represented in the CPU page table by a special *device-private swap entry*; if the CPU touches it, the fault handler calls back into the driver to migrate it home. AMD (Alex Sierra, 2022) added `MEMORY_DEVICE_COHERENT` for device memory the CPU *can* access coherently ([kernel docs](https://docs.kernel.org/mm/hmm.html)).
 
 ## ***How We Got Here***
 ---
@@ -104,7 +104,7 @@ timeline
     2016 : Pascal GPUs support replayable page faults
     2017 : HMM merged in Linux 4.14 (Jérôme Glisse)
     2019 : HMM reworked; mmu interval notifiers (5.5)
-    2022 : NVIDIA open GPU kernel modules; 6.0 device-coherent pages
+    2022 : NVIDIA open GPU kernel modules; device-coherent pages
     2023 : accel subsystem (6.2); GPUVM (6.6); CUDA 12.2 uses HMM
     2025 : dmem cgroup (6.14); drm_gpusvm (6.15); nova-core
     2026 : Xe multi-device SVM (7.0); Nova and vGPU work
@@ -161,7 +161,7 @@ again:
     release_lock(driver->update);
 ```
 
-In plain words: take a sequence number, snapshot the CPU's mappings, then, under the driver's own lock, check that nothing invalidated the range in the meantime; if something did, start over. When the CPU side later unmaps, migrates, or reclaims a page, the notifier callback fires and the driver must tear down the GPU mapping before the core kernel proceeds. This is how the kernel stays the single source of truth without trusting the GPU.
+In plain words: take a sequence number, snapshot the CPU's mappings, then, under the driver's own lock, check that nothing invalidated the range in the meantime; if something did, start over. `hmm_range_fault()` must be called with the mmap lock held; current docs (7.4-rc) prefer `hmm_range_fault_unlocked_timeout()`, which is called without it, followed by the same `mmu_interval_read_retry()` check ([kernel docs](https://docs.kernel.org/mm/hmm.html)). When the CPU side later unmaps, migrates, or reclaims a page, the notifier callback fires and the driver must tear down the GPU mapping before the core kernel proceeds. This is how the kernel stays the single source of truth without trusting the GPU.
 
 ### Migrating to Device Memory
 
@@ -196,7 +196,8 @@ NPUs and AI accelerators that don't draw anything use **DRM accel** (`/dev/accel
 *As of November 2026, shared virtual memory has moved from vendor code into common DRM helpers, device memory is gaining cgroup control, and NVIDIA's upstream story is being rebuilt in Rust.*
 
 - **Intel Xe** uses drm_gpusvm, and Linux 7.0 (Apr 2026) extended SVM across **multiple devices** ([Phoronix](https://phoronix.com/news/linux-7.0-graphics-drivers)).
-- **NVIDIA Nova** (Rust, for GSP-based GPUs from Turing on) adds functionality every release, in 7.3 and again in 7.4 ([Phoronix 7.3](https://phoronix.com/news/NVIDIA-Nova-Rust-Linux-7.3), [7.4](https://phoronix.com/news/NVIDIA-Nova-Linux-7.4-Changes)). NVIDIA builds its upstream **vGPU** support on top of Nova ([Phoronix](https://phoronix.com/news/NVIDIA-Upstream-vGPU-Nova)), and at LPC 2026 the long-term goal was presented as Nova becoming a driver NVIDIA itself uses ([Phoronix](https://www.phoronix.com/news/Nova-Driver-LPC-2026)). See [[Rust in the Linux Kernel]].
+- **AMD is converging on the same helpers.** Huang Rui's amdgpu SVM rewrite on drm_gpusvm and drm_pagemap reached v9 in August 2026: phase 1 covers one GPU with retryable faults (XNACK on), behind a default-off `CONFIG_DRM_AMDGPU_SVM`, tested on MI300X and MI60; XNACK-off and multi-GPU come in later phases ([v9](https://lwn.net/Articles/1087111/)).
+- **NVIDIA Nova** (Rust, for GSP-based GPUs from Turing on) adds functionality every release, in 7.3 and again in 7.4 ([Phoronix 7.3](https://phoronix.com/news/NVIDIA-Nova-Rust-Linux-7.3), [7.4](https://phoronix.com/news/NVIDIA-Nova-Linux-7.4-Changes)). NVIDIA builds its upstream **vGPU** support on top of Nova ([Phoronix](https://phoronix.com/news/NVIDIA-Upstream-vGPU-Nova)), and at LPC 2026 in Prague (Oct 2026) John Hubbard (NVIDIA) and Danilo Krummrich (Red Hat) set the goal of Nova replacing NVIDIA's out-of-tree open kernel modules and, in time, Nouveau on Turing and newer. GSP boots from Turing through Blackwell, but Nova isn't ready for end users and has no timeline; VMs, Vulkan compute and CUDA are planned ([Phoronix](https://www.phoronix.com/news/Nova-Driver-LPC-2026)). See [[Rust in the Linux Kernel]].
 - **Device memory in cgroups.** The **dmem** controller (6.14) caps how much VRAM a cgroup may allocate; a series adding **reclaim** (evicting a cgroup's buffers when it exceeds its limit) reached v6 in June 2026 ([v6](https://lkml.rescloud.iu.edu/hypermail/linux/kernel/2606.1/09601.html)). See [[Containers, Namespaces and cgroups]].
 - **Hardware coherence spreads.** NVLink-C2C superchips (Grace Hopper, Grace Blackwell, Vera Rubin) and AMD's MI300A APU expose GPU memory as NUMA nodes the kernel can manage, which ties GPU memory to the tiering work in [[CXL and Memory Tiering]].
 - **Linux 7.3** brought further DRM work across old and new GPUs ([Phoronix](https://phoronix.com/news/Linux-7.3-DRM)).
@@ -237,6 +238,7 @@ NPUs and AI accelerators that don't draw anything use **DRM accel** (`/dev/accel
 **State of play**
 - [dmem cgroup pull](https://lists.freedesktop.org/archives/dri-devel/2025-January/485282.html): Jan 2025.
 - [dmem cgroup reclaim v6](https://lkml.rescloud.iu.edu/hypermail/linux/kernel/2606.1/09601.html): Jun 2026.
+- [amdgpu SVM on drm_gpusvm, v9](https://lwn.net/Articles/1087111/): Huang Rui, Aug 2026.
 - [Linux 7.0 graphics drivers](https://phoronix.com/news/linux-7.0-graphics-drivers), [Linux 7.3 DRM](https://phoronix.com/news/Linux-7.3-DRM): Phoronix.
 - [Nova in 7.3](https://phoronix.com/news/NVIDIA-Nova-Rust-Linux-7.3), [Nova in 7.4](https://phoronix.com/news/NVIDIA-Nova-Linux-7.4-Changes), [Nova at LPC 2026](https://www.phoronix.com/news/Nova-Driver-LPC-2026), [vGPU on Nova](https://phoronix.com/news/NVIDIA-Upstream-vGPU-Nova): Phoronix.
 
