@@ -534,5 +534,6 @@ Open problems worth tracking:
 - [[Virtualization and Hypervisors]] — Posted interrupts and IPI virtualization exist to avoid VM exits.
 - [[Transient Execution Attacks and Mitigations]] — Mitigations add cost at exactly the kernel entry and exit points described here.
 - [[sched_ext and Pluggable Scheduling]] — Kernel-side custom scheduling, the counterpart to user-interrupt schedulers like Skyloft.
+- [[Linux Networking Stack]] — The receive and transmit paths NAPI feeds: GRO, RPS/RFS, protocols and sockets.
 - [[Linux in Networking]] — Existing vault note on the Linux network stack, including NAPI.
 - [[The Boot Process]] — Where the IDT and interrupt controllers are first set up.

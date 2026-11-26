@@ -97,7 +97,7 @@ updated: 2026-11-26
 ---
 *The Linux network stack is built for generality: every protocol, firewall rule, socket option and tool works on every packet. That generality costs hundreds of nanoseconds per packet, and network links have grown faster than CPU cores.*
 
-A packet through the normal path takes an interrupt ([[Interrupts and Exceptions]]), gets an `sk_buff` allocated for it ([[Memory Allocators]]), passes through queueing disciplines, netfilter and the protocol stack under several locks, and is finally copied into the application's buffer when it calls `recv()` across the [[System Calls and the User-Kernel Boundary|system-call boundary]]. Each step is reasonable; together they don't fit.
+A packet through the normal path ([[Linux Networking Stack]]) takes an interrupt ([[Interrupts and Exceptions]]), gets an `sk_buff` allocated for it ([[Memory Allocators]]), passes through queueing disciplines, netfilter and the protocol stack under several locks, and is finally copied into the application's buffer when it calls `recv()` across the [[System Calls and the User-Kernel Boundary|system-call boundary]]. Each step is reasonable; together they don't fit.
 
 Measured costs from Jesper Brouer's analysis ([LWN, Jan 2015](https://lwn.net/Articles/629155/)):
 
@@ -430,6 +430,7 @@ Drop rates from the [XDP paper](https://courses.grainger.illinois.edu/ece598hpn/
 
 ## Related Notes
 
+- [[Linux Networking Stack]] — The general-purpose path that bypass skips: sk_buff, NAPI, GRO/GSO, qdiscs.
 - [[eBPF]] — The verified in-kernel programs XDP runs.
 - [[io_uring]] — Asynchronous I/O and its zero-copy receive path.
 - [[Interrupts and Exceptions]] — The per-packet interrupt cost polling avoids.
