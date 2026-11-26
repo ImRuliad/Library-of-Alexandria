@@ -295,7 +295,7 @@ Now the [[Roofline Model and Arithmetic Intensity|roofline]] consequence. The *r
 - H100 SXM: $989 \text{ TFLOPS} / 3.35 \text{ TB/s} \approx 295$ FLOPs per byte.
 - B200: $2.25 \text{ PFLOPS} / 8 \text{ TB/s} \approx 281$ FLOPs per byte in FP16, but about 1,125 in dense FP4 (9 PFLOPS).
 
-*In plain English: on an H100, a kernel must do about 300 FP16 operations on every byte it fetches from HBM, or the Tensor Cores wait on memory.* From V100 to H100 the FP16 ridge roughly tripled (A100 to H100 alone: 153 to 295). Blackwell held the FP16 ridge level by nearly doubling bandwidth, but its narrow formats push the ridge far higher, so low-precision kernels fall on the memory-bound side unless they reuse each byte heavily. That is the pressure behind [[Kernel Fusion]], FP8 and FP4 (fewer bytes per element), and [[FlashAttention]].
+*In plain English: on an H100, a kernel must do about 300 FP16 operations on every byte it fetches from HBM, or the Tensor Cores wait on memory.* From A100 to H100 the FP16 ridge nearly doubled (153 to 295). Blackwell held the FP16 ridge level by nearly doubling bandwidth, but its narrow formats push the ridge far higher, so low-precision kernels fall on the memory-bound side unless they reuse each byte heavily. That is the pressure behind [[Kernel Fusion]], FP8 and FP4 (fewer bytes per element), and [[FlashAttention]].
 
 #### **Block-Scaled Low Precision**
 At 4 bits a number has only a handful of representable values, so one scale per tensor loses too much. Blackwell's Tensor Cores apply a separate scale to each small block of the $K$ dimension inside the instruction ([CUTLASS docs](https://docs.nvidia.com/cutlass/4.7.0/media/docs/cpp/blackwell_functionality.html)):
