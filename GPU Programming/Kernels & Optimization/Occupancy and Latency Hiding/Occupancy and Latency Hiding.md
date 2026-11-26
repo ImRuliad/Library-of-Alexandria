@@ -375,3 +375,5 @@ Open problems:
 - [[CUTLASS and CuTe]] — Kernels built for one block per SM.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Theoretical vs achieved occupancy and stall reasons.
 - [[Blackwell Architecture]] — Tensor Memory and what it frees in the register file.
+- [[Register Pressure and Spilling]] — What happens when registers are capped to raise occupancy.
+- [[Persistent Kernels and Stream-K]] — Launching exactly one wave of resident blocks.

@@ -449,3 +449,5 @@ Open problems:
 - [[ROCm and HIP]] — Why AMD kernels use ping-pong and interleave schedules instead.
 - [[FlashAttention]] — The best-known warp-specialized kernel family.
 - [[ThunderKittens and Tile DSLs]] — TK's LCSF template packages producer/consumer warpgroups.
+- [[Persistent Kernels and Stream-K]] — The persistent tile loop warp-specialized GEMMs run in.
+- [[Register Pressure and Spilling]] — `setmaxnreg` and the register budget each role gets.

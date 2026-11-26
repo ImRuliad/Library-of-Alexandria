@@ -357,3 +357,4 @@ Open problems:
 - [[ROCm and HIP]] — 64-lane wavefronts and lockstep execution.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Branch efficiency and active threads per instruction.
 - [[FlashAttention]] — Warp-specialized attention in practice.
+- [[Cooperative Groups]] — Typed handles for warps, tiles and coalesced groups.

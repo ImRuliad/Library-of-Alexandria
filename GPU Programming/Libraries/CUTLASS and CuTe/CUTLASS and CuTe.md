@@ -373,3 +373,4 @@ It is the same vocabulary as the C++ version, without template instantiation. NV
 - [[CUDA Tile and cuTile]] — NVIDIA's compiler-scheduled tile layer beside CuTe DSL.
 - [[ThunderKittens and Tile DSLs]] — Other tile-level kernel DSLs.
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — Block-scaled formats in CUTLASS GEMMs.
+- [[Persistent Kernels and Stream-K]] — CUTLASS's persistent and Stream-K tile schedulers.

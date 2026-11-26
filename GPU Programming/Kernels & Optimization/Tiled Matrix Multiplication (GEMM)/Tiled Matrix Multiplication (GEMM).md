@@ -361,3 +361,5 @@ Open problems:
 - [[CUDA Tile and cuTile]] — GEMM as a few lines of tile code.
 - [[ThunderKittens and Tile DSLs]] — Tile primitives for GEMM and attention.
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — FP8 and FP4 block-scaled GEMMs.
+- [[Persistent Kernels and Stream-K]] — Tile schedulers that fix wave quantization in the GEMM grid.
+- [[Register Pressure and Spilling]] — Why the accumulator tile is capped by the register file.

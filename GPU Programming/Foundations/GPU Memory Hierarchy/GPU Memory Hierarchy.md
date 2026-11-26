@@ -270,3 +270,4 @@ Open problems:
 - [[Thread Block Clusters and Distributed Shared Memory]] — Distributed shared memory across a cluster's SMs.
 - [[MIG and MPS - Sharing a GPU]] — Partitioning L2 and HBM between tenants with MIG.
 - [[Multi-GPU Communication - NVLink and NCCL]] — NVLink, the next level out from HBM.
+- [[Register Pressure and Spilling]] — What spills to local memory and what it costs.

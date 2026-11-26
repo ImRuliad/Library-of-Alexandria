@@ -328,3 +328,5 @@ Open problems:
 - [[Numba and CuPy]] — SIMT kernels and GPU arrays from Python.
 - [[Thread Block Clusters and Distributed Shared Memory]] — The cluster level of the hierarchy in depth.
 - [[Multi-GPU Communication - NVLink and NCCL]] — Programming many GPUs: NVLink and NCCL collectives.
+- [[Cooperative Groups]] — Explicit groups of threads at every level, up to the grid.
+- [[CUDA Memory Model and Atomics]] — What one thread is guaranteed to see of another's writes.

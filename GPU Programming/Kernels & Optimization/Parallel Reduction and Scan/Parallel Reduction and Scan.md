@@ -459,3 +459,5 @@ Open problems:
 - [[ROCm and HIP]] — 64-lane wavefronts and portable warp code.
 - [[Profiling with Nsight Compute and Nsight Systems]] — Measuring achieved bandwidth against peak.
 - [[Thread Block Clusters and Distributed Shared Memory]] — Cross-block reductions through distributed shared memory.
+- [[Cooperative Groups]] — Grid-wide sync and tiled partitions for reductions.
+- [[CUDA Memory Model and Atomics]] — Fences, scopes and atomics behind single-pass reductions and scans.
