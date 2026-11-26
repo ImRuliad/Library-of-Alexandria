@@ -502,7 +502,7 @@ flowchart LR
 
 *Instead of running passes over the whole program in order, a query-based compiler computes each fact on demand and caches it, so a small edit recomputes only what depends on it.*
 
-rustc says plainly that it is not "a series of passes over the code which execute sequentially." Its major steps are queries on a `TyCtxt` that call each other; results are cached in memory and on disk, and on the next build only queries whose inputs changed are rerun. Lexing, parsing, name resolution and macro expansion were still outside the query system according to the guide's note dated November 2022 ([rustc dev guide](https://rustc-dev-guide.rust-lang.org/overview.html)).
+rustc says plainly that it is not "a series of passes over the code which execute sequentially." Its major steps are queries on a `TyCtxt` that call each other; results are cached in memory and on disk, and on the next build only queries whose inputs changed are rerun (the red-green algorithm, covered in [[Incremental Computation]]). Lexing, parsing, name resolution and macro expansion were still outside the query system according to the guide's note dated November 2022 ([rustc dev guide](https://rustc-dev-guide.rust-lang.org/overview.html)).
 
 Roslyn (C#, Visual Basic) took the same shift from the IDE side: its pipeline is Parse, Declaration, Bind and Emit, and each phase is exposed as an API (syntax tree, symbol table, semantic model, emit) that Visual Studio uses for formatting, navigation, refactoring and Edit-and-Continue ([Microsoft Learn](https://learn.microsoft.com/dotnet/csharp/roslyn-sdk/compiler-api-model)). The compiler becomes a database about the program that both the build and the editor query.
 
@@ -586,6 +586,7 @@ Open problems:
 - [[Intermediate Representations]] — Design choices for the IRs every stage hands off.
 - [[SSA Form]] — The form `mem2reg` produced in the walkthrough, and why optimizers want it.
 - [[Dataflow Analysis]] — The analyses passes depend on.
+- [[Incremental Computation]] — Red-green, salsa and early cutoff: how query-based compilers reuse work across edits.
 - [[Classic Optimizations]] — Constant propagation, CSE, DCE, inlining: the bulk of the middle end.
 - [[Closure Conversion and Defunctionalization]] — How functional compilers turn nested first-class functions into first-order code.
 - [[Loop Optimizations]] — Induction variables, LICM and loop deletion, as in the closed-form example.

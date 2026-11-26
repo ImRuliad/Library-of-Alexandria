@@ -554,3 +554,4 @@ The old lexer/parser split reappears exactly: regular token-level structure is p
 - [[Abstract Interpretation]] — The general theory of sound static analysis over abstract domains.
 - [[Dependent and Refinement Types]] — Types that depend on values, and SMT-checked refinements.
 - [[Regular Expression Engines]] — Run-time regex matching: backtracking vs lazy DFAs, derivatives, ReDoS.
+- [[Incremental Computation]] — The general reuse-after-edit machinery (red-green, salsa, early cutoff) that incremental trees feed.

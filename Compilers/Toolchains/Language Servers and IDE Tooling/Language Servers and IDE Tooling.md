@@ -539,6 +539,7 @@ Open problems:
 ## Related Notes
 
 - [[Lexing and Parsing]] — Resilient parsing, red-green trees, rowan and tree-sitter's GLR algorithm in depth.
+- [[Incremental Computation]] — The algorithms under salsa: red-green verification, backdating, durability and early cutoff.
 - [[Type Systems and Inference]] — The next trait solver, TypeScript 7's checker and Python checkers built for language servers.
 - [[Compiler Pipeline]] — The batch pipeline that IDE front ends reorganize into lazy queries.
 - [[Intermediate Representations]] — rust-analyzer's item trees and HIR are IDE-oriented IRs.

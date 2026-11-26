@@ -536,7 +536,7 @@ GCC 16.1 was released April 30, 2026 ([GCC announce](https://gcc.gnu.org/piperma
 
 - **Non-distributive precision.** Path sensitivity recovers the `a + b = 5` case but at exponential cost; Clang's framework bounds it with SAT queries and iteration caps ([Clang doxygen](https://clang.llvm.org/doxygen/DataflowAnalysis_8h_source.html)).
 - **Composition.** MLIR's RFC itself called composing optimistic analyses "almost" composable and unresolved ([RFC](https://discourse.llvm.org/t/rfc-a-dataflow-analysis-framework/63340)).
-- **Incrementality.** Re-analyzing a whole program per edit is too slow for IDEs; LADDDER-style incremental solvers point the way, but mainstream compilers still recompute per function.
+- **Incrementality.** Re-analyzing a whole program per edit is too slow for IDEs ([[Incremental Computation]]); LADDDER-style incremental solvers point the way, but mainstream compilers still recompute per function.
 - **Scaling vs soundness.** Bounded Datalog trades completeness and determinism for termination ([Antoniadis et al.](https://yanniss.github.io/choice-oopsla25.pdf)); acceptable for bug finding, not for optimization.
 - **Compile-time budgets.** Polonius alpha's worst case of 2-3x and Clang lifetime safety's worst case near 200% on generated code show the cost of moving richer analyses into the default build.
 - **Trusting the analysis.** A wrong "always true" fact silently miscompiles; verifying analyses ([[Verified Compilers]]) and differential testing ([[Compiler Testing and Fuzzing]]) are the defenses, and [[Formal Methods in Practice]] covers the proof side.
