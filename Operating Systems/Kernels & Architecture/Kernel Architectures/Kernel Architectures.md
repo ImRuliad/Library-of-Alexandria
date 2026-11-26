@@ -262,7 +262,7 @@ $$
 
 **Worked example.** seL4 on an x86-64 Skylake at 3.4 GHz measures an IPC call at about 742 cycles and the reply at about 598 cycles, so one round trip is about 1,340 cycles, or roughly 0.39 µs ([seL4 performance page](https://sel4.systems/performance.html)).
 
-- A 4 KiB read that hits the page cache does maybe 1 µs of real work. On a microkernel it makes two round trips (app → FS server, FS server → cache or driver): $2 \times 0.39 = 0.79$ µs of crossing. Overhead $= 0.79 / (1 + 0.79) \approx 44\%$.
+- A 4 KiB read that hits the [[Page Cache and Memory Reclaim|page cache]] does maybe 1 µs of real work. On a microkernel it makes two round trips (app → FS server, FS server → cache or driver): $2 \times 0.39 = 0.79$ µs of crossing. Overhead $= 0.79 / (1 + 0.79) \approx 44\%$.
 - The same read from an NVMe SSD does about 80 µs of work (device latency dominates). Overhead $= 0.79 / 80.79 \approx 1\%$.
 
 So microkernel cost matters for chatty, cache-hot paths and disappears for I/O-bound ones. That's why fast IPC (L4's lesson) and fewer crossings (batching, shared-memory rings, putting hot paths in the same domain) decide whether a microkernel is competitive. Mach's IPC was an order of magnitude slower, which turned that 44% into a multiple.

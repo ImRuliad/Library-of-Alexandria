@@ -50,7 +50,7 @@ updated: 2026-11-26
 ---
 *A microkernel keeps only the mechanisms that can't safely live outside the kernel and pushes everything else into isolated user-space servers. seL4 is the microkernel that proved the idea can be both fast and mathematically correct.*
 
-- **The idea:** the kernel provides address spaces, threads, IPC, interrupt delivery and access control. Drivers, file systems and network stacks are ordinary processes, so a bug in one is contained, and the trusted base is small. See [[Kernel Architectures]] for how this compares with monolithic designs.
+- **The idea:** the kernel provides address spaces, threads, IPC, interrupt delivery and access control. Drivers, [[File Systems|file systems]] and network stacks are ordinary processes, so a bug in one is contained, and the trusted base is small. See [[Kernel Architectures]] for how this compares with monolithic designs.
 - **The historical problem:** first-generation microkernels (Mach) were slow because IPC was slow. Jochen Liedtke's L4 showed in the 1990s that IPC could be an order of magnitude faster with a ruthlessly minimal kernel.
 - **seL4** is an L4-family microkernel of roughly 10–12 thousand lines whose C implementation is **formally proved** to match its specification, with further proofs that it enforces integrity and confidentiality ([Heiser 2026](https://www.trustworthy.systems/publications/papers/Heiser_26.pdf)).
 - **Design signatures:** capability-based access control, no dynamic memory allocation inside the kernel (user space hands it typed memory), and IPC in a few hundred cycles: about 742 cycles for a call on a 3.4 GHz Skylake ([seL4 performance](https://sel4.systems/performance.html)).
@@ -80,7 +80,7 @@ Liedtke's rule: "a concept is tolerated inside the µ-kernel only if moving it o
 
 | Kept in the kernel | Pushed to user space |
 |---|---|
-| Address spaces (page tables) | Paging policy, swapping, page cache |
+| Address spaces (page tables) | Paging policy, swapping, [[Page Cache and Memory Reclaim|page cache]] |
 | Threads and a basic scheduler | Higher-level scheduling policy |
 | IPC | Naming, service discovery |
 | Interrupt delivery (as messages) | Device drivers |

@@ -48,7 +48,7 @@ updated: 2026-11-26
 *A library OS turns operating system services into a library you link into your program. A unikernel is the extreme case: one application and exactly the OS code it needs, compiled into a single-address-space image that boots directly on a hypervisor.*
 
 - **The idea** comes from the 1995 exokernel: the kernel should only multiplex hardware safely, and abstractions like files and sockets should be libraries an application can pick or replace ([Engler et al., SOSP 1995](https://dl.acm.org/doi/10.1145/224057.224076)). See [[Kernel Architectures]].
-- **A unikernel** links app + network stack + file system + drivers into one image, runs in one address space with no user/kernel split, and relies on the hypervisor for isolation ([Madhavapeddy et al., ASPLOS 2013](https://sites.cs.ucsb.edu/~rich/class/cs270/papers/unikernel.pdf)).
+- **A unikernel** links app + network stack + [[File Systems|file system]] + drivers into one image, runs in one address space with no user/kernel split, and relies on the hypervisor for isolation ([Madhavapeddy et al., ASPLOS 2013](https://sites.cs.ucsb.edu/~rich/class/cs270/papers/unikernel.pdf)).
 - **What you get:** tiny images (about 1–2 MB), boot in milliseconds, a few MB of RAM, and often higher throughput than a Linux VM. Unikraft reports nginx, Redis and SQLite running 1.7x–2.7x faster than on Linux guests ([Kuenzer et al., EuroSys 2021](https://arxiv.org/abs/2104.12721)).
 - **What you lose:** multiple processes, a shell, familiar debugging tools, and often full Linux compatibility.
 - **Now (Nov 2026):** unikernels have found a market as dense, fast-booting sandboxes. Unikraft raised a $6M seed in October 2025 to run "millions of strongly isolated instances on a few servers", and demonstrated waking VM number 1,000,000 on one commodity server in about 10 ms at QCon London (March 2026) ([InfoQ](https://www.infoq.com/news/2026/03/qcon-million-sandboxes-server)). Research has shown Linux itself can be configured into something unikernel-like (Lupine, UKL).
@@ -62,7 +62,7 @@ A typical microservice VM runs one process. Yet the guest boots a full Linux ker
 | Cost | Where it comes from |
 |---|---|
 | Boot time | Kernel init, device probing, init system, user-space startup; hundreds of ms for a minimal Linux VM |
-| Memory | Kernel, page cache, user-space services; tens to hundreds of MB per guest |
+| Memory | Kernel, [[Page Cache and Memory Reclaim|page cache]], user-space services; tens to hundreds of MB per guest |
 | Attack surface | Every driver, syscall and tool in the image is reachable by an attacker |
 | Run-time overhead | [[System Calls and the User-Kernel Boundary|User-kernel crossings]], data copies between buffers, generic code paths |
 | Duplicated isolation | The hypervisor already isolates the VM, and the guest kernel isolates its one process again |
