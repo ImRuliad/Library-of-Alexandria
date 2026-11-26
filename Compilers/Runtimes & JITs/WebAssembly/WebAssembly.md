@@ -490,5 +490,6 @@ For a compiler, the component model adds a new linking layer above [[Linking and
 - [[Verified Compilers]] — Mechanized Wasm semantics and verified lowering.
 - [[Compiler Testing and Fuzzing]] — How engines hunt sandbox-escaping miscompiles.
 - [[Compiler, Assembler, Linker, and Loader]] — The native C build stages that wasm-ld and runtimes mirror.
-- [[Software Fault Isolation]] — Planned: NaCl, Wasm and hardware-assisted sandboxing compared.
+- [[Software Fault Isolation]] — NaCl, Wasm and hardware-assisted sandboxing compared.
 - [[Sea of Nodes]] — Click's graph IR used by HotSpot C2 and Graal.
+- [[Deoptimization and Speculation]] — V8's Wasm deopts to Liftoff and speculative `call_indirect` inlining since Chrome 137.

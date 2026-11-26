@@ -292,7 +292,7 @@ Kinds of speculation in production engines:
 
 *Deopt rebuilds the interpreter's view of a frame from optimized machine state; OSR moves a running loop between tiers without waiting for the function to return.*
 
-At every point where optimized code might exit (each guard), the compiler records a *frame state* (V8), *OSR exit* (JSC) or *scope descriptor* (HotSpot): which bytecode offset to resume at, and where each interpreter-visible variable now lives (a register, a stack slot, a constant, or "this object was never allocated; here are its fields", after [[Escape Analysis|escape analysis]]). Deopt runs that recipe backwards.
+At every point where optimized code might exit (each guard), the compiler records a *frame state* (V8), *OSR exit* (JSC) or *scope descriptor* (HotSpot): which bytecode offset to resume at, and where each interpreter-visible variable now lives (a register, a stack slot, a constant, or "this object was never allocated; here are its fields", after [[Escape Analysis|escape analysis]]). Deopt runs that recipe backwards; [[Deoptimization and Speculation]] covers eager and lazy deopt, exit counting and deopt loops in depth.
 
 ```mermaid
 sequenceDiagram
@@ -467,6 +467,7 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[GPU Kernel Compilers]] — Drivers that JIT shaders and PTX at load time.
 - [[Compiler Testing and Fuzzing]] — The main defense against JIT optimizer bugs.
 - [[Verified Compilers]] — Formal models of speculation and deoptimization.
-- [[Profile-Guided Optimization]] — Planned: offline PGO, AutoFDO and BOLT versus a JIT's online profiles.
-- [[Sea of Nodes]] — Planned: the graph IR of HotSpot C2, Graal and (until 2025) TurboFan.
+- [[Profile-Guided Optimization]] — Offline PGO, AutoFDO and BOLT versus a JIT's online profiles.
+- [[Sea of Nodes]] — The graph IR of HotSpot C2, Graal and (until 2025) TurboFan.
 - [[Escape Analysis]] — Removing heap allocations that never escape a method.
+- [[Deoptimization and Speculation]] — Guards, frame states, lazy invalidation and deopt loops.

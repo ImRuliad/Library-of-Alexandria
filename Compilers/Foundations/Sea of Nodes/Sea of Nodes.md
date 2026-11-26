@@ -516,6 +516,7 @@ Open problems:
 - [[Instruction Scheduling]] — Ordering inside a block, the step after GCM picks blocks.
 - [[Pointer and Alias Analysis]] — Alias classes decide how far memory operations can float.
 - [[Escape Analysis]] — A key whole-graph pass in C2, Graal and TurboFan's frontend.
+- [[Deoptimization and Speculation]] — What Graal's `FrameState` nodes are for, and how deopt metadata is shrunk.
 - [[E-Graphs and Equality Saturation]] — Cranelift's aegraph, the hybrid descendant.
 - [[WebAssembly]] — Pre-scheduled input that pushed V8 toward a CFG IR.
 - [[Register Allocation]] — Where schedule-induced live ranges are paid for; Simple's chapter 20.

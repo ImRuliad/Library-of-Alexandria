@@ -514,7 +514,7 @@ go build ./cmd/server                   # -pgo=auto finds default.pgo
 
 - [[Linking and LTO]] — Post-link layout with BOLT and Propeller, and how PGO stacks with LTO; this note avoids repeating it.
 - [[JIT Compilation]] — Tiered JITs as online PGO: inline caches, type feedback, Dynamic PGO.
-- [[Deoptimization and Speculation]] — Planned: what a JIT does when a profile-based guess turns out wrong.
+- [[Deoptimization and Speculation]] — What a JIT does when a profile-based guess turns out wrong.
 - [[ML-Guided Optimization]] — Learned inlining and layout policies, learned branch probabilities, AI-Propeller.
 - [[Classic Optimizations]] — Inlining and the scalar passes whose decisions profiles steer.
 - [[Loop Optimizations]] — Unrolling, peeling and unswitching that profiles turn on or off.
