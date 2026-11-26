@@ -87,7 +87,7 @@ $$s^{\,n} \text{ combined states}$$
 
 before counting messages in flight, which multiply it further.
 
-*In words:* every node you add multiplies the state space, so checkers work on small configurations, typically a few nodes and a few values, and rely on the bet that most design bugs show up at small scale.
+*In words:* every node you add multiplies the state space, so checkers work on small configurations, a few nodes and a few values, and a bug that only appears with many nodes can be missed.
 
 **Worked example.** Three local states per node and five nodes give $3^5 = 243$ combinations; ten nodes give $3^{10} = 59{,}049$; twenty give about 3.5 billion. That is why specs check three or five replicas, not a hundred.
 
@@ -143,7 +143,7 @@ TLA+ describes a system as a set of variables and the steps that can change them
 | Internal lock manager | Lock-free data structure | 223 lines PlusCal | More confidence; missed a liveness bug |
 | Unnamed | Fault-tolerant replication and reconfiguration | 318 lines TLA+ | 1 bug; verified an aggressive optimization |
 
-Notice how small the specs are. A few hundred lines covered designs that took far more code to build.
+Notice how small the specs are: a few hundred lines each.
 
 ### P and Checking Production Logs
 
@@ -203,10 +203,10 @@ At the top of the spectrum, the code itself is proven. IronFleet combined TLA-st
 | Choice | Gain | Cost |
 |---|---|---|
 | Design model (TLA+, P) | Finds deep design bugs in weeks | Says nothing about the code ([CACM 2015](https://6826.csail.mit.edu/2019/papers/formal-methods-amazon.pdf)) |
-| Small configurations | Tractable checking | Bugs needing many nodes slip through |
+| Small configurations | Tractable checking | A bug that needs many nodes can be missed |
 | Safety only | Easier to check | Misses liveness bugs ([CACM 2015](https://6826.csail.mit.edu/2019/papers/formal-methods-amazon.pdf)) |
 | Executable models (ShardStore) | Tests real code, owned by devs | Not exhaustive ([Murat Demirbas](https://muratbuffalo.blogspot.com/2021/10/using-lightweight-formal-methods-to.html)) |
-| Full proof (IronFleet, Dafny) | Code-level guarantees | Large effort, specialist skills |
+| Full proof (IronFleet, Dafny) | Code-level guarantees ([Microsoft Research](https://www.microsoft.com/en-us/research/publication/ironfleet-proving-practical-distributed-systems-correct/)) | Steep learning curves and academic tooling ([Queue](https://queue.acm.org/detail.cfm?id=3712057)) |
 
 Open problems:
 
