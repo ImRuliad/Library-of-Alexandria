@@ -250,3 +250,4 @@ Open problems:
 - [[Processes and Threads]]: the thread-per-request model io_uring replaces.
 - [[Containers, Namespaces and cgroups]]: seccomp restrictions on io_uring.
 - [[Kernel Security Hardening]]: why io_uring is often disabled.
+- [[Lock-Free Data Structures and Memory Ordering]]: the acquire/release protocol behind single-producer/single-consumer rings.

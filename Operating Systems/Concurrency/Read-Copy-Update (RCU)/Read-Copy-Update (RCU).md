@@ -260,3 +260,4 @@ Open problems:
 - [[File Systems]]: the dentry cache's RCU path walk.
 - [[eBPF]]: BPF programs run under RCU protection.
 - [[Kernel Bypass Networking]]: networking holds about half of the kernel's RCU uses.
+- [[Lock-Free Data Structures and Memory Ordering]]: hazard pointers and epochs compared with RCU, and the memory models RCU depends on.
