@@ -257,3 +257,4 @@ Open problems:
 - [[Replication]] — primary-backup failover needs exactly one primary, which leases and fencing provide
 - [[3. System Interactions|GFS: System Interactions]] — GFS's master grants chunk leases
 - [[Auto-Sharding]] — Centrifuge and Slicer lease key ranges to the servers that own them
+- [[Hot Keys and Cache Stampedes]] — memcache leases, a different kind: permission to refill a cache slot, where a lost token only costs a miss

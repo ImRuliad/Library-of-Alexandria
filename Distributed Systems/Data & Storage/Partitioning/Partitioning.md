@@ -372,7 +372,7 @@ $$
 
 **Caching and replicating hot reads.** Facebook's memcache tier, itself partitioned by consistent hashing, replicates a small, very hot key set to several servers so any replica can answer; in their example this cut per-server load from 1M to 500k requests/s. They also warn that rehashing a failed server's keys onto survivors is risky because "a single key can account for 20% of a server's requests" ([Nishtala et al., 2013](https://pdos.csail.mit.edu/6.824/papers/memcache-fb.pdf)). Slicer and Databricks' Dicer replicate hot slices across several tasks automatically ([Adya et al.](https://cs.ubc.ca/~andy/538w-2016/papers/osdi16-adya.pdf); [Databricks, Jan 2026](https://www.databricks.com/blog/open-sourcing-dicer-databricks-auto-sharder)).
 
-**Request coalescing.** When a hot cached value expires or is invalidated, every reader misses at once and hits the database (a thundering herd). Facebook's *leases* give only one client per key a token to refill the cache, at most once every 10 seconds; others wait briefly and retry. Peak database load in their test dropped from 17K to 1.3K queries/s ([Nishtala et al.](https://pdos.csail.mit.edu/6.824/papers/memcache-fb.pdf)). The general pattern is often called request coalescing; see [[Reliability Patterns]].
+**Request coalescing.** When a hot cached value expires or is invalidated, every reader misses at once and hits the database (a thundering herd). Facebook's *leases* give only one client per key a token to refill the cache, at most once every 10 seconds; others wait briefly and retry. Peak database load in their test dropped from 17K to 1.3K queries/s ([Nishtala et al.](https://pdos.csail.mit.edu/6.824/papers/memcache-fb.pdf)). The general pattern is often called request coalescing; see [[Hot Keys and Cache Stampedes]] and [[Reliability Patterns]].
 
 ### Secondary Indexes
 
@@ -547,6 +547,7 @@ Open problems worth tracking:
 - [[Disaggregated Systems]] — Separating compute from storage changes what "moving a partition" costs.
 - [[Auto-Sharding]] — Slicer, Shard Manager and Dicer: load-aware sharding as a shared service.
 - [[Cluster Scheduling]] — Placing shards of services alongside the scheduler's container moves.
+- [[Hot Keys and Cache Stampedes]] — Leases, coalescing, serving stale, XFetch, hot-read replication and write salting in depth.
 - [[Reliability Patterns]] — Request coalescing, caching and load shedding around hot keys.
 - [[CRDTs]] — Mergeable counters as an alternative to salting a hot write key.
 - [[Logs and Streaming]] — Partitioned logs, where partition count and key choice set ordering and parallelism.

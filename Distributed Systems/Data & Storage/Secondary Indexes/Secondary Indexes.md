@@ -434,7 +434,7 @@ Open problems:
 - [[Deterministic Simulation Testing]] — Exploring the failure timings that orphan or lose index entries.
 - [[Object Storage]] — Where immutable-file layouts make classic indexes hard.
 - [[Tail Latency and Hedging]] — Planned: the math behind scatter-gather slowness.
-- [[Hot Keys and Cache Stampedes]] — Planned: low-cardinality index values as hot keys.
+- [[Hot Keys and Cache Stampedes]] — Low-cardinality index values as hot keys, and how to salt or cache them.
 - [[Change Data Capture]] — Planned: deriving indexes and views from a change stream instead of the write path.
 - [[Deterministic Transactions]] — Planned: cheaper multi-partition writes.
 - [[Bloom and Range Filters]] — Planned: the lightweight alternative to indexes in LSMs and lakehouses.

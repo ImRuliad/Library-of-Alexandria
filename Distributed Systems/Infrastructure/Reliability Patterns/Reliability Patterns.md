@@ -210,7 +210,7 @@ What the 22 incidents showed:
 | Most common outage duration | 4 to 10 hours (35%) |
 | Most popular fix | Load shedding, in over half |
 
-A **look-aside cache** can sustain one too: if timeouts stop the cache from refilling, the hit rate stays low and the database stays overloaded. In a MongoDB experiment with a 3-second timeout and up to 4 retries, a 10-second, 80% drop in CPU capacity cut goodput about 90% and the system did not recover on its own ([OSDI 2022](https://www.usenix.org/system/files/osdi22-huang-lexiang.pdf)).
+A **look-aside cache** can sustain one too: if timeouts stop the cache from refilling, the hit rate stays low and the database stays overloaded. In a MongoDB experiment with a 3-second timeout and up to 4 retries, a 10-second, 80% drop in CPU capacity cut goodput about 90% and the system did not recover on its own ([OSDI 2022](https://www.usenix.org/system/files/osdi22-huang-lexiang.pdf)). The cache-side defenses (leases, coalescing, serving stale, Gutter pools) are in [[Hot Keys and Cache Stampedes]].
 
 ## ***Where It Is Now***
 
@@ -269,3 +269,4 @@ Open problems:
 - [[Deterministic Simulation Testing]] — a way to test recovery paths before production does
 - [[Time and Clocks]] — timeouts and deadlines depend on clocks
 - [[Consistency Models]] — retries and caches can serve stale results
+- [[Hot Keys and Cache Stampedes]] — keeping a cache miss from becoming a herd that overloads the database

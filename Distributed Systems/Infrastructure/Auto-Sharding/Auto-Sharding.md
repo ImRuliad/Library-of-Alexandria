@@ -394,7 +394,7 @@ The same idea now hides inside managed systems. Elasticsearch Serverless (Decemb
 - [[CRDTs]] — Mergeable state for hot keys with many writers.
 - [[Deterministic Simulation Testing]] — Testing moves and handovers under faults.
 - [[Formal Methods in Practice]] — Checking ownership-transfer protocols.
-- [[Hot Keys and Cache Stampedes]] — Planned: salting, leases and coalescing for keys no split can fix.
+- [[Hot Keys and Cache Stampedes]] — Salting, leases and coalescing for keys no split can fix.
 - [[Reconciliation and Control Loops]] — Planned: the desired-vs-actual loop Helix uses.
 - [[Cluster Metadata and Routing]] — Planned: how shard maps reach clients.
 - [[Tail Latency and Hedging]] — Planned: handling slow owners at request time.

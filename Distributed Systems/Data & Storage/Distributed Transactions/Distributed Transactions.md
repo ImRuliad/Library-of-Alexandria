@@ -273,7 +273,7 @@ Garcia-Molina and Salem designed sagas for long-lived transactions that would ot
 
 Open problems worth tracking:
 - **Cross-region commit latency.** Any protocol that needs a majority in several regions pays the speed of light at least once per transaction; speculation and fast paths shave rounds but complicate recovery ([Mako](https://www.usenix.org/system/files/osdi25-shen-weihai.pdf); see [[CAP and PACELC]]).
-- **Contention.** [[Partitioning|Hot keys]] cause lock queues, restarts or aborts in every design; deterministic ordering handles contention best but needs read and write sets in advance ([Calvin](https://www.cs.princeton.edu/courses/archive/fall19/cos418/papers/calvin.pdf)).
+- **Contention.** [[Hot Keys and Cache Stampedes|Hot keys]] cause lock queues, restarts or aborts in every design; deterministic ordering handles contention best but needs read and write sets in advance ([Calvin](https://www.cs.princeton.edu/courses/archive/fall19/cos418/papers/calvin.pdf)).
 - **Weaker isolation by default.** Several systems default to snapshot isolation, which allows write skew; see [[Consistency Models]] and [[Isolation Testing]].
 - **Correct recovery paths.** Staged records, prepared reads and speculative aborts are where subtle bugs live; formal models and simulation testing are how teams find them ([[Formal Methods in Practice]], [[Deterministic Simulation Testing]]).
 - **Transactions across systems.** Between services, databases and queues there is still no good alternative to sagas, idempotency keys and outbox patterns; see [[Reliability Patterns]] and [[Logs and Streaming]].

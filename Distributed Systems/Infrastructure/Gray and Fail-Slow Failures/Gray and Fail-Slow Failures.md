@@ -483,3 +483,4 @@ Open problems worth tracking:
 - [[Cluster Scheduling]] — Where eviction, quarantine and warm standbys are carried out.
 - [[Disaggregated Systems]] — Compute separated from storage, as in Azure's virtual-disk gray failures.
 - [[Time and Clocks]] — Timeouts and the limits of what silence can tell you.
+- [[Hot Keys and Cache Stampedes]] — How a slow or lost cache becomes a database overload that sustains itself.

@@ -249,7 +249,7 @@ No locks means no client can stall others by holding one; Brooker argues this cu
 | OCC at commit (DSQL) | No locks, one coordination point per transaction | Aborts on hot keys; transaction size limits |
 
 Open problems worth tracking:
-- **Hot keys and contention.** Every design degrades when many transactions touch the same row: lock queues, restarts or aborts. Schema design is still the main defense; see [[Partitioning]].
+- **Hot keys and contention.** Every design degrades when many transactions touch the same row: lock queues, restarts or aborts. Schema design is still the main defense; see [[Partitioning]] and [[Hot Keys and Cache Stampedes]].
 - **Clock trust.** HLC systems depend on a configured clock-offset bound; a clock that jumps past it can break guarantees. Better time sync shrinks the bound; see [[Clock Synchronization]] and [[Leases and Fencing]].
 - **Lease cost at scale.** Millions of consensus groups each with a lease is expensive; CockroachDB's 2026 work and LeaseGuard both target this ([[Raft]]).
 - **Testing.** These are some of the most complex systems in production; Jepsen and simulation testing keep finding isolation bugs ([[Isolation Testing]], [[Deterministic Simulation Testing]]).

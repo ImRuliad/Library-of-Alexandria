@@ -239,3 +239,4 @@ Open problems and lessons:
 - [[Reliability Patterns]] — retry storms and failover handling the Chubby team saw
 - [[Distributed SQL]] — the larger NewSQL stores etcd compares itself against
 - [[Auto-Sharding]] — Slicer holds its ownership leases in Chubby locks; Shard Manager keeps state in ZooKeeper
+- [[Hot Keys and Cache Stampedes]] — the same herd problem in caches, solved with leases and request coalescing
