@@ -5,13 +5,15 @@ tags:
   - python
   - numba
   - cupy
-status: draft
+status: complete
 sources:
   - https://numba.readthedocs.io/en/stable/release/0.63.0-notes.html
   - https://numba.readthedocs.io/en/stable/reference/deprecation.html
   - https://nvidia.github.io/numba-cuda/
   - https://github.com/NVIDIA/numba-cuda-mlir/releases/tag/v0.6.1
   - https://pypi.org/project/numba-cuda-mlir/
+  - https://numba.readthedocs.io/en/0.65.0/_sources/reference/deprecation.rst.txt
+  - https://numba.readthedocs.io/en/stable/release/0.67.0-notes.html
   - https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/
   - https://www.preferred.jp/en/news/pr20260219
   - https://medium.com/cupy-team/announcing-cupy-v14-e8515ec05fca
@@ -53,10 +55,10 @@ updated: 2026-11-26
 ---
 *Numba and CuPy are the two oldest ways to use NVIDIA GPUs from Python. Numba compiles Python functions into CUDA kernels you write thread by thread; CuPy is a NumPy-compatible array library whose operations run as GPU kernels, with escape hatches for custom CUDA. Together they cover "write my own kernel" and "run my NumPy code on the GPU."*
 
-- **Numba** (Anaconda, 2012) is a JIT compiler for numerical Python built on LLVM. Its `@cuda.jit` decorator turns a Python function into a [[CUDA Programming Model|SIMT CUDA kernel]] with `threadIdx`, `blockIdx`, shared memory and atomics. The CUDA target now lives in NVIDIA's separately maintained **numba-cuda** package; the built-in `numba.cuda` was deprecated in its favour ([deprecation notices](https://numba.readthedocs.io/en/stable/reference/deprecation.html)).
+- **Numba** (Anaconda, 2012) is a JIT compiler for numerical Python built on LLVM. Its `@cuda.jit` decorator turns a Python function into a [[CUDA Programming Model|SIMT CUDA kernel]] with `threadIdx`, `blockIdx`, shared memory and atomics. The CUDA target moved to NVIDIA's separate **numba-cuda** package (the built-in target was deprecated in Numba 0.61), and in 2026 NVIDIA put numba-cuda into maintenance mode in favour of a new MLIR-based successor, **numba-cuda-mlir** ([deprecation notices](https://numba.readthedocs.io/en/0.65.0/_sources/reference/deprecation.rst.txt), [numba-cuda docs](https://nvidia.github.io/numba-cuda/)).
 - **CuPy** (Preferred Networks, 2015) implements most of the NumPy and SciPy APIs on the GPU, calling cuBLAS, cuFFT, cuSPARSE and its own generated kernels. Change `import numpy as np` to `import cupy as cp` and much code runs unchanged. It also runs on AMD through ROCm.
 - **Why they matter:** they are how scientists, data engineers and educators use GPUs without C++. They also share arrays with PyTorch, JAX and RAPIDS without copies through `__cuda_array_interface__` and DLPack.
-- **Where they are now (Nov 2026):** CuPy v14 (Feb 19, 2026) adopted NumPy 2 semantics, added bfloat16 and installs CUDA from pip wheels ([CuPy v14](https://medium.com/cupy-team/announcing-cupy-v14-e8515ec05fca)). CUDA 13.3 (May 2026) introduced a Numba CUDA MLIR backend as a drop-in replacement for `numba.cuda` ([CUDA 13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/)). For AI kernels, most new Python work has moved to tile languages ([[Triton]], [[CUDA Tile and cuTile|cuTile]]).
+- **Where they are now (Nov 2026):** CuPy v14 (Feb 19, 2026) adopted NumPy 2 semantics, added initial bfloat16 and ROCm 7 support, and can use CUDA from pip wheels ([CuPy v14](https://medium.com/cupy-team/announcing-cupy-v14-e8515ec05fca)). CUDA 13.3 (May 2026) introduced Numba CUDA MLIR, usable as "a drop-in replacement for `numba.cuda` by simply replacing the import statement" ([CUDA 13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/)). For AI kernels, most new Python work has moved to tile languages ([[Triton]], [[CUDA Tile and cuTile|cuTile]]).
 
 ## ***The Problem***
 ---
@@ -110,14 +112,14 @@ timeline
     2018-2020 : RAPIDS builds on CuPy and Numba; __cuda_array_interface__ spreads; CuPy ROCm support
     2019 : Chainer ends; PFN moves to PyTorch; CuPy continues
     2023-2024 : NVIDIA maintains numba-cuda as a separate package; CuPy v13
-    2025 : CUDA 13.1 cuTile Python; Numba 0.63 (Dec)
-    2026 : CuPy v14 (Feb); CUDA Python 1.0 and Numba CUDA MLIR backend (CUDA 13.3, May)
+    2025 : Numba 0.61 deprecates built-in CUDA target (Jan); Numba 0.63 (Dec); CUDA 13.1 cuTile Python
+    2026 : CuPy v14 (Feb); CUDA Python 1.0 and Numba CUDA MLIR (CUDA 13.3, May); Numba 0.67 (Aug); numba-cuda in maintenance mode
 ```
 
 - **Numba.** Released in 2012 by Continuum Analytics (later Anaconda) to compile NumPy-heavy loops with LLVM; a CUDA target followed, first in the commercial NumbaPro and then open-sourced. It became the standard way to teach CUDA concepts in Python ([Wikipedia](https://en.wikipedia.org/wiki/Numba)).
 - **CuPy.** Built in 2015 at Preferred Networks as the GPU array library for the Chainer framework, split out as its own project, and kept going after Chainer was retired in favour of PyTorch ([Wikipedia](https://en.wikipedia.org/wiki/CuPy), [PFN, Feb 2026](https://www.preferred.jp/en/news/pr20260219)).
 - **RAPIDS and interop.** NVIDIA's RAPIDS data-science libraries built on both, and `__cuda_array_interface__` let the Python GPU ecosystem share memory instead of copying.
-- **NVIDIA takes ownership.** The CUDA target was split from Numba's core into NVIDIA's `numba-cuda` package, and the built-in target deprecated ([deprecation notices](https://numba.readthedocs.io/en/stable/reference/deprecation.html)). NVIDIA's own Python stack (`cuda.core`, `cuda.compute`, `cuda.coop`, cuTile) grew around it.
+- **NVIDIA takes ownership.** The CUDA target was split from Numba's core into NVIDIA's `numba-cuda` package; Numba 0.61 (Jan 2025) deprecated the built-in target, 0.63 began warning when `numba-cuda` is missing, and removal comes no earlier than 0.63 ([deprecation notices](https://numba.readthedocs.io/en/0.65.0/_sources/reference/deprecation.rst.txt)). NVIDIA's own Python stack (`cuda.core`, `cuda.compute`, `cuda.coop`, cuTile) grew around it.
 
 ## ***How It Works***
 ---
@@ -208,17 +210,17 @@ For small arrays the bottleneck flips to launch and Python overhead (several mic
 
 ## ***Where It Is Now***
 ---
-*As of November 2026: both projects are healthy and NVIDIA-backed. Numba's CUDA target is NVIDIA's numba-cuda with a new MLIR backend; CuPy v14 is current. For new AI kernels, though, the Python center of gravity is tile languages.*
+*As of November 2026: both projects are active. Numba's CUDA future is NVIDIA's numba-cuda-mlir, with numba-cuda in maintenance mode; CuPy v14 is current. For new AI kernels, though, the Python center of gravity is tile languages.*
 
 ### Numba in 2026
 
-- **Core Numba** 0.63.0 shipped Dec 8, 2025 ([release notes](https://numba.readthedocs.io/en/stable/release/0.63.0-notes.html)). The built-in CUDA target is deprecated in favour of the `numba-cuda` package ([deprecation notices](https://numba.readthedocs.io/en/stable/reference/deprecation.html)).
-- **numba-cuda** is maintained by NVIDIA and installed separately (`pip install numba-cuda`); existing `from numba import cuda` code keeps working once it is installed ([numba-cuda docs](https://nvidia.github.io/numba-cuda/)).
-- **Numba CUDA MLIR backend.** CUDA 13.3 (May 2026) introduced it as "a drop-in replacement for `numba.cuda`" built on MLIR rather than Numba's older lowering ([CUDA 13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/)); it ships as `numba-cuda-mlir`, at v0.6.x by late 2026 ([releases](https://github.com/NVIDIA/numba-cuda-mlir/releases/tag/v0.6.1)).
+- **Core Numba** reached 0.67.0 on Aug 11, 2026, after 0.65 (Mar) and 0.66 (Jun) ([0.67.0 notes](https://numba.readthedocs.io/en/stable/release/0.67.0-notes.html)). The built-in CUDA target is deprecated; since 0.63, using it without `numba-cuda` installed warns ([deprecation notices](https://numba.readthedocs.io/en/0.65.0/_sources/reference/deprecation.rst.txt)).
+- **numba-cuda** is NVIDIA's package for the classic CUDA target; Numba's docs say "no code changes are required" for code that uses `from numba import cuda` once it is installed. Its docs now say it is in maintenance mode, with only security and critical fixes through the life of CUDA 13, and recommend moving to numba-cuda-mlir "as soon as practical" ([numba-cuda docs](https://nvidia.github.io/numba-cuda/)).
+- **Numba CUDA MLIR.** CUDA 13.3 (May 2026) introduced it as a Numba-compatible kernel generator on MLIR and the modern NVVM toolchain, with about 1.4× faster warm JIT compiles and lower launch overhead ([CUDA 13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/)). It installs with `pip install numba-cuda-mlir[cu13]`, needs Python 3.11+ and compute capability 7.0+, and migrating usually means changing the import to `numba_cuda_mlir.cuda`; code that uses Numba's extension APIs needs more work, since it generates MLIR rather than LLVM IR. It was at v0.6.x by late 2026 ([PyPI](https://pypi.org/project/numba-cuda-mlir/), [releases](https://github.com/NVIDIA/numba-cuda-mlir/releases/tag/v0.6.1)).
 
 ### CuPy in 2026
 
-- **CuPy v14** (Feb 19, 2026): NumPy v2 semantics (type promotion and API changes), bfloat16 support, and installation with CUDA libraries from pip wheels instead of a system toolkit ([CuPy v14](https://medium.com/cupy-team/announcing-cupy-v14-e8515ec05fca), [PFN](https://www.preferred.jp/en/news/pr20260219)). The 14.2 line is the stable release in late 2026.
+- **CuPy v14** (Feb 19, 2026): "behavior equivalent to NumPy v2" for type promotion and casting, initial bfloat16 (via `ml_dtypes`), ROCm 7 builds, and use "without installing a system-wide CUDA Toolkit" through the `[ctk]` extra, e.g. `pip install 'cupy-cuda13x[ctk]'` ([CuPy v14](https://medium.com/cupy-team/announcing-cupy-v14-e8515ec05fca), [PFN](https://www.preferred.jp/en/news/pr20260219)). CuPy 14.2 added SciPy-compatible sparse array classes.
 - **AMD:** CuPy has ROCm builds; AMD documents "plug-and-play" CuPy on Instinct GPUs ([AMD ROCm blog](https://rocm.blogs.amd.com/artificial-intelligence/cupy-v13/README.html)). See [[ROCm and HIP]].
 - **As a substrate.** NVIDIA's own cuTile examples use CuPy arrays and streams to launch tile kernels ([cuTile Python blog](https://developer.nvidia.com/blog/simplify-gpu-programming-with-nvidia-cuda-tile-in-python)).
 
@@ -227,10 +229,10 @@ For small arrays the bottleneck flips to launch and Python overhead (several mic
 | Layer | Tools (late 2026) | When to use |
 |---|---|---|
 | Arrays | CuPy, PyTorch, JAX, cuPyNumeric | NumPy-style code |
-| SIMT kernels in Python | numba-cuda (+ MLIR backend), `cupyx.jit` | Custom non-tensor-core algorithms, teaching |
+| SIMT kernels in Python | numba-cuda-mlir (numba-cuda in maintenance), `cupyx.jit` | Custom non-tensor-core algorithms, teaching |
 | Tile kernels | [[Triton]], [[CUDA Tile and cuTile|cuTile]], CuTe DSL, [[ThunderKittens and Tile DSLs|Gluon/Helion/Pallas]] | AI kernels needing Tensor Cores and TMA |
 | Device-wide algorithms | `cuda.compute` (reduce, scan, sort), `cuda.coop` (block/warp primitives) | [[Parallel Reduction and Scan]] without writing it |
-| Runtime and drivers | `cuda.core` / CUDA Python 1.0 | Streams, memory, launches from Python |
+| Runtime and drivers | `cuda.core` (stable in CUDA Python 1.0) | Streams, memory, launches from Python |
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -246,7 +248,7 @@ For small arrays the bottleneck flips to launch and Python overhead (several mic
 
 - **Below the tensor-core line.** Numba exposes threads, not tiles. Fast matmuls and attention need Hopper/Blackwell asynchronous paths that only tile languages and C++ libraries reach, so Numba remains for everything else (stencils, simulations, irregular algorithms).
 - **Eager vs. compiled.** CuPy's eager model pays one kernel and one memory round trip per operation. `cp.fuse`, `ElementwiseKernel` and graph capture help; whole-program compilers (JAX's XLA, `torch.compile`) do it automatically, which is CuPy's competitive pressure.
-- **Packaging churn.** NumPy 2 semantics, the numba-cuda split and the MLIR backend all changed in 2024-2026; older tutorials may install the wrong package or rely on deprecated APIs.
+- **Packaging churn.** NumPy 2 semantics, the numba-cuda split and the move to numba-cuda-mlir all happened in 2024-2026; older tutorials may install the wrong package or rely on deprecated APIs.
 
 ## ***Resources***
 ---
@@ -254,8 +256,8 @@ For small arrays the bottleneck flips to launch and Python overhead (several mic
 
 **Numba**
 - [numba-cuda documentation](https://nvidia.github.io/numba-cuda/), NVIDIA.
-- [Numba deprecation notices](https://numba.readthedocs.io/en/stable/reference/deprecation.html) and [0.63.0 release notes](https://numba.readthedocs.io/en/stable/release/0.63.0-notes.html).
-- [NVIDIA/numba-cuda-mlir releases](https://github.com/NVIDIA/numba-cuda-mlir/releases/tag/v0.6.1).
+- [Numba deprecation notices](https://numba.readthedocs.io/en/0.65.0/_sources/reference/deprecation.rst.txt) and [0.67.0 release notes](https://numba.readthedocs.io/en/stable/release/0.67.0-notes.html).
+- [numba-cuda-mlir on PyPI](https://pypi.org/project/numba-cuda-mlir/) and [releases](https://github.com/NVIDIA/numba-cuda-mlir/releases/tag/v0.6.1): install and migration notes.
 
 **CuPy**
 - [CuPy documentation](https://docs.cupy.dev/en/stable/), especially [user-defined kernels](https://docs.cupy.dev/en/stable/user_guide/kernel.html) and [interoperability](https://docs.cupy.dev/en/stable/user_guide/interoperability.html).
@@ -264,7 +266,7 @@ For small arrays the bottleneck flips to launch and Python overhead (several mic
 **Context**
 - [CUDA 13.3 blog](https://developer.nvidia.com/blog/nvidia-cuda-13-3-enhances-gpu-development-with-tile-programming-in-c-compiler-autotuning-and-python-updates/): CUDA Python 1.0 and the Numba MLIR backend.
 
-## Related Notes
+## ***Related Notes***
 
 - [[CUDA Programming Model]] — What `@cuda.jit` kernels express.
 - [[Kernel Fusion]] — Why CuPy's `ElementwiseKernel` and `cp.fuse` pay off.
