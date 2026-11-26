@@ -483,3 +483,4 @@ Open problems worth tracking:
 - [[PagedAttention]] — Fixed-size KV blocks that make the cache movable and poolable.
 - [[Deterministic Simulation Testing]] — Testing multi-tier storage systems under injected faults.
 - [[Stream Processing]] — Flink 2.0's disaggregated state (ForSt): remote primary state with a local cache.
+- [[Diskless Streaming]] — Kafka-style logs split into stateless brokers, object storage and a metadata coordinator.

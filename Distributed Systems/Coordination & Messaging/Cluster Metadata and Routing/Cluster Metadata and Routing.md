@@ -463,4 +463,4 @@ The lesson both write-ups point toward: the fast, global propagation that makes 
 - [[Reconciliation and Control Loops]] — Planned: placement services as reconcilers.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: staging metadata changes by cell.
 - [[Queueing Theory for Systems]] — Planned: sizing metadata tiers for cold starts.
-- [[Diskless Streaming]] — Planned: offset-assigning coordinators over object storage.
+- [[Diskless Streaming]] — Offset-assigning coordinators over object storage.

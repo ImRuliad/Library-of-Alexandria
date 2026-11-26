@@ -342,7 +342,7 @@ The trade against Kafka's ISR: a majority quorum needs $2f + 1$ replicas for $f$
 
 **Tiered storage (KIP-405).** Closed segments are copied to [[Object Storage]] and deleted locally after a shorter local retention; reads of old data come from the object store. Production-ready since Kafka 3.9 ([3.9 announcement](https://kafka.apache.org/blog/2024/11/06/apache-kafka-3.9.0-release-announcement/)). The active segment is still replicated broker-to-broker, so cross-zone replication traffic is unchanged. Recent additions: new followers can bootstrap from the last tiered offset (KIP-1023, off by default) in 4.3 ([4.3](https://kafka.apache.org/blog/2026/05/22/apache-kafka-4.3.0-release-announcement/)), and delayed upload settings to reduce redundancy (KIP-1241) in 4.4 ([4.4](https://kafka.apache.org/blog/2026/10/22/apache-kafka-4.4.0-release-announcement/)).
 
-**Diskless (zero-disk) designs.** The pattern, from WarpStream and now in KIP-1163:
+**Diskless (zero-disk) designs.** The pattern, from WarpStream and now in KIP-1163 (covered in depth in [[Diskless Streaming]]):
 
 ```mermaid
 flowchart LR
@@ -495,7 +495,9 @@ Open problems worth tracking:
 - [IBM completes acquisition of Confluent](https://newsroom.ibm.com/2026-03-17-ibm-completes-acquisition-of-confluent,-making-real-time-data-the-engine-of-enterprise-ai-and-agents): Mar 2026.
 - [CoreWeave acquires Bufstream](https://buf.build/blog/coreweave-acquires-bufstream): Buf, May 2026.
 
-## Related Notes
+## ***Related Notes***
+---
+*The log sits on replication and consensus, feeds stream processors and databases, and is moving onto object storage.*
 
 - [[Replication]] — ISR, ELR and how Kafka's scheme compares with primary-backup, chain and quorum replication.
 - [[Raft]] — KRaft's controller quorum and Redpanda's per-partition groups.
@@ -509,6 +511,7 @@ Open problems worth tracking:
 - [[Isolation Testing]] — Jepsen-style checking for G0, G1 and aborted reads.
 - [[Partitioning]] — Key-hashed partitions as the unit of order and parallelism.
 - [[Object Storage]] — The storage layer of diskless logs.
+- [[Diskless Streaming]] — Diskless logs in depth: offset-assigning coordinators, read caches, and the systems side by side.
 - [[Disaggregated Systems]] — Separating compute from storage, as Pulsar and diskless Kafka do.
 - [[CAP and PACELC]] — Unclean leader election and `min.insync.replicas` as availability versus durability.
 - [[Failure Models]] — Unclean shutdowns, lost page cache, correlated failures.

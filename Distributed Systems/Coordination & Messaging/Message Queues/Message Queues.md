@@ -468,5 +468,5 @@ On the producer side, the mirror problem (writing to the database and the queue 
 - [[Queueing Theory for Systems]] — Planned: Little's law, Erlang-C and admission control in depth.
 - [[Tail Latency and Hedging]] — Planned: how queueing delay shows up in tail latency.
 - [[Resource Fairness]] — Planned: fair sharing between tenants.
-- [[Diskless Streaming]] — Planned: logs built on object storage.
+- [[Diskless Streaming]] — Logs built on object storage.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: per-cell queues as an isolation boundary.
