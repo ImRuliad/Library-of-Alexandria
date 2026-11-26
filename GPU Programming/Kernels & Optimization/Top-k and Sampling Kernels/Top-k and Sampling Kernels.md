@@ -8,7 +8,7 @@ tags:
   - llm-sampling
   - cub
   - flashinfer
-status: draft
+status: complete
 sources:
   - https://hgpu.org/?p=6781
   - https://arxiv.org/pdf/1702.08734
@@ -392,7 +392,7 @@ In plain words: sorting moves about 8x more data than selecting, before counting
 - **CUB / CCCL.** `DeviceTopK` has shipped since CCCL 3.3.0 and gained decomposers in 3.4.0 and environment overloads in 3.5.0; `DeviceBatchedTopK` arrived in 3.5.0 (October 2026), and 3.5.0 also fixed a `DeviceTopK` race condition (backported to 3.4.3) ([CUB DeviceTopK](https://nvidia.github.io/cccl/unstable/cub/api/structcub_1_1DeviceTopK.html), [CCCL releases](https://github.com/NVIDIA/cccl/releases)). `DeviceTopK` still implements only the unsorted, non-deterministic contract; the batched API already offers sorted output and deterministic tie-breaking on Hopper and newer.
 - **AMD.** `rocprim::topk` and `rocprim::topk_pairs` return $k$ elements in any order; their `Ordered`, `Deterministic` and `Stable` parameters exist but are "not supported yet" ([rocPRIM](https://rocm.docs.amd.com/projects/rocPRIM/en/latest/device_ops/topk.html)). AITER's AdaptiveTopK (Feb 2026, MI300X) switches between register bitonic kernels for small $k$ and an 11-bit radix kernel for large $k$ using a fitted cost model, matching or beating `torch.topk` and Triton for $k$ from 1 to 2048 ([AMD ROCm blog](https://rocm.blogs.amd.com/software-tools-optimization/adaptive-topk/README.html)). See [[ROCm and HIP]].
 - **FlashInfer.** Beyond sampling, it now has standalone `top_k`, `top_k_varlen` and page-table / ragged transforms used by sparse attention. Opt-in deterministic top-k (merged April 1, 2026) assigns each block a fixed output range and writes "greater" before "equal" items in a fixed order; on an A100 it costs 7 to 10% over the non-deterministic path and is 1.31x to 1.77x faster than `torch.topk`'s deterministic mode ([FlashInfer PR #2661](https://github-users.yhajoa.workers.dev/flashinfer-ai/flashinfer/pull/2661)).
-- **Serving engines.** vLLM uses FlashInfer's sampler on CUDA when available (with a sort-based or Triton fallback) and a menu of indexer top-k backends for DSA models ([vLLM](https://docs.vllm.ai/en/latest/api/vllm/v1/sample/ops/topk_topp_sampler/)). TensorRT-LLM ships its own per-row radix kernel and, since spring 2026, GVR for decode ([GVR blog](https://nvidia.github.io/TensorRT-LLM/blogs/tech_blog/blog21_Temporal_Correlation_Meets_Sparse_Attention.html)).
+- **Serving engines.** vLLM uses FlashInfer's sampler on CUDA when available (with a sort-based or Triton fallback) and a menu of indexer top-k backends for DSA models ([vLLM](https://docs.vllm.ai/en/latest/api/vllm/v1/sample/ops/topk_topp_sampler/)). TensorRT-LLM ships its own per-row radix kernel, plus GVR inside its DSA decode path, turned on with `enable_heuristic_topk: true` in the sparse-attention config ([GVR blog](https://nvidia.github.io/TensorRT-LLM/blogs/tech_blog/blog21_Temporal_Correlation_Meets_Sparse_Attention.html)).
 
 **Research, 2025 to 2026**
 
