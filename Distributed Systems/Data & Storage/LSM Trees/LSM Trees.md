@@ -403,7 +403,7 @@ flowchart LR
 - **Pebble** has a storage abstraction in which an SSTable or blob file can be local, *shared* (on remote storage, owned by one Pebble instance in the cluster and possibly used by several) or *external* (on remote storage, owned by none) ([Pebble objstorage docs](https://pkg.go.dev/github.com/cockroachdb/pebble/v2/objstorage@v2.1.0)).
 - **Neon** (serverless Postgres) is LSM-like rather than a textbook LSM: its pageserver stores *delta layers* (an indexed WAL) over *image layers* (materialized pages at an LSN), replays deltas into new images, and uploads layer files of about 128–256 MB to S3 ([Vanlightly, 2023](https://www.jack-vanlightly.com/analyses/2023/11/15/neon-serverless-postgresql-asds-chapter-3)).
 
-This is the storage side of [[Disaggregated Systems]]: compute nodes hold a cache, object storage holds the truth, and compaction becomes a job that can run anywhere. Commit protocols, request-cost math and safe garbage collection for these engines are in [[Databases on Object Storage]].
+This is the storage side of [[Disaggregated Systems]]: compute nodes hold a cache, object storage holds the truth, and compaction becomes a job that can run anywhere; how that job is shipped, scheduled and installed safely is in [[Disaggregated LSMs and Compaction Offload]]. Commit protocols, request-cost math and safe garbage collection for these engines are in [[Databases on Object Storage]].
 
 ## ***Where It Is Now***
 ---
@@ -443,12 +443,12 @@ This is the storage side of [[Disaggregated Systems]]: compute nodes hold a cach
 | **"How to Grow an LSM-tree?"** (Mo, Luo, Idreos) | SIGMOD 2025 | Adding levels (RocksDB) vs growing fixed levels (Bigtable); hybrid *Vertiorizon* gets up to 3.2x throughput over the vertical scheme ([arXiv](https://arxiv.org/pdf/2504.17178)) |
 | **LSM-KVS survey** (Lv et al., incl. OceanBase) | 2025 | Taxonomy of 2020–2025 work: compaction stalls, filters, ZNS and persistent memory, disaggregation, multi-tenancy ([arXiv](https://arxiv.org/html/2507.09642v1)) |
 | **HATS** (Ren, Sheng, Cao, Li, Lee) | FAST 2026, February | Co-schedules reads and compaction across Cassandra replicas to cut latency spikes ([USENIX](https://www.usenix.org/conference/fast26/presentation/ren)) |
-| **O3-LSM** (Lin et al.) | arXiv, March 2026 | Offloads memtables, flushes and compaction to disaggregated memory; up to 4.5x write throughput over Disaggregated-RocksDB, CaaS-LSM and Nova-LSM ([arXiv](https://arxiv.org/abs/2603.05439)) |
+| **O3-LSM** (Lin et al.) | SIGMOD 2026 (June; preprint March 2026) | Offloads memtables, flushes and compaction to disaggregated memory; up to 4.5x write throughput over Disaggregated-RocksDB, CaaS-LSM and Nova-LSM ([arXiv](https://arxiv.org/abs/2603.05439)) |
 | **LSM-Raft** (Zhang et al.) | SIGMOD 2026 | Raft log units are entries or compacted SSTables; safety checked in TLA+ ([dbscholar](https://rmarcus.info/dbscholar/papers/hddfd005d29d7b6da)) |
 | **Tidehunter** (Chursin et al., Mysten Labs) | VLDB 2026 | Treats the WAL as permanent storage with small index tables, avoiding value compaction; 763K writes/s on 1 TB of 1 KB values, 6.8x RocksDB and 2.2x BlobDB in the published paper (the February 2026 preprint said 830K and 8.4x) ([PVLDB](https://www.vldb.org/pvldb/vol19/p3786-zablotchi.pdf); [VLDB 2026 program](https://vldb.org/2026/program.html)) |
 | **Terark-DS** (Zhang et al., HUST and ByteDance) | VLDB 2026 | Key-value separation on disaggregated storage with access-pattern-aware redundancy; 20.4%–63.9% higher write throughput, 22.7%–58.6% lower cost ([VLDB 2026 program](https://vldb.org/2026/program.html)) |
 
-The direction is clear: compaction is now treated as a schedulable, offloadable job (to other replicas, remote workers, disaggregated memory or FaaS), and value separation has moved from research to defaults. See [[Formal Methods in Practice]] for LSM-Raft's and SlateDB's verification.
+The direction is clear: compaction is now treated as a schedulable, offloadable job (to other replicas, remote workers, disaggregated memory or FaaS), and value separation has moved from research to defaults; [[Disaggregated LSMs and Compaction Offload]] covers that shift in depth. See [[Formal Methods in Practice]] for LSM-Raft's and SlateDB's verification.
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -488,7 +488,7 @@ Open problems worth tracking:
 - [Rethinking The Compaction Policies in LSM-trees](https://people.iiis.tsinghua.edu.cn/~huanchen/publications/ecotune-sigmod25.pdf): Wang, Qiu, Yuan and Zhang, SIGMOD 2025.
 - [How to Grow an LSM-tree?](https://arxiv.org/pdf/2504.17178): Mo, Luo and Idreos, SIGMOD 2025.
 - [Holistic and Automated Task Scheduling for Distributed LSM-tree-based Storage](https://www.usenix.org/conference/fast26/presentation/ren): Ren et al., FAST 2026.
-- [O3-LSM: Maximizing Disaggregated LSM Write Performance via Three-Layer Offloading](https://arxiv.org/abs/2603.05439): Lin et al., arXiv March 2026.
+- [O3-LSM: Maximizing Disaggregated LSM Write Performance via Three-Layer Offloading](https://arxiv.org/abs/2603.05439): Lin et al., SIGMOD 2026 (PACMMOD 4(3), June 2026; [paper](https://cs.purdue.edu/homes/csjgwang/pubs/SIGMOD26_O3LSM.pdf)).
 - [LSM-Raft: Optimizing Raft for LSM-tree Store](https://rmarcus.info/dbscholar/papers/hddfd005d29d7b6da): Zhang et al., SIGMOD 2026 (index entry; links to the paper).
 
 **Analysis and surveys**
@@ -520,6 +520,7 @@ Open problems worth tracking:
 - [[Distributed Transactions]] — MVCC versions stored as LSM keys and garbage-collected by compaction.
 - [[Object Storage]] — Where object-native LSMs like SlateDB keep their SSTables.
 - [[Disaggregated Systems]] — Compaction offloaded from compute; storage on shared remote tiers.
+- [[Disaggregated LSMs and Compaction Offload]] — Remote compaction protocols, compaction as a service, near-data compaction.
 - [[Logs and Streaming]] — Kafka Streams and Flink state in RocksDB; WAL-as-storage designs like Tidehunter.
 - [[Anti-Entropy and Repair]] — Tombstones must reach every replica before they are purged.
 - [[Time and Clocks]] — Timestamps decide which version and which tombstone wins.

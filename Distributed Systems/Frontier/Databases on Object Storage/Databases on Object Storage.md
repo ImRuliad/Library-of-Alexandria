@@ -394,7 +394,7 @@ Open problems:
 - [[Lakehouse Table Formats]] — Planned: Delta, Iceberg and DuckLake commit protocols.
 - [[Shared Logs]] — Planned: sequencer plus shared storage.
 - [[Cloud-Native Database Storage]] — Planned: page servers and GetPage@LSN.
-- [[Disaggregated LSMs and Compaction Offload]] — Planned: compaction as a service.
+- [[Disaggregated LSMs and Compaction Offload]] — Compaction as a service: remote workers, scheduling, zombie results.
 - [[Serverless Databases]] — Planned: scale to zero and branching.
 - [[Backup and Point-in-Time Recovery]] — Planned: PITR as a pointer to an older LSN.
 - [[Tail Latency and Hedging]] — Planned: hedged GETs against object-store tails.

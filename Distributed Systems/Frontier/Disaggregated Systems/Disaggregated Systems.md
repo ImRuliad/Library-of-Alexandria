@@ -114,7 +114,7 @@ Disaggregation answers all three by putting each resource in its own pool and re
 | **Memory disaggregation, cache-line level** | Memory on a coherent link | 64-byte cache lines, via CPU loads and stores | CXL | Pond, TPP, PolarDB on CXL |
 | **Accelerator and phase disaggregation** | GPUs in another pool | Tensors, KV cache blocks | NVLink, RDMA | DistServe, Mooncake |
 
-A 2022 TPC panel summarized the database version: "Disaggregated DBMSs separate processing from storage, enabling each to scale elastically and independently," and noted that compute can be split further by function (writes, queries, compaction) ([Ghandeharizadeh et al., 2022](https://arxiv.org/pdf/2411.01269)).
+A 2022 TPC panel summarized the database version: "Disaggregated DBMSs separate processing from storage, enabling each to scale elastically and independently," and noted that compute can be split further by function (writes, queries, compaction) ([Ghandeharizadeh et al., 2022](https://arxiv.org/pdf/2411.01269)). The compaction split is covered in [[Disaggregated LSMs and Compaction Offload]].
 
 ### The Latency Ladder
 
@@ -475,6 +475,7 @@ Open problems worth tracking:
 - [[Object Storage]] — The cheapest tier, under Snowflake and Neon.
 - [[Databases on Object Storage]] — Engines with no durable state but the object store, and how they commit.
 - [[LSM Trees]] — Immutable files and layers, as in Snowflake files and Neon's delta and image layers.
+- [[Disaggregated LSMs and Compaction Offload]] — Splitting an LSM's compaction, flushes and memtables across machines.
 - [[Partitioning]] — Page-server partitions and Snowflake's consistent hashing of files to workers.
 - [[Gray and Fail-Slow Failures]] — Slow shared storage or memory slows every attached node.
 - [[Silent Data Corruption]] — More tiers, more places for pages and logs to diverge.
