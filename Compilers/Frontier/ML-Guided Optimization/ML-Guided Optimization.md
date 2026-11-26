@@ -402,7 +402,7 @@ Google's **Magellan** runs AlphaEvolve over C++ policy code in marked "evolve bl
 | Regalloc priority | From −0.55% to −0.15% relative to the existing heuristic, which the authors call on par |
 | XLA e-graph extraction | 7% better than manual policies (see [[E-Graphs and Equality Saturation]]) |
 
-The appeal is maintainability: the output is readable code reviewers can upstream, not a weight file. The same pipeline produced **AI-Propeller** (June 2026), an interprocedural code-layout heuristic for the post-link optimizer Propeller, rewarded by hardware performance counters: 1.6% on Clang and 0.23% on Google Search over the deployed Ext-TSP layout ([Ananda et al.](https://arxiv.org/html/2606.00131); see [[Profile-Guided Optimization]]). Neither paper says the evolved heuristics have been upstreamed or shipped; the size heuristic is described as "production ready" ([LLVM Dev Mtg 2025 slides](https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf)).
+The appeal is maintainability: the output is readable code reviewers can upstream, not a weight file. The same pipeline produced **AI-Propeller** (June 2026), an interprocedural code-layout heuristic for the post-link optimizer Propeller, rewarded by hardware performance counters: 1.6% on Clang and 0.23% on Google Search over the deployed Ext-TSP layout ([Ananda et al.](https://arxiv.org/html/2606.00131); see [[Profile-Guided Optimization]] and [[Code Layout]]). Neither paper says the evolved heuristics have been upstreamed or shipped; the size heuristic is described as "production ready" ([LLVM Dev Mtg 2025 slides](https://llvm.org/devmtg/2025-10/slides/technical_talks/chen.pdf)).
 
 ### LLM-Written Kernels
 
@@ -549,6 +549,7 @@ Open problems as of late 2026:
 
 ## Related Notes
 
+- [[Code Layout]] — Ext-TSP and the AI-Propeller heuristic evolved from it.
 - [[Classic Optimizations]] — The inliner cost model MLGO and Magellan replace.
 - [[Register Allocation]] — Greedy allocation and the eviction and priority advisors.
 - [[Compiler Pipeline]] — Pass managers and the phase-ordering problem.

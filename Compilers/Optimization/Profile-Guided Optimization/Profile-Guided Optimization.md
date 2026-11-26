@@ -113,7 +113,7 @@ updated: 2026-11-26
 - **Two ways to get one.** *Instrumented* PGO builds a special binary with counters (`clang -fprofile-generate`, run, `llvm-profdata merge`, `clang -fprofile-use`): exact, but the training build is slow (73% overhead on HHVM in Meta's measurement). *Sampled* PGO (AutoFDO) maps hardware branch samples from `perf` on ordinary production binaries back to source; it reached 85% of instrumented gains at Google ([Chen et al., CGO 2016](https://research.google/pubs/pub45290/)), and Meta's CSSPGO closes most of the remaining gap with pseudo-probes ([He et al., CGO 2024](https://htyu.github.io/paper/Revamping_Sampling_based_PGO_with_Context_sensitivity_and_Pseudo_instrumentation_preprint.pdf)).
 - **Who uses it.** Chrome (up to 10% faster page loads), CPython's `--enable-optimizations`, the Linux kernel (AutoFDO and Propeller since 6.13), Go (on by default with a `default.pgo` file since 1.21, 2 to 14% gains), .NET (Dynamic PGO on by default since .NET 8, about 15% on average), and over 75% of Meta's data-center cycles.
 - **The hard parts are operational.** Profiles go stale as code changes, training runs may not match production, and builds become non-reproducible. Stale-profile matching (BOLT, LLVM's sample loader, Wax at ASPLOS 2026) recovers most of the benefit from old profiles.
-- **As of November 2026:** the action is in sampled and post-link PGO on Arm (SPE, ETE, BRBE support in LLVM 23, GCC 16 and the Android kernel), stale-profile matching, and learned profile inference and layout (ProfiX at NeurIPS 2025, AI-Propeller in 2026). Post-link layout itself (BOLT, Propeller) is covered in [[Linking and LTO]].
+- **As of November 2026:** the action is in sampled and post-link PGO on Arm (SPE, ETE, BRBE support in LLVM 23, GCC 16 and the Android kernel), stale-profile matching, and learned profile inference and layout (ProfiX at NeurIPS 2025, AI-Propeller in 2026). Post-link layout itself (BOLT, Propeller) is covered in [[Linking and LTO]], and the layout algorithms in [[Code Layout]].
 
 ## ***The Problem***
 ---
@@ -512,6 +512,7 @@ go build ./cmd/server                   # -pgo=auto finds default.pgo
 
 ## Related Notes
 
+- [[Code Layout]] — The block placement, splitting and function ordering algorithms that consume block and call counts.
 - [[Linking and LTO]] — Post-link layout with BOLT and Propeller, and how PGO stacks with LTO; this note avoids repeating it.
 - [[JIT Compilation]] — Tiered JITs as online PGO: inline caches, type feedback, Dynamic PGO.
 - [[Deoptimization and Speculation]] — What a JIT does when a profile-based guess turns out wrong.

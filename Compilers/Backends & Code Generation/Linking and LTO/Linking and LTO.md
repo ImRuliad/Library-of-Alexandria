@@ -450,7 +450,7 @@ AutoFDO made PGO practical for Google's fleet by profiling production binaries c
 
 *After the compiler is done, rearrange the machine code itself using a profile of the final binary.*
 
-Large server binaries are limited by the instruction cache and iTLB, not by arithmetic. Profiles collected on the *final* binary are exact about which basic blocks are hot, with nothing reshaping the code afterwards. Both tools use that to reorder basic blocks within functions, split hot and cold parts, and reorder functions so hot code shares pages.
+Large server binaries are limited by the instruction cache and iTLB, not by arithmetic. Profiles collected on the *final* binary are exact about which basic blocks are hot, with nothing reshaping the code afterwards. Both tools use that to reorder basic blocks within functions, split hot and cold parts, and reorder functions so hot code shares pages; the algorithms are covered in [[Code Layout]].
 
 | | BOLT (Meta) | Propeller (Google) |
 |---|---|---|
@@ -552,6 +552,7 @@ The gains stack because each layer works with information the earlier ones lacke
 - [[Intermediate Representations]] — The bitcode and GIMPLE that LTO object files carry.
 - [[LLVM]] — lld, ThinLTO, WholeProgramDevirt, BOLT and PGO all live in the LLVM project.
 - [[Classic Optimizations]] — Inlining, constant propagation and dead-code elimination that LTO extends across files.
+- [[Code Layout]] — Ext-TSP, C3/CDSort, hot/cold splitting and balanced partitioning: the layout algorithms linkers and post-link tools apply.
 - [[Register Allocation]] — PGO-guided spill placement and hot/cold splitting.
 - [[JIT Compilation]] — JITs link code at run time and use live profiles, the in-process cousin of PGO.
 - [[WebAssembly]] — lld's Wasm port and a different, module-level linking model.

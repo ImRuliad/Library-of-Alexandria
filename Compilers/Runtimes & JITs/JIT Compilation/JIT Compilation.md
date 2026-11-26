@@ -151,7 +151,7 @@ What the JIT specializes on:
 | Object layout (hidden class, shape, map) | Inline cache at each property access | Property access becomes one compare and one load |
 | Operand types (small int, double, string) | Type feedback slots per arithmetic op | Unboxed machine arithmetic with an overflow check |
 | Call targets | Call-site caches | Direct calls, then inlining |
-| Branch frequencies | Counters | Code layout; never-taken paths left out entirely |
+| Branch frequencies | Counters | [[Code Layout]]; never-taken paths left out entirely |
 | Loaded classes (static languages too) | Class hierarchy analysis | Devirtualizing a call with one implementer |
 
 ### The Tiering Bet

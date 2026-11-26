@@ -369,7 +369,7 @@ LLVM's target-independent code generator runs these stages ([LLVM docs, Code Gen
 | 3 | SSA-based machine optimizations | Optional cleanups (machine CSE, LICM, sinking, peephole) on machine IR still in SSA |
 | 4 | Register allocation | Maps an "infinite virtual register file in SSA form" to real registers, inserting spills |
 | 5 | Prolog/epilog insertion | Builds the stack frame once spill slots are known |
-| 6 | Late machine optimizations | Branch folding, block placement, final peepholes |
+| 6 | Late machine optimizations | Branch folding, block placement ([[Code Layout]]), final peepholes |
 | 7 | Code emission | Prints assembly or writes object bytes via the MC layer |
 
 Running `llc -O2 -debug-pass=Structure` on this function lists the real pass names in order, including "X86 DAG->DAG Instruction Selection", "Eliminate PHI nodes for register allocation", "Two-Address instruction pass", "Machine Instruction Scheduler", "Greedy Register Allocator", "Prologue/Epilogue Insertion & Frame Finalization", "Post RA top-down list latency scheduler" and "X86 Assembly Printer". Instruction selection on x86 uses *SelectionDAG*: build a DAG per basic block, legalize types and operations the target lacks, combine, match patterns, then linearize. GlobalISel is the newer alternative that works on whole functions ([LLVM docs, Code Generator](https://www.llvm.org/docs/CodeGenerator.html)). Details in [[Instruction Selection]] and [[Register Allocation]].
