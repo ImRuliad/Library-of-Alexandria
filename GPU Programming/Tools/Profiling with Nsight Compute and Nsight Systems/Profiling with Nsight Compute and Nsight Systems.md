@@ -274,6 +274,8 @@ From the Profiling Guide's section on workload durations ([Profiling Guide](http
 - **Flushed caches.** `ncu` flushes all GPU caches between replay passes. A kernel that normally finds its inputs in L2 looks worse. For cache-sensitive kernels use `--replay-mode application --cache-control none`.
 - **Serialization.** `ncu` serializes kernel launches outside range replay, so concurrency effects vanish. Durations will not match Nsight Systems.
 - **Host timers lie under the profiler.** CUDA events and CPU timers include the tool's overhead; use the reported `gpu__time_duration`.
+
+Timing kernels outside a profiler has its own traps; see [[Benchmarking GPU Kernels Correctly]].
 - **Tracing overhead.** In Nsight Systems, node-level graph tracing, Unified Memory page-fault tracing (`--cuda-um-cpu-page-faults`, `--cuda-um-gpu-page-faults`) and CUDA backtraces can add significant overhead, and runs longer than five minutes are not officially supported ([User Guide](https://docs.nvidia.com/nsight-systems/UserGuide)).
 
 ## ***Where It Is Now***
@@ -335,3 +337,4 @@ Open problems:
 - [[Multi-GPU Communication - NVLink and NCCL]] — What the NCCL kernels on a multi-GPU timeline are doing.
 - [[GPU Fault Tolerance in Production]] — The other operations toolbox: DCGM health watches and diagnostics.
 - [[Instruction Cache and Code Size on GPUs]] — "No Instruction" stalls and the `sm__icc_*` metrics.
+- [[Benchmarking GPU Kernels Correctly]] — Timing kernels outside the profiler: cold caches, clocks, power and noise.

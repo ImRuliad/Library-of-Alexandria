@@ -377,3 +377,4 @@ It is the same vocabulary as the C++ version, without template instantiation. NV
 - [[Persistent Kernels and Stream-K]] — CUTLASS's persistent and Stream-K tile schedulers.
 - [[GEMM Autotuning and Kernel Selection]] — nvMatmulHeuristics ranking and `cutlass_profiler` tuning.
 - [[Instruction Cache and Code Size on GPUs]] — Template instantiation, kernel filters and binary size.
+- [[Benchmarking GPU Kernels Correctly]] — NVIDIA's GEMM measurement methodology from the CUTLASS docs.

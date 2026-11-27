@@ -247,3 +247,4 @@ Open problems:
 - [[LLM Serving]] — Batching decisions made on the roofline.
 - [[AI Accelerators]] — Roofline comparisons across chips.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — The scaling book's chapter, in the vault.
+- [[Benchmarking GPU Kernels Correctly]] — Roofline floors as a sanity check on measured times.

@@ -274,7 +274,7 @@ cudaEventSynchronize(stop);
 float ms; cudaEventElapsedTime(&ms, start, stop);
 ```
 
-The timestamps are taken on the GPU when the stream reaches each marker, so the measurement excludes CPU launch time and includes only GPU execution between them. Resolution is around 0.5 microseconds ([Runtime API](https://docs.nvidia.com/cuda/cuda-runtime-api/cuda_runtime_api/group__CUDART__EVENT.html)). For anything more detailed, use a profiler (see [[Profiling with Nsight Compute and Nsight Systems]]).
+The timestamps are taken on the GPU when the stream reaches each marker, so the measurement excludes CPU launch time and includes only GPU execution between them. Resolution is around 0.5 microseconds ([Runtime API](https://docs.nvidia.com/cuda/cuda-runtime-api/cuda_runtime_api/group__CUDART__EVENT.html)). For anything more detailed, use a profiler (see [[Profiling with Nsight Compute and Nsight Systems]]). For timing short kernels, cold caches and clock control, see [[Benchmarking GPU Kernels Correctly]].
 
 #### **The Default Stream Trap**
 Work issued without a stream goes to the *legacy default stream* (stream 0). It is special: it waits for all work in every blocking stream, and every blocking stream waits for it. Any operation on stream 0 issued between work in two other streams prevents them from overlapping ([CUDA Programming Guide 2.5](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/asynchronous-execution.html)).
@@ -374,3 +374,4 @@ Open problems:
 - [[Distributed Training]] — Overlapping gradient communication with compute on separate streams.
 - [[GPU Cluster Infrastructure]] — The networks whose transfers streams overlap with compute.
 - [[MIG and MPS - Sharing a GPU]] — Sharing one GPU between processes with MPS and MIG.
+- [[Benchmarking GPU Kernels Correctly]] — What event timing brackets, and cold caches, clocks and launch gaps.

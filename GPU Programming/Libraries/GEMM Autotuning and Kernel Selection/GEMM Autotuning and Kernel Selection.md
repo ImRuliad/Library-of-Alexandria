@@ -180,6 +180,8 @@ If each takes half a second to compile and time (an assumption for the example),
 
 *An autotuner is only as good as its stopwatch. A kernel timed in a tight loop on warm caches can win the benchmark and lose in the real model.*
 
+The full method (cold caches, clocks and power, launch gaps, noise) is in [[Benchmarking GPU Kernels Correctly]].
+
 | Pitfall | Why it misleads | Fix used in practice |
 |---|---|---|
 | Warm L2 cache | Repeated runs find inputs already in L2 | Triton's `do_bench` clears a 256 MB buffer "before each kernel call to make sure that the L2 cache doesn't contain any input data" ([Triton source](https://github.com/triton-lang/triton/blob/main/python/triton/testing.py)) |
@@ -478,3 +480,4 @@ The Helion numbers (11 kernels × 3 shapes on B200): LFBO benchmarked about 546 
 - [[ML Compilers]] — AutoTVM, Ansor and compiler-side tuning.
 - [[ML-Guided Optimization]] — Learned cost models beyond GPUs.
 - [[LLM-Written Kernels]] — LLMs writing kernels, not only tuning them.
+- [[Benchmarking GPU Kernels Correctly]] — The full method behind an autotuner's stopwatch.

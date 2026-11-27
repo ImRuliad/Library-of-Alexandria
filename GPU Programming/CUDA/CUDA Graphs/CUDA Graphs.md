@@ -326,3 +326,4 @@ Open problems:
 - [[KV Cache]] — The per-request state that makes attention hard to capture.
 - [[Speculative Decoding]] — Variable-length steps that complicate graph capture.
 - [[Distributed Training]] — Graphs reduce CPU jitter that turns into stragglers across ranks.
+- [[Benchmarking GPU Kernels Correctly]] — Timing graph replay to remove launch overhead, and why a flush can't sit inside the graph.

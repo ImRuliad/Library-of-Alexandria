@@ -226,7 +226,7 @@ for k in range(0, tl.cdiv(K, BLOCK_K)):
 Three more ideas from the tutorial:
 
 - **Grouped ordering for L2 reuse.** Launching tiles row by row reloads the same columns of B many times. Grouping `GROUP_SIZE_M` rows of tiles together makes neighbouring instances share A and B tiles in L2. In the tutorial's example this cuts block loads from 90 to 54, worth more than 10% on some GPUs (see [[GPU Memory Hierarchy]]).
-- **Autotuning.** `@triton.autotune(configs=[...], key=['M','N','K'])` benchmarks a list of `triton.Config`s (block sizes, `num_warps`, `num_stages`) the first time a new shape appears and caches the winner (see [[GEMM Autotuning and Kernel Selection]]).
+- **Autotuning.** `@triton.autotune(configs=[...], key=['M','N','K'])` benchmarks a list of `triton.Config`s (block sizes, `num_warps`, `num_stages`) the first time a new shape appears and caches the winner (see [[GEMM Autotuning and Kernel Selection]]). Candidates are timed with `triton.testing.do_bench` (see [[Benchmarking GPU Kernels Correctly]]).
 - **Fused epilogue.** An activation (the tutorial uses leaky ReLU) is applied to `acc` "while the accumulator is still in FP32", before the store, saving a second kernel.
 
 The tutorial reports performance "on par with cuBLAS": about 217 TFLOPS against cuBLAS's 224 at 4096 on its A100. The tiling logic itself is the subject of [[Tiled Matrix Multiplication (GEMM)]].
@@ -387,3 +387,4 @@ The placement is this note's judgement, not a measurement. The pattern behind it
 - [[ThunderKittens and Tile DSLs]] — ThunderKittens, Gluon, TileLang and other tile DSLs.
 - [[Numba and CuPy]] — The older Python GPU tools.
 - [[GEMM Autotuning and Kernel Selection]] — `@triton.autotune`, `max-autotune` and pruning the config search.
+- [[Benchmarking GPU Kernels Correctly]] — `do_bench` and what a fair kernel timing needs.
