@@ -189,7 +189,7 @@ Control flow inside the body is removed by **if-conversion**: both sides are com
 
 The loop vectorizer recognizes reductions with `+`, `*`, `&`, `|`, `^`, min and max, and integer and pointer induction variables ([LLVM docs](https://www.llvm.org/docs/Vectorizers.html)). For an integer sum it keeps a vector of partial sums, then does a horizontal reduction after the loop. Integer addition is associative, so this is exact.
 
-Floating-point addition is not associative, so `((s+x0)+x1)+x2...` and `(s+x0+x4...) + (x1+x5...)` can round differently. Compilers therefore need permission (`-ffast-math`, `-fassociative-math`, or `#pragma clang loop vectorize(enable)`), or an *ordered* (in-order) reduction. AArch64 and RISC-V have in-order reduction instructions, "though these are usually less efficient" ([LLVM docs](https://www.llvm.org/docs/Vectorizers.html)).
+[[Floating-Point Semantics|Floating-point addition is not associative]], so `((s+x0)+x1)+x2...` and `(s+x0+x4...) + (x1+x5...)` can round differently. Compilers therefore need permission (`-ffast-math`, `-fassociative-math`, or `#pragma clang loop vectorize(enable)`), or an *ordered* (in-order) reduction. AArch64 and RISC-V have in-order reduction instructions, "though these are usually less efficient" ([LLVM docs](https://www.llvm.org/docs/Vectorizers.html)).
 
 $$
 s = \sum_{i=0}^{n-1} x_i \;\longrightarrow\; s = \sum_{l=0}^{VF-1} \Big( \sum_{k} x_{k \cdot VF + l} \Big)
@@ -511,3 +511,4 @@ The TSVC2 study found indirect accesses defeated GCC and Clang on all 8 such loo
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages that produce the assembly shown here.
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
 - [[Bounds Check Elimination]] — In-loop range checks block vectorization; removing them is often what lets a loop vectorize.
+- [[Floating-Point Semantics]] — Why float reductions need reassociation permission, and what fast-math and FMA contraction change.

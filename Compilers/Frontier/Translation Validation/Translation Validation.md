@@ -39,7 +39,7 @@ sources:
   - https://www2.cs.utah.edu/~regehr/papers/pldi25.pdf
   - https://arxiv.org/pdf/2607.02684
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -327,7 +327,7 @@ Alive2 (Lopes, Lee, Hur, Liu and Regehr, PLDI 2021) is about 23,000 lines of C++
 - **The real refinement query.** With nondeterminism variables $N$ on both sides and preconditions that may differ (LLVM can drop a `nonnull` attribute, so the target's precondition can hold where the source's fails), the final formula is: for all source inputs, target inputs and target outcomes, if the target can produce that outcome under some $N_{\text{tgt}}$, then the source can produce an outcome it refines under some $N_{\text{src}}$. The negation is split into **seven** smaller queries (preconditions, UB, return domain, poison, undef, value equality, memory), which gives sharper error messages and easier solver problems.
 - **Values.** Integers are bit-vectors, floats use SMT's floating-point theory, aggregates are concatenated bit-vectors, pointers are `(block id, offset)`.
 - **Calls.** An unknown call is a pure function of its arguments and memory, returning a value, a new memory and a UB flag. A target call cannot be new, so each one must match some source call; a fresh index picks which, and "no match" is UB. Unsupported intrinsics become over-approximated calls, and a bug that depends on them is not reported as definite.
-- **Floating point.** NaN bit patterns are not unique, so float-to-int `bitcast` was given nondeterministic NaN bits after the community found no consensus; x86's 80-bit floats are unsupported.
+- **Floating point.** NaN bit patterns are not unique ([[Floating-Point Semantics]]), so float-to-int `bitcast` was given nondeterministic NaN bits after the community found no consensus; x86's 80-bit floats are unsupported.
 - **Failures found.** On LLVM's unit tests, 121 refinement violations: 43 involving `undef` inputs, 18 branches on undef or poison, 17 memory bugs, 9 vector bugs and others. 47 were reported and 28 fixed at publication. Several led to LangRef changes, such as making branching on `undef` UB. The authors also found six soundness bugs in Z3 itself.
 
 The tools: `alive-tv` compares two IR files; an `opt` plugin adds `-tv`, so `opt -tv -sroa -instcombine -tv -gvn -tv file.ll` validates each listed pass; a Clang plugin and the `alivecc`/`alive++` drivers validate every IR-level optimization during a normal build ([PLDI 2021](https://www-old.cs.utah.edu/~regehr/alive2-pldi21.pdf)).
@@ -570,3 +570,4 @@ Open problems:
 - [[Microkernels and seL4]] — Binary-level validation of a verified kernel.
 - [[Pointer and Alias Analysis]] — The optimizations Alive2's memory model has to justify.
 - [[Proof Assistant Kernels]] — Independent re-checking of proofs, the same per-run idea applied to proof assistants.
+- [[Floating-Point Semantics]] — What IEEE rules and fast-math flags let an FP rewrite do, and how Alive-FP checked them.

@@ -491,5 +491,5 @@ quadrantChart
 - [[Roofline Model and Arithmetic Intensity]] — The same max-of-bounds idea at kernel and memory-bandwidth scale.
 - [[PTX and SASS]] — Reverse-engineered GPU latencies, the GPU analogue of uops.info.
 - [[LLM-Written Kernels]] — Search loops that need a cheap cost signal before measuring.
-- [[Floating-Point Semantics]] — Planned: why splitting a float accumulator needs reassociation permission.
+- [[Floating-Point Semantics]] — Why splitting a float accumulator needs reassociation permission.
 - [[Spectre Mitigations in Compilers]] — Planned: microarchitectural behavior that changes what code is safe, not just how fast it is.

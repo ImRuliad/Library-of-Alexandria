@@ -48,7 +48,7 @@ sources:
   - https://arxiv.org/pdf/2606.12064
   - https://releases.llvm.org/20.1.0/tools/clang/docs/ReleaseNotes.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -642,3 +642,4 @@ Open problems:
 - [[Loop Optimizations]] — Induction variable widening and loop assumptions that rely on UB.
 - [[LLVM]] — The IR whose UB semantics this note describes.
 - [[Rust in the Linux Kernel]] — Where Rust's no-UB-in-safe-code contract meets C's UB-heavy kernel code.
+- [[Floating-Point Semantics]] — `nnan` and `ninf` make NaNs and infinities `poison`, floating point's version of UB.

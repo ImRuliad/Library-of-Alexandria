@@ -52,7 +52,7 @@ sources:
   - https://www.easa.europa.eu/en/downloads/144162/en
   - https://theaircurrent.com/tac-explains/glossary-ai-ml-terms-aircraft-certification/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -469,7 +469,7 @@ Scale check: VNN-COMP 2025's ViT benchmark consisted of two *shallow* vision tra
 Three results define the problem:
 
 - **Jia and Rinard (SAS 2021).** "Many verifiers inaccurately model floating point arithmetic." Against MIPVerify (complete, MILP-based), they found adversarial examples in 82 of 320 cases the verifier had certified robust (16/160 MNIST, 66/160 CIFAR-10), across five inference implementations. They also built networks whose weights make CROWN's incomplete check return a wrong robustness claim ([SAS 2021](https://conf.researchr.org/details/sas-2021/sas-2021-papers/4/Exploiting-Verified-Neural-Networks-via-Floating-Point-Numerical-Error); [arXiv](https://ar5iv.labs.arxiv.org/html/2003.03021)).
-- **Szász, Bánhelyi and Jelasity (2025).** Floating-point addition is not associative, so the same network gives different outputs under different expression trees, rounding modes or precisions. They prove that interval propagation and zonotopes can miss the true extremes of a deployed computation, and build backdoored networks with "detector" neurons (exploiting, for example, $\omega = 2^{24}$ in binary32) that look safe at full precision; per a machine-generated review of the paper, all ten verifier configurations tested missed two of their backdoor types on 100 MNIST inputs. If deployment uses one known expression tree, interval propagation along that tree is sound in practice ([arXiv 2506.01054](https://arxiv.org/abs/2506.01054)).
+- **Szász, Bánhelyi and Jelasity (2025).** [[Floating-Point Semantics|Floating-point addition is not associative]], so the same network gives different outputs under different expression trees, rounding modes or precisions. They prove that interval propagation and zonotopes can miss the true extremes of a deployed computation, and build backdoored networks with "detector" neurons (exploiting, for example, $\omega = 2^{24}$ in binary32) that look safe at full precision; per a machine-generated review of the paper, all ten verifier configurations tested missed two of their backdoor types on 100 MNIST inputs. If deployment uses one known expression tree, interval propagation along that tree is sound in practice ([arXiv 2506.01054](https://arxiv.org/abs/2506.01054)).
 - **Quantized networks (AAAI 2021).** Ignoring rounding in low-bit quantized networks "has been shown to lead to wrong conclusions"; bit-exact verification of quantized networks against bit-vector specifications is PSPACE-hard, while idealized real-valued verification is in NP ([Henzinger, Lechner and Žikelić](https://ojs.aaai.org/index.php/AAAI/article/view/16496)). See [[Quantization]] for why deployments quantize anyway.
 
 Mitigations in use: DeepZ was designed to be sound with respect to floating-point arithmetic, and ERAN claims floating-point soundness except for its LP/MILP parts ([ERAN](https://github.com/eth-sri/eran)); PyRAT claims floating-point soundness; α,β-CROWN runs in 32- or 64-bit ([VNN-COMP 2025](https://arxiv.org/pdf/2512.19007)); VNN-LIB 2.0 lets a query state floating-point semantics at a given precision ([vnn-list](https://groups.google.com/g/vnn-list/c/yVd-2KZDsD0)). Even a formally verified certifier is only as good as its model of arithmetic: a Dafny-verified $\ell_2$ robustness certifier (2025) found three exploitable bugs in an earlier unverified one (one from floating-point imprecision), yet its own proof is over reals and rationals, not the float pipeline ([Tobler, Syeda and Murray](https://arxiv.org/abs/2505.06958)).
@@ -636,3 +636,4 @@ quadrantChart
 - [[Program Synthesis]] — SAIL and vibecheck show LLMs synthesizing verifier components under soundness checks.
 - [[Distributed Training]] — Tensor parallelism and FSDP reused to shard bound propagation across GPUs.
 - [[Compiler Testing and Fuzzing]] — Counterexample search and SoundnessBench play the role of differential testing for verifiers.
+- [[Floating-Point Semantics]] — IEEE 754, reduction order and fast-math: the gap between real-valued proofs and compiled networks.

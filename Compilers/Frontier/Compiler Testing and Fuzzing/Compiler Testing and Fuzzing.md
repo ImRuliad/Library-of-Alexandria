@@ -51,7 +51,7 @@ sources:
   - https://www.llvm.org/devmtg/2025-10
   - https://2026.ecoop.org/details/ICOOOLPS-2026-icooolps-2026/1/Pragmatic-Approaches-to-Improving-Compiler-Correctness
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -471,7 +471,7 @@ quadrantChart
 
 Open problems as of late 2026:
 
-- **Oracles for unspecified semantics.** Floating point under fast-math, GPU shaders and tensor compilers often have no exact expected output. NNSmith's NaN-avoiding inputs and GLFuzz's same-device comparison are workarounds, not solutions. See [[GPU Kernel Compilers]].
+- **Oracles for unspecified semantics.** [[Floating-Point Semantics|Floating point under fast-math]], GPU shaders and tensor compilers often have no exact expected output. NNSmith's NaN-avoiding inputs and GLFuzz's same-device comparison are workarounds, not solutions. See [[GPU Kernel Compilers]].
 - **Loops, memory and concurrency.** YARPGen v2 made loops tractable; aliasing-heavy code, atomics and memory models remain thin in generators. Rustlantis shows an aliasing model (Stacked or Tree Borrows) can be built into a generator.
 - **UB in LLM-written tests.** LLM generators produce realistic code but cannot promise UB-freedom; LegoFuzz filters with sanitizers and profiling, and LLVM's fuzzer-report guidelines say outright that a clean sanitizer run is not proof.
 - **Triage and deduplication.** Bug counts in papers keep rising; maintainer time does not. Clustering by root cause, automatic bisection and Alive2 explanations help; papers that report "confirmed" counts measure maintainer attention as much as fuzzer quality.
@@ -548,3 +548,4 @@ Open problems as of late 2026:
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
 - [[Proof Assistant Kernels]] — Differential testing of proof checkers: several Lean kernels and the Kernel Arena.
 - [[Sanitizers]] — How ASan, MSan, TSan and UBSan turn silent bugs into the crashes fuzzers look for.
+- [[Floating-Point Semantics]] — Why reassociated or contracted results have no single expected output.

@@ -46,7 +46,7 @@ sources:
   - https://isa-afp.org/entries/Equality_Saturation_Checker.html
   - https://arxiv.org/abs/2510.09932
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -365,7 +365,7 @@ Cranelift proposed an e-graph mid-end in 2022 ([Bytecode Alliance RFC #27](https
 
 | Domain | System | What the e-graph does |
 |---|---|---|
-| Floating point | Herbie ([Panchekha et al., PLDI 2015](https://fpbench.cs.washington.edu/pldi15-paper.pdf)) | Simplifies candidate rewrites while searching for more accurate formulas; an egg case study, and egglog's paper reimplemented its rewriter |
+| [[Floating-Point Semantics\|Floating point]] | Herbie ([Panchekha et al., PLDI 2015](https://fpbench.cs.washington.edu/pldi15-paper.pdf)) | Simplifies candidate rewrites while searching for more accurate formulas; an egg case study, and egglog's paper reimplemented its rewriter |
 | Tensor graphs | Tensat ([Yang et al., MLSys 2021](https://arxiv.org/abs/2101.01332v1)) | Up to 16% faster graphs than the prior state of the art with 48× less optimization time on average; see [[ML Compilers]] |
 | Rule synthesis | Ruler ([Nandi et al., OOPSLA 2021](https://arxiv.org/pdf/2108.10436)), Enumo ([Pal et al., OOPSLA 2023](https://par.nsf.gov/biblio/10510243-equality-saturation-theory-exploration-la-carte)) | Use saturation to infer small, sound rule sets from enumerated terms |
 | CAD | Szalinski ([Nandi et al., PLDI 2020](https://arxiv.org/abs/1909.12252)) | Recovers loops and structure from flat CAD meshes |
@@ -463,3 +463,4 @@ Open problems as of late 2026:
 - [[AI Accelerators]] — Targets for saturation-based instruction selection.
 - [[Sea of Nodes]] — Click's graph IR used by HotSpot C2 and Graal.
 - [[Instruction Scheduling]] — Ordering instructions for pipelines, including modulo scheduling.
+- [[Floating-Point Semantics]] — Herbie in context: accuracy-improving rewrites versus fast-math rewrites.

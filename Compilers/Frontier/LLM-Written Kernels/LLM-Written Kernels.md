@@ -47,7 +47,7 @@ sources:
   - https://icml.cc/virtual/2026/82785
   - https://www.usenix.org/conference/osdi26/presentation/cheng
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -169,7 +169,7 @@ $$
 
 Three things make this harder than it looks:
 
-- **Floating point is not associative.** A faster kernel that reorders a reduction gets different low bits. Tolerances must exist, and any tolerance is room to hide a cheaper, less precise computation.
+- **[[Floating-Point Semantics|Floating point is not associative]].** A faster kernel that reorders a reduction gets different low bits. Tolerances must exist, and any tolerance is room to hide a cheaper, less precise computation.
 - **Low precision needs special rules.** FlashInfer-Bench lets an FP8 kernel pass if at least a fraction $\rho$ of outputs (example $\rho = 0.95$) meet the criterion, instead of loosening the tolerance for everything.
 - **Some kernels have no single right answer.** Sampling kernels are checked by comparing output distributions with total variation distance, and any sample that violates the mask (say, an index outside the top-k) fails immediately ([Xing et al.](https://arxiv.org/html/2601.00227v1)).
 
@@ -527,3 +527,4 @@ The pattern of the merges matters: small fused glue kernels, large isolated spee
 - [[RL for Reasoning]] — The training method behind Kevin, CUDA-L1 and CUDA Agent, and why rewards get hacked.
 - [[ML Compilers]] — Inductor and XLA, the baselines agents must beat.
 - [[FlashAttention]] — The kind of kernel agents still don't produce at expert level.
+- [[Floating-Point Semantics]] — Reassociation, contraction and reduction order: why kernels need tolerances at all.
