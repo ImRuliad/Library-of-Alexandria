@@ -23,7 +23,7 @@ sources:
   - https://en.wikipedia.org/wiki/Rubin_(microarchitecture)
   - https://rocm.blogs.amd.com/software-tools-optimization/matrix-cores-cdna/README.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -397,3 +397,4 @@ Open problems:
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — FP8, FP6, FP4 and block-scaled formats the tensor cores consume.
 - [[CUDA Tile and cuTile]] — Tile programming that targets tensor cores portably.
 - [[Floating-Point Emulation on Tensor Cores]] — Getting FP64 and FP32 matrix products out of INT8, FP8 and BF16 Tensor Cores.
+- [[Mixed-Precision Iterative Refinement and HPL-MxP]] — FP64-accurate linear solves from a low-precision Tensor Core LU plus FP64 refinement, and HPL-MxP.

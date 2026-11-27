@@ -37,7 +37,7 @@ sources:
   - https://www.hpcwire.com/2026/11/16/nvidia-recommits-to-fp64-with-a-new-gpu-the-rubin-hpc/
   - https://theregister.com/hpc/2026/11/17/gpu-giants-throw-hpc-users-some-tasty-crumbs/5310611
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -380,3 +380,4 @@ For a sense of time saved, NVIDIA's GB200 figure of 147 TFLOPS at 3.9x native im
 - [[CUTLASS and CuTe]] — Where custom emulation kernels get their integer GEMMs.
 - [[Sparse Linear Algebra on GPUs]] — The sparse kernels emulation does not help.
 - [[AI Accelerators]] — Chips built for low precision, where emulation may be the only route to FP64.
+- [[Mixed-Precision Iterative Refinement and HPL-MxP]] — The other route to FP64 answers: factor in low precision, refine in FP64, and the HPL-MxP benchmark built on it.

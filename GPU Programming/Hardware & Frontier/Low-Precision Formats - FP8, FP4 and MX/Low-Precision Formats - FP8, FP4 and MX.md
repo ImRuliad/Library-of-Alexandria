@@ -29,7 +29,7 @@ sources:
   - https://www.nvidia.com/en-us/data-center/h100/
   - https://developer.nvidia.com/blog/boosting-matrix-multiplication-speed-and-flexibility-with-nvidia-cublas-12-9
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -295,3 +295,4 @@ The OCP published **MX spec v1.1** on Oct 9, 2026 ([OCP v1.1](https://www.openco
 - [[Roofline Model and Arithmetic Intensity]] — The bandwidth arithmetic above.
 - [[AI Accelerators]] — Low-precision support beyond GPUs.
 - [[Floating-Point Emulation on Tensor Cores]] — Using these formats to emulate FP64 and FP32.
+- [[Mixed-Precision Iterative Refinement and HPL-MxP]] — Using FP16, BF16 and TF32 factorizations for FP64-accurate solves, and why HPL-MxP stops at 16 bits.

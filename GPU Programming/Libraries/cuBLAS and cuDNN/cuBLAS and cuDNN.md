@@ -38,7 +38,7 @@ sources:
   - https://siboehm.com/articles/22/CUDA-MMM
   - https://www.nvidia.com/en-us/data-center/h100/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -457,3 +457,4 @@ In PyTorch, `torch.use_deterministic_algorithms(True)` makes PyTorch use determi
 - [[Profiling with Nsight Compute and Nsight Systems]] — How to see which library kernel actually ran.
 - [[GEMM Autotuning and Kernel Selection]] — Heuristics, `CUBLAS_GEMM_AUTOTUNE`, TunableOp and model-pruned tuning in depth.
 - [[Device-Side Math Libraries (MathDx)]] — cuBLASDx and cuSolverDx: BLAS and solvers called inside your own kernel.
+- [[Mixed-Precision Iterative Refinement and HPL-MxP]] — cuSOLVER's IRS solvers, which run their LU on low-precision cuBLAS GEMMs and refine in FP64.

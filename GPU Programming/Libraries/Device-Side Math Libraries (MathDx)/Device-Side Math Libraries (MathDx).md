@@ -42,7 +42,7 @@ sources:
   - https://developer.nvidia.com/blog/introducing-tile-based-programming-in-warp-1-5-0
   - https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -375,3 +375,4 @@ MathDx started header-only and is moving to **link-time optimization (LTO)** lib
 - [[Roofline Model and Arithmetic Intensity]] — When fusion pays.
 - [[Random Number Generation on GPUs]] — cuRAND, cuRANDDx and counter-based RNG (planned).
 - [[Batched Small-Matrix Linear Algebra]] — Batched solvers across MAGMA, cuSOLVER and cuSolverDx (planned).
+- [[Mixed-Precision Iterative Refinement and HPL-MxP]] — The host-side cuSOLVER IRS solvers: low-precision LU with FP64 refinement for large systems.
