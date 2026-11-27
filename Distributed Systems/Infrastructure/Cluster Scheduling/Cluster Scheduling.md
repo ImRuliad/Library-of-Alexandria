@@ -168,7 +168,7 @@ $$
 
 CPUs are full, so allocation stops: A runs 3 tasks, B runs 2, and both have a dominant share of 2/3. The paper writes this as maximizing $(x, y)$ subject to $x + 3y \le 9$, $4x + y \le 18$ and $\frac{2x}{9} = \frac{y}{3}$, which gives $x = 3$, $y = 2$.
 
-**Why DRF and not something simpler.** DRF has *sharing incentive* (no user does better with a static $1/n$ slice), *strategy-proofness* (lying about demand can't raise your share), *envy-freeness* and *Pareto efficiency*. It isn't *resource monotonic* (adding resources can shrink someone's share), and the authors argue no policy gets that together with the first and last properties. It was implemented in Mesos; in trace-driven simulations of a Facebook Hadoop cluster it cut completion times of large jobs by up to 66%, and on EC2 it beat slot-based fair sharing (the Hadoop Fair Scheduler's approach) ([Ghodsi et al.](https://people.eecs.berkeley.edu/~alig/papers/drf.pdf)). Kueue and Volcano bring fair sharing between tenants to Kubernetes ([[#Gang Scheduling for ML on Kubernetes|below]]).
+**Why DRF and not something simpler.** DRF has *sharing incentive* (no user does better with a static $1/n$ slice), *strategy-proofness* (lying about demand can't raise your share), *envy-freeness* and *Pareto efficiency*. It isn't *resource monotonic* (adding resources can shrink someone's share), and the authors argue no policy gets that together with the first and last properties. It was implemented in Mesos; in trace-driven simulations of a Facebook Hadoop cluster it cut completion times of large jobs by up to 66%, and on EC2 it beat slot-based fair sharing (the Hadoop Fair Scheduler's approach) ([Ghodsi et al.](https://people.eecs.berkeley.edu/~alig/papers/drf.pdf)). Kueue and Volcano bring fair sharing between tenants to Kubernetes ([[#Gang Scheduling for ML on Kubernetes|below]]). Fair queuing, hierarchical DRF, Kueue's borrowing share formula and GPU-era fairness are in [[Resource Fairness]].
 
 ### All-or-Nothing Gangs
 
@@ -493,7 +493,7 @@ Open problems worth tracking:
 - **Devices that misbehave.** A slow or degraded GPU stalls a whole gang. DRA device taints let operators fence it off, but detecting it is still the operator's job ([[Gray and Fail-Slow Failures]], [[Silent Data Corruption]]). The 1.37 gang scheduler can evict whole groups but can't yet release a DRA device from a running claim ([SoftwareSeni](https://www.softwareseni.com/kubernetes-1-37-for-ai-workloads-and-how-to-verify-what-shipped/)).
 - **Control-plane scale.** Twine shards by entitlement, EKS rebuilt etcd; Kubernetes upstream still assumes one etcd group and a serial scheduler ([[Coordination Services]]).
 - **Requests vs usage.** Users over-ask, so schedulers overcommit and autoscale vertically (Borg's 2019 data shows allocations well above capacity); getting it wrong trades waste for OOM kills.
-- **Fairness with heterogeneous hardware.** DRF assumes interchangeable units of each resource; one H100 hour is not one older-GPU hour, and multi-cluster queueing adds another level.
+- **Fairness with heterogeneous hardware.** DRF assumes interchangeable units of each resource; one H100 hour is not one older-GPU hour, and multi-cluster queueing adds another level. Gavel and Themis, two answers, are in [[Resource Fairness]].
 - **Feedback loops.** Preemption, retries and autoscaling interacting badly can keep a cluster overloaded after the trigger is gone; see [[Reliability Patterns]].
 
 ## ***Resources***
@@ -544,3 +544,4 @@ Open problems worth tracking:
 - [[Reliability Patterns]] — Load shedding, priorities and retry storms in the jobs a scheduler runs.
 - [[Disaggregated Systems]] — Separating compute from storage changes what a scheduler must co-locate.
 - [[Auto-Sharding]] — Shard Manager's TaskController negotiates container restarts with Twine.
+- [[Resource Fairness]] — Max-min, fair queuing, DRF's extensions, Kueue fair sharing and GPU-era fairness in depth.

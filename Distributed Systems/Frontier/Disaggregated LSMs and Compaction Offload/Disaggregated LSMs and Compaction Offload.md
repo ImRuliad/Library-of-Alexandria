@@ -373,7 +373,7 @@ Two loose ends follow from the example:
 - **Job startup cost.** Preparing a remote job took over 10 seconds in CaaS-LSM's measurements, so short compactions (especially L0) are often better run locally; the right cutoff is workload-specific.
 - **Write stalls need more than compaction offload.** O3-LSM's result says the bottleneck moves to memtable memory and flush bandwidth once compaction is gone.
 - **Duplicate work across replicas.** In a [[Raft]] group with local storage, every replica compacts the same data. LSM-Raft ships compacted files instead; with shared storage, systems keep one copy and one compactor. Which is cheaper depends on network versus CPU cost.
-- **Fairness and multi-tenancy.** A shared pool serves many trees; ranking jobs (CaaS-LSM's trigger reason, level and score) is a scheduling policy, with the same fairness questions as [[Cluster Scheduling]].
+- **Fairness and multi-tenancy.** A shared pool serves many trees; ranking jobs (CaaS-LSM's trigger reason, level and score) is a scheduling policy, with the same fairness questions as [[Cluster Scheduling]] and [[Resource Fairness]].
 - **Range tombstones and resumption.** RocksDB had to fix resumption across truncated range deletions twice in 2025 and 2026, and SlateDB still listed range deletions as unimplemented in November 2026 ([[LSM Trees#Deletes and Tombstones|LSM Trees]]). Splitting and resuming merges is where subtle deletion bugs live.
 - **Verification.** The install rule is simple, but it interacts with fencing, manifest CAS and garbage collection. SlateDB's manifest protocol has been formally specified; most offload paths have not ([[Formal Methods in Practice]]).
 

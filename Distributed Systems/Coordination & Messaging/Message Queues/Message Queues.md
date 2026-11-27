@@ -292,7 +292,7 @@ sequenceDiagram
 - **Standard queues** are at-least-once with best-effort order: "there's no absolute guarantee that a message won't be delivered more than once during the visibility timeout period."
 - **FIFO queues** order messages per `MessageGroupId` and deduplicate sends: "If you retry the `SendMessage` action within the 5-minute deduplication interval, Amazon SQS doesn't introduce any duplicates into the queue." The deduplication ID is either given or, with content-based deduplication, "a SHA-256 hash ... of the message ... body" ([FIFO exactly-once](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html)). This protects against producer retries; it does not stop a consumer from processing a redelivered message twice.
 - **DLQs** use a redrive policy with `maxReceiveCount`. In standard queues the enqueue timestamp survives the move to the DLQ, so retention counts from the original send; in FIFO queues it resets ([SQS DLQ docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html)).
-- **Fair queues** (July 2025) reuse `MessageGroupId` on *standard* queues as a tenant ID. When one tenant "has a disproportionately large number of in-flight messages compared to others", SQS "prioritizes message delivery for other tenants", so a noisy tenant's backlog raises its own dwell time rather than everyone's. It needs no consumer change and adds a metric, `ApproximateNumberOfMessagesVisibleInQuietGroups` ([fair queues docs](https://docs.aws.amazon.com/en_gb/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fair-queues.html)). This is the managed version of the Builders' Library advice to isolate tenants; see also [[Hot Keys and Cache Stampedes]] and the planned [[Resource Fairness]].
+- **Fair queues** (July 2025) reuse `MessageGroupId` on *standard* queues as a tenant ID. When one tenant "has a disproportionately large number of in-flight messages compared to others", SQS "prioritizes message delivery for other tenants", so a noisy tenant's backlog raises its own dwell time rather than everyone's. It needs no consumer change and adds a metric, `ApproximateNumberOfMessagesVisibleInQuietGroups` ([fair queues docs](https://docs.aws.amazon.com/en_gb/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fair-queues.html)). This is the managed version of the Builders' Library advice to isolate tenants; see also [[Hot Keys and Cache Stampedes]] and [[Resource Fairness]].
 
 ### RabbitMQ Quorum Queues
 
@@ -467,7 +467,7 @@ On the producer side, the mirror problem (writing to the database and the queue 
 - [[Object Storage]] — Where logs, and perhaps queues, are moving.
 - [[Queueing Theory for Systems]] — Planned: Little's law, Erlang-C and admission control in depth.
 - [[Tail Latency and Hedging]] — Planned: how queueing delay shows up in tail latency.
-- [[Resource Fairness]] — Planned: fair sharing between tenants.
+- [[Resource Fairness]] — Fair queuing, shuffle sharding and fair sharing between tenants.
 - [[Diskless Streaming]] — Logs built on object storage.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: per-cell queues as an isolation boundary.
 - [[MVCC and Version Garbage Collection]] — Dead tuples, the xmin horizon and why long transactions starve a Postgres queue.

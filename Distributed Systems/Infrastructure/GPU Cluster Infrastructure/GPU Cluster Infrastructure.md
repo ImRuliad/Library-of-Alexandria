@@ -480,6 +480,7 @@ Open problems worth tracking:
 - [[Gray and Fail-Slow Failures]] — Stragglers, flapping links and throttled GPUs that slow a lockstep job.
 - [[Silent Data Corruption]] — Wrong answers from accelerators, about one per thousand chips by Meta's 2025 count.
 - [[Cluster Scheduling]] — Topology-aware placement, Slurm and Kubernetes for GPU jobs.
+- [[Resource Fairness]] — Sharing GPUs fairly: Themis finish-time fairness, Gavel for mixed GPU types, Kueue and Volcano fair share.
 - [[Reliability Patterns]] — Timeouts and their trade-offs, as with NCCL watchdogs.
 - [[Replication]] — In-memory checkpoint replicas and redundant model state.
 - [[Coordination Services]] — Rendezvous stores and drivers that run recovery.

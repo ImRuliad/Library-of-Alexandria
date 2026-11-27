@@ -273,3 +273,4 @@ Open problems:
 - [[Hot Keys and Cache Stampedes]] — keeping a cache miss from becoming a herd that overloads the database
 - [[Cluster Metadata and Routing]] — constant-work metadata refresh (DynamoDB MemDS) and the 2025 outages caused by bad routing and policy metadata
 - [[Message Queues]] — at-least-once delivery, idempotent consumers, dead-letter queues and backlog recovery
+- [[Resource Fairness]] — fair queuing and shuffle sharding decide whose requests wait or get shed under overload
