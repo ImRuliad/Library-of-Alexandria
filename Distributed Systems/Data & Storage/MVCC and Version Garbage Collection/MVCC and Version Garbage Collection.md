@@ -425,7 +425,7 @@ CockroachDB used to remove data from dropped tables and cancelled imports direct
 **Open problems:**
 
 - **Fair holds.** Nothing yet ranks holders: a paused change feed and a production OLTP workload share one horizon, and the only lever is an expiry that kills the feed. Per-holder budgets, or tiering held history to [[Object Storage]], are obvious next steps.
-- **Cross-system horizons.** A lakehouse sink, a search index and a replica each read "as of" a time. Lining up their holds with the source's GC is still manual ([[Change Data Capture]]).
+- **Cross-system horizons.** A [[Lakehouse Table Formats|lakehouse]] sink, a search index and a replica each read "as of" a time. Lining up their holds with the source's GC is still manual ([[Change Data Capture]]).
 - **Unbounded wraparound.** PostgreSQL's multixact members went 64-bit in version 19, but transaction IDs did not; the full 64-bit XID change is still out of tree.
 - **Is MVCC worth it on the primary?** The CIDR 2027 argument for single-version control is unmeasured against production HTAP workloads; the 2017 data showed MVCC's GC overhead is real but its read benefits were large.
 - **Tombstones and replicas.** GC must respect both the local horizon and replica convergence; time-based grace periods are still the norm outside ScyllaDB ([[Anti-Entropy and Repair]]).
@@ -480,3 +480,4 @@ CockroachDB used to remove data from dropped tables and cancelled imports direct
 - [[Replication]] — Standbys whose queries hold back the primary's horizon.
 - [[Object Storage]] — Where held history could be tiered.
 - [[Bloom and Range Filters]] — Skipping files full of dead versions.
+- [[Lakehouse Table Formats]] — Snapshots, time travel and vacuum at the granularity of files.

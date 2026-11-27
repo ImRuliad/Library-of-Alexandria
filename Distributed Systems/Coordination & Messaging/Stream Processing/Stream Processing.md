@@ -532,7 +532,7 @@ Streaming databases embody the table-centric view. RisingWave positions itself a
 - [[Change Data Capture]] — Database changelogs as stream input; snapshots, outbox and resolved timestamps.
 - [[Message Queues]] — Queues versus logs as inputs.
 - [[Diskless Streaming]] — Object-storage logs under stream processors.
-- [[Lakehouse Table Formats]] — Planned: Iceberg and Paimon as streaming sinks.
+- [[Lakehouse Table Formats]] — Iceberg and Paimon as streaming sinks, and the commit-rate ceiling they impose.
 - [[Checkpointing]] — Planned: checkpoint intervals and costs in training clusters, the same trade-off.
 - [[Incremental View Maintenance]] — Planned: DBSP, Differential Dataflow and streaming databases.
 - [[Watermarks and Late Data]] — Planned: watermark generation, idleness and lateness policies in depth.

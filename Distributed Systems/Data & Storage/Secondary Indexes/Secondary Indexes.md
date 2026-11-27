@@ -384,7 +384,7 @@ Open problems:
 - **Write amplification with many indexes.** Every transactional index adds partitions to the commit. Wide tables with 10 indexes turn single-row updates into 10-plus-partition transactions; deterministic and batched designs ([[Deterministic Transactions]]) may lower the per-index cost.
 - **Low-cardinality and hot index values.** An index on `status` with three values puts every write for `status = 'active'` on one index partition: a [[Hot Keys and Cache Stampedes|hot key]] the base table never had. Global indexes need the same salting and splitting tricks as base data ([[Partitioning]]).
 - **Index lag you can see.** Asynchronous indexes rarely expose *how* stale they are; read-your-writes through a GSI is not available, and applications discover lag by surprise ([[Consistency Models]]).
-- **Indexes over object storage.** Lakehouse tables and object-store databases ([[Object Storage]]) mostly rely on min/max statistics and filters per file rather than true secondary indexes; maintaining a global index on immutable files is an open design area ([[Bloom and Range Filters]], [[Lakehouse Table Formats]]).
+- **Indexes over object storage.** [[Lakehouse Table Formats|Lakehouse tables]] and object-store databases ([[Object Storage]]) mostly rely on min/max statistics and filters per file rather than true secondary indexes; maintaining a global index on immutable files is an open design area ([[Bloom and Range Filters]], [[Lakehouse Table Formats]]).
 - **Testing.** Index/table divergence only shows under specific failure timings, which is exactly what [[Deterministic Simulation Testing]] and [[Isolation Testing]] (Jepsen-style) are for.
 
 ## ***Resources***
@@ -438,4 +438,4 @@ Open problems:
 - [[Change Data Capture]] — Deriving indexes and views from a change stream instead of the write path.
 - [[Deterministic Transactions]] — Cheaper multi-partition writes, and OLLP for index-dependent transactions.
 - [[Bloom and Range Filters]] — The lightweight alternative to indexes in LSMs and lakehouses.
-- [[Lakehouse Table Formats]] — Planned: file-level statistics instead of secondary indexes.
+- [[Lakehouse Table Formats]] — File-level statistics instead of secondary indexes.

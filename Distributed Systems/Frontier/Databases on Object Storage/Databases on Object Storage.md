@@ -316,7 +316,7 @@ The cost is in garbage collection: every reader, checkpoint and branch is a refe
 | **ClickHouse Cloud** | Analytics | Keeper (part metadata) | Stateless compute with shared and distributed caches ([Jul 2025](https://clickhouse.com/blog/clickhouse-cloud-stateless-compute)) |
 | **Husky** | Events, logs | FoundationDB | Introduced May 2022 ([Datadog](https://datadoghq.com/blog/engineering/introducing-husky)) |
 | **Litestream** | SQLite replication | Object store (lease via conditional writes) | Revamped May 2025; VFS read replicas planned ([Fly.io](https://fly.io/blog/litestream-revamped/)) |
-| **DuckLake** | Lakehouse tables | SQL catalog database | 1.0 in spring 2026 ([InfoQ](https://infoq.com/news/2026/05/ducklake-sql-catalog)) |
+| **DuckLake** | [[Lakehouse Table Formats|Lakehouse tables]] | SQL catalog database | 1.0 in spring 2026 ([InfoQ](https://infoq.com/news/2026/05/ducklake-sql-catalog)) |
 | **Diskless Kafka** | Streaming | Batch coordinators (KIP-1150) | KIP accepted Mar 2026; see [[Diskless Streaming]] |
 | **Milliscale** | OLTP research | S3 Express appends | arXiv, Mar 2026 |
 
@@ -391,7 +391,7 @@ Open problems:
 - [[MVCC and Version Garbage Collection]] — Horizons and references that hold history alive.
 - [[Coordination Services]] — Keeper, FoundationDB-style metadata services as commit points.
 - [[Consistency Models]] — Strong vs eventual reads over a cached object store.
-- [[Lakehouse Table Formats]] — Planned: Delta, Iceberg and DuckLake commit protocols.
+- [[Lakehouse Table Formats]] — Delta, Iceberg, Hudi and DuckLake commit protocols and catalogs.
 - [[Shared Logs]] — Planned: sequencer plus shared storage.
 - [[Cloud-Native Database Storage]] — Planned: page servers and GetPage@LSN.
 - [[Disaggregated LSMs and Compaction Offload]] — Compaction as a service: remote workers, scheduling, zombie results.

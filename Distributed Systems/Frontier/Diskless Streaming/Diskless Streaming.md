@@ -450,6 +450,6 @@ This note found no Jepsen analysis of a diskless system since Bufstream 0.1.0 (N
 - [[Leases and Fencing]] — Coordinator leases and what happens when they lapse.
 - [[Hot Keys and Cache Stampedes]] — Zone caches under catch-up load.
 - [[Deterministic Simulation Testing]] — How Inkless was validated.
-- [[Lakehouse Table Formats]] — Planned: Iceberg and Delta, where Ursa writes.
+- [[Lakehouse Table Formats]] — Iceberg and Delta, where Ursa writes, and their commit protocols.
 - [[Write-Ahead Logging]] — WAL tiers in front of object storage, and WAL-on-object-storage designs like SlateDB.
 - [[Databases on Object Storage]] — Commit-point versus sequencer designs for object-native engines.

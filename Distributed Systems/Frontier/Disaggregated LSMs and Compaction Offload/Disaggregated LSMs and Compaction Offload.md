@@ -421,5 +421,5 @@ Two loose ends follow from the example:
 - [[Gray and Fail-Slow Failures]] — Slow workers, timeouts and zombies.
 - [[Formal Methods in Practice]] — Verified manifest protocols.
 - [[Erasure Coding]] — Terark-DS stores value files with 4:2 erasure coding.
-- [[Lakehouse Table Formats]] — Planned: Paimon, Iceberg and Delta compaction jobs.
+- [[Lakehouse Table Formats]] — Paimon, Iceberg and Delta compaction jobs, and why they race with writers.
 - [[Cloud-Native Database Storage]] — Planned: page servers that do background merge work near the data.

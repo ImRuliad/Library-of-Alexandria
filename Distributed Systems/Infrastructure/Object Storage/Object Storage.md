@@ -212,7 +212,7 @@ timeline
 
 **Windows Azure Storage (2011–2012).** Microsoft's SOSP paper described a strongly consistent cloud store built in three layers: stateless front ends, a partition layer that provides "transaction ordering and strong consistency for objects", and an append-only stream layer that replicates 1 GB extents synchronously three ways inside a storage stamp, with asynchronous geo-replication between stamps ([Calder et al., SOSP 2011, §3–4](https://www.cs.purdue.edu/homes/csjgwang/CloudNativeDB/AzureStorageSOSP11.pdf)). The 2012 follow-up introduced Local Reconstruction Codes ([Huang et al.](https://www.usenix.org/system/files/conference/atc12/atc12-final181_0.pdf)). Azure was strongly consistent nine years before S3.
 
-**The lakehouse era (2020 on).** The Delta Lake paper (VLDB 2020) showed how to get ACID tables on object stores with an ordered log of JSON files, and also why S3 made it hard: S3 "does not have atomic 'put if absent' or rename operations", so Databricks ran "a separate lightweight coordination service" to stop two writers creating the same log entry ([Armbrust et al., §3.2.2](https://www.vldb.org/pvldb/vol13/p3411-armbrust.pdf)). The paper also notes that S3 `LIST` was "always eventually consistent" (§2.2). S3's strong consistency (December 2020) and conditional writes (2024) removed both obstacles.
+**The lakehouse era (2020 on).** The Delta Lake paper ([[Lakehouse Table Formats]]) (VLDB 2020) showed how to get ACID tables on object stores with an ordered log of JSON files, and also why S3 made it hard: S3 "does not have atomic 'put if absent' or rename operations", so Databricks ran "a separate lightweight coordination service" to stop two writers creating the same log entry ([Armbrust et al., §3.2.2](https://www.vldb.org/pvldb/vol13/p3411-armbrust.pdf)). The paper also notes that S3 `LIST` was "always eventually consistent" (§2.2). S3's strong consistency (December 2020) and conditional writes (2024) removed both obstacles.
 
 ## ***How It Works***
 ---
@@ -532,6 +532,7 @@ Open problems worth tracking:
 - [[Formal Methods in Practice]] — P, ShardStore and S3's consistency proof work.
 - [[Deterministic Simulation Testing]] — Testing systems whose correctness depends on store semantics.
 - [[Distributed Transactions]] — Optimistic concurrency behind Delta and Iceberg commits.
+- [[Lakehouse Table Formats]] — Delta, Iceberg and Hudi: ACID tables built on conditional writes and catalogs.
 - [[Partitioning]] — Prefix partitioning and request-rate scaling.
 - [[LSM Trees]] — The structure behind ShardStore, SlateDB and turbopuffer.
 - [[Logs and Streaming]] — Diskless Kafka and WarpStream.

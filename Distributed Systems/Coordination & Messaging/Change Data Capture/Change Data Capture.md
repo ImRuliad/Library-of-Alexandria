@@ -485,5 +485,5 @@ The relationship to CDC is the table/log equation run in the other direction: CD
 - [[Write-Ahead Logging]] — The log CDC reads: LSNs, checkpoints and why slots pin WAL.
 - [[MVCC and Version Garbage Collection]] — Why a stalled slot blocks vacuum, and how CockroachDB and TiCDC hold history with expiring protected timestamps and service safe points.
 - [[Message Queues]] — Queues versus logs as CDC transports; the inbox table on the consuming side.
-- [[Lakehouse Table Formats]] — Planned: Iceberg and Delta as CDC destinations.
+- [[Lakehouse Table Formats]] — Iceberg and Delta as CDC destinations; deletion vectors and merge-on-read.
 - [[Incremental View Maintenance]] — Planned: materialized views derived from change streams.

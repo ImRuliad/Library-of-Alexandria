@@ -321,3 +321,4 @@ Open problems worth tracking:
 - [[Stream Processing]] — Two-phase-commit sinks tied to Flink checkpoints, and Kafka Streams' transactional read-process-write.
 - [[Message Queues]] — The queues sagas run on, and inbox tables for exactly-once processing.
 - [[MVCC and Version Garbage Collection]] — Keeping snapshot versions, resolving stale locks before GC, and snapshot-too-old.
+- [[Lakehouse Table Formats]] — Optimistic single-table commits on object storage, and why multi-table transactions are still a catalog feature.

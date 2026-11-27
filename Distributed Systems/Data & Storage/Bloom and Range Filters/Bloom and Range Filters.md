@@ -467,7 +467,7 @@ A filter shipped to another node is a snapshot. Keys added at the source after i
 - [[Distributed SQL]] — CockroachDB, TiDB and YugabyteDB, whose LSM engines carry these filters.
 - [[Deterministic Simulation Testing]] — Catching the implementation bugs that turn into false negatives.
 - [[Silent Data Corruption]] — A corrupted filter block is a silent false negative.
-- [[Lakehouse Table Formats]] — Planned: Parquet and Iceberg file-level statistics and Bloom filters.
+- [[Lakehouse Table Formats]] — Parquet and Iceberg file-level statistics and Bloom filters.
 - [[Databases on Object Storage]] — Where filter placement decides GET counts.
 - [[Write-Ahead Logging]] — The other half of an LSM's storage layout.
 - [[Probabilistic Sketches]] — Planned: HyperLogLog, Count-Min and other approximate summaries.
