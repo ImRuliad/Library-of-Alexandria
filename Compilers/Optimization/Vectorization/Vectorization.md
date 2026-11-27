@@ -42,7 +42,7 @@ sources:
   - https://llvm.org/pubs/2012-05-13-InPar-ispc.html
   - https://www-inf.telecom-sudparis.eu/COURS/CSC5001/Supports/Cours/OpenMP/OpenMP-4.0-C.pdf
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -199,7 +199,7 @@ $$
 
 ### Cost Model, VF and Interleaving
 
-*The compiler tries each legal width, estimates cycles per scalar iteration from per-instruction target costs, and also picks an interleave count to hide latency.*
+*The compiler tries each legal width, estimates cycles per scalar iteration from per-instruction target costs ([[Microarchitectural Performance Models]] covers where those costs come from), and also picks an interleave count to hide latency.*
 
 $$
 \text{VF}^{*} = \arg\max_{VF} \frac{VF \cdot C_{\text{scalar}}}{C_{\text{vector}}(VF)}
@@ -497,6 +497,7 @@ The TSVC2 study found indirect accesses defeated GCC and Clang on all 8 such loo
 ## Related Notes
 
 - [[Loop Optimizations]] — Interchange, distribution, unrolling and the dependence tests vectorization relies on.
+- [[Microarchitectural Performance Models]] — TTI cost tables and the tools (llvm-mca, uiCA) used to check them.
 - [[Dataflow Analysis]] — The analyses behind alias and dependence reasoning.
 - [[SSA Form]] — Vectorizers work on SSA IR; VPlan has its own def-use chains.
 - [[Classic Optimizations]] — LICM and induction-variable simplification that canonicalize loops first.

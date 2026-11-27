@@ -60,7 +60,7 @@ sources:
   - https://arxiv.org/html/2512.23236v3
   - https://pytorch.org/blog/kernelfalcon-autonomous-gpu-kernel-generation-via-deep-agents/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -287,7 +287,7 @@ That is the point of the design: ML is a build-time choice by a toolchain vendor
 
 *Instead of modeling the hardware by hand, measure many programs and fit a predictor; the predictor then filters a search so only promising candidates touch real hardware.*
 
-**Basic blocks: Ithemal.** The analytical baseline is a tool like `llvm-mca`, which simulates the pipeline from the scheduling model in the backend. Real output for a four-instruction block on Haswell, looped 100 times:
+**Basic blocks: Ithemal.** The analytical baseline is a tool like `llvm-mca` (see [[Microarchitectural Performance Models]]), which simulates the pipeline from the scheduling model in the backend. Real output for a four-instruction block on Haswell, looped 100 times:
 
 ```text
 $ llvm-mca -mcpu=haswell -x86-asm-syntax=intel -iterations=100 bb.s
@@ -550,6 +550,7 @@ Open problems as of late 2026:
 ## Related Notes
 
 - [[Code Layout]] — Ext-TSP and the AI-Propeller heuristic evolved from it.
+- [[Microarchitectural Performance Models]] — Analytical and simulation throughput models (llvm-mca, uiCA, Facile) that learned models are measured against.
 - [[Classic Optimizations]] — The inliner cost model MLGO and Magellan replace.
 - [[Register Allocation]] — Greedy allocation and the eviction and priority advisors.
 - [[Compiler Pipeline]] — Pass managers and the phase-ordering problem.

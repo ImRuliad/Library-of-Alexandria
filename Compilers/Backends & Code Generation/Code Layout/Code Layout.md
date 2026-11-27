@@ -51,7 +51,7 @@ sources:
   - https://mail.openjdk.org/pipermail/hotspot-runtime-dev/2025-December/083350.html
   - https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-10/runtime
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -526,7 +526,7 @@ A [[JIT Compilation|JIT]] lays out blocks within a compiled method like an ahead
 - [[JIT Compilation]] — Code caches, tiering, and hot-code grouping in HotSpot.
 - [[ML-Guided Optimization]] — MLGO, Magellan and AI-Propeller: learned and evolved compiler heuristics.
 - [[Program Synthesis]] — AlphaEvolve as evaluator-scored program search.
-- [[Microarchitectural Performance Models]] — Planned: models of the front-end costs that layout reduces.
+- [[Microarchitectural Performance Models]] — Models of the front-end costs that layout reduces; uiCA's alignment-sensitive predictions.
 - [[Stack Unwinding and Exception Tables]] — Planned: the unwind metadata every split fragment needs.
 - [[Reproducible Builds]] — Planned: why profile-dependent layout complicates bit-identical builds.
 - [[Reward Hacking in Code Benchmarks]] — Planned: the risks of scoring evolved heuristics by benchmarks.

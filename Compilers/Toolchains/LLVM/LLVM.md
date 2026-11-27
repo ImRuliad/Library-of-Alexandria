@@ -77,7 +77,7 @@ sources:
   - https://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20240122/1284932.html
   - https://lists.llvm.org/pipermail/llvm-branch-commits/2026-June/095984.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -500,3 +500,4 @@ The second round of area-team elections (members serve one-year terms) closed on
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
 - [[Sanitizers]] — The compiler-rt runtimes and IR passes behind `-fsanitize=`.
+- [[Microarchitectural Performance Models]] — llvm-mca, llvm-exegesis and TargetTransformInfo cost tables.

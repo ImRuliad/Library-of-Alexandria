@@ -72,7 +72,7 @@ sources:
   - https://ar5iv.labs.arxiv.org/html/2210.03894
   - https://github.com/google/gematria
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -537,7 +537,7 @@ A 2025 NVIDIA talk argued the opposite direction too: that IR-level cost modelli
 | uiCA (2021) | Detailed reverse-engineered simulation of Intel front and back ends | 0.45% on the same set, about 1% across Intel generations ([Abel & Reineke](https://ar5iv.arxiv.org/html/2107.14210)) |
 | GRANITE (2022) | Graph neural network over a dependency graph of instructions and values | 6.5% to 7.6% MAPE on the Ithemal dataset, below Ithemal's 8.3% to 9.9% ([Sýkora et al.](https://ar5iv.labs.arxiv.org/html/2210.03894)) |
 
-uiCA's authors attribute llvm-mca's error to what LLVM models omit: front-end bottlenecks, micro- and macro-fusion, move elimination. Google's Gematria packages GRANITE and Ithemal and has a CMake subset (`llvm-granite`, `llvm-cm`) that its maintainers plan to merge into the LLVM monorepo ([Gematria](https://github.com/google/gematria)). The practical route into compilers so far is indirect: measure better, write better TableGen (the Igalia X60 work), and use learned models to audit them. See [[ML-Guided Optimization]].
+uiCA's authors attribute llvm-mca's error to what LLVM models omit: front-end bottlenecks, micro- and macro-fusion, move elimination. Google's Gematria packages GRANITE and Ithemal and has a CMake subset (`llvm-granite`, `llvm-cm`) that its maintainers plan to merge into the LLVM monorepo ([Gematria](https://github.com/google/gematria)). The practical route into compilers so far is indirect: measure better, write better TableGen (the Igalia X60 work), and use learned models to audit them. See [[ML-Guided Optimization]] and, for how these predictors work and how they compare, [[Microarchitectural Performance Models]].
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -613,6 +613,7 @@ uiCA's authors attribute llvm-mca's error to what LLVM models omit: front-end bo
 - [[GPU Kernel Compilers]] — Scheduling for occupancy, dual issue and latency hiding on GPUs.
 - [[Occupancy and Latency Hiding]] — The GPU trade-off AMDGPU's scheduling stages optimize.
 - [[PTX and SASS]] — NVIDIA's ptxas encodes stall counts and barriers in SASS control bits.
+- [[Microarchitectural Performance Models]] — llvm-mca, uiCA, OSACA and learned models built on (or checked against) the same machine models.
 - [[GPU Architecture Basics]] — Warps, issue slots and why GPUs hide latency with parallelism.
 - [[Triton]] — CuAsmRL rewrites Triton-generated SASS schedules.
 - [[ML-Guided Optimization]] — Learned throughput models and RL schedulers.

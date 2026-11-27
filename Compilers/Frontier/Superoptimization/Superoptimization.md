@@ -45,7 +45,7 @@ sources:
   - https://arxiv.org/html/2609.27214
   - https://zwang4.github.io/publication/oopsla26/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -442,7 +442,7 @@ Hydra fully generalized 30 of 40 optimizations taken from LLVM's missed-optimiza
 
 ### Minotaur: SIMD
 
-*Minotaur extends Souper's approach to vector code and floating point, using Alive2 as the checker and LLVM-MCA as the cost model.*
+*Minotaur extends Souper's approach to vector code and floating point, using Alive2 as the checker and LLVM-MCA as the cost model ([[Microarchitectural Performance Models]]).*
 
 Liu, Mada and Regehr ([OOPSLA 2024](https://arxiv.org/html/2306.00229v3); [PACMPL](https://par.nsf.gov/servlets/purl/10646970)) extract "cuts" from LLVM functions, synthesize cheaper equivalents and verify them with Alive2, for which they added formal semantics of 165 x86-64 SIMD intrinsics (SSE through AVX-512). Cost is uOps estimated by LLVM-MCA, which they found predicted speed better than cycles. On Cascade Lake it gave an average 7.3% speedup on GMP (max 13%) and 1.5% on SPEC CPU 2017 (max 4.5% on 638.imagick). Cold-cache compiles can be hundreds of times slower than clang -O3; warm-cache builds are 3% slower.
 
@@ -589,6 +589,7 @@ Open problems as of late 2026:
 
 - [[Classic Optimizations]] — Peepholes, InstCombine and match.pd, where superoptimizer findings end up.
 - [[LLVM]] — The IR Souper, Minotaur and Alive2 work on, and InstCombine's rules for new folds.
+- [[Microarchitectural Performance Models]] — llvm-mca and other throughput models used as the cost in superoptimizer search.
 - [[E-Graphs and Equality Saturation]] — Denali's e-graph grew into today's rewrite-based alternative to search.
 - [[Instruction Selection]] — Rule-based lowering whose gaps superoptimizers fill.
 - [[Vectorization]] — Minotaur's SIMD domain.
