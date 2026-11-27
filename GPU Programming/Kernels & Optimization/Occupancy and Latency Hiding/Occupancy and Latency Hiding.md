@@ -44,7 +44,7 @@ sources:
   - https://docs.nvidia.com/cuda/archive/13.0.0/cuda-toolkit-release-notes/index.html
   - https://www.nvidia.com/en-us/data-center/h100/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -378,3 +378,4 @@ Open problems:
 - [[Register Pressure and Spilling]] — What happens when registers are capped to raise occupancy.
 - [[Persistent Kernels and Stream-K]] — Launching exactly one wave of resident blocks.
 - [[GEMM Autotuning and Kernel Selection]] — Searching block and tile sizes when occupancy models fall short.
+- [[Analytical GPU Performance Models]] — MWP-CWP and other models built on Little's Law.

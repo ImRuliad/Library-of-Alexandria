@@ -435,7 +435,7 @@ None of these is exotic, and single rows already move results by double digits: 
 - [[MIG and MPS - Sharing a GPU]] — Measuring kernels on a shared GPU.
 - [[GPU Fault Tolerance in Production]] — DCGM and clock-event monitoring that also flags throttling.
 - [[GPU Power, Thermals and Power Smoothing]] — DVFS and power capping behind clock drift (planned).
-- [[Analytical GPU Performance Models]] — Predicting instead of timing (planned).
+- [[Analytical GPU Performance Models]] — Predicting instead of timing.
 - [[Deterministic and Batch-Invariant Kernels]] — What "correct" means when results may vary run to run (planned).
 - [[Green Contexts and SM Partitioning]] — Benchmarking with only part of the GPU (planned).
 - [[LLM-Written Kernels]] — Kernel-generating agents, whose results depend on hardened harnesses.

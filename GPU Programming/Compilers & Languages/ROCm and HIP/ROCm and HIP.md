@@ -25,7 +25,7 @@ sources:
   - https://rocm.docs.amd.com/projects/HIP/en/docs-7.1.0/understand/hardware_implementation.html
   - https://vllm.ai/blog/2026-03-04-vllm-triton-backend-deep-dive
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -327,3 +327,4 @@ The pattern: AMD's hardware is competitive on paper, especially in memory capaci
 - [[Multi-GPU Communication - NVLink and NCCL|Multi-GPU Communication: NVLink and NCCL]] — RCCL is AMD's NCCL fork.
 - [[Roofline Model and Arithmetic Intensity]] — The ridge-point arithmetic above.
 - [[AI Accelerators]] — The wider accelerator landscape.
+- [[Analytical GPU Performance Models]] — Origami and tritonBLAS, AMD's GEMM performance models.

@@ -22,7 +22,7 @@ sources:
   - https://arxiv.org/abs/2603.05451
   - https://gwern.net/doc/www/siboehm.com/d4b3e9d6de0655f490fe6369f4d004936248a833.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -248,3 +248,4 @@ Open problems:
 - [[AI Accelerators]] — Roofline comparisons across chips.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — The scaling book's chapter, in the vault.
 - [[Benchmarking GPU Kernels Correctly]] — Roofline floors as a sanity check on measured times.
+- [[Analytical GPU Performance Models]] — Models that refine the roofline bound into a predicted time.

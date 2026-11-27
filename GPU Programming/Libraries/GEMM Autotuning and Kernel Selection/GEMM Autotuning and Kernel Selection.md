@@ -45,7 +45,7 @@ sources:
   - https://rocm.docs.amd.com/projects/hipBLASLt/en/latest/how-to/how-to-use-hipblaslt-offline-tuning.html
   - https://pypi.org/project/rocm-origami/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -117,7 +117,7 @@ Searching everything is the obvious fix, and it is slow. "The traditional approa
 | Approach | How it decides | Cost per new shape | Typical accuracy | Examples |
 |---|---|---|---|---|
 | Fixed rules / heuristic tables | Hand-written or learned lookup from shape, type, GPU | Microseconds | Good on common shapes, poor on odd ones | cuBLAS default, cuDNN heuristic mode A |
-| Analytical performance model | Estimates runtime from tile math, bandwidth, caches, waves | Milliseconds | Near the best on the shapes it models | nvMatmulHeuristics, Origami, tritonBLAS |
+| [[Analytical GPU Performance Models|Analytical performance model]] | Estimates runtime from tile math, bandwidth, caches, waves | Milliseconds | Near the best on the shapes it models | nvMatmulHeuristics, Origami, tritonBLAS |
 | Empirical autotuning | Compile and time candidates on the real GPU | Seconds to hours | Best of what it tried, if measured honestly | `@triton.autotune`, `max-autotune`, TunableOp, `cutlass_profiler` |
 
 Modern systems combine them: a model or heuristic proposes a shortlist, and timing picks from it.
@@ -481,3 +481,4 @@ The Helion numbers (11 kernels × 3 shapes on B200): LFBO benchmarked about 546 
 - [[ML-Guided Optimization]] — Learned cost models beyond GPUs.
 - [[LLM-Written Kernels]] — LLMs writing kernels, not only tuning them.
 - [[Benchmarking GPU Kernels Correctly]] — The full method behind an autotuner's stopwatch.
+- [[Analytical GPU Performance Models]] — How the models that prune the search work, and where they miss.
