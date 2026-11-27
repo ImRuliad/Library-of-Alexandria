@@ -35,7 +35,7 @@ sources:
   - https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/
   - https://openai.com/index/scaling-postgresql/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -397,4 +397,4 @@ Open problems:
 - [[Cluster Metadata and Routing]] — how routers learn the shard map.
 - [[Change Data Capture]] — The WAL-based catch-up stream used in resharding.
 - [[Hot Keys and Cache Stampedes]] — Hot tenants and keys too big for one shard: caching, coalescing and salting.
-- [[Deterministic Transactions]] — Planned: ordering before execution, another route to cross-shard consistency.
+- [[Deterministic Transactions]] — Ordering before execution, another route to cross-shard consistency.

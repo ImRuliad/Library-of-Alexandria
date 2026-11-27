@@ -36,7 +36,7 @@ sources:
   - https://www.mongodb.com/docs/manual/tutorial/maintain-uniqueness-in-sharded-clusters/
   - https://docs.citusdata.com/en/v12.0/faq/faq.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -436,6 +436,6 @@ Open problems:
 - [[Tail Latency and Hedging]] — Planned: the math behind scatter-gather slowness.
 - [[Hot Keys and Cache Stampedes]] — Low-cardinality index values as hot keys, and how to salt or cache them.
 - [[Change Data Capture]] — Deriving indexes and views from a change stream instead of the write path.
-- [[Deterministic Transactions]] — Planned: cheaper multi-partition writes.
+- [[Deterministic Transactions]] — Cheaper multi-partition writes, and OLLP for index-dependent transactions.
 - [[Bloom and Range Filters]] — The lightweight alternative to indexes in LSMs and lakehouses.
 - [[Lakehouse Table Formats]] — Planned: file-level statistics instead of secondary indexes.

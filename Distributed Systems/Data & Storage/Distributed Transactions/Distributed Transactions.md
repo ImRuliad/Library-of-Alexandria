@@ -18,7 +18,7 @@ sources:
   - https://www.usenix.org/system/files/osdi25-shen-weihai.pdf
   - https://www.instaclustr.com/blog/apache-cassandra-6-accord-transactions-what-you-need-to-know/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -53,7 +53,7 @@ updated: 2026-11-26
 - **Two problems, not one:** *atomic commit* (all shards commit or all abort) and *isolation* (concurrent transactions behave as if run in some order). Protocols solve them separately and combine them.
 - **2PC:** a coordinator asks every participant to prepare, then tells them all to commit if every one said yes. It costs four message delays and **blocks** if the coordinator dies after participants prepared ([Gray and Lamport](https://arxiv.org/pdf/cs/0408036)).
 - **The fix in practice:** make the coordinator and participants fault tolerant by replicating each with [[Paxos]] or [[Raft]] (Spanner, CockroachDB, TiDB, MongoDB). Gray and Lamport showed 2PC is Paxos Commit with zero tolerated faults.
-- **Ways around 2PC:** agree on transaction order first, then execute deterministically (Calvin); validate optimistically once at commit (Aurora DSQL); or split work into steps with compensations (sagas).
+- **Ways around 2PC:** agree on transaction order first, then execute deterministically (Calvin; see [[Deterministic Transactions]]); validate optimistically once at commit (Aurora DSQL); or split work into steps with compensations (sagas).
 - **Now (Nov 2026):** consensus-backed 2PC is standard in [[Distributed SQL]]; research targets geo-distributed latency (Mako, OSDI 2025), leaderless one-round-trip transactions (Accord in Cassandra 6) and formal verification of commit protocols (MongoDB, VLDB 2025).
 
 ## ***The Problem***
@@ -227,6 +227,8 @@ From the [Calvin paper](https://www.cs.princeton.edu/courses/archive/fall19/cos4
 - Result: nearly half a million TPC-C New Order transactions per second on 100 EC2 machines.
 - **Catch:** transactions must declare their read and write sets in advance. Dependent transactions do a low-isolation "reconnaissance" read first (OLLP), then restart deterministically if the data changed.
 
+The whole family, from Calvin to Aria, SLOG, Detock and Accord, is covered in [[Deterministic Transactions]].
+
 ### Optimistic Validation at Commit
 
 *Run the transaction without coordination, then check once at commit whether anyone else wrote the same keys. One coordination point per transaction, at the cost of aborts under contention.*
@@ -267,7 +269,7 @@ Garcia-Molina and Salem designed sagas for long-lived transactions that would ot
 | 2PC over consensus groups | Nonblocking in practice | A consensus round per prepare and commit; more latency |
 | Percolator | No central coordinator; scales out | Snapshot isolation only; slow cleanup of crashed transactions |
 | Parallel commits | About one consensus round per commit | Complex recovery logic for staged records |
-| Deterministic (Calvin) | No 2PC; short lock holds; replicate inputs | Read and write sets known up front; batching latency |
+| Deterministic (Calvin, [[Deterministic Transactions]]) | No 2PC; short lock holds; replicate inputs | Read and write sets known up front; batching latency |
 | Optimistic validation | No locks; one coordination point | Aborts and retries on hot keys |
 | Sagas | Works across services; no long locks | No isolation; compensations are hand-written |
 
@@ -309,6 +311,7 @@ Open problems worth tracking:
 - [[CAP and PACELC]] — The latency cost of cross-region commits.
 - [[Partitioning]] — Why data ends up on several shards in the first place.
 - [[Leaderless Consensus]] — Accord and fast paths for one-round-trip transactions.
+- [[Deterministic Transactions]] — Calvin and its successors: ordering before execution so no shard can veto.
 - [[Reliability Patterns]] — Idempotency and retries for sagas and cross-service work.
 - [[Change Data Capture]] — The transactional outbox: publishing saga messages atomically with a local commit.
 - [[Formal Methods in Practice]] — TLA+ models of commit protocols.

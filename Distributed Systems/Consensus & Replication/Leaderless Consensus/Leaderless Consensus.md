@@ -37,7 +37,7 @@ sources:
   - https://cassandra.apache.org/_/download.html
   - https://www.instaclustr.com/blog/apache-cassandra-6-accord-transactions-what-you-need-to-know/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -344,6 +344,8 @@ Tempo's argument against dependency graphs is that a command can be delayed by a
 
 *Apply the same machinery to multi-key, multi-shard transactions, so one protocol does both [[Distributed Transactions|concurrency control]] and replication. Accord is the version going into production.*
 
+Both are deterministic databases without a global log: once the order of conflicting transactions is agreed, every replica executes them the same way and no shard can veto. [[Deterministic Transactions]] compares them with Calvin, SLOG and Detock.
+
 **Janus (OSDI 2016)** noticed that concurrency control and consensus both need conflicting operations ordered the same way everywhere, so one dependency graph can do both ([Mu et al.](https://www.cs.princeton.edu/~wlloyd/papers/janus-osdi16.pdf)). "EPaxos's use of dependency graphs … inspired Janus's dependency tracking." It commits in one wide-area round trip without contention and "always commits with at most two cross-data-center roundtrips in the face of contention," without aborts, for one-shot stored-procedure transactions. The price: its fast quorum "contains all r replica servers," so one slow replica blocks every fast path.
 
 **Accord (Cassandra CEP-15)** is "a new leaderless timestamp protocol" by Benedict Elliott Smith and colleagues, aimed at strict-serializable transactions in one wide-area round trip while tolerating any minority of failures ([CEP-15](https://cwiki.apache.org/confluence/spaces/CASSANDRA/pages/188744725/CEP-15+General+Purpose+Transactions)). From the whitepaper ([Elliott Smith, Zhang, Eggleston, Andreas](https://cwiki-test.apache.org/confluence/download/attachments/188744725/Accord.pdf?api=v2)):
@@ -509,6 +511,7 @@ Open problems worth tracking:
 - [[Raft]] — The leader-based baseline; CURP and Jetpack add fast paths on top of it.
 - [[Replication]] — Where leaderless consensus sits next to Dynamo-style leaderless replication, which gives up consensus entirely.
 - [[Distributed Transactions]] — Janus and Accord fold concurrency control into consensus instead of layering 2PC over it.
+- [[Deterministic Transactions]] — Calvin-style ordering before execution, the database lineage Janus and Accord belong to.
 - [[Time and Clocks]] — Hybrid logical clocks order Accord transactions; Tempo uses logical timestamps.
 - [[Clock Synchronization]] — How tight clocks must be for Accord's reorder buffer, Nezha and EPaxos Revisited to pay off.
 - [[Clock-Assisted Consensus]] — Deadline-ordered multicast, Tiga, Domino and Clock-RSM: clocks for speed, not safety.
