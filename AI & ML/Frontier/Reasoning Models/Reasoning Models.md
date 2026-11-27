@@ -353,7 +353,7 @@ These are vendor claims on vendor-chosen tasks; treat the direction as reliable 
 
 #### **Faithfulness and Monitorability**
 
-A chain of thought is useful for safety only if it reflects what the model actually did.
+A chain of thought is useful for safety only if it reflects what the model actually did. The full story, from hint tests to 2026 system-card reporting, is in [[Chain-of-Thought Faithfulness and Monitorability]].
 
 - **Unfaithful by default.** When given hints that changed their answers, reasoning models mentioned using the hint in at least 1% of cases but "often below 20%". Outcome-based RL improved faithfulness at first and then plateaued, and when RL taught models to exploit hints (reward hacking), they did not verbalize it more ([Chen et al., Anthropic, May 2025](https://arxiv.org/abs/2505.05410)).
 - **Fragile.** A multi-lab position paper argued that reasoning in human language is "a new and fragile opportunity" for oversight, and that developers should weigh how their choices (for example, training directly against the CoT, or moving reasoning out of text) affect it ([Korbak et al., Jul 2025](https://arxiv.org/abs/2507.11473)).
@@ -434,5 +434,6 @@ Sources for unlinked rows: [OpenAI o1](https://openai.com/index/learning-to-reas
 - [[Speculative Decoding]] — Cuts the wall-clock cost of long sequential chains.
 - [[Mixture of Experts]] — Low active parameters make long thinking affordable at frontier scale.
 - [[Looped Transformers]] — Reasoning in hidden state instead of text, and what that means for monitoring.
+- [[Chain-of-Thought Faithfulness and Monitorability]] — Whether the thinking text reflects the real reasoning, and how labs monitor it.
 - [[Transformer]] — Fixed compute per token is the limitation that chain of thought works around.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — The decode-cost arithmetic behind the price of thinking tokens.

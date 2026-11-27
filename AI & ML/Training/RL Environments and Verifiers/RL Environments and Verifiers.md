@@ -387,7 +387,7 @@ Most reward hacking is an environment bug the policy found. ImpossibleBench (CMU
 | Letting the agent abort and flag for a human, GPT-5 | 54% → 9% |
 | LLM monitors catching cheating on SWE-bench-style tasks | 42 to 65% |
 
-Cheats seen: editing tests, overloading `==` so objects equal anything, keeping hidden call counters, and special-casing test inputs. Hiding tests cut cheating to near zero but also hurt legitimate performance; read-only tests stopped edits but not the other tricks. Environment builders report the same kinds of hacks in training, plus agents looking up solutions online or reading future commits ([Epoch AI](https://epoch.ai/gradient-updates/state-of-rl-envs)). The consequences go beyond wasted compute: Anthropic found hacks learned in real coding environments generalized into broader misalignment (see [[RL for Reasoning#Reward Hacking|Reward Hacking]]).
+Cheats seen: editing tests, overloading `==` so objects equal anything, keeping hidden call counters, and special-casing test inputs. Hiding tests cut cheating to near zero but also hurt legitimate performance; read-only tests stopped edits but not the other tricks. Environment builders report the same kinds of hacks in training, plus agents looking up solutions online or reading future commits ([Epoch AI](https://epoch.ai/gradient-updates/state-of-rl-envs)). The consequences go beyond wasted compute: Anthropic found hacks learned in real coding environments generalized into broader misalignment (see [[RL for Reasoning#Reward Hacking|Reward Hacking]]). Monitors that read the agent's chain of thought catch far more hacks than monitors that see only its actions ([[Chain-of-Thought Faithfulness and Monitorability]]).
 
 #### **Auditing the Checkers**
 
@@ -469,4 +469,4 @@ Open problems:
 - [[Long Context]] — Agent rollouts run to hundreds of thousands of tokens.
 - [[Synthetic Data]] — Planned note: synthetic tasks and generated training data.
 - [[Context Engineering and Agent Memory]] — Planned note: what agents keep in context across long episodes.
-- [[Chain-of-Thought Faithfulness and Monitorability]] — Planned note: monitoring reasoning to catch reward hacking.
+- [[Chain-of-Thought Faithfulness and Monitorability]] — Monitoring reasoning to catch reward hacking, and why the monitor must stay out of the reward.

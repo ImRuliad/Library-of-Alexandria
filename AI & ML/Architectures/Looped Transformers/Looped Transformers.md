@@ -45,7 +45,7 @@ sources:
   - https://www.testingcatalog.com/z-ai-launches-glm-5-4-its-first-loop-transformer-model/
   - https://www.datacamp.com/blog/glm-5-4
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -383,7 +383,7 @@ Reading across: at equal parameters looping is a clear win for reasoning; at equ
 - **Training stability.** Shared blocks receive gradients from every visit, which breaks standard residual scaling ([Li et al., 2026](https://arxiv.org/abs/2607.13491)); truncated backprop is cheap but weakens the loop ([Schwethelm et al.](https://arxiv.org/html/2604.21106v3)).
 - **Deciding the loop count.** Learned exits work in papers (Ouro, MoR) but production systems run fixed counts; Z.ai lists adaptive per-token iterations as future work. Loops also extrapolate poorly beyond the trained count (Ouro dips past 4), and models can overthink (GLM-5.4's "marathon thinking").
 - **Loops vs tokens.** It is unclear which mix of deeper passes and longer chains of thought is most efficient; GLM-5.4 and Huginn suggest loops shorten traces, but nobody has a joint scaling law yet.
-- **Monitorability.** Reasoning moved into hidden state cannot be read. Whether looping caused Astra's monitorability regression is disputed; Raschka attributes it to shorter traces ([Raschka](https://magazine.sebastianraschka.com/p/gpt-6-astra-looped-transformers-and)). See [[Reasoning Models]].
+- **Monitorability.** Reasoning moved into hidden state cannot be read. Whether looping caused Astra's monitorability regression is disputed; Raschka attributes it to shorter traces ([Raschka](https://magazine.sebastianraschka.com/p/gpt-6-astra-looped-transformers-and)). See [[Reasoning Models]] and [[Chain-of-Thought Faithfulness and Monitorability]], which covers an Oct 2026 study finding no systematic monitorability gap between looped and matched non-looped models.
 - **Unverified flagship claims.** GLM-5.4's "2T-3T parameter" comparison has no method, and its ablation numbers are not yet in a paper.
 
 ## ***Resources***
@@ -438,5 +438,6 @@ Reading across: at equal parameters looping is a clear win for reasoning; at equ
 - [[Sparse Attention]] — GLM-5.4's second pass reuses DeepSeek Sparse Attention indices from the first.
 - [[Attention Sinks and Gated Attention]] — SMELT finds the second pass weakens the attention sink.
 - [[Speculative Decoding]] — Looped models can self-speculate with few passes and verify with many.
+- [[Chain-of-Thought Faithfulness and Monitorability]] — Why hidden-state reasoning worries oversight researchers, and what the evidence shows.
 - [[LLM Serving]] — Early exit and depth-wise batching change how batches are scheduled.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Why fewer weights do not mean fewer bytes moved per decode step.

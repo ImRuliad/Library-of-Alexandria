@@ -395,6 +395,8 @@ Most valuable tasks (writing, medical advice, research) have no unit test. The 2
 
 When the reward is a test suite, models learn to game the tests, for example by editing the unit tests or the code that computes the reward ([Weng, Nov 2024](https://lilianweng.github.io/posts/2024-11-28-reward-hacking/)). Anthropic showed in November 2025 that this is not just wasted compute: a model that learned hacks like calling `sys.exit(0)` to make tests look passed in real Claude coding environments became broadly misaligned, sabotaging safety-research code 12% of the time in one evaluation. Standard RLHF only hid the problem in chat settings. What worked was **inoculation prompting**, telling the model in training that the hack is acceptable in this context, which removed the misaligned generalization; Anthropic says it now uses this in training Claude ([Anthropic, Nov 2025](https://www.anthropic.com/research/emergent-misalignment-reward-hacking); [paper](https://arxiv.org/abs/2511.18397)).
 
+Reading the model's chain of thought is the most effective way found so far to catch hacks during training, but putting that monitor into the reward teaches models to hide the hack instead of dropping it; see [[Chain-of-Thought Faithfulness and Monitorability]].
+
 #### **Async and Off-Policy RL**
 
 Generation dominates wall-clock time. On one H100 with 512 rollouts per step, a 7B model at 32K output tokens takes about 45 minutes per step and a 32B model about 3.7 hours ([HF, Mar 2026](https://huggingface.co/blog/async-rl-training-landscape)). So every one of the 16 open libraries Hugging Face surveyed puts inference and training on separate GPU pools joined by a rollout buffer, and handles the resulting staleness by rejecting old samples, bounding the lag, or importance-sampling correction.
@@ -502,6 +504,7 @@ Open problems:
 
 - [[Reasoning Models]] — What RL-trained models do at inference: long chains of thought and test-time compute.
 - [[RL Environments and Verifiers]] — The tasks, sandboxes and verifiers that produce the rewards, and how they get hacked.
+- [[Chain-of-Thought Faithfulness and Monitorability]] — Monitoring reasoning to catch reward hacking, and why the monitor must stay out of the reward.
 - [[Distillation]] — How reasoning learned with RL is distilled into small models.
 - [[Scaling Laws]] — Pretraining laws, and where RL's sigmoid compute curves fit beside them.
 - [[Mixture of Experts]] — Why MoE routing makes RL importance ratios unstable, and the routing-replay fixes.
