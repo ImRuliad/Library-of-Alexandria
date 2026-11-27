@@ -412,3 +412,4 @@ Open problems:
 - [[Megakernels]] — atomic work distribution, one of the kernels proved correct in Lean.
 - [[Unified Memory]] — CPU-GPU sharing, tested on Grace Hopper.
 - [[Work Stealing and Dynamic Load Balancing]] — atomic queues and spin-waits that depend on getting ordering right.
+- [[Coherent CPU-GPU Superchips]] — the Grace Hopper hardware and coherence protocol the ISMM 2026 tests probed.

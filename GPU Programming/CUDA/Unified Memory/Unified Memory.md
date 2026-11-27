@@ -51,7 +51,7 @@ updated: 2026-11-26
 
 ## ***TL;DR***
 ---
-*Unified Memory gives the CPU and GPU one pointer to the same data, and the system moves or shares the bytes underneath. It makes GPU code far easier to write, but on PCIe systems its speed depends entirely on avoiding page faults, usually with prefetch hints; on coherent CPU-GPU superchips it becomes close to the default way to program.*
+*Unified Memory gives the CPU and GPU one pointer to the same data, and the system moves or shares the bytes underneath. It makes GPU code far easier to write, but on PCIe systems its speed depends entirely on avoiding page faults, usually with prefetch hints; on [[Coherent CPU-GPU Superchips|coherent CPU-GPU superchips]] it becomes close to the default way to program.*
 
 - **What it is:** one address space plus automatic data movement. Allocate with `cudaMallocManaged` (or, on newer Linux systems, plain `malloc`), and both CPU and GPU code can dereference the same pointer ([CUDA Programming Guide 2.6](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/understanding-memory.html)).
 - **How it moves data:** on PCIe GPUs since Pascal (2016), a GPU access to a page that lives in CPU memory raises a page fault; the driver copies the page over and the warp retries. On hardware-coherent systems (Grace Hopper, Grace Blackwell), the GPU can read CPU memory directly at cache-line granularity, and pages migrate based on access counters.
@@ -358,3 +358,4 @@ Open problems:
 - [[GPU Cluster Infrastructure]] — Superchip nodes and NVLink domains at rack scale.
 - [[KV Cache]] — The inference memory pressure that drives CPU offload on superchips.
 - [[Multi-GPU Communication - NVLink and NCCL]] — NVLink and peer-to-peer access between GPUs.
+- [[Coherent CPU-GPU Superchips]] — The NVLink-C2C hardware, coherence protocol and driver modes behind the hardware-coherent tier.

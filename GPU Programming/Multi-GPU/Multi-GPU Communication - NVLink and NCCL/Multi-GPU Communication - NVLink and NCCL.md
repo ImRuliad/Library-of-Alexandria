@@ -338,3 +338,4 @@ ncclCommDestroy(comm);
 - [[ROCm and HIP]] — AMD's stack, with RCCL in place of NCCL.
 - [[GPU Architecture Basics]] — SMs, the resource NCCL kernels borrow.
 - [[GPU Fault Tolerance in Production]] — NVLink Xids, NCCL timeouts and recovering jobs when a GPU fails.
+- [[Coherent CPU-GPU Superchips]] — The CPU-GPU NVLink-C2C link inside each GH200 and GB200 node.

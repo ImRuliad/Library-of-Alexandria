@@ -237,7 +237,7 @@ $$b_{\text{eff}} = 4 + \frac{8}{16} = 4.5 \text{ bits per value}$$
 
 Sources: [NVIDIA](https://www.nvidia.com/en-us/data-center/gb200-nvl72/), [Lockwood](https://glennklockwood.com/garden/processors/b200).
 
-- Each Grace CPU connects to two B200s over NVLink-C2C at 900 GB/s, so CPU memory is coherent, fast overflow space for KV caches and optimizer state (see [[Unified Memory]]).
+- Each Grace CPU connects to two B200s over NVLink-C2C at 900 GB/s ([[Coherent CPU-GPU Superchips]]), so CPU memory is coherent, fast overflow space for KV caches and optimizer state (see [[Unified Memory]]).
 - Because all 72 GPUs share one NVLink domain, tensor- and expert-parallel groups can span far more than 8 GPUs without touching InfiniBand. SemiAnalysis measured NVL72 at "over 9x higher bandwidth" than multi-node B300 over InfiniBand ([SemiAnalysis, Feb 2026](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs)). The plumbing is in [[Multi-GPU Communication - NVLink and NCCL]]; the data-center side in [[GPU Cluster Infrastructure]].
 
 ### Compiling for Blackwell
@@ -322,3 +322,4 @@ Sources: [NVIDIA, May 2025](https://developer.nvidia.com/blog/nvidia-blackwell-a
 - [[FlashAttention]] — The kernel that shows Blackwell's balance most clearly.
 - [[AI Accelerators]] — Blackwell against TPUs, MI355X and others.
 - [[GPU Cluster Infrastructure]] — Power, cooling and networking around NVL72.
+- [[Coherent CPU-GPU Superchips]] — Grace, NVLink-C2C and coherence in GB200, GB300 and Vera Rubin.

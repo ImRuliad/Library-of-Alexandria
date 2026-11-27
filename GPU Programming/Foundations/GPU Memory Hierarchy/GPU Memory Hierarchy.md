@@ -271,3 +271,4 @@ Open problems:
 - [[MIG and MPS - Sharing a GPU]] — Partitioning L2 and HBM between tenants with MIG.
 - [[Multi-GPU Communication - NVLink and NCCL]] — NVLink, the next level out from HBM.
 - [[Register Pressure and Spilling]] — What spills to local memory and what it costs.
+- [[Coherent CPU-GPU Superchips]] — Host memory reached over NVLink-C2C instead of PCIe.
