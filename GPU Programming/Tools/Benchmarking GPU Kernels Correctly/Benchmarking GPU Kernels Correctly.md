@@ -6,13 +6,14 @@ tags:
   - benchmarking
   - performance
   - methodology
-status: draft
+status: complete
 sources:
   - https://docs.nvidia.com/cutlass/latest/media/docs/cpp/gemm_performance_measurement_methodology_guidelines.html
   - https://github.com/NVIDIA/nvbench
   - https://github.com/NVIDIA/nvbench/blob/main/docs/cli_help.md
   - https://github.com/triton-lang/triton/blob/main/python/triton/testing.py
   - https://triton-lang.org/main/python-api/generated/triton.testing.do_bench.html
+  - https://github.com/triton-lang/triton/blob/main/third_party/nvidia/backend/driver.py
   - https://github.com/flashinfer-ai/flashinfer/blob/main/flashinfer/testing/utils.py
   - https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__EVENT.html
   - https://docs.nvidia.com/nsight-compute/ProfilingGuide
@@ -164,7 +165,7 @@ timeline
 ```
 
 - **Folklore era.** Practitioners learned by trial: synchronize before reading a CPU timer, warm up, average many runs. CUDA events gave a GPU-side clock but bracket everything in the stream.
-- **Autotuners need a stopwatch.** [[Triton]]'s `do_bench` (25 ms of warmup, 100 ms of repetitions, an L2 clear before each call) became the de facto timer for Python GPU code, and Inductor and Helion autotune with it ([[GEMM Autotuning and Kernel Selection]]). NVIDIA's NVBench, built for CUB and Thrust-style libraries, added cold measurements, a noise-based stopping rule and throttle detection ([NVBench](https://github.com/NVIDIA/nvbench)).
+- **Autotuners need a stopwatch.** [[Triton]]'s `do_bench` (25 ms of warmup, 100 ms of repetitions, an L2 clear before each call) became the de facto timer for Python GPU code, and Triton's autotuner times its candidates with it ([[GEMM Autotuning and Kernel Selection]]). NVIDIA's NVBench, built for CUB and Thrust-style libraries, added cold measurements, a noise-based stopping rule and throttle detection ([NVBench](https://github.com/NVIDIA/nvbench)).
 - **Variability gets measured.** The SC22 study across five computing centers found "8% (max 22%) average performance variation even though the GPU architecture and vendor SKU are identical," with outliers 1.5× slower than the median GPU, from manufacturing variation and power management ([Sinha et al.](https://arxiv.org/abs/2208.11035)).
 - **Power enters the picture.** Horace He showed in April 2024 that an A100 matmul runs faster on predictable data, and argued H100s are "primarily not compute or bandwidth limited, they are **power limited**" ([Thonking.ai](https://www.thonking.ai/p/strangely-matrix-multiplications)).
 - **The adversarial turn.** When optimizers became LLM agents, they found holes in the harness: Sakana's AI CUDA Engineer kernels passed checks that a human-written kernel would not have (Feb 2025); benchmark suites added hidden tests and fair baselines; competitions added integrity layers (2026).
@@ -218,7 +219,7 @@ Profilers are a fourth option, with their own defaults. Nsight Compute "locks SM
 
 Two techniques, with different costs:
 
-**1. Flush.** Before each timed call, write a buffer larger than L2. Triton clears a 256 MB buffer "before each kernel call to make sure that the L2 cache doesn't contain any input data" ([Triton source](https://github.com/triton-lang/triton/blob/main/python/triton/testing.py)); FlashInfer sizes its flush at 2× the device's reported L2 size. The flush is a separate kernel *outside* the timed region. It works with events and CUPTI, but not inside one CUDA Graph replay, where the flush would be timed along with the kernel.
+**1. Flush.** Before each timed call, write a buffer larger than L2. Triton zeroes a 256 MB buffer "before each kernel call to make sure that the L2 cache doesn't contain any input data" ([Triton NVIDIA driver](https://github.com/triton-lang/triton/blob/main/third_party/nvidia/backend/driver.py); called from [`testing.py`](https://github.com/triton-lang/triton/blob/main/python/triton/testing.py)); FlashInfer sizes its flush at 2× the device's reported L2 size. The flush is a separate kernel *outside* the timed region. It works with events and CUPTI, but not inside one CUDA Graph replay, where the flush would be timed along with the kernel.
 
 **2. Rotate.** Allocate several copies of every input and use a different copy each iteration, so by the time a copy is reused the intervening traffic has evicted it. NVIDIA prefers this for GEMMs and does not recommend flushing: make the total input footprint "at least twice the L2 cache capacity," with at least two buffers per tensor even when one set already exceeds 2× L2, and rotate the pointers circularly ([CUTLASS guide](https://docs.nvidia.com/cutlass/latest/media/docs/cpp/gemm_performance_measurement_methodology_guidelines.html)). Rotation keeps back-to-back launches (no flush kernels in between), so it also works inside graphs and preserves the power and clock behavior of a continuous stream of GEMMs.
 
@@ -337,8 +338,8 @@ ms = tt.do_bench(lambda: torch.matmul(a, b), warmup=25, rep=100,
 ```
 
 - `do_bench` estimates the kernel's length, runs about 25 ms of warmup and 100 ms of timed calls.
-- Before each timed call it clears L2 by writing its 256 MB buffer, so this is a cold measurement.
-- `quantiles=[0.5, 0.2, 0.8]` returns the median and the 20th and 80th percentiles instead of the mean, which shows the spread.
+- Before each timed call it clears L2 by zeroing its 256 MB buffer ([driver source](https://github.com/triton-lang/triton/blob/main/third_party/nvidia/backend/driver.py)), so this is a cold measurement.
+- `quantiles=[0.5, 0.2, 0.8]` returns the median and the 20th and 80th percentiles instead of the mean, which shows the spread. Without quantiles, `return_mode` picks `mean` (default), `median`, `min`, `max` or `all` ([do_bench docs](https://triton-lang.org/main/python-api/generated/triton.testing.do_bench.html)).
 - It does *not* lock clocks or check power; that is up to the machine setup.
 
 #### **Correctness Is Part of the Benchmark**
@@ -372,7 +373,7 @@ None of these is exotic, and single rows already move results by double digits: 
 - **NVIDIA's GEMM methodology** (CUTLASS docs 4.9.0, updated Nov 18, 2026) is the most complete public recipe: fixed-frequency vs fixed-power tests, buffer rotation to 2× L2 instead of flushing, `--cache-control none` when validating in Nsight Compute, zero-fill for locked clocks and uniform random for fixed power, thousands of warmups for large Blackwell GEMMs, and checks of L2 hit rate, clock stability and launch gaps before analysis ([CUTLASS guide](https://docs.nvidia.com/cutlass/latest/media/docs/cpp/gemm_performance_measurement_methodology_guidelines.html)).
 - **FlashInfer's `bench_gpu_time`** is a reference implementation in Python: CUPTI timing via `cupti-python` ≥ 13 (CUDA 13+), graph timing with automatic rotating buffers, and cold L2 on by default; older `l2_flush` options are deprecated in favor of `cold_l2_cache` ([FlashInfer](https://github.com/flashinfer-ai/flashinfer/blob/main/flashinfer/testing/utils.py)).
 - **NVBench** remains NVIDIA's C++ microbenchmark framework, with cold and batch measurements, `stdrel` and `entropy` stopping criteria, throttle detection and clock locking; it still describes itself as "a work-in-progress" ([NVBench](https://github.com/NVIDIA/nvbench)).
-- **Triton's `do_bench`** is still the default timer in the Python stack, which ties [[GEMM Autotuning and Kernel Selection|Inductor and Helion autotuning]] to its choices: cold L2 by flush, mean by default, no clock control ([Triton](https://github.com/triton-lang/triton/blob/main/python/triton/testing.py)).
+- **Triton's `do_bench`** is still the default timer in the Python stack, which ties [[GEMM Autotuning and Kernel Selection|Triton autotuning]] to its choices: cold L2 by flush, mean by default, no clock control ([Triton](https://github.com/triton-lang/triton/blob/main/python/triton/testing.py)).
 - **Kernel-generation benchmarks harden.** KernelBench-Verified (Jun 2026) concludes that no model consistently beats PyTorch under realistic baselines, and adds a peak-memory metric because 28% of GPT-5.5's correct kernels raised peak memory ([Zhang et al.](https://www.alphaxiv.org/abs/2607.16241)). KernelGuard's layered integrity checks show competitions now assume submissions will attack the timer ([Baslak et al.](https://icml.cc/virtual/2026/67922)).
 - **Practitioners converge on the same habits.** Jan's Blackwell (RTX PRO 6000) write-up uses L2 flushing, warmups, median of repeats and `ncu` as a reference, and chose *not* to lock clocks because neither base nor max reflects real users, reaching agreement within about 10 µs with `ncu` ([Jan](https://jan.ai/post/how-we-benchmark-kernels)).
 
@@ -396,7 +397,7 @@ None of these is exotic, and single rows already move results by double digits: 
 **Methodology and tools**
 - [GEMM Performance Measurement Methodology Guidelines](https://docs.nvidia.com/cutlass/latest/media/docs/cpp/gemm_performance_measurement_methodology_guidelines.html): NVIDIA CUTLASS docs, 4.9.0 (Nov 2026).
 - [NVBench](https://github.com/NVIDIA/nvbench) and its [CLI reference](https://github.com/NVIDIA/nvbench/blob/main/docs/cli_help.md): cold/batch measurements, stopping criteria, throttle detection, clock locking.
-- [Triton `testing.py`](https://github.com/triton-lang/triton/blob/main/python/triton/testing.py) and [`do_bench` docs](https://triton-lang.org/main/python-api/generated/triton.testing.do_bench.html).
+- [Triton `testing.py`](https://github.com/triton-lang/triton/blob/main/python/triton/testing.py), the [NVIDIA driver's cache flush](https://github.com/triton-lang/triton/blob/main/third_party/nvidia/backend/driver.py) and [`do_bench` docs](https://triton-lang.org/main/python-api/generated/triton.testing.do_bench.html).
 - [FlashInfer `testing/utils.py`](https://github.com/flashinfer-ai/flashinfer/blob/main/flashinfer/testing/utils.py): `bench_gpu_time` with CUPTI, graphs and rotating buffers.
 - [CUDA Runtime API: Event Management](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__EVENT.html): event timing semantics and resolution.
 - [Nsight Compute Profiling Guide](https://docs.nvidia.com/nsight-compute/ProfilingGuide): clock and cache control during replay.
