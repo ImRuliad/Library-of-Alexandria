@@ -401,7 +401,7 @@ Kueue counts a node as failed when it is missing, or not Ready with its workload
 - [[Blackwell Architecture]] — GB200 and NVL72, the rack-scale NVLink domain.
 - [[Mixture of Experts]] — All-to-all traffic that makes locality matter even more.
 - [[Queueing Theory for Systems]] — Planned: why waiting for a whole domain grows so fast near full load.
-- [[Overcommit and Vertical Autoscaling]] — Planned: the opposite philosophy, packing tighter than requests.
+- [[Overcommit and Vertical Autoscaling]] — The opposite philosophy, packing tighter than requests.
 - [[Fleet Health and Hardware Screening]] — Planned: finding the bad nodes that hot swap replaces.
 - [[Checkpointing]] — Planned: what an evicted gang restarts from.
 - [[Elastic Training and Job Migration]] — Planned: shrinking or moving a gang instead of killing it.

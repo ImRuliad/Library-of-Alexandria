@@ -42,7 +42,7 @@ sources:
   - https://arxiv.org/abs/2407.00079
   - https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -480,6 +480,7 @@ Open problems worth tracking:
 - [[Gray and Fail-Slow Failures]] — Slow shared storage or memory slows every attached node.
 - [[Silent Data Corruption]] — More tiers, more places for pages and logs to diverge.
 - [[Cluster Scheduling]] — Placing compute next to its cached data.
+- [[Overcommit and Vertical Autoscaling]] — The other answer to stranded and idle memory: oversell it, offload it, or shrink the request (Coach, TMO).
 - [[GPU Cluster Infrastructure]] — Prefill/decode pools and KV cache transfer fabrics.
 - [[KV Cache]] — The "page" of LLM serving, moved between prefill and decode pools.
 - [[PagedAttention]] — Fixed-size KV blocks that make the cache movable and poolable.

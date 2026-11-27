@@ -530,6 +530,7 @@ Open problems worth tracking:
 
 - [[Cluster Scheduling]] — DRF's worked example, Slurm fair share and Fair Tree, Kueue and Volcano in the Kubernetes batch stack.
 - [[Gang and Topology-Aware Scheduling]] — All-or-nothing jobs, which make fair shares lumpy.
+- [[Overcommit and Vertical Autoscaling]] — Who loses first when reclaimed capacity runs out: priority kill order and QoS classes.
 - [[GPU Cluster Infrastructure]] — The heterogeneous, topology-sensitive accelerators that break DRF's assumptions.
 - [[Message Queues]] — SQS fair queues and noisy tenants in shared queues.
 - [[Reliability Patterns]] — Load shedding, quotas and retry storms; fairness decides who is shed.

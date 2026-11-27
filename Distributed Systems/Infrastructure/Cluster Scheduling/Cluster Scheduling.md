@@ -54,7 +54,7 @@ sources:
   - https://www.hpcwire.com/2026/05/15/slurm-vs-kubernetes-in-the-age-of-ai/
   - https://arxiv.org/pdf/2607.28223
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -140,7 +140,7 @@ Borg's version is the reference design ([Verma et al., §2.5](https://research.g
 - **Quota** is checked at *admission*, not during placement: a job without enough quota at its priority is rejected on submission. Production quota is limited to the cell's real capacity, while every user has effectively unlimited quota at priority zero, so free work can soak up idle capacity.
 - **Preempted tasks** go back to the pending queue instead of being migrated (§3.2).
 
-**Overcommit and reclamation.** Users ask for more than they use. Borg sets each task's *reservation* at its limit, then decays it after 300 seconds toward actual usage plus a safety margin; the gap between limit and reservation is reclaimed for non-prod work. Prod tasks are scheduled against their limits, non-prod tasks may use reclaimed resources, and about 20% of the workload in a median cell ran in reclaimed resources (§5.5).
+**Overcommit and reclamation.** Users ask for more than they use. Borg sets each task's *reservation* at its limit, then decays it after 300 seconds toward actual usage plus a safety margin; the gap between limit and reservation is reclaimed for non-prod work. Prod tasks are scheduled against their limits, non-prod tasks may use reclaimed resources, and about 20% of the workload in a median cell ran in reclaimed resources (§5.5). Prediction-driven overcommit and Autopilot-style rightsizing are in [[Overcommit and Vertical Autoscaling]].
 
 *Worked example:* a prod task asks for 4 cores and uses about 1.5. After five minutes its reservation decays to, say, 2 cores (usage plus margin). The other 2 cores of its limit can host a batch task. If the prod task's usage climbs, its reservation grows quickly and the batch task is the one that gets squeezed or preempted.
 
@@ -492,7 +492,7 @@ Open problems worth tracking:
 - **Topology.** A training job's speed depends on which GPUs share NVLink or a switch, which flat resource counts can't express; Slurm blocks, Volcano HyperNodes and Kubernetes' topology-aware scheduling are three separate answers, compared in [[Gang and Topology-Aware Scheduling]]. See also [[GPU Cluster Infrastructure]].
 - **Devices that misbehave.** A slow or degraded GPU stalls a whole gang. DRA device taints let operators fence it off, but detecting it is still the operator's job ([[Gray and Fail-Slow Failures]], [[Silent Data Corruption]]). The 1.37 gang scheduler can evict whole groups but can't yet release a DRA device from a running claim ([SoftwareSeni](https://www.softwareseni.com/kubernetes-1-37-for-ai-workloads-and-how-to-verify-what-shipped/)).
 - **Control-plane scale.** Twine shards by entitlement, EKS rebuilt etcd; Kubernetes upstream still assumes one etcd group and a serial scheduler ([[Coordination Services]]).
-- **Requests vs usage.** Users over-ask, so schedulers overcommit and autoscale vertically (Borg's 2019 data shows allocations well above capacity); getting it wrong trades waste for OOM kills.
+- **Requests vs usage.** Users over-ask, so schedulers overcommit and autoscale vertically (Borg's 2019 data shows allocations well above capacity); getting it wrong trades waste for OOM kills. See [[Overcommit and Vertical Autoscaling]].
 - **Fairness with heterogeneous hardware.** DRF assumes interchangeable units of each resource; one H100 hour is not one older-GPU hour, and multi-cluster queueing adds another level. Gavel and Themis, two answers, are in [[Resource Fairness]].
 - **Feedback loops.** Preemption, retries and autoscaling interacting badly can keep a cluster overloaded after the trigger is gone; see [[Reliability Patterns]].
 
@@ -546,3 +546,4 @@ Open problems worth tracking:
 - [[Disaggregated Systems]] — Separating compute from storage changes what a scheduler must co-locate.
 - [[Auto-Sharding]] — Shard Manager's TaskController negotiates container restarts with Twine.
 - [[Resource Fairness]] — Max-min, fair queuing, DRF's extensions, Kueue fair sharing and GPU-era fairness in depth.
+- [[Overcommit and Vertical Autoscaling]] — Borg reclamation, peak prediction, Autopilot, Kubernetes VPA and in-place resize in depth.
