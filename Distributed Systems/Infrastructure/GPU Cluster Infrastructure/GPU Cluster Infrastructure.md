@@ -338,7 +338,7 @@ sequenceDiagram
 - **Timeouts cut both ways.** A NIC that flaps for a few seconds tripped NCCL's default timeout, so MegaScale raised it ([Jiang et al.](https://www.usenix.org/system/files/nsdi24-jiang-ziheng.pdf)); too long a timeout wastes the whole cluster while it waits. Llama 3's NCCLX instead monitors the library's state and times out when it detects a stall, and dumps a "flight recorder" of collective metadata and stack traces on watchdog or heartbeat timeouts to localize the culprit ([Llama 3 paper](https://arxiv.org/pdf/2407.21783)). See [[Reliability Patterns]] for timeouts in general.
 - **Startup is part of recovery.** Initializing communication groups for 2,048 GPUs took about 1,047 s in Megatron-LM; replacing the blocking TCPStore with Redis and removing global barriers got it under 5 s, and under 30 s for 10,000+ GPUs ([Jiang et al.](https://www.usenix.org/system/files/nsdi24-jiang-ziheng.pdf)). That rendezvous store is a small [[Coordination Services|coordination service]].
 - **Elastic shrink instead of restart.** NCCL 2.27's `ncclCommShrink` excludes failed GPUs from a communicator, with an error mode that aborts in-flight operations, so a framework can continue on fewer ranks instead of tearing everything down ([NVIDIA, Jul 2025](https://developer.nvidia.com/blog/enabling-fast-inference-and-resilient-training-with-nccl-2-27)). Shrinking changes the parallel layout, which is why checkpoints must be reshardable (below).
-- **Placement.** Meta's scheduler places jobs topology-aware, using a "minimum cut" to reduce cross-zone traffic, and MegaScale places data-heavy jobs under one ToR ([Gangidi and Zeng](https://engineering.fb.com/2024/08/05/data-center-engineering/roce-network-distributed-ai-training-at-scale/); [Jiang et al.](https://www.usenix.org/system/files/nsdi24-jiang-ziheng.pdf)). That belongs to [[Cluster Scheduling]].
+- **Placement.** Meta's scheduler places jobs topology-aware, using a "minimum cut" to reduce cross-zone traffic, and MegaScale places data-heavy jobs under one ToR ([Gangidi and Zeng](https://engineering.fb.com/2024/08/05/data-center-engineering/roce-network-distributed-ai-training-at-scale/); [Jiang et al.](https://www.usenix.org/system/files/nsdi24-jiang-ziheng.pdf)). That belongs to [[Cluster Scheduling]], and the placement mechanisms (Slurm blocks, Kueue TAS, Volcano HyperNodes, ComputeDomains) are in [[Gang and Topology-Aware Scheduling]].
 
 ### Checkpointing
 
@@ -480,6 +480,7 @@ Open problems worth tracking:
 - [[Gray and Fail-Slow Failures]] — Stragglers, flapping links and throttled GPUs that slow a lockstep job.
 - [[Silent Data Corruption]] — Wrong answers from accelerators, about one per thousand chips by Meta's 2025 count.
 - [[Cluster Scheduling]] — Topology-aware placement, Slurm and Kubernetes for GPU jobs.
+- [[Gang and Topology-Aware Scheduling]] — Placing whole jobs inside one NVLink domain, rack or block.
 - [[Resource Fairness]] — Sharing GPUs fairly: Themis finish-time fairness, Gavel for mixed GPU types, Kueue and Volcano fair share.
 - [[Reliability Patterns]] — Timeouts and their trade-offs, as with NCCL watchdogs.
 - [[Replication]] — In-memory checkpoint replicas and redundant model state.

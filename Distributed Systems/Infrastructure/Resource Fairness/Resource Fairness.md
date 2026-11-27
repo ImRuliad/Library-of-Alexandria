@@ -474,7 +474,7 @@ FairInference's framing is the cleanest statement of the trade-off in this whole
 | Instantaneous fairness (DRF) | Strategy-proof, memoryless | Unfair to late arrivals when tasks run for hours |
 | Decayed history (fair share) | Fair over days, matches how teams think about budgets | Depends on the half-life; less strategy-proof |
 | Outcome fairness (Themis) | Fair finish times, placement-aware | Needs runtime and slowdown estimates; auctions are complex |
-| Preemption to restore fairness | Quick return of borrowed quota | Lost work, checkpoint overhead, gang re-placement |
+| Preemption to restore fairness | Quick return of borrowed quota | Lost work, checkpoint overhead, gang re-placement ([[Gang and Topology-Aware Scheduling]]) |
 | Locality-aware ordering (DLPM) | Cache hits and throughput | Looser fairness bound (adds the quantum) |
 
 Open problems worth tracking:
@@ -529,6 +529,7 @@ Open problems worth tracking:
 *Fairness is one of the three goals every scheduler balances, so most links here are to the systems that need it.*
 
 - [[Cluster Scheduling]] — DRF's worked example, Slurm fair share and Fair Tree, Kueue and Volcano in the Kubernetes batch stack.
+- [[Gang and Topology-Aware Scheduling]] — All-or-nothing jobs, which make fair shares lumpy.
 - [[GPU Cluster Infrastructure]] — The heterogeneous, topology-sensitive accelerators that break DRF's assumptions.
 - [[Message Queues]] — SQS fair queues and noisy tenants in shared queues.
 - [[Reliability Patterns]] — Load shedding, quotas and retry storms; fairness decides who is shed.

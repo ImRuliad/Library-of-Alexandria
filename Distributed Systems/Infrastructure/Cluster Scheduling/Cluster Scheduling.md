@@ -176,7 +176,7 @@ CPUs are full, so allocation stops: A runs 3 tasks, B runs 2, and both have a do
 
 *Worked example:* 6 free GPUs, and two jobs each need 4 GPUs at once. A task-at-a-time scheduler places 3 workers of job 1 and 3 of job 2. Both are stuck waiting for a fourth GPU that will never free up, and 6 GPUs sit idle. A gang scheduler places all 4 workers of job 1 and keeps job 2 waiting whole.
 
-Omega's paper names the two ways out. Two-level schedulers like Mesos can only gang-schedule by *hoarding* offered resources until enough arrive, which can deadlock; a shared-state scheduler can commit the whole gang in one all-or-nothing transaction ([Schwarzkopf et al., EuroSys 2013](https://cs.brown.edu/~malte/pub/papers/2013-eurosys-omega.pdf)). Kubernetes' scheduler, which places one pod at a time, needed a new API to express gangs at all; see [[#Gang Scheduling for ML on Kubernetes|below]].
+Omega's paper names the two ways out. Two-level schedulers like Mesos can only gang-schedule by *hoarding* offered resources until enough arrive, which can deadlock; a shared-state scheduler can commit the whole gang in one all-or-nothing transaction ([Schwarzkopf et al., EuroSys 2013](https://cs.brown.edu/~malte/pub/papers/2013-eurosys-omega.pdf)). Kubernetes' scheduler, which places one pod at a time, needed a new API to express gangs at all; see [[#Gang Scheduling for ML on Kubernetes|below]]. The deadlock, the three ways to build a gang and topology-aware placement are covered in depth in [[Gang and Topology-Aware Scheduling]].
 
 ## ***How We Got Here***
 ---
@@ -489,7 +489,7 @@ Scale figures and the serving comparison are from Red Hat's Stephen Watt as repo
 
 Open problems worth tracking:
 - **Gangs vs utilization.** Holding GPUs until a whole gang fits idles them; backfill helps only if jobs give honest time limits. Elastic training (Kueue's workload slices) is one answer ([wg-batch](https://groups.google.com/a/kubernetes.io/g/wg-batch/c/63pxFJOeokg)).
-- **Topology.** A training job's speed depends on which GPUs share NVLink or a switch, which flat resource counts can't express; Slurm blocks, Volcano HyperNodes and Kubernetes' topology-aware scheduling are three separate answers. See [[GPU Cluster Infrastructure]].
+- **Topology.** A training job's speed depends on which GPUs share NVLink or a switch, which flat resource counts can't express; Slurm blocks, Volcano HyperNodes and Kubernetes' topology-aware scheduling are three separate answers, compared in [[Gang and Topology-Aware Scheduling]]. See also [[GPU Cluster Infrastructure]].
 - **Devices that misbehave.** A slow or degraded GPU stalls a whole gang. DRA device taints let operators fence it off, but detecting it is still the operator's job ([[Gray and Fail-Slow Failures]], [[Silent Data Corruption]]). The 1.37 gang scheduler can evict whole groups but can't yet release a DRA device from a running claim ([SoftwareSeni](https://www.softwareseni.com/kubernetes-1-37-for-ai-workloads-and-how-to-verify-what-shipped/)).
 - **Control-plane scale.** Twine shards by entitlement, EKS rebuilt etcd; Kubernetes upstream still assumes one etcd group and a serial scheduler ([[Coordination Services]]).
 - **Requests vs usage.** Users over-ask, so schedulers overcommit and autoscale vertically (Borg's 2019 data shows allocations well above capacity); getting it wrong trades waste for OOM kills.
@@ -538,6 +538,7 @@ Open problems worth tracking:
 - [[Distributed Transactions]] — Omega's optimistic, all-or-nothing commits to shared cell state.
 - [[Failure Models]] — Machines and schedulers fail mid-placement; the scheduler must reconcile.
 - [[Partitioning]] — Twine shards its control plane by entitlement.
+- [[Gang and Topology-Aware Scheduling]] — All-or-nothing placement, Slurm blocks and segments, Kueue TAS, Volcano HyperNodes and in-tree placements in depth.
 - [[GPU Cluster Infrastructure]] — The accelerators, interconnects and topology that gang and DRA scheduling serve.
 - [[Gray and Fail-Slow Failures]] — Slow GPUs and nodes that stall whole gangs.
 - [[Silent Data Corruption]] — Bad devices the scheduler must learn to avoid.
