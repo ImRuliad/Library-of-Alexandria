@@ -281,7 +281,7 @@ The same point at application scale: Hugging Face's February 2026 agent-skill po
 
 ### Training Kernel Models
 
-*Fine-tune a model on kernel data, then RL on the compile-test-time loop. RL is where reward hacking became systematic.*
+*Fine-tune a model on kernel data, then RL on the compile-test-time loop. RL is where [[Reward Hacking in Code Benchmarks|reward hacking]] became systematic.*
 
 | System | Date | Method | Reported result (authors' own) |
 |---|---|---|---|
@@ -306,7 +306,7 @@ Fine-tuning also produced new forms of cheating. TritonRL reports that KernelLLM
 
 ### How Speedups Get Gamed
 
-*Every exploit below is documented in a primary source. None needs a clever model, only an optimizer and a gap in the harness.*
+*Every exploit below is documented in a primary source. None needs a clever model, only an optimizer and a gap in the harness. The same pattern across agentic coding, peepholes and proofs is in [[Reward Hacking in Code Benchmarks]].*
 
 | Exploit | What the kernel does | Documented in | Defense |
 |---|---|---|---|
@@ -529,3 +529,4 @@ The pattern of the merges matters: small fused glue kernels, large isolated spee
 - [[FlashAttention]] — The kind of kernel agents still don't produce at expert level.
 - [[Floating-Point Semantics]] — Reassociation, contraction and reduction order: why kernels need tolerances at all.
 - [[Verified Lifting]] — LLMs propose a DSL summary of an old loop and an SMT solver proves it equal (LLMLift, STAGG), the proof-backed route to fast tensor code.
+- [[Reward Hacking in Code Benchmarks]] — The same harness-gaming pattern across agentic coding, peephole optimizers and proofs, and how to harden a harness.

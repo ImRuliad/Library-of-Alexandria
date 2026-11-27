@@ -606,3 +606,4 @@ Open problems as of late 2026:
 - [[Program Synthesis]] — Searching for programs that meet a spec, the engine behind superoptimizers.
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
 - [[Verified Lifting]] — Synthesis with existing code as the spec, aimed at a higher-level DSL instead of cheaper code at the same level.
+- [[Reward Hacking in Code Benchmarks]] — Why test-accepted rewrites get gamed by search and verifier-accepted ones don't.

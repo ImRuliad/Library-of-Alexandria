@@ -529,5 +529,5 @@ A [[JIT Compilation|JIT]] lays out blocks within a compiled method like an ahead
 - [[Microarchitectural Performance Models]] — Models of the front-end costs that layout reduces; uiCA's alignment-sensitive predictions.
 - [[Stack Unwinding and Exception Tables]] — Planned: the unwind metadata every split fragment needs.
 - [[Reproducible Builds]] — Planned: why profile-dependent layout complicates bit-identical builds.
-- [[Reward Hacking in Code Benchmarks]] — Planned: the risks of scoring evolved heuristics by benchmarks.
+- [[Reward Hacking in Code Benchmarks]] — The risks of scoring evolved heuristics by benchmarks.
 - [[Calling Conventions and ABIs]] — Planned: cross-fragment and cross-function jumps must still respect the ABI.

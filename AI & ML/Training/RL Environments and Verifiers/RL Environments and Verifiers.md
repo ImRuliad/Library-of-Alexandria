@@ -470,3 +470,4 @@ Open problems:
 - [[Synthetic Data]] — Planned note: synthetic tasks and generated training data.
 - [[Context Engineering and Agent Memory]] — Planned note: what agents keep in context across long episodes.
 - [[Chain-of-Thought Faithfulness and Monitorability]] — Monitoring reasoning to catch reward hacking, and why the monitor must stay out of the reward.
+- [[Reward Hacking in Code Benchmarks]] — The compilers view: how kernel, peephole and proof optimizers exploit their checkers, and how to harden them.
