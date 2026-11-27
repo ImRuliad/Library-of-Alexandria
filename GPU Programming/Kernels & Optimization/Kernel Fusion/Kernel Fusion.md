@@ -294,7 +294,7 @@ Sources: [Hazy Research](https://hazyresearch.stanford.edu/blog/2025-05-27-no-bu
 | Compute-bound + compute-bound | Nothing to save; can slow down | HFUSE found little benefit fusing two compute-bound kernels |
 | Reductions break parallelism | A reduction in the middle forces sync or a split | Inductor's split reductions; cuDNN allows a reduction only at the epilogue's end |
 | Store vs recompute | Training needs intermediates for backward | FlashAttention and Liger recompute instead of storing |
-| Fusion barriers | Library calls ([[cuBLAS and cuDNN\|cuBLAS, cuDNN]], cuRAND) can't be fused through | XLA |
+| Fusion barriers | Library calls ([[cuBLAS and cuDNN\|cuBLAS, cuDNN]], [[Random Number Generation on GPUs\|cuRAND]]) can't be fused through | XLA |
 | Compile time | Each new fusion is a new kernel to compile and tune | FlexAttention recompiles when captured scalars change |
 | Numerics and debugging | Fused math reorders operations; bugs hide inside one big kernel | FlexAttention is not bitwise identical to FlashAttention; Liger's fused RoPE diverged on non-contiguous gradients |
 | Synchronization | Megakernel barrier counts miscounted → deadlock | Cohere: "Barrier accounting needs explicit invariants and careful testing" |
@@ -349,3 +349,4 @@ Open problems:
 - [[Persistent Kernels and Stream-K]] — Persistent blocks, the launch style megakernels and fused GEMMs build on.
 - [[Device-Side Math Libraries (MathDx)]] — Library FFTs, GEMMs and solvers you call inside a fused kernel.
 - [[Instruction Cache and Code Size on GPUs]] — The code-size cost of fusing many operators into one kernel.
+- [[Random Number Generation on GPUs]] — Counter-based RNG generated inside the consumer kernel, and dropout masks recomputed instead of stored.

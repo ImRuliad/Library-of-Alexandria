@@ -134,7 +134,7 @@ NVIDIA's Warp team measured the effect: for dense linear algebra such as robot f
 | **cuBLASDx** | GEMM (`function::MM`) and triangular solve (TRSM) | Seven float types (FP16, BF16, TF32, FP32, FP64, FP8 e4m3/e5m2) and eight integer types; real or complex; A, B, C precisions can differ ([requirements](https://docs.nvidia.com/cuda/cublasdx/requirements_func.html)) |
 | **cuFFTDx** | 1D FFTs, complex and real, forward and inverse | Block or thread execution; see [[FFT on GPUs]] |
 | **cuSolverDx** | POTRF/POTRS/POSV, GETRF/GETRS/GESV, GEQRF, GELS, HEEV, HEGV, GESVD, BDSVD, GTSV, TRSM | "High performance batched Cholesky, LU, and QR factorizations" ([cuSolverDx](https://docs.nvidia.com/cuda/cusolverdx)) |
-| **cuRANDDx** | XORWOW, MRG32k3a, Philox4_32, PCG, Sobol; uniform, normal, log-normal, Poisson | A "modern replacement" for cuRAND's device API, which the docs call "out-dated and no longer being updated" ([cuRANDDx](https://docs.nvidia.com/cuda/curanddx/)) |
+| **cuRANDDx** ([[Random Number Generation on GPUs\|RNG]]) | XORWOW, MRG32k3a, Philox4_32, PCG, Sobol; uniform, normal, log-normal, Poisson | A "modern replacement" for cuRAND's device API, which the docs call "out-dated and no longer being updated" ([cuRANDDx](https://docs.nvidia.com/cuda/curanddx/)) |
 | **nvCOMPDx** | LZ4 and ANS compression and decompression | Block and warp APIs; output is interchangeable with host nvCOMP ([nvCOMPDx](https://docs.nvidia.com/cuda/nvcompdx/index.html)) |
 
 All need a Turing (SM75) or newer GPU, CUDA 13.0.3 or newer and a C++17 compiler ([MathDx](https://docs.nvidia.com/cuda/mathdx/index.html)).
@@ -373,6 +373,6 @@ MathDx started header-only and is moving to **link-time optimization (LTO)** lib
 - [[Megakernels]] — The far end of fusion.
 - [[GPU Memory Hierarchy]] — Shared memory sizes behind the size limits.
 - [[Roofline Model and Arithmetic Intensity]] — When fusion pays.
-- [[Random Number Generation on GPUs]] — cuRAND, cuRANDDx and counter-based RNG (planned).
+- [[Random Number Generation on GPUs]] — cuRAND, cuRANDDx and counter-based RNG.
 - [[Batched Small-Matrix Linear Algebra]] — Batched solvers across MAGMA, cuSOLVER and cuSolverDx (planned).
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — The host-side cuSOLVER IRS solvers: low-precision LU with FP64 refinement for large systems.

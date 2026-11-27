@@ -279,3 +279,4 @@ For small arrays the bottleneck flips to launch and Python overhead (several mic
 - [[Shared Memory and Bank Conflicts]] — `cuda.shared.array` in Numba.
 - [[Roofline Model and Arithmetic Intensity]] — The bandwidth arithmetic above.
 - [[ROCm and HIP]] — CuPy's AMD backend.
+- [[Random Number Generation on GPUs]] — What `cp.random` and Monte Carlo kernels draw on: cuRAND and counter-based generators.

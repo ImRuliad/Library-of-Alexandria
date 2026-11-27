@@ -469,3 +469,4 @@ Open problems:
 - [[Speculative Decoding]] — Verification is rejection sampling too.
 - [[Mixture of Experts]] — Router top-k over experts.
 - [[Forward Progress and Inter-Block Synchronization]] — Why multi-block barriers need co-residency and are gated on SM count.
+- [[Random Number Generation on GPUs]] — Philox, seeds and offsets behind the random draws a sampler makes.

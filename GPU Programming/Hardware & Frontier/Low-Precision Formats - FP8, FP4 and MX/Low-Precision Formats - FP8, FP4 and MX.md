@@ -254,7 +254,7 @@ The OCP published **MX spec v1.1** on Oct 9, 2026 ([OCP v1.1](https://www.openco
 | Hardware applies scales inside the MMA | Formats differ by vendor (NVFP4 is NVIDIA-only; FP8 variants differed on MI300) |
 
 - **MX vs NVFP4.** NVFP4's smaller block and finer scale are more accurate; MX is an open multi-vendor standard. AMD's MI355X does not list NVFP4, so 4-bit checkpoints are not fully portable.
-- **Training below FP8.** NVFP4 pretraining works at 12B with careful recipes (16×16 random Hadamard transforms on weight-gradient inputs, stochastic rounding of gradients, 16×16 2D weight scaling, and about 16% of linear layers kept in BF16); whether it holds at frontier scale without loss is still being tested.
+- **Training below FP8.** NVFP4 pretraining works at 12B with careful recipes (16×16 random Hadamard transforms on weight-gradient inputs, stochastic rounding of gradients (the random bits come from an in-kernel generator; see [[Random Number Generation on GPUs]]), 16×16 2D weight scaling, and about 16% of linear layers kept in BF16); whether it holds at frontier scale without loss is still being tested.
 - **Scale overhead in kernels.** Loading, laying out and copying scale factors into Tensor Memory is extra work per K step; small GEMMs (decode, MoE experts) feel it most.
 - **Accumulation.** Hopper's limited FP8 accumulation precision forced software promotion; any future narrower accumulator would reopen the issue.
 - **Format sprawl.** E4M3, E5M2, E3M2, E2M3, E2M1, E8M0, UE4M3, now E5M3: every new format needs conversion instructions, library kernels and framework support on every vendor.
@@ -296,3 +296,4 @@ The OCP published **MX spec v1.1** on Oct 9, 2026 ([OCP v1.1](https://www.openco
 - [[AI Accelerators]] — Low-precision support beyond GPUs.
 - [[Floating-Point Emulation on Tensor Cores]] — Using these formats to emulate FP64 and FP32.
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — Using FP16, BF16 and TF32 factorizations for FP64-accurate solves, and why HPL-MxP stops at 16 bits.
+- [[Random Number Generation on GPUs]] — The random bits behind stochastic rounding and Blackwell's `.rs` convert instructions.
