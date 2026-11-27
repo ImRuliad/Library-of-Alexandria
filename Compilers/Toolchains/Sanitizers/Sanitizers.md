@@ -660,7 +660,7 @@ xychart-beta
 - [[WebAssembly]] — Linear-memory safety and hardware tagging proposals.
 - [[Garbage Collection]] — The other answer to use-after-free: never free memory that is still reachable.
 - [[Reference Counting and Reuse]] — Deterministic freeing without dangling pointers.
-- [[Bounds Check Elimination]] — Planned: proving checks redundant, the same problem ASan-- attacks.
+- [[Bounds Check Elimination]] — Proving checks redundant, the same problem ASan-- attacks.
 - [[Concurrency Memory Models]] — Planned: happens-before and data races, the semantics TSan checks.
 - [[Stack Unwinding and Exception Tables]] — Planned: the unwinding every sanitizer report depends on.
 - [[Linear and Uniqueness Types]] — Planned: static ownership that rules out use-after-free at compile time.

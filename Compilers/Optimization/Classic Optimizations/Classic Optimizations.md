@@ -495,3 +495,4 @@ Open problems:
 - [[Compiler, Assembler, Linker, and Loader]] — The owner's note on the C build stages around the optimizer.
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
+- [[Bounds Check Elimination]] — Redundancy elimination and code motion specialized to array range checks.

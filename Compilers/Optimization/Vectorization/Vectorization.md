@@ -509,3 +509,4 @@ The TSVC2 study found indirect accesses defeated GCC and Clang on all 8 such loo
 - [[AI Accelerators]] — Hardware that goes beyond SIMD to matrix units.
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages that produce the assembly shown here.
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
+- [[Bounds Check Elimination]] — In-loop range checks block vectorization; removing them is often what lets a loop vectorize.

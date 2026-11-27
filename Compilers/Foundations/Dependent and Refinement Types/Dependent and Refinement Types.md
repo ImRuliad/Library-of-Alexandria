@@ -585,3 +585,4 @@ Open problems:
 - [[Translation Validation]] — Planned: checking compiler output per run, the other road to trusting `native_decide`-style computation.
 - [[RL for Reasoning]] — How AlphaProof-style provers are trained against the Lean checker.
 - [[Proof Assistant Kernels]] — LCF and de Bruijn kernels, independent and verified checkers, and the 2026 Lean kernel bugs in depth.
+- [[Bounds Check Elimination]] — The compiler-analysis route to the same goal DML's types reach statically.

@@ -87,7 +87,7 @@ Rice's theorem says any non-trivial question about what a program computes is un
 
 | Who asks | Question | Abstraction that answers it |
 |---|---|---|
-| Bounds-check elimination | Is `i` always in $[0, n)$ here? | Intervals, or $i$ relative to $n$ (octagons) |
+| [[Bounds Check Elimination]] | Is `i` always in $[0, n)$ here? | Intervals, or $i$ relative to $n$ (octagons) |
 | Overflow and RTE proofs (Astrée, Frama-C) | Can this `int` addition overflow on any input? | Intervals, octagons, filter domains |
 | [[Vectorization]] | Is this pointer 16-byte aligned on every iteration? | Congruences ($p \equiv 0 \bmod 16$), known bits |
 | InstCombine | Is bit 1 of `y` always zero? | Known bits |

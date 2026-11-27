@@ -422,7 +422,7 @@ Duboscq et al. measured Graal's deopt metadata at **1.7× to 1.9× the size of t
 - [[Garbage Collection]] — Safepoints and stack maps share machinery with deopt metadata.
 - [[LLVM]] — `deopt` bundles, guards, guard widening and loop predication.
 - [[Loop Optimizations]] — Guard hoisting and OSR entry at loop headers.
-- [[Bounds Check Elimination]] — Planned: speculative range checks and loop predication.
+- [[Bounds Check Elimination]] — Speculative range checks and loop predication.
 - [[Classic Optimizations]] — Speculative constant propagation and dead-code elimination after guards.
 - [[Compiler Testing and Fuzzing]] — Finding deopt correctness and performance bugs.
 - [[Verified Compilers]] — Formal models of speculation and deoptimization.
