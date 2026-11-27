@@ -51,7 +51,7 @@ sources:
   - https://lilianweng.github.io/posts/2024-11-28-reward-hacking/
   - https://rlhfbook.com/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -385,7 +385,7 @@ A September 2026 Hugging Face review of fifteen reports from thirteen labs (Oct 
 - **Coding dominates**, with search, office-style tasks (spreadsheets, slides, mock email and chat apps) and, for Kimi K3, GPU kernel tasks.
 - **The harness is the environment.** Kimi K3 trains inside reconstructions of agent harnesses such as Claude Code and Codex; Liquid AI captures token-level trajectories from shipped harnesses.
 - **Scale:** GLM-5 built over 10k verifiable environments across 9 programming languages; Cursor reports "hundreds of thousands of concurrent sandboxed coding environments" for Composer; DeepSeek describes hundreds of thousands of sandboxes per cluster. DeepSeek-V3.2 synthesized 1,827 environments and about 85,000 agentic prompts ([DeepSeek-AI, Dec 2025](https://arxiv.org/html/2512.02556)).
-- **The bottleneck moved.** Zhipu: "much of the difficulty in scaling post-training moves from the model to the environment", and Nathan Lambert reports $10M+ spent on single environments at top labs (both as quoted in the HF review).
+- **The bottleneck moved.** Zhipu: "much of the difficulty in scaling post-training moves from the model to the environment", and Nathan Lambert reports $10M+ spent on single environments at top labs (both as quoted in the HF review). How environments and their verifiers are built, validated and hacked is in [[RL Environments and Verifiers]].
 
 #### **Rewards Beyond Verifiers**
 
@@ -454,7 +454,7 @@ Open problems:
 - **Credit assignment over long horizons.** One reward at the end of a 100-turn agent episode says little about which step mattered.
 - **Ceilings.** RL curves are sigmoids with a recipe-dependent ceiling ([Khatri et al.](https://arxiv.org/html/2510.13786)), and evidence is mixed on whether RL expands what a model can solve or only how reliably it solves it ([Yue et al.](https://arxiv.org/abs/2504.13837); [Cheng et al.](https://arxiv.org/abs/2610.04158)).
 - **Numerics.** Training and inference engines disagree, worst on MoE models; there is no settled fix ([Yu et al., 2026](https://arxiv.org/pdf/2609.32444)).
-- **Environments are the new data.** Building and running verifiable environments costs more than the algorithm, and they are hard to share or replicate ([HF, Sep 2026](https://huggingface.co/blog/sergiopaniego/rl-environments-2026)).
+- **Environments are the new data.** Building and running verifiable environments costs more than the algorithm, and they are hard to share or replicate ([HF, Sep 2026](https://huggingface.co/blog/sergiopaniego/rl-environments-2026)); see [[RL Environments and Verifiers]].
 
 ## ***Resources***
 ---
@@ -501,6 +501,7 @@ Open problems:
 ## Related Notes
 
 - [[Reasoning Models]] — What RL-trained models do at inference: long chains of thought and test-time compute.
+- [[RL Environments and Verifiers]] — The tasks, sandboxes and verifiers that produce the rewards, and how they get hacked.
 - [[Distillation]] — How reasoning learned with RL is distilled into small models.
 - [[Scaling Laws]] — Pretraining laws, and where RL's sigmoid compute curves fit beside them.
 - [[Mixture of Experts]] — Why MoE routing makes RL importance ratios unstable, and the routing-replay fixes.

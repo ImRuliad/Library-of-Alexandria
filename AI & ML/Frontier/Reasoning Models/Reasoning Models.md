@@ -46,7 +46,7 @@ sources:
   - https://www.standardmedia.co.ke/business/article/2001553533/ai-catches-up-with-humans-to-score-100pc-at-top-maths-contest
   - https://lilianweng.github.io/posts/2025-05-01-thinking/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -120,7 +120,7 @@ Why it works, in plain terms: every generated token is another forward pass whos
 
 #### **Verifiers and Best-of-N**
 
-A **verifier** is a model trained to judge whether a solution is correct. At test time you sample $N$ candidates and return the one the verifier scores highest: **best-of-N**. Cobbe et al. introduced GSM8K (8.5K problems) to study this and found verification "scales more effectively with increased data than a finetuning baseline" ([Cobbe et al., Oct 2021](https://arxiv.org/abs/2110.14168)). If the verifier were perfect, best-of-N would succeed whenever any one of the $N$ samples is right.
+A **verifier** is a model trained to judge whether a solution is correct. At test time you sample $N$ candidates and return the one the verifier scores highest: **best-of-N**. Cobbe et al. introduced GSM8K (8.5K problems) to study this and found verification "scales more effectively with increased data than a finetuning baseline" ([Cobbe et al., Oct 2021](https://arxiv.org/abs/2110.14168)). If the verifier were perfect, best-of-N would succeed whenever any one of the $N$ samples is right. How verifiers fail, and how they became the reward inside RL environments, is in [[RL Environments and Verifiers]].
 
 #### **Outcome vs Process Reward Models**
 
@@ -426,6 +426,7 @@ Sources for unlinked rows: [OpenAI o1](https://openai.com/index/learning-to-reas
 
 - [[Scaling Laws]] — Test-time compute is the second scaling axis; train-to-test laws push pretraining toward overtraining.
 - [[RL for Reasoning]] — The training algorithms (PPO, GRPO and successors) and reward design behind reasoning models.
+- [[RL Environments and Verifiers]] — The tasks, sandboxes and checkers reasoning models are trained in, and how verifiers fail.
 - [[Distillation]] — How reasoning traces from large models make small models strong reasoners (R1-Distill).
 - [[Long Context]] — Thinking chains consume the context window; long outputs need long context.
 - [[KV Cache]] — Long generations make the cache, not the weights, the memory bottleneck.
