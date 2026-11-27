@@ -484,3 +484,4 @@ Open problems worth tracking:
 - [[Disaggregated Systems]] — Compute separated from storage, as in Azure's virtual-disk gray failures.
 - [[Time and Clocks]] — Timeouts and the limits of what silence can tell you.
 - [[Hot Keys and Cache Stampedes]] — How a slow or lost cache becomes a database overload that sustains itself.
+- [[Erasure Coding]] — Slow or missing fragments turn reads into degraded reads that decode from $k$ others.

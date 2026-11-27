@@ -173,7 +173,7 @@ $$
 
 *In words:* data is lost only when more fragments fail than the code can absorb. *Worked example* with $p = 0.01$ (a deliberately pessimistic toy number): three replicas lose data with probability $p^3 = 1.0 \times 10^{-6}$; RS (6, 3) with $n = 9$ gives about $1.2 \times 10^{-6}$ at half the storage; RS (10, 4) with $n = 14$ gives about $1.9 \times 10^{-7}$, five times safer than three replicas at under half the storage. Real systems also have to worry about correlated failures (a rack, a zone, a bad firmware batch), which is why fragments are spread across failure domains and why repair speed matters as much as the code ([[Failure Models]]).
 
-The catch is the last column of the table. Rebuilding one lost fragment of an RS (12, 4) stripe reads 12 fragments over the network, which is the cost Azure's Local Reconstruction Codes were designed to cut (see [[#Erasure Coding in Production|Erasure Coding in Production]]).
+The catch is the last column of the table. Rebuilding one lost fragment of an RS (12, 4) stripe reads 12 fragments over the network, which is the cost Azure's Local Reconstruction Codes were designed to cut (see [[#Erasure Coding in Production|Erasure Coding in Production]], and [[Erasure Coding]] for the other repair-efficient codes).
 
 ## ***How We Got Here***
 ---
@@ -545,3 +545,4 @@ Open problems worth tracking:
 - [[Time and Clocks]] — Why lease timeouts still need bounded clock drift.
 - [[Stream Processing]] — Checkpoints and, since Flink 2.0, primary operator state kept in object storage.
 - [[Databases on Object Storage]] — Engines whose only durable state is in an object store: commit protocols, batching, caching and GC.
+- [[Erasure Coding]] — Reed-Solomon, LRCs, regenerating codes, wide stripes and repair in depth.

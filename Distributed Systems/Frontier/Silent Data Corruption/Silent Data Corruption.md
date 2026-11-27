@@ -215,7 +215,7 @@ timeline
 
 The NetApp studies are the reason storage systems checksum everything:
 - **Checksum mismatches** (the drive returned the wrong bytes): 0.66% of nearline disks and 0.06% of enterprise disks developed at least one in their first 17 months. Mismatches cluster: given one on a disk, the chance of more is about 0.6, and one nearline system had 92 disks with mismatches ([Bairavasundaram et al., FAST 2008](https://www.cs.utoronto.ca/~bianca/papers/fast08.pdf)).
-- **Where they are found:** scrubbing found about 49% of mismatches on nearline disks and 73% on enterprise disks; about 8% were found only during RAID reconstruction, which is the worst time, because the redundancy needed to repair them is already being used.
+- **Where they are found:** scrubbing found about 49% of mismatches on nearline disks and 73% on enterprise disks; about 8% were found only during RAID reconstruction ([[Erasure Coding]]), which is the worst time, because the redundancy needed to repair them is already being used.
 - **Latent sector errors** show strong temporal locality: 40% to 80% arrive within a minute of the previous one ([Bairavasundaram et al., SIGMETRICS 2007](https://pages.cs.wisc.edu/~remzi/Classes/739/Fall2015/Papers/latent-sigmetrics07.pdf)).
 
 **End-to-end checksums.** ZFS's designers put it as "never, ever trust the underlying hardware": compute the checksum while the data is still in the application's fault domain and store data and checksum separately, so one failure can't destroy both ([Bonwick and Moore, ACM Queue 2007](https://queue.acm.org/detail.cfm?id=1317400)). ZFS keeps each block's checksum in its parent block pointer, so the tree of pointers checks itself from the root down ([Zhang et al., FAST 2010](https://static.usenix.org/events/fast10/tech/full_papers/zhang.pdf)).
@@ -501,3 +501,4 @@ Open problems worth tracking:
 - [[LSM Trees]] — Storage engines where on-disk corruption must be detected and handled.
 - [[Reliability Patterns]] — Checkpointing, isolation and retries around unreliable components.
 - [[FlashAttention]] — Its recomputation and invariants give AEGIS cheap SDC checks.
+- [[Erasure Coding]] — Checksums turn corrupt fragments into erasures that parity can rebuild.

@@ -439,3 +439,4 @@ Open problems worth tracking:
 - [[Byzantine Fault Tolerance]] — Consensus when nodes can lie, not just stop.
 - [[Silent Data Corruption]] — Faults that break Raft's crash-only assumption.
 - [[Write-Ahead Logging]] — The local log each replica fsyncs, and what happens when an entry is corrupted.
+- [[Erasure Coding]] — CRaft, which stores coded fragments of each log entry and falls back to full copies.

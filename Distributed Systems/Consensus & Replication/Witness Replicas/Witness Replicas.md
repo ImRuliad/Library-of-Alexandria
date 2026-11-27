@@ -374,3 +374,4 @@ Sources: [Spanner replication](https://docs.cloud.google.com/spanner/docs/replic
 - [[Formal Methods in Practice]] — Checking election and reconfiguration rules with extra roles.
 - [[Deterministic Simulation Testing]] — Exercising failover paths a witness only sees during failures.
 - [[Write-Ahead Logging]] — What a log replica stores, and why a log is enough to rebuild state.
+- [[Erasure Coding]] — CRaft and RS-Paxos: storing coded fragments of each entry instead of full copies.

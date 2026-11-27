@@ -394,3 +394,4 @@ Open problems worth tracking:
 - [[Formal Methods in Practice]] — TLA+ and proofs for replication protocols like Accord.
 - [[Anti-Entropy and Repair]] — Hinted handoff, read repair and Merkle-tree repair in detail.
 - [[Cluster Metadata and Routing]] — How coordinators learn replica sets, and Cassandra's epoch-staged ownership changes.
+- [[Erasure Coding]] — Durability from coded fragments instead of full copies, and CRaft's coded Raft log.
