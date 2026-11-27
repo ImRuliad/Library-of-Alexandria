@@ -7,7 +7,7 @@ tags:
   - gpu
   - kubernetes
   - slurm
-status: draft
+status: complete
 sources:
   - https://www.cse.huji.ac.il/~feit/papers/Cosched95IJPP.pdf
   - https://cs.brown.edu/~malte/pub/papers/2013-eurosys-omega.pdf
