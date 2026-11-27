@@ -50,7 +50,7 @@ sources:
   - https://arxiv.org/abs/2604.13290v2
   - https://pldi26.sigplan.org/track/pldi-2026-papers
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -89,7 +89,7 @@ updated: 2026-11-26
 - **Specs and search.** A synthesizer needs a specification, a space of candidate programs (usually a grammar or DSL), and a search strategy. The SyGuS formulation makes all three explicit: find an expression in grammar $L$ that makes formula $\phi$ valid in a theory $T$ ([Alur et al., FMCAD 2013](https://web.eecs.umich.edu/~weimerw/2022-481W/readings/Alur13.pdf)).
 - **The core algorithms.** Bottom-up *enumeration* with *observational equivalence* (keep one program per behaviour on the examples), *CEGIS* (synthesize against a few inputs, let an SMT solver find a counterexample, repeat), *sketching* (fill `??` holes in a partial program), and *top-down deduction* (push the spec into sub-specs, as in FlashMeta and Synquid).
 - **It already ships.** Flash Fill has been in Excel since Excel 2013 and its PROSE descendants sit in Power Query, Power BI and Visual Studio; inside compilers, synthesis finds peephole rules (Souper, Hydra), rewrite rules (Ruler, Enumo), instruction selectors (Hydride) and abstract transformers (POPL 2026's NiceToMeetYou).
-- **Guaranteed vs. filtered.** CEGIS with a full verifier, deductive synthesis and SMT-checked lifting give a proof; PBE, AlphaCode-style "sample a million, keep what passes the tests", and evaluator-scored search like AlphaEvolve do not. My own cvc5 run below shows the gap: given only two examples, the solver returns `f(x) = x`.
+- **Guaranteed vs. filtered.** CEGIS with a full verifier, deductive synthesis and SMT-checked [[Verified Lifting|lifting]] give a proof; PBE, AlphaCode-style "sample a million, keep what passes the tests", and evaluator-scored search like AlphaEvolve do not. My own cvc5 run below shows the gap: given only two examples, the solver returns `f(x) = x`.
 - **As of November 2026.** Classic search is still advancing (POPL 2026 oriented metrics, AMaze; PLDI 2026 Presynthesis), the last SyGuS-Comp listed on its site is 2019, and LLMs are now competitive synthesizers *when paired with a checker*: GPT-5 solved 143 of 148 SyGuS benchmarks against cvc5's 137, but cvc5 was about 16x faster ([Egolf et al., 2026](https://arxiv.org/html/2603.20264v1)).
 
 ## ***The Problem***
@@ -463,7 +463,7 @@ Three generations, roughly:
 2. **Sample massively, filter by tests.** AlphaCode generated up to a million samples per competitive-programming problem, filtered them on the problem's example tests (removing about 99%), clustered the survivors by behaviour on generated inputs, and submitted at most 10; it averaged a ranking around the top 54.3% in 10 Codeforces contests ([Li et al., 2022](https://ar5iv.labs.arxiv.org/html/2203.07814)). This is observational equivalence reused as a de-duplication step, but there is no verifier, so it sits in the "filtered by tests" row.
 3. **LLM plus formal checker.** The model proposes, a solver checks, counterexamples go back:
    - **LLM-guided enumeration.** Li, Parsert and Polgreen prompt an LLM for SyGuS solutions, turn its (often wrong) answers into a probabilistic grammar that weights an enumerator inside CEGIS, or let the enumerator call the LLM for helper functions mid-search. On 609 SyGuS benchmarks, the LLM alone solved 303, cvc5 415, and "LLM first, then the LLM-weighted A* enumerator" 488 ([CAV 2024](https://arxiv.org/abs/2403.03997v2)).
-   - **Verified lifting.** LLMLift has GPT-4 write a program summary in a Python-embedded IR plus loop invariants, proves equivalence with an SMT-based checker, then pattern-matches the summary into a DSL (Spark, TACO, a switch language, a tensor IR). It solved 44 of 45 Spark benchmarks against MetaLift's 40 and all 60 TACO benchmarks against C2TACO's 57, without the roughly 1,000 lines of hand-written search-space description the symbolic tools needed ([Bhatia et al., NeurIPS 2024](https://arxiv.org/html/2406.03003v1)).
+   - **[[Verified Lifting]].** LLMLift has GPT-4 write a program summary in a Python-embedded IR plus loop invariants, proves equivalence with an SMT-based checker, then pattern-matches the summary into a DSL (Spark, TACO, a switch language, a tensor IR). It solved 44 of 45 Spark benchmarks against MetaLift's 40 and all 60 TACO benchmarks against C2TACO's 57, without the roughly 1,000 lines of hand-written search-space description the symbolic tools needed ([Bhatia et al., NeurIPS 2024](https://arxiv.org/html/2406.03003v1)).
    - **Evaluator-driven evolution.** AlphaEvolve pairs Gemini proposals with automated evaluators and an evolutionary database; it found a 48-multiplication algorithm for 4x4 complex matrices, a Borg scheduling heuristic recovering about 0.7% of Google's compute, and a 23% faster Gemini matmul kernel ([DeepMind, May 2025](https://deepmind.google/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/)). Whether a result is *proved* depends entirely on the evaluator: a matrix-multiplication identity can be checked exactly, a scheduling heuristic only scored.
 
 ```mermaid
@@ -604,3 +604,4 @@ Open problems as of late 2026:
 - [[Compiler Testing and Fuzzing]] — Test-based checking, and finding bugs in verifiers and synthesizers.
 - [[LLVM]] — Where synthesized peepholes and transformers end up.
 - [[MLIR]] — Hydride's input and NiceToMeetYou's SMT dialect.
+- [[Verified Lifting]] — Synthesis with legacy code as the spec and a DSL as the target: STNG, Dexter, MetaLift, Tenspiler, LLMLift, STAGG.

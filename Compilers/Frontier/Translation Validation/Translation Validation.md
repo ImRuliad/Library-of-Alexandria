@@ -571,3 +571,4 @@ Open problems:
 - [[Pointer and Alias Analysis]] — The optimizations Alive2's memory model has to justify.
 - [[Proof Assistant Kernels]] — Independent re-checking of proofs, the same per-run idea applied to proof assistants.
 - [[Floating-Point Semantics]] — What IEEE rules and fast-math flags let an FP rewrite do, and how Alive-FP checked them.
+- [[Verified Lifting]] — Proving a lifted DSL program equal to the legacy loop it replaces, the same per-output check aimed up an abstraction level.

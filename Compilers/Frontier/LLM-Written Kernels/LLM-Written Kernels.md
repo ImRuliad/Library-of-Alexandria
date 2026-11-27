@@ -528,3 +528,4 @@ The pattern of the merges matters: small fused glue kernels, large isolated spee
 - [[ML Compilers]] — Inductor and XLA, the baselines agents must beat.
 - [[FlashAttention]] — The kind of kernel agents still don't produce at expert level.
 - [[Floating-Point Semantics]] — Reassociation, contraction and reduction order: why kernels need tolerances at all.
+- [[Verified Lifting]] — LLMs propose a DSL summary of an old loop and an SMT solver proves it equal (LLMLift, STAGG), the proof-backed route to fast tensor code.

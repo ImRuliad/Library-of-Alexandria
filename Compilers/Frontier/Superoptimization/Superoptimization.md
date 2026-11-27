@@ -605,3 +605,4 @@ Open problems as of late 2026:
 - [[Register Allocation]] — Another place where optimal solvers serve mainly as a yardstick.
 - [[Program Synthesis]] — Searching for programs that meet a spec, the engine behind superoptimizers.
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
+- [[Verified Lifting]] — Synthesis with existing code as the spec, aimed at a higher-level DSL instead of cheaper code at the same level.

@@ -47,7 +47,7 @@ sources:
   - https://hc32.hotchips.org/assets/program/conference/day2/HotChips2020_ML_Training_Cerebras_v03.pdf
   - https://arxiv.org/abs/2601.17754
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -461,3 +461,4 @@ The lesson: for [[LLM Serving]], the heavy kernels ([[FlashAttention]], MoE GEMM
 - [[LLM Serving]] — Where `torch.compile` and CUDA graphs meet vLLM and SGLang.
 - [[Transformer]] — The workload most of these optimizations target.
 - [[Mixture of Experts]] — Dynamic routing that strains static-shape compilers.
+- [[Verified Lifting]] — Getting legacy C++ loops into tensor frameworks in the first place, with a proof (Tenspiler, C2TACO, STAGG).
