@@ -39,7 +39,7 @@ sources:
   - https://docs.nvidia.com/deeplearning/cudnn/latest/fe-oss-apis/dsa.html
   - https://www.nvidia.com/en-us/data-center/h100/
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -458,3 +458,4 @@ Net: in late 2026, [[Quantization]] and [[Low-Precision Formats - FP8, FP4 and M
 - [[Sparse Attention]] — Attention-side sparsity and its kernels.
 - [[Quantization]] — The model-compression alternative to pruning.
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — GMRES as the refinement engine for dense mixed-precision solves.
+- [[Batched Small-Matrix Linear Algebra]] — Batched dense factorizations for frontal matrices and block preconditioners, and cuDSS batches.

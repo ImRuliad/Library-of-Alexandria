@@ -36,7 +36,7 @@ sources:
   - https://newreleases.io/project/github/NVIDIA/cutlass/release/v2.8.0
   - https://docs.nvidia.com/cutlass/4.6.0/CHANGELOG.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -415,6 +415,6 @@ The common pattern is the same as for MoE: replace a padded dense tensor with pa
 - [[Mixture of Experts]] — The architecture that made grouped GEMM central.
 - [[LLM Serving]] — Ragged decode batches and paged KV.
 - [[FlashAttention]] — Variable-length attention with `cu_seqlens`.
-- [[Batched Small-Matrix Linear Algebra]] — Variable-size batched factorizations (planned).
+- [[Batched Small-Matrix Linear Algebra]] — Variable-size batched factorizations (MAGMA vbatched) and per-thread vs per-block solvers.
 - [[Deterministic and Batch-Invariant Kernels]] — Reproducible ragged reductions (planned).
 - [[GPU-Initiated Communication with NVSHMEM]] — Device-side dispatch for fused MoE kernels (planned).

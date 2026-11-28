@@ -40,7 +40,7 @@ sources:
   - https://indico.cern.ch/event/1538409/contributions/6521976/attachments/3096181/5485165/cern-talk.pdf
   - https://arxiv.org/html/2601.08082v3
 created: 2026-11-27
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -431,7 +431,7 @@ The two compose: the FP64 residuals and the GMRES steps in refinement are themse
 
 - **Conditioning sets the ceiling.** Classical refinement with an FP16 factorization handles $\kappa_\infty$ up to about $10^4$; GMRES-IR raises that, but iteration counts climb with difficulty (4 to 83 in Haidar et al.'s tests), and past some point the fallback to full FP64 runs and you pay for both ([Haidar et al. 2020](https://pmc.ncbi.nlm.nih.gov/articles/PMC7735315)). You usually do not know $\kappa$ in advance, so the fallback is a necessity, not a corner case.
 - **Memory overhead.** You need the original $A$ in FP64 (for residuals) *and* the low-precision factors, plus GMRES workspace. For a single solve on a memory-limited GPU that can be the deciding cost. HPL-MxP sidesteps it at scale by storing the matrix in BF16 and regenerating what it needs, which a real application usually cannot do.
-- **Small problems do not benefit.** The $O(n^2)$ refinement and launch overhead only disappear behind the $O(n^3)$ factorization for large $n$; the Cholesky study above saw no gain below $n = 8192$. Batched small systems are a different problem (see [[Device-Side Math Libraries (MathDx)]]).
+- **Small problems do not benefit.** The $O(n^2)$ refinement and launch overhead only disappear behind the $O(n^3)$ factorization for large $n$; the Cholesky study above saw no gain below $n = 8192$. Batched small systems are a different problem (see [[Batched Small-Matrix Linear Algebra]] and [[Device-Side Math Libraries (MathDx)]]).
 - **Many right-hand sides amortize the factor.** One factorization serves every column of $B$, but each column needs its own refinement, so the refinement share grows with `nrhs`. The cuSOLVER docs advise taking "the number of right-hand sides, the size of the matrix as well as the convergence rate into account."
 - **Pivoting.** Real matrices usually need partial pivoting. cuSOLVER's IRS factorizations pivot; HPL-MxP's do not, because its generator guarantees they need not. That is one reason HPL-MxP speedups overstate what a general solver gets.
 - **What the benchmark measures.** At large $N$ the $N^3$ factorization dominates, so HPL-MxP mostly measures 16-bit GEMM throughput; halving the precision roughly doubles the score while solving the same problem, which is why the 16-bit floor was needed ([Lockwood](https://glennklockwood.com/garden/HPL-MxP)). A machine with weak FP64 and strong FP16 looks great, which is informative about AI-style hardware but says little about vector-bound FP64 codes.
@@ -477,6 +477,7 @@ The two compose: the FP64 residuals and the GMRES steps in refinement are themse
 - [[Low-Precision Formats - FP8, FP4 and MX]] — FP16, BF16, TF32 and FP8 layouts, and why range and precision trade off.
 - [[cuBLAS and cuDNN]] — The GEMMs inside the factorization, and cuBLAS's emulation modes.
 - [[Device-Side Math Libraries (MathDx)]] — cuSolverDx for small and batched factorizations inside your own kernels.
+- [[Batched Small-Matrix Linear Algebra]] — Millions of small factorizations at once, the opposite end from HPL-MxP.
 - [[Tiled Matrix Multiplication (GEMM)]] — The trailing-matrix update that is most of the LU's work.
 - [[Sparse Linear Algebra on GPUs]] — Krylov solvers like GMRES, and the sparse codes refinement does not reach.
 - [[Roofline Model and Arithmetic Intensity]] — Why the $O(n^3)$ factorization is compute-bound and the $O(n^2)$ refinement is bandwidth-bound.

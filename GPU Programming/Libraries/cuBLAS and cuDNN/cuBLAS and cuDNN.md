@@ -38,7 +38,7 @@ sources:
   - https://siboehm.com/articles/22/CUDA-MMM
   - https://www.nvidia.com/en-us/data-center/h100/
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -266,7 +266,7 @@ Many small GEMMs waste a GPU if launched one by one. cuBLAS offers three batch f
 | Strided batched | `cublasGemmStridedBatchedEx` | All the same; matrix $i$ at `base + i*stride` | Per-head attention matmuls |
 | Grouped | `cublas<t>gemmGroupedBatched`, `cublasGemmGroupedBatchedEx`; cuBLASLt grouped layouts | Different sizes, transposes and scales per group, one launch | [[Mixture of Experts]] layers where each expert gets a different number of tokens |
 
-NVIDIA describes grouped GEMM as "a generalization of the batched APIs". It matters most for MoE: each expert's GEMM has its own token count ([[Grouped GEMM and Ragged Batches]]). In cuBLAS 12.5, for MoE generation with batch sizes 8 and 64 in FP16, the grouped API ran about 1.2x faster than looping over batched GEMM calls ([NVIDIA, Jun 2024](https://developer.nvidia.com/blog/introducing-grouped-gemm-apis-in-cublas-and-more-performance-updates)). CUDA 13.1 added experimental grouped GEMM to cuBLASLt with per-group layouts (`cublasLtGroupedMatrixLayoutCreate`), per-batch FP8 scaling and device-side $\alpha$/$\beta$; 13.2 extended it to MXFP8 and NVFP4; 13.4 added dynamic scheduling on Blackwell data-center GPUs for "up to 20%" gains at large group counts ([CUDA 13.4 notes](https://docs.nvidia.com/cuda/archive/13.4.2/cuda-toolkit-release-notes/index.html)). Grouped GEMM also produced most of 2026's correctness patches (see [[#Trade-offs & Open Problems|Trade-offs]]).
+NVIDIA describes grouped GEMM as "a generalization of the batched APIs". It matters most for MoE: each expert's GEMM has its own token count ([[Grouped GEMM and Ragged Batches]]). In cuBLAS 12.5, for MoE generation with batch sizes 8 and 64 in FP16, the grouped API ran about 1.2x faster than looping over batched GEMM calls ([NVIDIA, Jun 2024](https://developer.nvidia.com/blog/introducing-grouped-gemm-apis-in-cublas-and-more-performance-updates)). CUDA 13.1 added experimental grouped GEMM to cuBLASLt with per-group layouts (`cublasLtGroupedMatrixLayoutCreate`), per-batch FP8 scaling and device-side $\alpha$/$\beta$; 13.2 extended it to MXFP8 and NVFP4; 13.4 added dynamic scheduling on Blackwell data-center GPUs for "up to 20%" gains at large group counts ([CUDA 13.4 notes](https://docs.nvidia.com/cuda/archive/13.4.2/cuda-toolkit-release-notes/index.html)). Grouped GEMM also produced most of 2026's correctness patches (see [[#Trade-offs & Open Problems|Trade-offs]]). cuBLAS also has batched LU, QR and least-squares routines (`getrfBatched`, `geqrfBatched`, `gelsBatched` and friends); [[Batched Small-Matrix Linear Algebra]] covers those and when MAGMA or cuSolverDx beats them.
 
 ### cuBLASXt, cuBLASMp and cuBLASDx
 
@@ -457,4 +457,5 @@ In PyTorch, `torch.use_deterministic_algorithms(True)` makes PyTorch use determi
 - [[Profiling with Nsight Compute and Nsight Systems]] — How to see which library kernel actually ran.
 - [[GEMM Autotuning and Kernel Selection]] — Heuristics, `CUBLAS_GEMM_AUTOTUNE`, TunableOp and model-pruned tuning in depth.
 - [[Device-Side Math Libraries (MathDx)]] — cuBLASDx and cuSolverDx: BLAS and solvers called inside your own kernel.
+- [[Batched Small-Matrix Linear Algebra]] — cuBLAS and cuSOLVER batched factorizations, and the MAGMA and cuSolverDx alternatives.
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — cuSOLVER's IRS solvers, which run their LU on low-precision cuBLAS GEMMs and refine in FP64.
