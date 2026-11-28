@@ -37,7 +37,7 @@ sources:
   - https://epoch.ai/gradient-updates/state-of-rl-envs
   - https://newsletter.semianalysis.com/p/rl-environments-and-rl-for-science
 created: 2026-11-27
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -468,6 +468,6 @@ Open problems:
 - [[Distillation]] — Environments also produce successful trajectories used for supervised fine-tuning and distillation.
 - [[Long Context]] — Agent rollouts run to hundreds of thousands of tokens.
 - [[Synthetic Data]] — Planned note: synthetic tasks and generated training data.
-- [[Context Engineering and Agent Memory]] — Planned note: what agents keep in context across long episodes.
+- [[Context Engineering and Agent Memory]] — What agents keep in context across long episodes, and RL-trained memory policies (MEM1, MemCalib).
 - [[Chain-of-Thought Faithfulness and Monitorability]] — Monitoring reasoning to catch reward hacking, and why the monitor must stay out of the reward.
 - [[Reward Hacking in Code Benchmarks]] — The compilers view: how kernel, peephole and proof optimizers exploit their checkers, and how to harden them.

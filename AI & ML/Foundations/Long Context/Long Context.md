@@ -45,7 +45,7 @@ sources:
   - https://huggingface.co/blog/deepseekv4
   - https://huggingface.co/blog/llama4-release
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -389,7 +389,7 @@ Long agent runs (coding, research, browsing) produce more tokens than any window
 | **Sub-agents** | Focused sub-agents work in clean windows and return condensed summaries | Same source |
 | **File-system and tool access** | Keep the corpus outside the prompt; read only what's needed | Coding agents as long-context processors ([Cao et al., 2026](https://arxiv.org/abs/2603.20432)) |
 
-Anthropic frames the reason as an "attention budget": with $n^2$ pairwise relationships for $n$ tokens, the model's ability to use each one "gets stretched thin", so every token added should earn its place ([Anthropic, 2025](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)). Better long context and compaction compound: one customer of Claude's 1M GA reported 15% fewer compaction events ([Claude blog, Mar 2026](https://claude.com/blog/1m-context-ga)).
+Anthropic frames the reason as an "attention budget": with $n^2$ pairwise relationships for $n$ tokens, the model's ability to use each one "gets stretched thin", so every token added should earn its place ([Anthropic, 2025](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)). Better long context and compaction compound: one customer of Claude's 1M GA reported 15% fewer compaction events ([Claude blog, Mar 2026](https://claude.com/blog/1m-context-ga)). The full toolkit (tool search, context editing, memory files, consolidation) and its evidence are in [[Context Engineering and Agent Memory]].
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -472,4 +472,5 @@ Open problems:
 - [[Pretraining Data]] — Where long documents (code repos, books) come from.
 - [[RL for Reasoning]] — Long-context RL extends reasoning training to long inputs.
 - [[Reasoning Models]] — Long chains of thought consume the same window.
+- [[Context Engineering and Agent Memory]] — Managing what goes into the window instead of enlarging it: compaction, notes, sub-agents, memory.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — The FLOPs and bandwidth arithmetic behind the worked example.

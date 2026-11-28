@@ -302,5 +302,5 @@ Open problems:
 - [[Speculative Decoding]] — The same rollback problem, solved with per-draft state slots or replay.
 - [[Sparse Attention]] — Sliding-window layers, the third state type a unified cache must validate.
 - [[Long Context]] — The long agent transcripts where hybrid prefix reuse matters most.
-- [[Context Engineering and Agent Memory]] — Prompt layouts that put reusable content at stable boundaries (planned note).
+- [[Context Engineering and Agent Memory]] — Why agents keep a stable, append-only prefix, and the cache-hit arithmetic behind it.
 - [[Quantization]] — Lower-precision recurrent state shrinks checkpoints but is precision-sensitive.

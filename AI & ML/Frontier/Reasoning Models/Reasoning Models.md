@@ -46,7 +46,7 @@ sources:
   - https://www.standardmedia.co.ke/business/article/2001553533/ai-catches-up-with-humans-to-score-100pc-at-top-maths-contest
   - https://lilianweng.github.io/posts/2025-05-01-thinking/
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -435,5 +435,6 @@ Sources for unlinked rows: [OpenAI o1](https://openai.com/index/learning-to-reas
 - [[Mixture of Experts]] — Low active parameters make long thinking affordable at frontier scale.
 - [[Looped Transformers]] — Reasoning in hidden state instead of text, and what that means for monitoring.
 - [[Chain-of-Thought Faithfulness and Monitorability]] — Whether the thinking text reflects the real reasoning, and how labs monitor it.
+- [[Context Engineering and Agent Memory]] — How agents keep long runs inside the window: compaction, notes, sub-agents and memory.
 - [[Transformer]] — Fixed compute per token is the limitation that chain of thought works around.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — The decode-cost arithmetic behind the price of thinking tokens.

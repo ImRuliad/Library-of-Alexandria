@@ -393,3 +393,4 @@ Open problems:
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why decode is memory-bound: arithmetic intensity against the chip's roofline.
 - [[Expert Parallelism and MoE Serving]] — Wide EP in depth: tokens per expert, all-to-all kernels, EPLB and attention-FFN disaggregation.
 - [[Prefill-Decode Disaggregation]] — Separate prefill and decode pools: sizing, KV transfer cost and when it pays.
+- [[Context Engineering and Agent Memory]] — The client side of prefix caching: how agents lay out prompts to hit the cache.
