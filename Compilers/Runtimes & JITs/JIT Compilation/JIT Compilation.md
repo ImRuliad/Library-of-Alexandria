@@ -62,7 +62,7 @@ sources:
   - https://daringfireball.net/2024/06/apple_disables_webkits_jit_in_lockdown_mode
   - https://developer.apple.com/tutorials/data/documentation/browserenginekit/protecting-code-compiled-just-in-time.md
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -475,3 +475,4 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[Bounds Check Elimination]] — Range check elimination and loop predication in HotSpot, V8, JavaScriptCore and .NET.
 - [[Safepoints and Stack Maps]] — The polls and per-pc maps every optimizing tier emits.
 - [[On-Stack Replacement]] — Back-edge counters, OSR entry at loop headers, and how each engine moves the frame.
+- [[Sampling Profilers and Safepoint Bias]] — Attributing samples to JIT code: safepoint bias, AsyncGetCallTrace, JFR, perf maps and jitdump.

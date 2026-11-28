@@ -44,7 +44,7 @@ sources:
   - https://arxiv.org/html/2511.00592v1
   - https://arxiv.org/abs/2512.15766
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -494,3 +494,4 @@ The pattern: keep the compiler's exact legality check (polyhedral dependence ana
 - [[Bounds Check Elimination]] — Pre/main/post loop splitting and loop predication that free loops from range checks.
 - [[Safepoints and Stack Maps]] — HotSpot's loop strip mining keeps safepoint polls out of the inner loop.
 - [[On-Stack Replacement]] — JITs count back-edges and enter optimized code at loop headers; an extra loop entry weakens LICM.
+- [[Sampling Profilers and Safepoint Bias]] — Poll-free counted loops are where safepoint-biased profilers misplace time.

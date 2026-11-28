@@ -74,7 +74,7 @@ sources:
   - https://research.google/pubs/ai-propeller-warehouse-scale-inter-procedural-code-layout-optimization-with-alphaevolve/
   - https://fosdem.org/schedule/event/fosdem-2025-4109-profile-guided-optimization-pgo-in-llvm-current-challenges-from-the-adopter-perspective
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -525,3 +525,4 @@ go build ./cmd/server                   # -pgo=auto finds default.pgo
 - [[LLVM]] — `llvm-profdata`, `llvm-profgen`, the sample loader and branch-weight metadata.
 - [[Virtual Memory and Paging]] — Page faults that startup function ordering reduces.
 - [[Compiler Testing and Fuzzing]] — Profile-dependent miscompiles and reproducibility.
+- [[Sampling Profilers and Safepoint Bias]] — How sampled profiles go wrong in JIT runtimes, and how `perf` names JIT code.

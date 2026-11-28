@@ -44,7 +44,7 @@ sources:
   - https://dblp.uni-trier.de/rec/conf/pldi/StichnothLC99.html
   - https://www.cs.purdue.edu/homes/hosking/ismm2000/papers/tarditi.pdf
 created: 2026-11-27
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -341,7 +341,7 @@ HotSpot's `DebugInformationRecorder` describes itself as collecting debug inform
 
 LLVM mirrors this split: the `"deopt"` bundle and the `"gc-live"` bundle land in the same stack-map record. V8 does the same with its `SafepointTable` (and `MaglevSafepointTable` for Maglev), which records "a bitmap of which stack spill slots ... and callee-saved registers hold tagged pointers at each call PC" ([V8 stack walking](https://chromium.googlesource.com/v8/v8.git/+/main/docs/runtime/stack-walking.md)). Interpreter and baseline frames need no table at all, because V8 guarantees every bytecode register slot holds a valid tagged value, initialised to `undefined` or a sentinel. That is a recurring design trick: make one tier's frames uniformly typed so only optimized frames need maps.
 
-The deopt connection has a catch: deopt metadata is often *larger* than the GC map, because it must describe primitives and scalar-replaced objects ([[Escape Analysis]]) too. Profilers have a catch of their own: sampling only at safepoints attributes time to the nearest poll rather than the hot instruction (*safepoint bias*), which is why JEP 518 aims to walk stacks at safepoints "while minimizing safepoint bias".
+The deopt connection has a catch: deopt metadata is often *larger* than the GC map, because it must describe primitives and scalar-replaced objects ([[Escape Analysis]]) too. Profilers have a catch of their own: sampling only at safepoints attributes time to the nearest poll rather than the hot instruction (*safepoint bias*, covered in [[Sampling Profilers and Safepoint Bias]]), which is why JEP 518 aims to walk stacks at safepoints "while minimizing safepoint bias".
 
 ### Stopping Without Polls - Signals and Hijacking
 
@@ -466,3 +466,4 @@ quadrantChart
 - [[Code Cache Management]] — Planned: maps and scopes are part of every compiled method's footprint.
 - [[Compiler Testing and Fuzzing]] — GC stress modes that catch GC holes.
 - [[Translation Validation]] — Checking that maps match the code they describe.
+- [[Sampling Profilers and Safepoint Bias]] — Why profilers that sample only at polls blame the wrong code, and how JFR's cooperative sampling corrects it.

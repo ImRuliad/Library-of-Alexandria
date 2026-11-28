@@ -40,7 +40,7 @@ sources:
   - https://lists.llvm.org/pipermail/llvm-dev/2016-February/095567.html
   - https://bernsteinbear.com/blog/launch-zjit/
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -430,3 +430,4 @@ Duboscq et al. measured Graal's deopt metadata at **1.7× to 1.9× the size of t
 - [[CPS and ANF]] — Deopt targets and specialized continuations are continuations in the formal sense.
 - [[Safepoints and Stack Maps]] — The same per-safepoint records hold GC maps and deopt frame states.
 - [[On-Stack Replacement]] — The upward direction: entering optimized code mid-loop, deopt run in reverse.
+- [[Sampling Profilers and Safepoint Bias]] — Profilers reuse the same per-pc scope records to name sampled frames.
