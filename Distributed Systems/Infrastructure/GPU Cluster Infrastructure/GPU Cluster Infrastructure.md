@@ -406,7 +406,7 @@ Checkpoint state per GPU is small next to the fabric's bandwidth (1 MB to 4 GB p
 ### Reliability Is Now About Silent and Slow Faults
 
 - **SDC rates rose.** Meta says silent data corruption now occurs in about one per thousand AI accelerators, against roughly one per million devices historically for soft-error bitflips ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)). ByteDance and Tsinghua's AEGIS (OSDI 2026) detects SDC during LLM training at about 0.86% overhead and found 18 real incidents in 35 million GPU hours ([OSDI '26](https://www.usenix.org/conference/osdi26/presentation/lei)). See [[Silent Data Corruption]].
-- **Stragglers and fail-slow parts** are handled with fleet-wide health checks and eviction rather than by protocol; see [[Gray and Fail-Slow Failures]].
+- **Stragglers and fail-slow parts** are handled with fleet-wide health checks and eviction rather than by protocol; see [[Gray and Fail-Slow Failures]]. Burn-in, health checks, lemon-node detection and the repair loop are in [[Fleet Health and Hardware Screening]].
 - **Recovery targets minutes, not hours**, through in-memory replicas, async and reshardable checkpoints, and communicator shrink, all covered above.
 
 ## ***Trade-offs & Open Problems***
@@ -498,3 +498,4 @@ Open problems worth tracking:
 - [[Multi-GPU Communication - NVLink and NCCL]] — NVLink, NVSwitch and NCCL from the GPU programmer's side.
 - [[GPUDirect RDMA and Storage]] — GPU-to-NIC and GPU-to-storage paths that skip the CPU.
 - [[Blackwell Architecture]] — The B200/GB300 chips and NVL72 racks.
+- [[Fleet Health and Hardware Screening]] — Keeping bad nodes out of jobs: burn-in, health checks, lemon nodes, quarantine and spares.

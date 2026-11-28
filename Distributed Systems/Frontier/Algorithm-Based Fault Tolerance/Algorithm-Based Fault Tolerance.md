@@ -375,5 +375,5 @@ Open problems:
 - [[Krylov Solvers on GPUs]] — Iterative methods that Online-ABFT extends checks to.
 - [[Floating-Point Semantics]] — Rounding, the reason checksums never match exactly.
 - [[GPU Fault Tolerance in Production]] — ECC, Xids and health checks, which don't see silent errors.
-- [[Fleet Health and Hardware Screening]] — Planned: finding the bad devices before ABFT has to catch their math.
+- [[Fleet Health and Hardware Screening]] — Finding and quarantining the bad devices before ABFT has to catch their math.
 - [[End-to-End Data Integrity]] — Planned: checksums for data at rest, the storage counterpart.

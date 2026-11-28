@@ -268,6 +268,8 @@ The last row is the testing problem in one line: most tests are useless for any 
 
 *Since bad parts escape the factory and others degrade in service, operators test their own fleets continuously, both during maintenance windows and alongside live workloads. The two find different defects.*
 
+This section covers the corruption-specific screens; burn-in, routine health checks, lemon nodes and the repair loop around them are in [[Fleet Health and Hardware Screening]].
+
 Meta's two systems ([Dixit et al., 2022](https://arxiv.org/abs/2203.08989); [Meta, Mar 2022](https://engineering.fb.com/2022/03/17/production-engineering/silent-errors/)):
 
 | | Fleetscanner (out of production) | Ripple (in production) |
@@ -503,3 +505,4 @@ Open problems worth tracking:
 - [[FlashAttention]] — Its recomputation and invariants give AEGIS cheap SDC checks.
 - [[Erasure Coding]] — Checksums turn corrupt fragments into erasures that parity can rebuild.
 - [[Algorithm-Based Fault Tolerance]] — Checksummed computation in depth, from 1984 processor arrays to GPU training.
+- [[Fleet Health and Hardware Screening]] — The wider screening and quarantine lifecycle: burn-in, health checks, lemon nodes, remediation.

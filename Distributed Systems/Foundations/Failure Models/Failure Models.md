@@ -21,7 +21,7 @@ sources:
   - https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/
   - https://www.usenix.org/conference/osdi26/presentation/lei
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -263,7 +263,7 @@ The timeout was a false suspicion: L never crashed. Safety survives only because
 
 #### **Silent Data Corruption in AI Clusters**
 - **Mercurial cores:** Google reported CPU cores that pass manufacturing tests yet occasionally compute wrong results, with no crash; it called for software that detects and isolates such cores ([Hochschild et al., 2021](https://research.google/pubs/pub50337/)).
-- **Rate in 2025:** Meta says soft-error bitflips were historically about one per million devices, while [[Silent Data Corruption|silent data corruption]] now occurs in about **one per thousand** AI accelerators because of higher silicon density. Its fleet tools include Fleetscanner (full sweep every 45 to 60 days), Ripple (tests alongside workloads, fleet coverage in days) and Hardware Sentinel, which Meta says beats testing-based detection by 41% ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)).
+- **Rate in 2025:** Meta says soft-error bitflips were historically about one per million devices, while [[Silent Data Corruption|silent data corruption]] now occurs in about **one per thousand** AI accelerators because of higher silicon density. Its fleet tools (see [[Fleet Health and Hardware Screening]]) include Fleetscanner (full sweep every 45 to 60 days), Ripple (tests alongside workloads, fleet coverage in days) and Hardware Sentinel, which Meta says beats testing-based detection by 41% ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)).
 - **Online detection, 2026:** ByteDance and Tsinghua's AEGIS detects SDC during LLM training with a cheap sensing stage and a separate verification stage, at about 0.86% overhead. Over 35 million GPU hours it caught 18 real SDC incidents and 13 faulty GPUs ([OSDI '26](https://www.usenix.org/conference/osdi26/presentation/lei)).
 
 Silent corruption is a Byzantine fault produced by hardware, not by an attacker. Most data systems still assume crash faults, so the 2026 answer is detection and isolation rather than full [[Byzantine Fault Tolerance]].
@@ -334,3 +334,4 @@ Open problems worth tracking:
 - [[GPU Cluster Infrastructure]] — Failures, stragglers and SDC at AI-training scale, where one fault stops thousands of GPUs.
 - [[Write-Ahead Logging]] — How crash-recovery with stable storage is built, and fsyncgate.
 - [[Fault Injection and Chaos Engineering]] — Injecting the faults a model claims to tolerate, in tests and in production.
+- [[Fleet Health and Hardware Screening]] — Finding and removing the hardware that produces these faults before it fails a job.

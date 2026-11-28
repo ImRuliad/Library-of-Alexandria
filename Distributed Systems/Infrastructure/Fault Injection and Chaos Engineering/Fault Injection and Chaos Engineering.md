@@ -508,4 +508,4 @@ The left end finds bugs cheaply and reproducibly but only within its fault model
 - [[Safe Configuration Rollout]] — Planned: staged config changes, the other half of failing small.
 - [[Crash Consistency]] — Planned: fsync semantics and crash-consistency testing.
 - [[Load Testing and Benchmarking]] — Planned: realistic load, which cascading-failure tests need.
-- [[Fleet Health and Hardware Screening]] — Planned: burn-in and quarantine of faulty hardware.
+- [[Fleet Health and Hardware Screening]] — Burn-in, health checks and quarantine of faulty hardware.

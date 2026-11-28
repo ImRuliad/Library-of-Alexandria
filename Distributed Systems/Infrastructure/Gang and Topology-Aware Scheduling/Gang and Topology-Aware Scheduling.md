@@ -402,6 +402,6 @@ Kueue counts a node as failed when it is missing, or not Ready with its workload
 - [[Mixture of Experts]] — All-to-all traffic that makes locality matter even more.
 - [[Queueing Theory for Systems]] — Why waiting grows so fast near full load.
 - [[Overcommit and Vertical Autoscaling]] — The opposite philosophy, packing tighter than requests.
-- [[Fleet Health and Hardware Screening]] — Planned: finding the bad nodes that hot swap replaces.
+- [[Fleet Health and Hardware Screening]] — Finding the bad nodes that hot swap replaces, and why a TPU slice is repaired whole.
 - [[Checkpointing]] — Planned: what an evicted gang restarts from.
 - [[Elastic Training and Job Migration]] — Planned: shrinking or moving a gang instead of killing it.
