@@ -486,3 +486,4 @@ With RISC-V's real register file, a compiler would keep everything in registers;
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages where this pass's output becomes assembly.
 - [[Instruction Scheduling]] — Planned: the phase-ordering partner of register allocation.
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
+- [[Safepoints and Stack Maps]] — Where live GC references sit at each safepoint, recorded after allocation.

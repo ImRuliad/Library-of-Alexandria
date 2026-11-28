@@ -501,3 +501,4 @@ The second round of area-team elections (members serve one-year terms) closed on
 - [[Undefined Behavior and Compiler Semantics]] — What UB, poison and provenance let the optimizer assume.
 - [[Sanitizers]] — The compiler-rt runtimes and IR passes behind `-fsanitize=`.
 - [[Microarchitectural Performance Models]] — llvm-mca, llvm-exegesis and TargetTransformInfo cost tables.
+- [[Safepoints and Stack Maps]] — `stackmap`, `patchpoint`, `gc.statepoint` and the `.llvm_stackmaps` section.

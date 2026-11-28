@@ -676,3 +676,4 @@ quadrantChart
 - [[Memory Models and Pointer Provenance]] — Address versus provenance capture in LLVM.
 - [[Compiler Testing and Fuzzing]] — Fuzzers keep finding allocation-elimination bugs in C2.
 - [[Verified Compilers]] — Proving these transformations correct is still largely open.
+- [[Safepoints and Stack Maps]] — Scalar-replaced objects must still be described at every safepoint for deopt.

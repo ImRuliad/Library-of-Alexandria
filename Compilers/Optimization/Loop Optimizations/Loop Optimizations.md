@@ -492,3 +492,4 @@ The pattern: keep the compiler's exact legality check (polyhedral dependence ana
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
 - [[Instruction Scheduling]] — Ordering instructions for pipelines, including modulo scheduling.
 - [[Bounds Check Elimination]] — Pre/main/post loop splitting and loop predication that free loops from range checks.
+- [[Safepoints and Stack Maps]] — HotSpot's loop strip mining keeps safepoint polls out of the inner loop.

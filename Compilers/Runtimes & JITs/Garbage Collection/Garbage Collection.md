@@ -325,7 +325,7 @@ ZGC stores GC state ("colors") in spare bits of each 64-bit pointer, so the chec
 
 ### Stack Maps and Safepoints
 
-*The collector can only stop a thread where the compiler has recorded which stack slots and registers hold pointers.*
+*The collector can only stop a thread where the compiler has recorded which stack slots and registers hold pointers. The full mechanics (polls, time-to-safepoint, map formats) are in [[Safepoints and Stack Maps]].*
 
 A **safepoint** is a program point where the runtime may pause a thread for GC; a **stack map** lists, for that point, the locations of live references. Compilers place safepoints at calls, allocation sites, and polls on loop back-edges and function returns, so a long loop cannot delay a collection indefinitely. Between safepoints the compiler is free to hold derived pointers (`base + offset`) in registers, which is why the map must also say which base each derived pointer belongs to.
 
@@ -473,3 +473,4 @@ MMTk is a Rust library of collectors (Immix, generational Immix, LXR and others)
 - [[Closure Conversion and Defunctionalization]] — Heap closures and their environments, and why linked environments retain dead data.
 - [[Escape Analysis]] — Stack allocation and barrier removal for objects that never escape.
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages, a world without a collector.
+- [[Safepoints and Stack Maps]] — Polls, time-to-safepoint, derived pointers and the stack-map formats collectors read.

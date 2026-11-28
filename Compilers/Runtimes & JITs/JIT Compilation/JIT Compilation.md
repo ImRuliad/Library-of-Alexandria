@@ -460,7 +460,7 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[Register Allocation]] — Linear scan in baseline tiers, heavier allocators at the top.
 - [[Instruction Selection]] — What the optimizing tier and copy-and-patch stencils emit.
 - [[Type Systems and Inference]] — The static alternative to type feedback.
-- [[Garbage Collection]] — Shares object layouts, safepoints and stack maps with the JIT.
+- [[Garbage Collection]] — Shares object layouts, [[Safepoints and Stack Maps|safepoints and stack maps]] with the JIT.
 - [[WebAssembly]] — Baseline and optimizing Wasm compilers (Liftoff, Winch, Cranelift).
 - [[LLVM]] — Used as a JIT back end (early FTL, PostgreSQL, HyPer, Julia) and to build CPython's stencils.
 - [[ML Compilers]] — `torch.compile` and JAX `jit`: JIT compilation for tensor programs.
@@ -473,3 +473,4 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[Deoptimization and Speculation]] — Guards, frame states, lazy invalidation and deopt loops.
 - [[Regular Expression Engines]] — Irregexp and PCRE2 JIT compile one pattern to native code.
 - [[Bounds Check Elimination]] — Range check elimination and loop predication in HotSpot, V8, JavaScriptCore and .NET.
+- [[Safepoints and Stack Maps]] — The polls and per-pc maps every optimizing tier emits.

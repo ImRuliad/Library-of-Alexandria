@@ -419,7 +419,7 @@ Duboscq et al. measured Graal's deopt metadata at **1.7× to 1.9× the size of t
 - [[Sea of Nodes]] — Graal's `FrameState` nodes carry deopt state through the graph.
 - [[Profile-Guided Optimization]] — The offline version of betting on a profile, with fallbacks instead of exits.
 - [[WebAssembly]] — Liftoff as V8's deopt target for Wasm since Chrome 137.
-- [[Garbage Collection]] — Safepoints and stack maps share machinery with deopt metadata.
+- [[Garbage Collection]] — [[Safepoints and Stack Maps|Safepoints and stack maps]] share machinery with deopt metadata.
 - [[LLVM]] — `deopt` bundles, guards, guard widening and loop predication.
 - [[Loop Optimizations]] — Guard hoisting and OSR entry at loop headers.
 - [[Bounds Check Elimination]] — Speculative range checks and loop predication.
@@ -428,3 +428,4 @@ Duboscq et al. measured Graal's deopt metadata at **1.7× to 1.9× the size of t
 - [[Verified Compilers]] — Formal models of speculation and deoptimization.
 - [[Translation Validation]] — Checking JIT optimizations case by case.
 - [[CPS and ANF]] — Deopt targets and specialized continuations are continuations in the formal sense.
+- [[Safepoints and Stack Maps]] — The same per-safepoint records hold GC maps and deopt frame states.

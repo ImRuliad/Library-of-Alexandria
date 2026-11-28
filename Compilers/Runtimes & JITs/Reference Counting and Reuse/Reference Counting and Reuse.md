@@ -555,6 +555,6 @@ quadrantChart
 - [[Dataflow Analysis]] — Liveness decides where the last use is, and so where `drop` goes.
 - [[Type Systems and Inference]] — Linear and uniqueness types are the static cousins of run-time uniqueness.
 - [[Value Types and Flattening]] — Value types avoid counting altogether by having no identity; Swift's copy-on-write sits on top of RC uniqueness.
-- [[Safepoints and Stack Maps]] — Planned: deferred RC and LXR scan roots the same way tracing collectors do.
+- [[Safepoints and Stack Maps]] — Deferred RC and LXR scan roots the same way tracing collectors do.
 - [[Verified Compilers]] — Garbage-freedom and frame-limited proofs, and the PLDI 2024 Coq/Iris equivalence proofs.
 - [[Classic Optimizations]] — Count elision is a cousin of redundancy elimination and code motion.

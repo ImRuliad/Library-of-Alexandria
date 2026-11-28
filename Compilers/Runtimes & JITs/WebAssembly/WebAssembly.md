@@ -495,3 +495,4 @@ For a compiler, the component model adds a new linking layer above [[Linking and
 - [[Deoptimization and Speculation]] — V8's Wasm deopts to Liftoff and speculative `call_indirect` inlining since Chrome 137.
 - [[Effect Handlers and Delimited Continuations]] — The WasmFX design behind stack switching, and how other runtimes capture continuations.
 - [[Bounds Check Elimination]] — Compiler techniques for the checks guard regions cannot cover, such as memory64.
+- [[Safepoints and Stack Maps]] — Cranelift's user stack maps behind Wasmtime's GC.
