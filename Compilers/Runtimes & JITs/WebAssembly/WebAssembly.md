@@ -392,7 +392,7 @@ With `memory64` the index is 64 bits, so no reservation can cover it and every a
 | Relaxed SIMD | Faster SIMD ops whose results may differ by platform (FMA, swizzle) | Wasm 3.0; a *deterministic profile* pins one behavior |
 | JS string builtins | Import JS string operations that engines can inline | Wasm 3.0 |
 | JSPI | Suspend Wasm while awaiting a JS promise, so synchronous C code can call async web APIs | Shipped in Chrome 137 ([Chrome](https://developer.chrome.com/release-notes/137); [V8](https://v8.dev/blog/jspi)) |
-| Stack switching | First-class continuations (`cont.new`, `resume`, `suspend`) for green threads, generators, [[Effect Handlers and Delimited Continuations|effect handlers]] | Phase 3, not part of 3.0 ([proposals](https://github.com/WebAssembly/proposals); [proposal repo](https://github.com/WebAssembly/stack-switching)); Wasmtime has an experimental x86-64 Linux implementation ([Wasmtime docs](https://docs.wasmtime.dev/stability-wasm-proposals.html)); a separation-logic semantics appeared at PLDI 2026 ([Iris-WasmFX](https://cs.au.dk/~birke/papers/2026-pldi-iris-wasmfx.pdf)) |
+| Stack switching | First-class continuations (`cont.new`, `resume`, `suspend`) for [[Green Threads and Virtual Threads|green threads]], generators, [[Effect Handlers and Delimited Continuations|effect handlers]] | Phase 3, not part of 3.0 ([proposals](https://github.com/WebAssembly/proposals); [proposal repo](https://github.com/WebAssembly/stack-switching)); Wasmtime has an experimental x86-64 Linux implementation ([Wasmtime docs](https://docs.wasmtime.dev/stability-wasm-proposals.html)); a separation-logic semantics appeared at PLDI 2026 ([Iris-WasmFX](https://cs.au.dk/~birke/papers/2026-pldi-iris-wasmfx.pdf)) |
 
 Wasmtime keeps a per-proposal table of what it supports and at what tier ([Wasmtime docs](https://docs.wasmtime.dev/stability-wasm-proposals.html)); Wasmtime 27 completed Wasm GC support ([Bytecode Alliance](https://bytecodealliance.org/articles/wasmtime-27.0)).
 
@@ -499,3 +499,4 @@ For a compiler, the component model adds a new linking layer above [[Linking and
 - [[Tiering Policies and Warm-up]] — The tier-up policies that dynamic tiering borrows from JavaScript engines.
 - [[Irreducible Control Flow]] — Multi-entry loops, and the Relooper, stackifier and dispatch-block fixes producers use.
 - [[Partial Evaluation and Self-Specializing Interpreters]] — weval specializes interpreters compiled to Wasm ahead of time, for platforms without runtime codegen.
+- [[Green Threads and Virtual Threads]] — The goroutine, virtual-thread and fiber runtimes that stack switching would let compile to Wasm.

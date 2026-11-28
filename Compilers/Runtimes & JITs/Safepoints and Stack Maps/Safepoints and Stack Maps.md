@@ -460,7 +460,7 @@ quadrantChart
 - [[Reference Counting and Reuse]] — Deferred RC scans stack roots the same way tracing does.
 - [[WebAssembly]] — Wasm GC in Wasmtime relies on Cranelift's user stack maps.
 - [[Effect Handlers and Delimited Continuations]] — Captured stacks still need scanning.
-- [[Green Threads and Virtual Threads]] — Planned: many suspended stacks, preemption without OS threads.
+- [[Green Threads and Virtual Threads]] — Many suspended stacks: Go copies them using these maps, and Loom's frozen frames are walked inside heap stack chunks.
 - [[Stack Unwinding and Exception Tables]] — Planned: the other per-pc table compilers emit.
 - [[Calling Conventions and ABIs]] — Planned: callee-saved registers decide which references survive a call in registers.
 - [[Code Cache Management]] — Planned: maps and scopes are part of every compiled method's footprint.

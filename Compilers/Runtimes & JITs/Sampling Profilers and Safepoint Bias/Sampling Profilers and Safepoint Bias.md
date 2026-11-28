@@ -452,4 +452,4 @@ V8 does the same for Ignition: `--interpreted-frames-native-stack` creates "copi
 - [[Code Cache Management]] — Planned: freed and reused JIT code breaks naive perf maps.
 - [[Stack Unwinding and Exception Tables]] — Planned: frame pointers vs unwind tables, which native profilers need.
 - [[Tiering Policies and Warm-up]] — Profiling a program whose compiled code is still changing.
-- [[Green Threads and Virtual Threads]] — Planned: sampling threads that are not mounted on a CPU.
+- [[Green Threads and Virtual Threads]] — How virtual threads mount and unmount, and why an unmounted thread is invisible to a signal-based sampler.

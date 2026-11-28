@@ -426,7 +426,7 @@ func spawn(ch chan int) { v := 42; go func() { ch <- v }() }          // lines 5
 ./ea.go:53:5: func literal escapes to heap
 ```
 
-Reading it row by row: returned and global-stored pointers escape; `x` escapes because `fmt.Println` takes `...any`, so the `int` is boxed into an interface whose contents flow into `Fprintln`'s parameters, which leak; a `make` with a non-constant size escapes on 1.24 even though it is never returned; a closure that captures `c` by reference and is returned forces `c` itself to the heap ("moved to heap"); the `go` statement's closure escapes because a goroutine outlives the frame.
+Reading it row by row: returned and global-stored pointers escape; `x` escapes because `fmt.Println` takes `...any`, so the `int` is boxed into an interface whose contents flow into `Fprintln`'s parameters, which leak; a `make` with a non-constant size escapes on 1.24 even though it is never returned; a closure that captures `c` by reference and is returned forces `c` itself to the heap ("moved to heap"); the `go` statement's closure escapes because a [[Green Threads and Virtual Threads|goroutine]] outlives the frame.
 
 `-m=2` explains each decision as a flow chain, which is the fastest way to find the line responsible:
 
@@ -677,3 +677,4 @@ quadrantChart
 - [[Compiler Testing and Fuzzing]] — Fuzzers keep finding allocation-elimination bugs in C2.
 - [[Verified Compilers]] — Proving these transformations correct is still largely open.
 - [[Safepoints and Stack Maps]] — Scalar-replaced objects must still be described at every safepoint for deopt.
+- [[Green Threads and Virtual Threads]] — Go can move goroutine stacks because escape analysis keeps pointers to stack data on the stack.

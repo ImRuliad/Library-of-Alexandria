@@ -474,3 +474,4 @@ MMTk is a Rust library of collectors (Immix, generational Immix, LXR and others)
 - [[Escape Analysis]] — Stack allocation and barrier removal for objects that never escape.
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages, a world without a collector.
 - [[Safepoints and Stack Maps]] — Polls, time-to-safepoint, derived pointers and the stack-map formats collectors read.
+- [[Green Threads and Virtual Threads]] — Millions of small stacks: precise maps for copying them, stack chunks as heap objects, and Go's GC-based goroutine leak profile.
