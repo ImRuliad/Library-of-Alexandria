@@ -44,7 +44,7 @@ sources:
   - https://goals.rust-lang.org/2026/stabilization-of-sanitizer-support.html
   - https://lwn.net/Articles/1100184/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -662,5 +662,5 @@ xychart-beta
 - [[Reference Counting and Reuse]] — Deterministic freeing without dangling pointers.
 - [[Bounds Check Elimination]] — Proving checks redundant, the same problem ASan-- attacks.
 - [[Concurrency Memory Models]] — Planned: happens-before and data races, the semantics TSan checks.
-- [[Stack Unwinding and Exception Tables]] — Planned: the unwinding every sanitizer report depends on.
+- [[Stack Unwinding and Exception Tables]] — The unwinding every sanitizer report depends on.
 - [[Linear and Uniqueness Types]] — Planned: static ownership that rules out use-after-free at compile time.

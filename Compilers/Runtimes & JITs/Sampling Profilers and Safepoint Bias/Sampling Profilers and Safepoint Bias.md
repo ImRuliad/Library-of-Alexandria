@@ -338,7 +338,7 @@ The format, per the spec ([jitdump-specification.txt](https://tomoyo.sourceforge
 | `JIT_CODE_MOVE` (1) | A function's code moved |
 | `JIT_CODE_DEBUG_INFO` (2) | pc-to-source-line entries; must come before the matching load record |
 | `JIT_CODE_CLOSE` (3) | End of the run |
-| `JIT_CODE_UNWINDING_INFO` (4) | `.eh_frame` data so perf can unwind through JIT frames |
+| `JIT_CODE_UNWINDING_INFO` (4) | `.eh_frame` data so perf can unwind through JIT frames (see [[Stack Unwinding and Exception Tables]]) |
 
 "All timestamps must use the same clock source," `CLOCK_MONOTONIC` recommended, which is why `perf record` needs `-k mono` ([spec](https://tomoyo.sourceforge.net/cgi-bin/lxr/source/tools/perf/Documentation/jitdump-specification.txt), [Wasmtime docs](https://docs.wasmtime.dev/examples-profiling-perf.html)).
 
@@ -450,6 +450,6 @@ V8 does the same for Ignition: `--interpreted-frames-native-stack` creates "copi
 - [[WebAssembly]] — Wasmtime's perf map and jitdump support.
 - [[LLVM]] — LLVM-based JITs can publish perf symbols through a perf JIT event listener.
 - [[Code Cache Management]] — Planned: freed and reused JIT code breaks naive perf maps.
-- [[Stack Unwinding and Exception Tables]] — Planned: frame pointers vs unwind tables, which native profilers need.
+- [[Stack Unwinding and Exception Tables]] — Frame pointers vs unwind tables, which native profilers need.
 - [[Tiering Policies and Warm-up]] — Profiling a program whose compiled code is still changing.
 - [[Green Threads and Virtual Threads]] — How virtual threads mount and unmount, and why an unmounted thread is invisible to a signal-based sampler.

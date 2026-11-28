@@ -77,7 +77,7 @@ sources:
   - https://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20240122/1284932.html
   - https://lists.llvm.org/pipermail/llvm-branch-commits/2026-June/095984.html
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -376,7 +376,7 @@ The stages run in order: IR-level preparation (CodeGenPrepare), instruction sele
 | **LLD** | Linker for ELF, Mach-O, COFF, Wasm | Rust made it the default linker on x86-64 Linux in 1.90 ([Rust Blog, 2025](https://blog.rust-lang.org/2025/09/01/rust-lld-on-1.90.0-stable)) |
 | **LLDB** | Debugger | Uses Clang to parse expressions in the debugged program's types |
 | **compiler-rt** | Runtime libraries | Builtins (soft-float, `__muldi3`), [[Sanitizers\|sanitizers]] (ASan, TSan, MSan, UBSan, HWASan), profiling, fuzzing (libFuzzer) |
-| **libc++, libc++abi, libunwind** | C++ standard library and ABI support | Default on Apple platforms; the only STL in Android's NDK since r18 ([Android NDK docs](https://developer.android.com/ndk/guides/cpp-support)) |
+| **libc++, libc++abi, libunwind** | C++ standard library and ABI support (libunwind: see [[Stack Unwinding and Exception Tables]]) | Default on Apple platforms; the only STL in Android's NDK since r18 ([Android NDK docs](https://developer.android.com/ndk/guides/cpp-support)) |
 | **[[MLIR]]** | Framework for multi-level IRs (dialects) | Base of Flang's FIR, ClangIR, Triton, Mojo, IREE, CIRCT |
 | **Flang** | Fortran front end | Lowers through MLIR (FIR, HLFIR) to LLVM IR ([Flang 23 notes](https://releases.llvm.org/23.1.0/tools/flang/docs/ReleaseNotes.html)) |
 | **BOLT** | Post-link binary optimizer | Reorders code using profiles, see [[Linking and LTO]] |
@@ -503,3 +503,4 @@ The second round of area-team elections (members serve one-year terms) closed on
 - [[Microarchitectural Performance Models]] — llvm-mca, llvm-exegesis and TargetTransformInfo cost tables.
 - [[Safepoints and Stack Maps]] — `stackmap`, `patchpoint`, `gc.statepoint` and the `.llvm_stackmaps` section.
 - [[Inline Caches and Code Patching]] — How JITs use `llvm.experimental.patchpoint` and `anyregcc` to host inline caches.
+- [[Stack Unwinding and Exception Tables]] — `invoke`, `landingpad`, funclet pads, and the libunwind runtime.

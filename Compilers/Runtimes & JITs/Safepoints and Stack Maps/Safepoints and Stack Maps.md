@@ -328,7 +328,7 @@ Each location is one of five kinds: `Register`, `Direct` (an address of a frame 
 
 ### One Table, Three Clients - GC, Deopt and Stack Walks
 
-*Because a safepoint is where the frame is fully described, the same record serves the collector, the deoptimizer, exception unwinding and profilers.*
+*Because a safepoint is where the frame is fully described, the same record serves the collector, the deoptimizer, [[Stack Unwinding and Exception Tables|exception unwinding]] and profilers.*
 
 HotSpot's `DebugInformationRecorder` describes itself as collecting debug information for "garbage collecting compiled frames", "stack tracing across compiled frames" and "deoptimizating compiled frames" ([debugInfoRec.hpp](https://android.googlesource.com/platform/libcore/+/8064294c77a%5E/src/hotspot/share/code/debugInfoRec.hpp)). For each safepoint pc it stores an oop map plus a chain of *scopes* (one per inlined method) with locals, expression-stack values and held monitors:
 
@@ -461,7 +461,7 @@ quadrantChart
 - [[WebAssembly]] — Wasm GC in Wasmtime relies on Cranelift's user stack maps.
 - [[Effect Handlers and Delimited Continuations]] — Captured stacks still need scanning.
 - [[Green Threads and Virtual Threads]] — Many suspended stacks: Go copies them using these maps, and Loom's frozen frames are walked inside heap stack chunks.
-- [[Stack Unwinding and Exception Tables]] — Planned: the other per-pc table compilers emit.
+- [[Stack Unwinding and Exception Tables]] — The other per-pc table compilers emit: how to leave a frame rather than what it holds.
 - [[Calling Conventions and ABIs]] — Planned: callee-saved registers decide which references survive a call in registers.
 - [[Code Cache Management]] — Planned: maps and scopes are part of every compiled method's footprint.
 - [[Compiler Testing and Fuzzing]] — GC stress modes that catch GC holes.

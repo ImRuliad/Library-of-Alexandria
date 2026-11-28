@@ -435,5 +435,5 @@ quadrantChart
 - [[JIT Compilation]] — Why HotSpot chose to keep JIT code on ordinary stacks.
 - [[Reference Counting and Reuse]] — The other runtime-memory design space covered in this area.
 - [[Sanitizers]] — ThreadSanitizer's runtime tracks goroutines as threads.
-- [[Stack Unwinding and Exception Tables]] — Planned: unwinding across fibers and stack switches.
+- [[Stack Unwinding and Exception Tables]] — Unwinding across fibers and stack switches, and what native profilers see of green threads.
 - [[Calling Conventions and ABIs]] — Planned: the C ABI boundary that forces stack switches and pinning.

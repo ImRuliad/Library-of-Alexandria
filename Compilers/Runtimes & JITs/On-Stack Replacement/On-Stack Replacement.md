@@ -45,7 +45,7 @@ sources:
   - https://docs.oracle.com/en/graalvm/jdk/21/docs/graalvm-as-a-platform/language-implementation-framework/OnStackReplacement/
   - https://chromium.googlesource.com/external/github.com/python/cpython/+/01a683a3d4dcc8fa2b28873dbe6f57183899ad31/InternalDocs/jit.md
 created: 2026-11-27
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -390,7 +390,7 @@ quadrantChart
 | Whole method with extra entry (C1) | One compile covers every loop and later calls | φs at the header with unknown inputs; weaker loop code |
 | Continuation from the loop (C2, .NET) | Clean single entry; the best code for this loop | One compile per hot loop header; nested loops need outer-iteration peeling; work before the loop never benefits |
 | Copy-out buffer (HotSpot) | Frames stay independent; simple to reason about | Copy plus malloc at entry |
-| Frame reuse (.NET) | No copy; address-taken locals keep their addresses | Non-standard prolog and epilog; the OSR epilog's two stack adjustments broke x64 unwind info once |
+| Frame reuse (.NET) | No copy; address-taken locals keep their addresses | Non-standard prolog and epilog; the OSR epilog's two stack adjustments broke x64 [[Stack Unwinding and Exception Tables|unwind info]] once |
 | Validate before entry (JSC) | No entry into code that will instantly deopt | Sometimes refuses and keeps running slow code |
 | Concurrent OSR compile (V8) | The loop keeps running while the compiler works | The hot loop may finish before the code is ready |
 | No OSR (V8 Wasm) | Simpler tiers, no frame translation for Wasm | A single long-running Wasm call stays in baseline code |
@@ -465,3 +465,4 @@ quadrantChart
 - [[Translation Validation]] — Checking OSR-compatible transformations case by case.
 - [[Irreducible Control Flow]] — Multi-entry loops that defeat loop reconstruction, and that OSR entries themselves create.
 - [[Inline Caches and Code Patching]] — Patchable call sites and the cross-modifying-code rules that OSR entry patching shares.
+- [[Stack Unwinding and Exception Tables]] — The unwind info a rewritten or reused frame must keep correct.

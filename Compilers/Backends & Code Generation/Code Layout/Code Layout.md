@@ -51,7 +51,7 @@ sources:
   - https://mail.openjdk.org/pipermail/hotspot-runtime-dev/2025-December/083350.html
   - https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-10/runtime
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -473,7 +473,7 @@ A [[JIT Compilation|JIT]] lays out blocks within a compiled method like an ahead
 - **Profile dependence.** Without a profile, layout falls back to static guesses and can only do modest things. With a stale or unrepresentative profile, it can make the common case slower, because what it moved away as cold is now hot.
 - **Small, noisy gains.** Typical wins are 0.5% to 3% per technique on large binaries and nothing on small ones. Measuring them needs quiet machines and many runs; AI-Propeller disabled turbo, SMT and ASLR to get 0.02% to 0.04% run-to-run variance.
 - **Intra versus interprocedural.** The compiler sees one function; the linker sees opaque functions. Interleaving blocks of different functions, where AI-Propeller found most of its gain, needs basic block sections or binary rewriting, and breaks the assumption that a function is one contiguous range.
-- **Tooling costs of splitting.** Every fragment needs unwind tables, debug ranges and symbol names (`foo.cold`, `foo.__part.1`); far fragments need long branches or thunks; profilers and crash reporters must map fragments back to functions.
+- **Tooling costs of splitting.** Every fragment needs [[Stack Unwinding and Exception Tables|unwind tables]], debug ranges and symbol names (`foo.cold`, `foo.__part.1`); far fragments need long branches or thunks; profilers and crash reporters must map fragments back to functions.
 - **Competing goals.** Speed wants hot code dense; mobile startup wants first-touched code together; download size wants similar code together. lld's priority groups in 23.1 let a build mix these per section group, but there is no single objective.
 - **Reproducibility.** A profile-dependent layout means the same source gives different binaries depending on the training run; see [[Reproducible Builds]].
 - **Huge pages are not free.** C3's authors found that putting all of HHVM's 133 MB of text on huge pages without sorting doubled iTLB misses; only hot, sorted text benefits.
@@ -527,7 +527,7 @@ A [[JIT Compilation|JIT]] lays out blocks within a compiled method like an ahead
 - [[ML-Guided Optimization]] — MLGO, Magellan and AI-Propeller: learned and evolved compiler heuristics.
 - [[Program Synthesis]] — AlphaEvolve as evaluator-scored program search.
 - [[Microarchitectural Performance Models]] — Models of the front-end costs that layout reduces; uiCA's alignment-sensitive predictions.
-- [[Stack Unwinding and Exception Tables]] — Planned: the unwind metadata every split fragment needs.
+- [[Stack Unwinding and Exception Tables]] — The unwind metadata every split fragment needs.
 - [[Reproducible Builds]] — Planned: why profile-dependent layout complicates bit-identical builds.
 - [[Reward Hacking in Code Benchmarks]] — The risks of scoring evolved heuristics by benchmarks.
 - [[Calling Conventions and ABIs]] — Planned: cross-fragment and cross-function jumps must still respect the ABI.

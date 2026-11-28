@@ -71,7 +71,7 @@ sources:
   - https://github.com/rust-lang/rust/blob/main/src/tools/opt-dist/src/main.rs
   - https://conf.researchr.org/details/cgo-2024/cgo-2024-main-conference/28/Revamping-Sampling-Based-PGO-with-Context-Sensitivity-and-Pseudo-instrumentation
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -142,7 +142,7 @@ The linker therefore carries two separate jobs: be **correct and fast** at gluin
 | 2. Symbol resolution | Build a global symbol table; each name gets one winner (strong beats weak, first COMDAT wins) | Errors: undefined symbol, duplicate definition |
 | 3. Garbage collection | With `--gc-sections`, keep only sections reachable from roots (entry point, exported symbols) | Needs `-ffunction-sections -fdata-sections` to be fine-grained |
 | 4. Layout | Merge like input sections (`.text` from every file into one output `.text`), merge strings, assign addresses, group into loadable segments | Linker scripts control this |
-| 5. Synthetic sections | Create GOT, PLT, `.dynamic`, `.dynsym`, `.rela.dyn`, `.eh_frame_hdr` | Only as many entries as needed |
+| 5. Synthetic sections | Create GOT, PLT, `.dynamic`, `.dynsym`, `.rela.dyn`, `.eh_frame_hdr` (see [[Stack Unwinding and Exception Tables]]) | Only as many entries as needed |
 | 6. Relocate and write | Apply every relocation, write the file | Usually the most parallel step |
 
 **Linker scripts** control the layout pass: which input sections go into which output sections, at what addresses. Every GNU-compatible linker has a default one; kernels, bootloaders and firmware write their own, e.g. `SECTIONS { . = 0x80000; .text : { KEEP(*(.text.boot)) *(.text*) } }` to put boot code first at a fixed address (see [[The Boot Process]]). The language is sequential (location counters, symbol assignments evaluated in order), one reason linkers are hard to parallelize.
@@ -560,3 +560,4 @@ The gains stack because each layer works with information the earlier ones lacke
 - [[Compiler Testing and Fuzzing]] — Finding LTO-only and linker miscompiles.
 - [[Profile-Guided Optimization]] — Planned: a deeper note on instrumentation, sampling and profile matching.
 - [[The Boot Process]] — Linker scripts place kernels and bootloaders at fixed addresses.
+- [[Stack Unwinding and Exception Tables]] — The `.eh_frame` sections the linker merges and indexes into `.eh_frame_hdr`.
