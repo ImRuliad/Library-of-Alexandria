@@ -236,7 +236,7 @@ Two caveats, both from look-back:
 
 ### Merge Sort and Merge Path
 
-When keys aren't fixed-width integers or floats, or the order is a custom comparator (strings, tuples compared field by field, a user lambda), radix sort doesn't apply and libraries fall back to merge sort: sort tiles in shared memory (often with a bitonic or odd-even network), then merge runs in $\log_2(n / \text{tile})$ rounds.
+When keys aren't fixed-width integers or floats, or the order is a custom comparator (strings, see [[GPU String Processing]]; tuples compared field by field, a user lambda), radix sort doesn't apply and libraries fall back to merge sort: sort tiles in shared memory (often with a bitonic or odd-even network), then merge runs in $\log_2(n / \text{tile})$ rounds.
 
 The hard part is splitting one merge of two sorted arrays $A$ and $B$ evenly across thousands of threads. **Merge Path** (Green, McColl and Bader, ICS 2012) views the merge as a staircase path through an $|A| \times |B|$ grid. The $k$-th output element lies on cross-diagonal $k$, and where the path crosses that diagonal can be found by binary search. So to give each of $p$ workers exactly $n/p$ outputs, binary-search the diagonals $k = n/p, 2n/p, \ldots$; each worker then merges its own slice independently, with no atomics or synchronization ([GPU Merge Path](https://www.cs.ucdavis.edu/~amenta/f15/GPUmp.pdf)).
 
@@ -479,3 +479,4 @@ Open problems:
 - [[Top-k and Sampling Kernels]] — Radix select, AIR Top-K and LLM sampling in depth.
 - [[GPU Databases and Dataframes]] — The engines (cuDF, Polars GPU, Spark, Presto, Sirius) built on these joins and group-bys.
 - [[Forward Progress and Inter-Block Synchronization]] — The progress assumption under Onesweep's chained look-back.
+- [[GPU String Processing]] — Sorting and grouping on string keys: dictionary codes and prefix extraction.

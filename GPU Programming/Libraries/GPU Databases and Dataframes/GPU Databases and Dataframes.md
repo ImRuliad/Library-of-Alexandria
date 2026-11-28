@@ -295,7 +295,7 @@ Optimizing existing hash-based group-by gave **up to 19.4×**, and their new par
 
 ### Strings, Nulls and Nested Types
 
-- **Strings** are the hardest type. With one thread per row, a warp's lanes finish at different times ([[Warp Divergence and Warp-Level Primitives]]); with one warp per row, short strings waste lanes. libcudf picks strategies per kernel, and regex is the worst case. The Sirius team found cuDF's runtime-compiled (JIT) string transforms ran a ClickBench regex query **13× faster** than the precompiled API, with warp occupancy rising from 32% to 85% ([NVIDIA, Dec 2025](https://developer.nvidia.com/blog/nvidia-gpu-accelerated-sirius-achieves-record-setting-clickbench-record/)). String `contains`, top-N and very large aggregations remained Sirius's slowest ClickBench queries.
+- **Strings** are the hardest type ([[GPU String Processing]]). With one thread per row, a warp's lanes finish at different times ([[Warp Divergence and Warp-Level Primitives]]); with one warp per row, short strings waste lanes. libcudf picks strategies per kernel, and regex is the worst case. The Sirius team found cuDF's runtime-compiled (JIT) string transforms ran a ClickBench regex query **13× faster** than the precompiled API, with warp occupancy rising from 32% to 85% ([NVIDIA, Dec 2025](https://developer.nvidia.com/blog/nvidia-gpu-accelerated-sirius-achieves-record-setting-clickbench-record/)). String `contains`, top-N and very large aggregations remained Sirius's slowest ClickBench queries.
 - **Nulls** cost one bitmap read per 32 rows and a little logic per operator (SQL's three-valued logic, null-equality options in joins).
 - **Nested types** (LIST, STRUCT, Variant) are offsets-of-offsets. libcudf supports them; Sirius did not yet in its CIDR paper; the Spark plugin added GPU Variant extraction for Spark 4.x in v26.10.0 ([download page](https://nvidia.github.io/cudf-spark/docs/download.html)).
 
@@ -412,3 +412,4 @@ Results come back as GPU-resident columns; other GPU libraries ([[Numba and CuPy
 - [[GPU Data Compression]] — nvCOMP for compressed columns and shuffles.
 - [[Distributed SQL]] — The CPU-side design of distributed query engines.
 - [[Hot Keys and Cache Stampedes]] — Skew, the same problem on a cluster.
+- [[GPU String Processing]] — String layouts, thread vs warp per string, regex and JIT transforms, dictionary encoding.

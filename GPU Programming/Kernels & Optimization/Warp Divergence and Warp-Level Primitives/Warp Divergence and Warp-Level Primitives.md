@@ -359,4 +359,5 @@ Open problems:
 - [[FlashAttention]] — Warp-specialized attention in practice.
 - [[Cooperative Groups]] — Typed handles for warps, tiles and coalesced groups.
 - [[Forward Progress and Inter-Block Synchronization]] — Intra-warp locks before and after independent thread scheduling, and the block-level picture.
+- [[GPU String Processing]] — Variable-length strings as a divergence case study: thread vs warp per string.
 - [[GPU Memory Model Testing and Verification]] — WarpDRF, the precise race-free contract for warp primitives, and the ITS races iGUARD finds.
