@@ -41,7 +41,7 @@ sources:
   - https://aws.amazon.com/blogs/machine-learning/detecting-and-recovering-from-silent-data-corruption-on-amazon-sagemaker-hyperpod/
   - https://jepsen.io/analyses/tigerbeetle-0.16.11
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -315,7 +315,7 @@ where $e$ is a vector of ones. *In words:* the column sums of the result must eq
 - Row checksum: $Be = (11, 15)^\top$, and $A(11, 15)^\top = (41, 93)^\top$. Row sums of $C$: 41 and 93. They match.
 - Now a faulty multiplier writes 47 instead of 43. Column 1 sums to 66 (expected 62) and row 2 sums to 97 (expected 93). The only element in both is $C_{21}$, off by 4, so the correct value is $47 - 4 = 43$.
 
-On GPUs, the catch is floating-point rounding: checksums never match exactly, so detectors need a tolerance that separates real faults from rounding noise. AEGIS accumulates its matrix-multiply checksums in float32 for exactly that reason ([Lei et al.](https://www.usenix.org/system/files/osdi26-lei.pdf)).
+On GPUs, the catch is floating-point rounding: checksums never match exactly, so detectors need a tolerance that separates real faults from rounding noise. AEGIS accumulates its matrix-multiply checksums in float32 for exactly that reason ([Lei et al.](https://www.usenix.org/system/files/osdi26-lei.pdf)). Weighted checksums, fail-stop recovery, GPU kernel placement and the 2026 threshold work are in [[Algorithm-Based Fault Tolerance]].
 
 ### SDC in AI Training
 
@@ -327,7 +327,7 @@ What SDC does to a training run, from the 2025 and 2026 evidence:
 - **Masked by loss noise.** In AEGIS's production data, "the majority of SDC incidents silently corrupted training correctness and escaped alarms", including NaN and inf checks, and only 3 of 18 incidents showed observable training failures ([Lei et al., OSDI 2026](https://www.usenix.org/system/files/osdi26-lei.pdf)).
 - **Parameter drift.** On real faulty nodes pulled from a cloud fleet, single-step gradient errors were small (worst case 5.1% of the gradient's norm), and loss curves looked normal, yet parameters drifted away from a healthy run; one fine-tuning run hit a loss spike and ended at 0% accuracy on its task ([Ma et al., 2025](https://arxiv.org/abs/2502.12340)).
 
-The Gemini team planned around it: SDC was expected "every week or two", handled with "deterministic replay to isolate incorrect computations" plus "proactive SDC scanners on idle machines and hot standbys" ([Gemini, 2023](https://arxiv.org/pdf/2312.11805)). Meta's toolbox adds *reductive triage* (binary search over shrinking sub-clusters to find the bad node), *hyper-checkpointing* (checkpoints at increasing frequency to narrow the window), deterministic training, shadow nodes that recompute random steps, and ABFT ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)). See [[GPU Cluster Infrastructure]].
+The Gemini team planned around it: SDC was expected "every week or two", handled with "deterministic replay to isolate incorrect computations" plus "proactive SDC scanners on idle machines and hot standbys" ([Gemini, 2023](https://arxiv.org/pdf/2312.11805)). Meta's toolbox adds *reductive triage* (binary search over shrinking sub-clusters to find the bad node), *hyper-checkpointing* (checkpoints at increasing frequency to narrow the window), deterministic training, shadow nodes that recompute random steps, and *algorithmic fault tolerance*, which Meta describes as building tolerance of corruption into the training algorithm itself, alongside gradient clipping ([Meta, Jul 2025](https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/)). See [[GPU Cluster Infrastructure]].
 
 **Checkpoints are the dangerous part.** A checkpoint written from a corrupted replica preserves the corruption, and restarting from it can bring the problem back. AWS's guide says its weight-fingerprint check "is the only one that can stop a checkpoint from being written out of a corrupted copy", so it forces that check on checkpoint steps ([AWS, Nov 2026](https://aws.amazon.com/blogs/machine-learning/detecting-and-recovering-from-silent-data-corruption-on-amazon-sagemaker-hyperpod/)).
 
@@ -428,7 +428,7 @@ Together with AEGIS's production data, these say loss monitoring is not a detect
 | Out-of-production fleet testing | Long, thorough tests; unique coverage | Slow fleet coverage (months); longer maintenance |
 | In-production testing | Fast coverage under real load and temperature | Steals production cycles; short tests miss some defects |
 | Dual or triple execution | General; TMR also corrects | 2x to 3x compute |
-| ABFT and invariant checks | A few percent overhead, locates errors | Only for operations with algebraic structure; floating-point tolerance tuning |
+| [[Algorithm-Based Fault Tolerance|ABFT]] and invariant checks | A few percent overhead, locates errors | Only for operations with algebraic structure; floating-point tolerance tuning |
 | Deterministic training plus replay | Precise localization | Constrains kernels and communication; replay compute |
 | Aggressive quarantine | Removes bad devices quickly | Retires good hardware on false positives; AWS keeps a human in the loop |
 
@@ -502,3 +502,4 @@ Open problems worth tracking:
 - [[Reliability Patterns]] — Checkpointing, isolation and retries around unreliable components.
 - [[FlashAttention]] — Its recomputation and invariants give AEGIS cheap SDC checks.
 - [[Erasure Coding]] — Checksums turn corrupt fragments into erasures that parity can rebuild.
+- [[Algorithm-Based Fault Tolerance]] — Checksummed computation in depth, from 1984 processor arrays to GPU training.

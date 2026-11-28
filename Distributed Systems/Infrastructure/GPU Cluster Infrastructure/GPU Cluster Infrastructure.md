@@ -40,7 +40,7 @@ sources:
   - https://engineering.fb.com/2025/07/22/data-infrastructure/how-meta-keeps-its-ai-hardware-reliable/
   - https://www.usenix.org/conference/osdi26/presentation/lei
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -429,7 +429,7 @@ Checkpoint state per GPU is small next to the fabric's bandwidth (1 MB to 4 GB p
 Open problems worth tracking:
 - **Synchronous training at the limit.** Job MTBF falls as $1/N$; at a few hundred thousand GPUs a 3-hour MTBF becomes minutes. Elastic shrink, hot spares and asynchronous or loosely coupled training are the candidate answers, none settled.
 - **Gray failures.** A slow NIC, a flapping link or a throttled GPU slows everyone without failing anything; detection still leans on heuristics and timeouts ([[Gray and Fail-Slow Failures]], [[Failure Models]]).
-- **Silent corruption.** Corruption is rare per chip but routine per job; detection without recomputation is open ([[Silent Data Corruption]]).
+- **Silent corruption.** Corruption is rare per chip but routine per job; detection without recomputation is open beyond the matrix multiplies that [[Algorithm-Based Fault Tolerance]] covers ([[Silent Data Corruption]]).
 - **Which Ethernet transport wins.** UEC 1.0, Spectrum-X, MetaRoCE and Microsoft's own stack all target the same problem with different trade-offs; interoperability at scale is unproven in public data as of November 2026.
 - **Power as a distributed systems constraint.** Tens-of-megawatt swings from synchronized steps ([Llama 3 paper](https://arxiv.org/pdf/2407.21783)) couple the job to the grid, and power, not GPUs, pushes training across sites.
 - **Scheduling and fragmentation.** Placement decides whether traffic stays inside a pod; fragmented allocations cost Meta over 30% in one routing scheme ([[Cluster Scheduling]]).
@@ -479,6 +479,7 @@ Open problems worth tracking:
 - [[Failure Models]] — Why job MTBF falls as $1/N$; the Llama 3 interruption data.
 - [[Gray and Fail-Slow Failures]] — Stragglers, flapping links and throttled GPUs that slow a lockstep job.
 - [[Silent Data Corruption]] — Wrong answers from accelerators, about one per thousand chips by Meta's 2025 count.
+- [[Algorithm-Based Fault Tolerance]] — Checksummed matrix multiplies that catch wrong math inside training jobs.
 - [[Cluster Scheduling]] — Topology-aware placement, Slurm and Kubernetes for GPU jobs.
 - [[Gang and Topology-Aware Scheduling]] — Placing whole jobs inside one NVLink domain, rack or block.
 - [[Resource Fairness]] — Sharing GPUs fairly: Themis finish-time fairness, Gavel for mixed GPU types, Kueue and Volcano fair share.

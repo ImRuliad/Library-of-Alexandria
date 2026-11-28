@@ -477,3 +477,4 @@ Open problems:
 - [[4. Master Operation]] — GFS re-replication, the repair loop coding makes more expensive.
 - [[End-to-End Data Integrity]] — Planned: checksums and scrubbing across the stack.
 - [[Tail Latency and Hedging]] — Reading extra fragments to cut the tail of degraded reads.
+- [[Algorithm-Based Fault Tolerance]] — The same parity idea applied to a computation, kept valid through arithmetic.
