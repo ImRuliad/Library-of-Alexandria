@@ -377,3 +377,4 @@ MathDx started header-only and is moving to **link-time optimization (LTO)** lib
 - [[Batched Small-Matrix Linear Algebra]] — Batched solvers across MAGMA, cuSOLVER and cuSolverDx, and when to fuse with cuSolverDx.
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — The host-side cuSOLVER IRS solvers: low-precision LU with FP64 refinement for large systems.
 - [[GPU Data Compression]] — nvCOMP, nvCOMPDx and the Blackwell Decompression Engine; LZ4 and ANS in depth.
+- [[Dense LU and Cholesky Factorization on GPUs]] — Large single factorizations with cuSOLVER and MAGMA, the host-side counterpart to cuSolverDx.

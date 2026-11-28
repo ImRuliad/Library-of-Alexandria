@@ -459,3 +459,4 @@ Net: in late 2026, [[Quantization]] and [[Low-Precision Formats - FP8, FP4 and M
 - [[Quantization]] — The model-compression alternative to pruning.
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — GMRES as the refinement engine for dense mixed-precision solves.
 - [[Batched Small-Matrix Linear Algebra]] — Batched dense factorizations for frontal matrices and block preconditioners, and cuDSS batches.
+- [[Dense LU and Cholesky Factorization on GPUs]] — The dense LU and Cholesky kernels that sparse direct solvers apply to frontal matrices.

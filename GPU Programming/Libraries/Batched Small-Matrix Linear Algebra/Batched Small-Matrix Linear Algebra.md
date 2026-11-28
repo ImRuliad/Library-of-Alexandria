@@ -410,5 +410,5 @@ The performance page is a compact checklist for any batched kernel: launch enoug
 - [[Tiled Matrix Multiplication (GEMM)]] — The trailing update that blocked batched algorithms reduce to.
 - [[CUDA Graphs]] — Cutting launch overhead in multi-kernel batched factorizations.
 - [[ROCm and HIP]] — rocSOLVER and hipSOLVER batched routines.
-- [[Dense LU and Cholesky Factorization on GPUs]] — Single large factorizations with cuSOLVER and MAGMA (planned).
+- [[Dense LU and Cholesky Factorization on GPUs]] — Single large factorizations with cuSOLVER and MAGMA.
 - [[Krylov Solvers on GPUs]] — Iterative solvers that use batched blocks as preconditioners (planned).

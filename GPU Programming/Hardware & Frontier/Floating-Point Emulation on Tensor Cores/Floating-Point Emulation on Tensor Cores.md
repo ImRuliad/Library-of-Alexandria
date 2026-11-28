@@ -381,3 +381,4 @@ For a sense of time saved, NVIDIA's GB200 figure of 147 TFLOPS at 3.9x native im
 - [[Sparse Linear Algebra on GPUs]] — The sparse kernels emulation does not help.
 - [[AI Accelerators]] — Chips built for low precision, where emulation may be the only route to FP64.
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — The other route to FP64 answers: factor in low precision, refine in FP64, and the HPL-MxP benchmark built on it.
+- [[Dense LU and Cholesky Factorization on GPUs]] — Dense factorizations whose trailing GEMMs emulation speeds up, and whose panels it does not.

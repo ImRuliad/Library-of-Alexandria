@@ -484,3 +484,4 @@ The two compose: the FP64 residuals and the GMRES steps in refinement are themse
 - [[ROCm and HIP]] — What hipSOLVER does and does not map from cuSOLVER's IRS family.
 - [[Blackwell Architecture]] — The FP64-poor, 16-bit-rich GPUs that HPL-MxP flatters most.
 - [[AI Accelerators]] — Low-precision chips where refinement or emulation is the only route to FP64.
+- [[Dense LU and Cholesky Factorization on GPUs]] — The FP64 LU and Cholesky that refinement replaces: panels, pivoting, row swaps and look-ahead.
