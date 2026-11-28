@@ -44,7 +44,7 @@ sources:
   - https://openjdk.org/jeps/491
   - https://homepages.inf.ed.ac.uk/slindley/papers/handlers-cps.pdf
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -159,7 +159,7 @@ A **shallow** handler drops the re-wrap: the continuation is $\lambda x.\, E[x]$
 | **Resumption count** | one-shot (resume at most once) vs multi-shot | One-shot continuations can *own* the stack segment and move it; multi-shot ones must copy or share it. OCaml is one-shot and raises an exception on a second resume ([manual](https://ocaml.org/manual/effects.html)); Koka and Effekt allow multi-shot. |
 | **Handler depth** | deep vs shallow | Deep handlers allow tail-resume optimizations and stay installed across resumes. |
 | **Handler binding** | dynamic (nearest enclosing handler at run time) vs lexical (the handler in scope where the code was written) | Dynamic binding needs a search up the handler stack; lexical binding can pass the handler like a variable ([Lexa, OOPSLA 2024](https://cs.uwaterloo.ca/~yizhou/papers/lexa-oopsla2024.pdf)). |
-| **Typing** | untyped (OCaml), effect rows (Koka), capabilities (Effekt) | Types let the compiler know *which* handler serves an operation and whether an operation can suspend at all, so it can compile the rest as plain code ([Leijen, POPL 2017](https://www.microsoft.com/en-us/research/?p=337556); [Effekt history](https://effekt-lang.org/evolution)). |
+| **Typing** | untyped (OCaml), effect rows (Koka), capabilities (Effekt); see [[Effect Types]] | Types let the compiler know *which* handler serves an operation and whether an operation can suspend at all, so it can compile the rest as plain code ([Leijen, POPL 2017](https://www.microsoft.com/en-us/research/?p=337556); [Effekt history](https://effekt-lang.org/evolution)). |
 
 One more distinction drives most optimizations: an operation is **tail-resumptive** if every handler clause for it ends by immediately resuming, such as `ask` in a reader effect or `get` in a state effect. Such an operation never really suspends, so a compiler can execute the clause in place, like a virtual call, without capturing a continuation ([Xie and Leijen](https://www.microsoft.com/en-us/research/uploads/prod/2021/08/genev-icfp21.pdf)).
 
@@ -437,7 +437,7 @@ The handler is just a block label, and the continuation is a typed reference. Bo
 
 **Open problems.**
 
-- **Typing effects in mainstream languages.** Row types (Koka) and capabilities (Effekt) work in research languages, but retrofitting either onto OCaml has not started, and typed effects are not agreed to be necessary ([OCaml Discuss, Sep 2026](https://discuss.ocaml.org/t/whats-the-status-of-typed-effects/18439)). Without types, compilers cannot prove an operation is tail-resumptive or that a function never suspends, and handlers stay dynamically scoped.
+- **Typing effects in mainstream languages.** Row types (Koka) and capabilities (Effekt) work in research languages (compared in [[Effect Types]]), but retrofitting either onto OCaml has not started, and typed effects are not agreed to be necessary ([OCaml Discuss, Sep 2026](https://discuss.ocaml.org/t/whats-the-status-of-typed-effects/18439)). Without types, compilers cannot prove an operation is tail-resumptive or that a function never suspends, and handlers stay dynamically scoped.
 - **Handler search vs zero-cost installation.** Dynamic scoping costs a search per perform; lexical scoping costs passing capabilities around unless the compiler builds side tables ([OOPSLA 2024](https://cs.uwaterloo.ca/~yizhou/papers/lexa-oopsla2024.pdf); [OOPSLA 2025](https://cs.uwaterloo.ca/~yizhou/papers/zero-oopsla2025.pdf)). Which is better depends on how often effects actually fire.
 - **Stack growth.** Moving stacks breaks interior pointers; segments suffer hot splits; virtual-memory reservations cost address space and behave differently across OSes ([Yu 2025](https://arxiv.org/pdf/2512.03083); [libmprompt](https://www.github.com/koka-lang/libmprompt)).
 - **Engine performance in Wasm.** The only published numbers are from a 2023 prototype that was slower than Asyncify at run time ([OOPSLA 2023](https://arxiv.org/pdf/2308.08347)); production-quality numbers from browser engines do not yet exist.
@@ -484,6 +484,7 @@ The handler is just a block label, and the continuation is a typed reference. Bo
 - [[Reference Counting and Reuse]] — Perceus, which Koka pairs with evidence passing; Effekt's uniqueness check for one-shot resumes.
 - [[Closure Conversion and Defunctionalization]] — How CPS continuations become heap closures or defunctionalized state machines.
 - [[Type Systems and Inference]] — Row types and effect inference in Koka.
+- [[Effect Types]] — The type-system half: rows, capabilities, modal effects and OxCaml modes, and why OCaml's effects stay untyped.
 - [[Intermediate Representations]] — Where continuations and join points sit among IR designs.
 - [[JIT Compilation]] — Engines that must implement stack switching in every tier.
 - [[Deoptimization and Speculation]] — Another runtime technique that rebuilds and swaps frames, and must keep unwinders honest.

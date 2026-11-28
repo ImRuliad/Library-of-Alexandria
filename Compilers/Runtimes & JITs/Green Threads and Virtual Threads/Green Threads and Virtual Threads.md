@@ -93,7 +93,7 @@ updated: 2026-11-28
 
 An OS thread is expensive in two ways: memory (a fixed stack reservation, usually in megabytes of address space, plus kernel bookkeeping) and switching (a trip through the kernel scheduler). That is fine for a few hundred threads and fails at a few hundred thousand.
 
-The industry's first answer was asynchronous code: callbacks, then futures, then `async`/`await`. It scales, but it changes the language. An `async` function can only be awaited from another `async` function, so the "color" spreads up the call graph, and blocking calls inside async code stall everything ([Nystrom, 2015](https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function)). Stack traces, debuggers and profilers also lose the logical thread of control.
+The industry's first answer was asynchronous code: callbacks, then futures, then `async`/`await`. It scales, but it changes the language. An `async` function can only be awaited from another `async` function, so the "color" (an effect that the type tracks, in the sense of [[Effect Types]]) spreads up the call graph, and blocking calls inside async code stall everything ([Nystrom, 2015](https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function)). Stack traces, debuggers and profilers also lose the logical thread of control.
 
 The green-thread answer keeps blocking code and makes the thread cheap instead. The JVM documentation puts the design rule plainly: virtual threads "are plentiful, and so each should represent not some shared, pooled, resource but a task" and "should never be pooled" ([Oracle, Java 26 docs](https://docs.oracle.com/en/java/javase/26/core/virtual-threads.html)).
 
@@ -423,6 +423,7 @@ quadrantChart
 *Green threads sit where stack maps, effect handlers and the garbage collector meet; these are the notes they lean on.*
 
 - [[Effect Handlers and Delimited Continuations]] — Green threads are one-shot stackful continuations plus a scheduler; OCaml 5 fibers and Loom's continuation primitive.
+- [[Effect Types]] — Typed effects as the general form of function colouring, and how effect polymorphism avoids splitting the world.
 - [[Safepoints and Stack Maps]] — The maps that let stacks be copied and scanned, and Go's signal-based preemption.
 - [[Garbage Collection]] — Precise stack scanning, stack chunks as heap objects, and Go's GC-based leak detection.
 - [[Escape Analysis]] — Why pointers to stack data never leave the stack in Go, which makes copying possible.

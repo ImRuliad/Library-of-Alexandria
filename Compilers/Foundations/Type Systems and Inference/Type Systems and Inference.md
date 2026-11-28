@@ -51,7 +51,7 @@ sources:
   - https://forums.swift.org/t/recent-improvements-to-the-type-checker/87048
   - https://www.infoq.com/news/2026/09/swift-6-4-released/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -169,7 +169,7 @@ $$
 
 ## ***How We Got Here***
 ---
-*Inference started as a logic result, became a practical algorithm for ML, and then spent forty years being bent to fit classes, subtyping, effects and existing untyped code.*
+*Inference started as a logic result, became a practical algorithm for ML, and then spent forty years being bent to fit classes, subtyping, [[Effect Types|effects]] and existing untyped code.*
 
 ```mermaid
 timeline
@@ -477,4 +477,5 @@ Open problems:
 - [[ML Compilers]] — Shape and dtype inference, related to Pyrefly's tensor-shape checking.
 - [[Formal Methods in Practice]] — Refinement types and SMT-backed verification.
 - [[Dependent and Refinement Types]] — Planned: Lean, Idris, Agda and LiquidHaskell in depth.
+- [[Effect Types]] — Extending HM with effect rows, Boolean effects or capabilities, and generalizing only total expressions.
 - [[Language Servers and IDE Tooling]] — Incremental, error-tolerant front ends behind editors.

@@ -58,7 +58,7 @@ sources:
   - https://mjtsai.com/blog/?p=23981
   - https://forums.swift.org/t/accepted-with-modifications-se-0446-nonescapable-types/75504
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -673,6 +673,7 @@ quadrantChart
 - [[Value Types and Flattening]] — The language-side answer: values without identity can be scalarized or flattened even where they escape.
 - [[Memory Allocators]] — Go 1.27's size-specialized malloc and freegc work on the allocations that do escape.
 - [[Closure Conversion and Defunctionalization]] — Whether a closure's environment escapes decides heap versus stack closures.
+- [[Effect Types]] — OxCaml's `local` mode and Effekt's second-class blocks: escape guarantees in the type system, used to keep effect handlers in scope.
 - [[Memory Models and Pointer Provenance]] — Address versus provenance capture in LLVM.
 - [[Compiler Testing and Fuzzing]] — Fuzzers keep finding allocation-elimination bugs in C2.
 - [[Verified Compilers]] — Proving these transformations correct is still largely open.

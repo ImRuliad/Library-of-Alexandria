@@ -75,7 +75,7 @@ sources:
   - https://arxiv.org/pdf/2507.23726v1
   - https://arxiv.org/abs/2510.01346
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -586,3 +586,4 @@ Open problems:
 - [[RL for Reasoning]] — How AlphaProof-style provers are trained against the Lean checker.
 - [[Proof Assistant Kernels]] — LCF and de Bruijn kernels, independent and verified checkers, and the 2026 Lean kernel bugs in depth.
 - [[Bounds Check Elimination]] — The compiler-analysis route to the same goal DML's types reach statically.
+- [[Effect Types]] — The other big extension of types with facts the compiler can use: what a computation does, not what its value satisfies.
