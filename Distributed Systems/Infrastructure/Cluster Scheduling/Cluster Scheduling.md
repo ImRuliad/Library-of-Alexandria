@@ -350,7 +350,7 @@ flowchart LR
 | Monolithic master; Omega's clients touching the store directly | Every component goes through the API server | "Don't expose raw state" |
 | Jobs the only grouping | Pods group containers; controllers adopt and orphan pods by label | Quarantine a bad pod by relabeling it |
 
-**Reconciliation.** Each controller compares desired state with observed state and acts to converge them, so after a crash it simply looks again; the paper calls this "control through choreography." The store under the API server is etcd, a [[Raft]] group ([[Coordination Services]]).
+**Reconciliation.** Each controller compares desired state with observed state and acts to converge them, so after a crash it simply looks again; the paper calls this "control through choreography" ([[Reconciliation and Control Loops]] covers the controller machinery in depth). The store under the API server is etcd, a [[Raft]] group ([[Coordination Services]]).
 
 ```mermaid
 sequenceDiagram
@@ -547,3 +547,4 @@ Open problems worth tracking:
 - [[Auto-Sharding]] — Shard Manager's TaskController negotiates container restarts with Twine.
 - [[Resource Fairness]] — Max-min, fair queuing, DRF's extensions, Kueue fair sharing and GPU-era fairness in depth.
 - [[Overcommit and Vertical Autoscaling]] — Borg reclamation, peak prediction, Autopilot, Kubernetes VPA and in-place resize in depth.
+- [[Reconciliation and Control Loops]] — Level-triggered controllers, informers and workqueues, stale caches, and controllers that fight.

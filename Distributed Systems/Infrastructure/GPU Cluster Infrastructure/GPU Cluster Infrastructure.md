@@ -314,7 +314,7 @@ Two second-order effects stand out. Synchronized checkpoints and collective wait
 
 ### Detection and Recovery
 
-*Recovery is a control loop: notice the job stalled, find the bad machine, swap it out, restart from state. The engineering goal is shrinking each stage from hours to minutes.*
+*Recovery is a control loop ([[Reconciliation and Control Loops]]): notice the job stalled, find the bad machine, swap it out, restart from state. The engineering goal is shrinking each stage from hours to minutes.*
 
 ```mermaid
 sequenceDiagram

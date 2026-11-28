@@ -418,7 +418,7 @@ Open problems worth tracking:
 - [[Gray and Fail-Slow Failures]] — Interference from noisy neighbors looks like a slow node from outside.
 - [[Auto-Sharding]] — Another controller that moves work and must coordinate with the scheduler and autoscalers.
 - [[Coordination Services]] — etcd, whose single-node outages Gardener avoided with in-place resize.
-- [[Reconciliation and Control Loops]] — Planned: the VPA, HPA and scheduler as interacting control loops.
+- [[Reconciliation and Control Loops]] — The VPA, HPA and scheduler as interacting control loops; HPA's formula and stabilizers.
 - [[Queueing Theory for Systems]] — Planned: why utilization near 100% makes latency explode.
 - [[Tail Latency and Hedging]] — Planned: the latency cost of colocation and throttling.
 - [[Performance Isolation and Colocation]] — Planned: Heracles and its successors in depth.

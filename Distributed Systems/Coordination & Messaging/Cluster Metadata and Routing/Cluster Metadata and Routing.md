@@ -403,7 +403,7 @@ The lesson both write-ups point toward: the fast, global propagation that makes 
 - **Staged rollout of the map itself.** Routing data is usually pushed globally because consistency demands one answer. The 2025 outages argue for cells and canaries even for metadata, which conflicts with having a single current map. See the planned [[Zonal Isolation and Cell-Based Architecture]].
 - **Cold-start load.** Constant work solves it at a price; prefetching and hints reduce it. Choosing per system remains guesswork, and the planned [[Queueing Theory for Systems]] note is where the numbers belong.
 - **Metadata as a scaling ceiling.** KRaft moved Kafka from tens of thousands to millions of partitions; the next limits are snapshot size and how long a new broker takes to load state. [[Diskless Streaming]] designs add a new routing question: which coordinator assigns offsets for data in [[Object Storage]].
-- **Control loops over the map.** Placement services are reconcilers: desired map vs actual. How they avoid oscillation and fight with each other (PD scheduling vs an operator's manual move) belongs to the planned [[Reconciliation and Control Loops]].
+- **Control loops over the map.** Placement services are reconcilers: desired map vs actual. How they avoid oscillation and fight with each other (PD scheduling vs an operator's manual move) belongs to [[Reconciliation and Control Loops]].
 
 ## ***Resources***
 ---
@@ -460,7 +460,7 @@ The lesson both write-ups point toward: the fast, global propagation that makes 
 - [[Formal Methods in Practice]] — Checking ownership-transfer protocols.
 - [[Deterministic Simulation Testing]] — Testing epoch races and stale routers.
 - [[Object Storage]] — Where diskless designs move data, adding new routing questions.
-- [[Reconciliation and Control Loops]] — Planned: placement services as reconcilers.
+- [[Reconciliation and Control Loops]] — Placement services as reconcilers; level triggering and controllers that fight.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: staging metadata changes by cell.
 - [[Queueing Theory for Systems]] — Planned: sizing metadata tiers for cold starts.
 - [[Diskless Streaming]] — Offset-assigning coordinators over object storage.

@@ -306,7 +306,7 @@ stateDiagram-v2
     OFFLINE --> [*]
 ```
 
-This level-triggered "desired vs actual" loop is the same pattern as Kubernetes controllers; see the planned [[Reconciliation and Control Loops]] note. Azure Service Fabric's Cluster Resource Manager takes a related stance: it "moves *services* to where they make the most sense, expecting traffic or load to follow", unlike a load balancer, which moves traffic to where services already are ([Microsoft Learn](https://learn.microsoft.com/en-us/azure/service-fabric/service-fabric-cluster-resource-manager-introduction)).
+This level-triggered "desired vs actual" loop is the same pattern as Kubernetes controllers; see [[Reconciliation and Control Loops]]. Azure Service Fabric's Cluster Resource Manager takes a related stance: it "moves *services* to where they make the most sense, expecting traffic or load to follow", unlike a load balancer, which moves traffic to where services already are ([Microsoft Learn](https://learn.microsoft.com/en-us/azure/service-fabric/service-fabric-cluster-resource-manager-introduction)).
 
 ## ***Where It Is Now***
 ---
@@ -395,6 +395,6 @@ The same idea now hides inside managed systems. Elasticsearch Serverless (Decemb
 - [[Deterministic Simulation Testing]] — Testing moves and handovers under faults.
 - [[Formal Methods in Practice]] — Checking ownership-transfer protocols.
 - [[Hot Keys and Cache Stampedes]] — Salting, leases and coalescing for keys no split can fix.
-- [[Reconciliation and Control Loops]] — Planned: the desired-vs-actual loop Helix uses.
+- [[Reconciliation and Control Loops]] — The desired-vs-actual loop Helix uses, and how such loops go wrong.
 - [[Cluster Metadata and Routing]] — how shard maps reach clients.
 - [[Tail Latency and Hedging]] — Planned: handling slow owners at request time.
