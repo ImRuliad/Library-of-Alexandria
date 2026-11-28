@@ -112,7 +112,7 @@ $$
 
 LLVM's terminology matches this: a loop has one **header**; a **latch** is a block with an edge to the header; that edge is a **backedge**; edges leaving the loop go from **exiting blocks** to **exit blocks** ([LLVM Loop Terminology](https://llvm.org/docs/LoopTerminology.html)). Loops whose bodies are disjoint or nested form a **loop nest** tree, and nest transformations operate on paths through that tree.
 
-**Reducible vs irreducible.** If every cycle in the CFG has a header that dominates it, the CFG is *reducible* and every cycle is a natural loop. Code built from `goto`, some state machines, and some optimizations can create a cycle with two entries, which has no such header. LLVM notes that "a cycle in the CFG does not imply there is a loop"; its `FixIrreducible` pass can insert new headers to turn such cycles into loops, but it is not in the default pipelines, so loop passes simply skip irreducible regions ([LLVM Loop Terminology](https://llvm.org/docs/LoopTerminology.html)).
+**Reducible vs irreducible.** (See [[Irreducible Control Flow]].) If every cycle in the CFG has a header that dominates it, the CFG is *reducible* and every cycle is a natural loop. Code built from `goto`, some state machines, and some optimizations can create a cycle with two entries, which has no such header. LLVM notes that "a cycle in the CFG does not imply there is a loop"; its `FixIrreducible` pass can insert new headers to turn such cycles into loops, but it is not in the default pipelines, so loop passes simply skip irreducible regions ([LLVM Loop Terminology](https://llvm.org/docs/LoopTerminology.html)).
 
 ### Canonical Loop Form
 
@@ -495,3 +495,4 @@ The pattern: keep the compiler's exact legality check (polyhedral dependence ana
 - [[Safepoints and Stack Maps]] — HotSpot's loop strip mining keeps safepoint polls out of the inner loop.
 - [[On-Stack Replacement]] — JITs count back-edges and enter optimized code at loop headers; an extra loop entry weakens LICM.
 - [[Sampling Profilers and Safepoint Bias]] — Poll-free counted loops are where safepoint-biased profilers misplace time.
+- [[Irreducible Control Flow]] — Multi-entry cycles that loop passes skip, and how compilers rewrite them into natural loops.

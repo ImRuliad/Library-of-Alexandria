@@ -345,7 +345,7 @@ Engines that compile the continuation only (C2, .NET) sidestep most of this: the
 
 - **Inside LLVM.** McVM (Lameed and Hendren) and OSRKit (D'Elia and Demetrescu) generate an OSR continuation function whose arguments are the live values at the OSR point, plus compensation code. With the `avail` reconstruction strategy, OSR from base to optimized code is possible at close to 100% of program points across SPEC CPU2006 and Phoronix benchmarks, and in the deopt direction at over 90% on all of them; without compensation code it is under 10% for most ([arXiv 1708.02512](https://arxiv.org/pdf/1708.02512)). The same reconstruction helps debuggers show correct values for "endangered" variables in optimized code. See [[LLVM]].
 - **As a code pattern.** Essertel, Tahboub and Rompf's "Duplicate, Optimize, Trampoline" lambda-lifts each loop into several versions (cheap to compile, heavily optimized, speculated), checks at the top of each iteration which version should run, and hands over at an iteration boundary. Because the switching is ordinary generated code, GCC or Clang can serve as the "JIT"; they used TCC for fast first versions and GCC for later ones in an SQL-to-C query compiler ([GPCE 2021](https://www.cs.purdue.edu/~rompf/papers/essertel-gpce21.pdf)). See [[Closure Conversion and Defunctionalization]] for lambda lifting.
-- **In unstructured interpreters.** Sulong rebuilds loops from LLVM IR basic blocks, wraps each in a Truffle `LoopNode`, and bails out on irreducible control flow. Warm-up improved by 1.5x to 9x on benchmarks where OSR triggered; fannkuch at size 11 went from not finishing in a day to under 30 minutes ([MPLR 2019](https://arxiv.org/pdf/1909.08815)).
+- **In unstructured interpreters.** Sulong rebuilds loops from LLVM IR basic blocks, wraps each in a Truffle `LoopNode`, and bails out on [[Irreducible Control Flow|irreducible control flow]]. Warm-up improved by 1.5x to 9x on benchmarks where OSR triggered; fannkuch at size 11 went from not finishing in a day to under 30 minutes ([MPLR 2019](https://arxiv.org/pdf/1909.08815)).
 
 ## ***Where It Is Now***
 ---
@@ -463,3 +463,4 @@ quadrantChart
 - [[Verified Compilers]] — Formal models of speculation, deopt and OSR.
 - [[Compiler Testing and Fuzzing]] — Stress modes for rarely run transitions.
 - [[Translation Validation]] — Checking OSR-compatible transformations case by case.
+- [[Irreducible Control Flow]] — Multi-entry loops that defeat loop reconstruction, and that OSR entries themselves create.

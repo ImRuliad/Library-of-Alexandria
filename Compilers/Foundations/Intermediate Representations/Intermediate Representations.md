@@ -463,7 +463,7 @@ Status per that post: Turbofan's whole JavaScript backend and the whole Wasm pip
 - **Semantics of each level.** Every new IR (SIL, MIR, ClangIR) needs its own semantics and correct lowering, and LLVM's 2025-2026 capture and provenance changes show even old IRs are still being pinned down. See [[Verified Compilers]] and [[Formal Methods in Practice]].
 - **Compile time versus freedom.** V8 halved compile time by giving up floating; Cranelift found eager rewriting matters more than keeping equivalent forms. How much generality a JIT IR can afford is still decided case by case.
 - **Memory effects.** Sea of nodes failed in V8 mainly on memory; multiple effect chains are "hard to manage" when most accesses may alias. Better alias information in the IR is the lever.
-- **Structure versus flexibility.** Wasm and `scf` keep structured control flow for verification and loop transforms, but irreducible code then needs the Relooper or node splitting.
+- **Structure versus flexibility.** Wasm and `scf` keep structured control flow for verification and loop transforms, but [[Irreducible Control Flow|irreducible code]] then needs the Relooper or node splitting.
 - **Testing IR invariants.** Wrong effect chains and bad lowerings survive for months; see [[Compiler Testing and Fuzzing]].
 
 ## ***Resources***
@@ -499,3 +499,4 @@ Status per that post: Turbofan's whole JavaScript backend and the whole Wasm pip
 - [[Compiler, Assembler, Linker, and Loader]] — The C build stages below the IR.
 - [[Sea of Nodes]] — Planned: Click's IR, HotSpot C2, Graal and V8's departure in depth.
 - [[CPS and ANF]] — Planned: functional-compiler IRs, join points and contification.
+- [[Irreducible Control Flow]] — Why structured IRs need multi-entry loops rewritten first.

@@ -385,7 +385,7 @@ def read_variable_recursive(var, block):
 
 - **Sealing.** A block is *sealed* once all its predecessors are known. A loop header can't be sealed until its back edge exists, so reads there create placeholder φs that are completed by `seal_block`.
 - **Trivial φs.** A φ that "just references itself and one other value v any number of times" is replaced by v, and its φ users are rechecked recursively.
-- **Guarantees.** Always *pruned* (φs are created only on demand); *minimal* for reducible CFGs. Irreducible CFGs can leave redundant φ cycles, removed by a post-pass over strongly connected components of the φ graph.
+- **Guarantees.** Always *pruned* (φs are created only on demand); *minimal* for reducible CFGs. [[Irreducible Control Flow|Irreducible CFGs]] can leave redundant φ cycles, removed by a post-pass over strongly connected components of the φ graph.
 - **Cost.** In LLVM 3.1 on SPEC CINT2000, the compiler executed about 0.28% fewer instructions than with LLVM's tuned Cytron-style construction. In libFirm, running local optimizations during construction shrank the graph to 88.2% of its nodes and made whole compilation 1.49 s faster ([Braun et al.](https://bernsteinbear.com/assets/img/braun13cc.pdf); [Saarland project page](https://compilers.cs.uni-saarland.de/projects/ssaconstr/)).
 
 Cranelift's `cranelift-frontend` crate is "A SSA-building API that handles incomplete CFGs," and says it is based on Braun et al. 2013; it fills in block parameters when a block is sealed ([cranelift-frontend ssa.rs](https://docs.rs/crate/cranelift-frontend/latest/source/src/ssa.rs)). Cytron remains the default in LLVM and rustc, partly from a long head start ([Cornell CS 6120 blog](https://www.cs.cornell.edu/courses/cs6120/2025sp/blog/efficient-ssa/)).
@@ -611,3 +611,4 @@ The biggest recent representation change was V8's. In March 2025 the V8 team des
 - [[Abstract Interpretation]] — The general theory of sound static analysis over abstract domains.
 - [[Pointer and Alias Analysis]] — Which pointers may refer to the same memory, and how optimizers use it.
 - [[CPS and ANF]] — The functional-compiler cousins of SSA.
+- [[Irreducible Control Flow]] — Multi-entry loops, where dominance-based reasoning and minimal SSA get harder.
