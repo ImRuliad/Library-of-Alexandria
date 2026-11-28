@@ -427,6 +427,7 @@ Sources for unlinked rows: [OpenAI o1](https://openai.com/index/learning-to-reas
 - [[Scaling Laws]] — Test-time compute is the second scaling axis; train-to-test laws push pretraining toward overtraining.
 - [[RL for Reasoning]] — The training algorithms (PPO, GRPO and successors) and reward design behind reasoning models.
 - [[RL Environments and Verifiers]] — The tasks, sandboxes and checkers reasoning models are trained in, and how verifiers fail.
+- [[Synthetic Data]] — Rejection-sampled and distilled reasoning traces, and what OpenThoughts learned about making them.
 - [[Distillation]] — How reasoning traces from large models make small models strong reasoners (R1-Distill).
 - [[Long Context]] — Thinking chains consume the context window; long outputs need long context.
 - [[KV Cache]] — Long generations make the cache, not the weights, the memory bottleneck.

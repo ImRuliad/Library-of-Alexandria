@@ -398,6 +398,7 @@ These are accusations by one party; the legal status of distillation beyond cont
 - [[Quantization]] — The other way to shrink a model: same network in fewer bits, versus a new smaller network.
 - [[Scaling Laws]] — Why small models are overtrained, and distillation scaling laws for when a teacher pays off.
 - [[Pretraining Data]] — Teacher logits and synthetic teacher text are now part of the pretraining data mix.
+- [[Synthetic Data]] — The wider practice of training on model-written text, from instruction pairs to reasoning traces, and its collapse risk.
 - [[Tokenization and Embeddings]] — Logit distillation needs a shared vocabulary; cross-tokenizer methods work around it.
 - [[Mixture of Experts]] — Many teachers and students (Llama 4 Behemoth, DeepSeek-V4, Gemma 4 26B-A4B) are MoE models.
 - [[Speculative Decoding]] — Draft models are small models whose job is to agree with a big one, the same goal distillation trains for.

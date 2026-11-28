@@ -467,7 +467,7 @@ Open problems:
 - [[Pretraining Data]] — The data stage before RL; environments play the role for post-training that datasets play for pretraining.
 - [[Distillation]] — Environments also produce successful trajectories used for supervised fine-tuning and distillation.
 - [[Long Context]] — Agent rollouts run to hundreds of thousands of tokens.
-- [[Synthetic Data]] — Planned note: synthetic tasks and generated training data.
+- [[Synthetic Data]] — Generated tasks, tools and self-play data, and when model-written data helps or collapses.
 - [[Context Engineering and Agent Memory]] — What agents keep in context across long episodes, and RL-trained memory policies (MEM1, MemCalib).
 - [[Chain-of-Thought Faithfulness and Monitorability]] — Monitoring reasoning to catch reward hacking, and why the monitor must stay out of the reward.
 - [[Reward Hacking in Code Benchmarks]] — The compilers view: how kernel, peephole and proof optimizers exploit their checkers, and how to harden them.

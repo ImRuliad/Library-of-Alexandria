@@ -506,6 +506,7 @@ Open problems:
 - [[RL Environments and Verifiers]] — The tasks, sandboxes and verifiers that produce the rewards, and how they get hacked.
 - [[Chain-of-Thought Faithfulness and Monitorability]] — Monitoring reasoning to catch reward hacking, and why the monitor must stay out of the reward.
 - [[Distillation]] — How reasoning learned with RL is distilled into small models.
+- [[Synthetic Data]] — Rejection-sampled reasoning traces and self-generated tasks.
 - [[Scaling Laws]] — Pretraining laws, and where RL's sigmoid compute curves fit beside them.
 - [[Mixture of Experts]] — Why MoE routing makes RL importance ratios unstable, and the routing-replay fixes.
 - [[LLM Serving]] — The inference engines that generate RL rollouts and dominate RL wall-clock time.

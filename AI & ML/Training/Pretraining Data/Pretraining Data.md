@@ -309,7 +309,7 @@ $$
 
 #### **Synthetic Data and Rephrasing**
 
-Three kinds of model-written pretraining data, in order of how far they move from real text:
+Three kinds of model-written pretraining data, in order of how far they move from real text (the full picture, across post-training and RL too, is in [[Synthetic Data]]):
 
 | Kind | What it is | Evidence |
 |---|---|---|
@@ -353,7 +353,7 @@ Closed frontier labs (OpenAI, Google DeepMind, Anthropic) do not publish token c
 - The Nemotron 3 Super card lists synthetic Common Crawl rewritten by Qwen3-30B-A3B and Mistral-NeMo-12B (415.8B tokens) and synthetic code from phi-4 (427.9B), beside 3.36T tokens of real English Common Crawl ([NVIDIA, Mar 2026](https://build.nvidia.com/nvidia/nemotron-3-super-120b-a12b.md)).
 - Qwen3 reports "trillions" of synthetic tokens ([Qwen Team, 2025](https://arxiv.org/pdf/2505.09388)); a 2026 survey of the field says several recent LLMs used "hundreds of billions of synthetic tokens during pretraining" ([Niklaus et al., 2026](https://arxiv.org/html/2604.13977v1)).
 
-The worry is **model collapse**: Shumailov et al. showed that "indiscriminate use of model-generated content in training causes irreversible defects", with the tails of the original distribution disappearing over generations ([Nature, Jul 2024](https://ideas.repec.org/a/nat/nature/v631y2024i8022d10.1038_s41586-024-07566-y.html)). Labs respond by keeping real data in every mix, using synthetic data mainly as rewrites of real documents, and filtering machine-generated web text: DeepSeek-V4 explicitly removes batched, templated auto-generated pages for this reason ([DeepSeek-AI, 2026](https://huggingface.co/papers/2606.19348.md)).
+The worry is **model collapse** (worked through in [[Synthetic Data]]): Shumailov et al. showed that "indiscriminate use of model-generated content in training causes irreversible defects", with the tails of the original distribution disappearing over generations ([Nature, Jul 2024](https://ideas.repec.org/a/nat/nature/v631y2024i8022d10.1038_s41586-024-07566-y.html)). Labs respond by keeping real data in every mix, using synthetic data mainly as rewrites of real documents, and filtering machine-generated web text: DeepSeek-V4 explicitly removes batched, templated auto-generated pages for this reason ([DeepSeek-AI, 2026](https://huggingface.co/papers/2606.19348.md)).
 
 #### **Open Datasets of 2025 and 2026**
 
@@ -442,6 +442,7 @@ Code and math corpora sit beside these: The Stack v2 (Feb 2024) was built with S
 
 - [[Scaling Laws]] — Why runs need so many tokens, and where the data-constrained laws plug in.
 - [[Tokenization and Embeddings]] — The tokenizer decides what a "token" is and so every budget in this note.
+- [[Synthetic Data]] — Rephrasing, generated textbooks, model collapse, and how much synthetic data to mix in.
 - [[Distillation]] — Synthetic rephrasing and generated textbooks pass a teacher model's knowledge into pretraining.
 - [[Long Context]] — The long-document phase that ends most 2025 to 2026 pretraining runs.
 - [[Distributed Training]] — How tens of trillions of tokens are streamed through thousands of accelerators.

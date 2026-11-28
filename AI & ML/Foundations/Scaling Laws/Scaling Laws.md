@@ -320,7 +320,7 @@ Algorithmic progress is why scaling-law constants go stale: a better architectur
 - **Loss is not capability.** Laws predict cross-entropy. Benchmark scores are thresholds on top of it and can look jumpy ([Schaeffer et al., 2023](https://arxiv.org/abs/2304.15004)); predicting which skills a model will have from its loss is still unreliable.
 - **Constants don't transfer.** $E$, $A$, $B$ and even the exponents depend on the data, tokenizer and architecture. Quoting "20 tokens per parameter" for a different setup is a rough guide at best.
 - **What "optimal" means depends on the bill.** Training-optimal, inference-aware, memory-optimal and train-to-test laws give very different answers for the same budget. There is no single right model size without knowing how it will be served.
-- **The data wall.** If high-quality text stops growing, $D$ can only grow through repetition, synthetic data or paraphrase, whose worth per token is still being measured ([Qin et al., 2026](https://arxiv.org/abs/2607.25271)).
+- **The data wall.** If high-quality text stops growing, $D$ can only grow through repetition, [[Synthetic Data|synthetic data]] or paraphrase, whose worth per token is still being measured ([Qin et al., 2026](https://arxiv.org/abs/2607.25271); [Roberts et al., 2026](https://arxiv.org/html/2610.31867)).
 - **Post-training laws are young.** RL laws are sigmoids with a ceiling that depends on the recipe; whether ceilings can be raised predictably, and how RL interacts with pretraining scale, is open ([Khatri et al., 2025](https://arxiv.org/abs/2510.13786)).
 
 ## ***Resources***
