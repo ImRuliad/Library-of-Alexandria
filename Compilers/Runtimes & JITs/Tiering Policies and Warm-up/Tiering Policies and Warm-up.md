@@ -349,7 +349,7 @@ The thresholds, from V8's main branch ([flag-definitions.h](https://raw.githubus
 
 **Rules on top of the budget.**
 
-- **Wait for stable feedback.** If an inline cache changed recently, the budget is reset so tiering waits for `minimum_invocations_after_ic_update` more runs; speculating on churning types only buys a deopt.
+- **Wait for stable feedback.** If an [[Inline Caches and Code Patching|inline cache]] changed recently, the budget is reset so tiering waits for `minimum_invocations_after_ic_update` more runs; speculating on churning types only buys a deopt.
 - **Don't interrupt yourself.** While a non-OSR compile is already in flight, the budget is set to its maximum; while an OSR compile is in flight, the loop budget is stretched 3x (`invocation_count_for_osr_factor_while_tiering_in_progress`).
 - **Cached tiering decisions.** Each function's `SharedFunctionInfo` (the per-source-function record that all its closures share) stores a 3-bit `CachedTieringDecision`. `kEarlyMaglev` and `kEarlyTurbofan` cut the budget to 30 runs; `kDelayMaglev` adds 600 runs for functions likely to deoptimize, and `kEarlyTurbofan` can skip Maglev entirely ([tiering-manager.cc](https://raw.githubusercontent.com/v8/v8/main/src/execution/tiering-manager.cc)). An August 2026 change by Intel's Tao Pan also sets `kDelayMaglev` when a Maglev compile aborts, "avoiding immediate re-compilation that would likely lead to another deoptimization or abort" ([CL 8287604](https://chromium-review.googlesource.com/c/v8/v8/+/8287604)).
 - **Power modes.** Efficiency or battery-saving modes can skip or delay tier-up steps ([v8pedia](https://v8pedia.void.app/pipeline/feedback)).
@@ -537,7 +537,7 @@ quadrantChart
 - [[Sampling Profilers and Safepoint Bias]] — Sampling as a hotness signal, and profiling code whose compiled form is still changing.
 - [[Safepoints and Stack Maps]] — Where counters and samples can safely hand control to the runtime.
 - [[Code Cache Management]] — Planned: the code memory that higher tiers and OSR consume.
-- [[Inline Caches and Code Patching]] — Planned: the feedback whose stability gates tier-up.
+- [[Inline Caches and Code Patching]] — The feedback whose stability gates tier-up, and the W^X writes that add to startup.
 - [[Compiler Benchmarking Methodology]] — Planned: measurement practice beyond warm-up, from SPEC run rules to noise control.
 - [[AOT Caches and Training Runs]] — Planned: the Leyden cache, ReadyToRun and Baseline Profiles in depth.
 - [[Persistent Compiler Caches]] — Planned: caching compiler output across runs, the build-system cousin of AOT caches.

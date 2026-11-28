@@ -239,7 +239,7 @@ stateDiagram-v2
 | JavaScriptCore | Execution counter per code block: a loop iteration adds 1 point, a call adds 15 | LLInt → Baseline at 500 points, Baseline → DFG at 1,000, DFG → FTL at 100,000, scaled by code size and past recompiles ([Pizlo](https://webkit.org/blog/10308/speculation-in-javascriptcore/)) |
 | .NET | One counter per Tier0 frame, set on entry, decremented at each patchpoint | 1,000 to the first helper call, then an OSR method after the patchpoint is hit more than 16 times, refilling the counter by 4,096 each time: "roughly 69,000" iterations at one site ([OsrDetailsAndDebugging](https://github.com/dotnet/runtime/blob/main/docs/design/features/OsrDetailsAndDebugging.md)) |
 | Truffle (GraalVM) | `LoopNode` iteration count, or `pollOSRBackEdge` in bytecode interpreters | `engine.OSRCompilationThreshold` = 100,352 ([GraalVM docs](https://docs.oracle.com/en/graalvm/jdk/21/docs/graalvm-as-a-platform/language-implementation-framework/OnStackReplacement/)) |
-| CPython JIT (3.13+) | Counter in the inline cache of `JUMP_BACKWARD` | Threshold in the counter; on success `JUMP_BACKWARD` is replaced by `ENTER_EXECUTOR` ([CPython InternalDocs](https://chromium.googlesource.com/external/github.com/python/cpython/+/01a683a3d4dcc8fa2b28873dbe6f57183899ad31/InternalDocs/jit.md)) |
+| CPython JIT (3.13+) | Counter in the [[Inline Caches and Code Patching|inline cache]] of `JUMP_BACKWARD` | Threshold in the counter; on success `JUMP_BACKWARD` is replaced by `ENTER_EXECUTOR` ([CPython InternalDocs](https://chromium.googlesource.com/external/github.com/python/cpython/+/01a683a3d4dcc8fa2b28873dbe6f57183899ad31/InternalDocs/jit.md)) |
 
 What the .NET Tier0 code looks like at a loop head, in pseudo-C (from the design doc's description and Toub's disassembly):
 
@@ -464,3 +464,4 @@ quadrantChart
 - [[Compiler Testing and Fuzzing]] — Stress modes for rarely run transitions.
 - [[Translation Validation]] — Checking OSR-compatible transformations case by case.
 - [[Irreducible Control Flow]] — Multi-entry loops that defeat loop reconstruction, and that OSR entries themselves create.
+- [[Inline Caches and Code Patching]] — Patchable call sites and the cross-modifying-code rules that OSR entry patching shares.

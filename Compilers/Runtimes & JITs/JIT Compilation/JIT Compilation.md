@@ -239,7 +239,7 @@ const q = new Point(3, 4);   // follows the same transitions, ends at M2
 q.z = 5;                     // new transition M2 → M3 {x@0, y@1, z@2}
 ```
 
-An *inline cache* (IC) sits at each property access or call site and remembers what it saw. Its states:
+An *inline cache* (IC) sits at each property access or call site and remembers what it saw (see [[Inline Caches and Code Patching]] for how sites are patched or updated safely). Its states:
 
 | State | Means | Code at the site |
 |---|---|---|
@@ -477,3 +477,4 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[On-Stack Replacement]] — Back-edge counters, OSR entry at loop headers, and how each engine moves the frame.
 - [[Sampling Profilers and Safepoint Bias]] — Attributing samples to JIT code: safepoint bias, AsyncGetCallTrace, JFR, perf maps and jitdump.
 - [[Tiering Policies and Warm-up]] — How each engine sets its tier-up thresholds, and how warm-up is measured and skipped.
+- [[Inline Caches and Code Patching]] — IC state machines in HotSpot, JSC, SpiderMonkey, V8 and CPython; patchpoints, i-cache maintenance and W^X.

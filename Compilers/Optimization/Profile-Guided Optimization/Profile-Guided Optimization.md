@@ -527,3 +527,4 @@ go build ./cmd/server                   # -pgo=auto finds default.pgo
 - [[Compiler Testing and Fuzzing]] — Profile-dependent miscompiles and reproducibility.
 - [[Sampling Profilers and Safepoint Bias]] — How sampled profiles go wrong in JIT runtimes, and how `perf` names JIT code.
 - [[Tiering Policies and Warm-up]] — When JITs collect profiles, and AOT caches that ship them from a training run.
+- [[Inline Caches and Code Patching]] — Inline caches as the runtime cousin of indirect-call promotion, and the source of type feedback.
