@@ -450,5 +450,5 @@ Numbers worth knowing:
 - [[Unified Memory]] — The overflow path behind the Polars chunked reader.
 - [[Kernel Fusion]] — Fusing decode into query kernels, the G-ALP approach.
 - [[Roofline Model and Arithmetic Intensity]] — I/O-bound vs decode-bound, the same ceiling argument.
-- [[Query Compilation and JIT on GPUs]] — JIT filters in the reader (planned).
+- [[Query Compilation and JIT on GPUs]] — JIT filters in the reader.
 - [[Blackwell Architecture]] — Home of the hardware decompression engine.

@@ -23,7 +23,7 @@ sources:
   - https://github.com/deepseek-ai/DeepEP
   - https://www.tomshardware.com/tech-industry/artificial-intelligence/deepseeks-ai-breakthrough-bypasses-industry-standard-cuda-uses-assembly-like-ptx-programming-instead
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -417,3 +417,4 @@ Open problems:
 - [[Register Pressure and Spilling]] — Reading ptxas register counts and spill reports.
 - [[CUDA Memory Model and Atomics]] — PTX's scopes, fences and memory orderings.
 - [[Instruction Cache and Code Size on GPUs]] — 16-byte SASS instructions, kernel size from `cuobjdump`, and fatbin size.
+- [[Query Compilation and JIT on GPUs]] — NVRTC, LLVM NVPTX and nvJitLink producing PTX, CUBIN and LTO-IR at runtime for database queries.

@@ -31,7 +31,7 @@ sources:
   - https://arxiv.org/pdf/2511.02043
   - https://developer.nvidia.com/blog/cuda-graphs
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -351,3 +351,4 @@ Open problems:
 - [[Instruction Cache and Code Size on GPUs]] — The code-size cost of fusing many operators into one kernel.
 - [[Random Number Generation on GPUs]] — Counter-based RNG generated inside the consumer kernel, and dropout masks recomputed instead of stored.
 - [[Krylov Solvers on GPUs]] — Fusing vector updates with reductions in conjugate gradient, from six-plus kernels per iteration to two.
+- [[Query Compilation and JIT on GPUs]] — Fusion decided per SQL query at runtime, and what the compile costs.

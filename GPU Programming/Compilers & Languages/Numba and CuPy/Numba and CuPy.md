@@ -25,7 +25,7 @@ sources:
   - https://en.wikipedia.org/wiki/CuPy
   - https://developer.nvidia.com/blog/simplify-gpu-programming-with-nvidia-cuda-tile-in-python
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -280,3 +280,4 @@ For small arrays the bottleneck flips to launch and Python overhead (several mic
 - [[Roofline Model and Arithmetic Intensity]] — The bandwidth arithmetic above.
 - [[ROCm and HIP]] — CuPy's AMD backend.
 - [[Random Number Generation on GPUs]] — What `cp.random` and Monte Carlo kernels draw on: cuRAND and counter-based generators.
+- [[Query Compilation and JIT on GPUs]] — How cuDF turns Numba-compiled PTX UDFs into fused kernels.

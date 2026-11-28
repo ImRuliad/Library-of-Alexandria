@@ -352,7 +352,7 @@ Results come back as GPU-resident columns; other GPU libraries ([[Numba and CuPy
 - **Theseus vs Databricks Photon (Aug 2025):** faster at every TPC-H scale from SF1K to SF30K at similar hourly cost, up to about 4× ([Aramburú et al.](https://arxiv.org/html/2508.05029v1)).
 - **Eiger vs libcudf (Jul 2026):** TPC-H SF10 to SF100 on a GH200, 1.7× to 1.8× faster in total, best 6.1× on Q16, from choosing join and group-by algorithms and table sizes at runtime ([Wu et al., 2026](https://arxiv.org/pdf/2607.04489)).
 
-**Trends:** superchips with fast CPU-GPU links (GH200, GB200) are the default benchmark hardware because they shrink the transfer problem; engines adopt libcudf instead of writing kernels; JIT compilation is returning for strings and predicates; and adaptive operator choice is the main research direction.
+**Trends:** superchips with fast CPU-GPU links (GH200, GB200) are the default benchmark hardware because they shrink the transfer problem; engines adopt libcudf instead of writing kernels; JIT compilation is returning for strings and predicates ([[Query Compilation and JIT on GPUs]]); and adaptive operator choice is the main research direction.
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -415,3 +415,4 @@ Results come back as GPU-resident columns; other GPU libraries ([[Numba and CuPy
 - [[Hot Keys and Cache Stampedes]] — Skew, the same problem on a cluster.
 - [[GPU String Processing]] — String layouts, thread vs warp per string, regex and JIT transforms, dictionary encoding.
 - [[GPU Parquet and File Decoding]] — How the scan itself works: libcudf's page decoding, chunked and hybrid-scan readers, GPU-friendly file layout.
+- [[Query Compilation and JIT on GPUs]] — Compiling pipelines and expressions per query: HeavyDB, DogQC, cuDF JIT, compile cost and caches.
