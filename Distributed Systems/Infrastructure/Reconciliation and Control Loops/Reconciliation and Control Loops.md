@@ -464,5 +464,5 @@ Anvil's verified controllers cost something at runtime but not much: FluentBit's
 - [[Gray and Fail-Slow Failures]] — Recovery loops that detect and replace bad machines.
 - [[Horizontal Autoscaling]] — Planned: HPA, KEDA, predictive and node autoscalers in depth.
 - [[Queueing Theory for Systems]] — Why loops that run near full utilization respond badly.
-- [[Fault Injection and Chaos Engineering]] — Planned: production perturbation, the field cousin of Sieve.
+- [[Fault Injection and Chaos Engineering]] — Production perturbation, the field cousin of Sieve; OAT's 86 operator bugs found by injecting faults during reconciliation.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: static stability and keeping control planes out of the data path.

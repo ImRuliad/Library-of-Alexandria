@@ -330,7 +330,7 @@ Open problems:
 - **Detecting hot keys fast enough.** Spikes are often sudden; a hot key detected a minute later may have already caused the incident. Sampling keeps overhead low but trades accuracy, and Twitter notes spikes are "not always" hot keys ([Yang et al.](https://www.pdl.cmu.edu/PDL-FTP/associated/OSDI20_TwemcacheWorkload.pdf)).
 - **Coalescing across tiers.** Each tier (process, proxy, CDN, shield) collapses only what reaches it. Getting one fetch per key fleet-wide needs routing by key, which itself concentrates a hot key on one coalescer.
 - **The single hot write key.** Salting and counters need the application to change and readers to merge; there's no general storage-level fix for one key that everyone writes ([[Partitioning]]).
-- **Testing the recovery path.** Cache-loss feedback loops only appear under load, which is why [[Deterministic Simulation Testing]] and fault injection matter here.
+- **Testing the recovery path.** Cache-loss feedback loops only appear under load, which is why [[Deterministic Simulation Testing]] and [[Fault Injection and Chaos Engineering|fault injection]] matter here.
 
 ## ***Resources***
 ---

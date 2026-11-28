@@ -60,7 +60,7 @@ updated: 2026-11-26
 
 A bug in a [[Raft]] or [[Paxos]] implementation often needs a specific sequence: a leader is partitioned, a message arrives late, a node restarts with a half-written log entry. Each step is unlikely, so the combination is rarer still. Unit tests cover the steps one at a time. Integration tests on real machines hit some combinations, but timing on real hardware is not repeatable, so a failure seen once may never show up again.
 
-Black-box fault injection like Jepsen drives a real cluster from outside and checks the history of operations against a [[Consistency Models|consistency model]]. It is powerful, but its runs are not deterministic, so a bug it finds may not be reproducible ([Phil Eaton](https://notes.eatonphil.com/2024-08-20-deterministic-simulation-testing.html)). DST attacks both halves: make rare interleavings common, and make every one of them replayable.
+Black-box [[Fault Injection and Chaos Engineering|fault injection]] like Jepsen drives a real cluster from outside and checks the history of operations against a [[Consistency Models|consistency model]]. It is powerful, but its runs are not deterministic, so a bug it finds may not be reproducible ([Phil Eaton](https://notes.eatonphil.com/2024-08-20-deterministic-simulation-testing.html)). DST attacks both halves: make rare interleavings common, and make every one of them replayable.
 
 ## ***Foundations***
 
@@ -231,3 +231,4 @@ Open problems:
 - [[Gray and Fail-Slow Failures]] — slow disks and flaky links a simulator should model
 - [[Distributed Transactions]] — FoundationDB and TigerBeetle are transactional systems built around simulation
 - [[Reliability Patterns]] — retries and timeouts are the code paths simulation stresses most
+- [[Fault Injection and Chaos Engineering]] — fault injection on real clusters and in production, and targeted injectors like CrashTuner and Legolas

@@ -496,4 +496,4 @@ Open problems:
 - [[Probabilistic Sketches]] — Planned: quantile sketches for mergeable percentiles.
 - [[RDMA and Datacenter Transports]] — Planned: microsecond fabrics and their tails.
 - [[Fair LLM Serving]] — Planned: fairness and tails in batched LLM serving.
-- [[Fault Injection and Chaos Engineering]] — Planned: injecting slowness to test tail tolerance.
+- [[Fault Injection and Chaos Engineering]] — Injecting slowness to test tail tolerance; FIS gray-failure scenarios and Xinda.

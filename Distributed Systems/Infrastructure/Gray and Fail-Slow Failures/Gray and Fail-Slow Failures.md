@@ -392,7 +392,7 @@ CSnake (EuroSys 2026) finds these loops by injecting faults, including delays th
 
 ### Testing and Detection in Storage Systems
 
-- **Fault-injection for fail-slow bugs (July 2025).** Sieve statically finds synchronized and timeout-protected I/O and injects slowness there; it found six unknown bugs in ZooKeeper, Kafka and HDFS, two confirmed ([Dong et al., ATC '25](https://www.usenix.org/conference/atc25/presentation/dong)). See [[Deterministic Simulation Testing]] for the broader case for injecting slow disks in tests.
+- **Fault-injection for fail-slow bugs (July 2025).** Sieve statically finds synchronized and timeout-protected I/O and injects slowness there; it found six unknown bugs in ZooKeeper, Kafka and HDFS, two confirmed ([Dong et al., ATC '25](https://www.usenix.org/conference/atc25/presentation/dong)). See [[Deterministic Simulation Testing]] for the broader case for injecting slow disks in tests, and [[Fault Injection and Chaos Engineering]] for slow-fault injection in general.
 - **Drive-level detection, FAST '27 (accepted; conference February 2027).** Kratos (UChicago, SJTU, NetApp) catalogs five disk fail-slow patterns, four previously unexamined, and claims 32.8 to 50% more detections than prior methods, over 95% accuracy across a wide threshold range and 3 to 128x speed ([Li et al.](https://www.usenix.org/conference/fast27/presentation/li)). SlowSight (Nankai, Huawei Cloud, Tsinghua) tackles the labeling bottleneck behind every learned detector, reaching F1 of 0.851 and 0.903 on two Huawei Cloud production datasets ([Zhao et al.](https://www.usenix.org/conference/fast27/presentation/zhao)). These are accepted-paper abstracts as of November 2026; the full papers aren't out yet.
 
 ### AI Training Made Stragglers a First-Class Problem
@@ -486,3 +486,4 @@ Open problems worth tracking:
 - [[Hot Keys and Cache Stampedes]] — How a slow or lost cache becomes a database overload that sustains itself.
 - [[Erasure Coding]] — Slow or missing fragments turn reads into degraded reads that decode from $k$ others.
 - [[Tail Latency and Hedging]] — Fan-out math, hedged and tied requests, and when redundancy backfires.
+- [[Fault Injection and Chaos Engineering]] — Injecting slow and partial faults on purpose, from Xinda to AWS FIS gray-failure scenarios.

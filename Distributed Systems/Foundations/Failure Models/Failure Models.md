@@ -259,7 +259,7 @@ The timeout was a false suspicion: L never crashed. Safety survives only because
 #### **Failures That Don't Fit the Textbook Models**
 - **[[Gray and Fail-Slow Failures|Gray failure]]:** the system's own detector says healthy while applications see failure ("differential observability"). Examples from Microsoft Azure: a core switch silently dropping packets, a VM whose heartbeats arrive over a local path while its real network is broken, a storage server crashing in a loop because a reporting bug hid its capacity pressure ([Huang et al., 2017](https://pages.cs.wisc.edu/~ra/Classes/739-sp20/papers/grayfailure-hotos17.pdf)). The recommended fix is to monitor from the application's point of view, not only with heartbeats.
 - **Fail-slow:** disks, SSDs, CPUs, memory and NICs that keep working at a fraction of their speed; faults convert from one form to another and cascade ([Gunawi et al., 2018](https://www.usenix.org/node/210509)). A crash-stop model treats a slow node as healthy, and one slow replica in a synchronous path slows everything.
-- **Partitions in practice:** most partition bugs are deterministic and need no special client input, so partition fault injection in tests catches the majority ([Alquraan et al.](https://www.usenix.org/conference/osdi18/presentation/alquraan)). See [[Deterministic Simulation Testing]].
+- **Partitions in practice:** most partition bugs are deterministic and need no special client input, so partition [[Fault Injection and Chaos Engineering|fault injection]] in tests catches the majority ([Alquraan et al.](https://www.usenix.org/conference/osdi18/presentation/alquraan)). See [[Deterministic Simulation Testing]].
 
 #### **Silent Data Corruption in AI Clusters**
 - **Mercurial cores:** Google reported CPU cores that pass manufacturing tests yet occasionally compute wrong results, with no crash; it called for software that detects and isolates such cores ([Hochschild et al., 2021](https://research.google/pubs/pub50337/)).
@@ -333,3 +333,4 @@ Open problems worth tracking:
 - [[Silent Data Corruption]] — Hardware that computes or stores wrong values without raising an error, now a fleet-scale problem in AI clusters.
 - [[GPU Cluster Infrastructure]] — Failures, stragglers and SDC at AI-training scale, where one fault stops thousands of GPUs.
 - [[Write-Ahead Logging]] — How crash-recovery with stable storage is built, and fsyncgate.
+- [[Fault Injection and Chaos Engineering]] — Injecting the faults a model claims to tolerate, in tests and in production.

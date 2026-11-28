@@ -276,3 +276,4 @@ Open problems:
 - [[Resource Fairness]] — fair queuing and shuffle sharding decide whose requests wait or get shed under overload
 - [[Queueing Theory for Systems]] — the math behind goodput collapse, load shedding signals and metastable tipping points
 - [[Tail Latency and Hedging]] — hedged requests are retries that fire on slowness; they need the same budgets and idempotency
+- [[Fault Injection and Chaos Engineering]] — experiments that exercise timeouts, fallbacks and recovery on purpose; ChAP found mismatched timeouts
