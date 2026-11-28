@@ -420,7 +420,7 @@ Open problems worth tracking:
 - [[Coordination Services]] — etcd, whose single-node outages Gardener avoided with in-place resize.
 - [[Reconciliation and Control Loops]] — The VPA, HPA and scheduler as interacting control loops; HPA's formula and stabilizers.
 - [[Queueing Theory for Systems]] — Why utilization near 100% makes latency explode.
-- [[Tail Latency and Hedging]] — Planned: the latency cost of colocation and throttling.
+- [[Tail Latency and Hedging]] — The latency cost of colocation and throttling.
 - [[Performance Isolation and Colocation]] — Planned: Heracles and its successors in depth.
 - [[Horizontal Autoscaling]] — Planned: HPA, KEDA, predictive scaling and node autoscalers.
 - [[Containers, Namespaces and cgroups]] — The cgroup controls (`cpu.max`, `memory.high`, `memory.reclaim`) that enforce all of this.

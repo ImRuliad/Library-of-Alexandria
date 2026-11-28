@@ -466,7 +466,7 @@ On the producer side, the mirror problem (writing to the database and the queue 
 - [[Isolation Testing]] — Jepsen-style testing that found NATS's durability gaps.
 - [[Object Storage]] — Where logs, and perhaps queues, are moving.
 - [[Queueing Theory for Systems]] — Little's law, Erlang C and admission control in depth.
-- [[Tail Latency and Hedging]] — Planned: how queueing delay shows up in tail latency.
+- [[Tail Latency and Hedging]] — How queueing delay shows up in tail latency.
 - [[Resource Fairness]] — Fair queuing, shuffle sharding and fair sharing between tenants.
 - [[Diskless Streaming]] — Logs built on object storage.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: per-cell queues as an isolation boundary.

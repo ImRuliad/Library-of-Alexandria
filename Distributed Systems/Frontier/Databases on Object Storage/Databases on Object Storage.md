@@ -41,7 +41,7 @@ sources:
   - https://iceberg.apache.org/spec/
   - https://aws.amazon.com/about-aws/whats-new/2026/11/amazon-s3-increases-read-request-rate/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -397,4 +397,4 @@ Open problems:
 - [[Disaggregated LSMs and Compaction Offload]] — Compaction as a service: remote workers, scheduling, zombie results.
 - [[Serverless Databases]] — Planned: scale to zero and branching.
 - [[Backup and Point-in-Time Recovery]] — Planned: PITR as a pointer to an older LSN.
-- [[Tail Latency and Hedging]] — Planned: hedged GETs against object-store tails.
+- [[Tail Latency and Hedging]] — Hedged GETs against object-store tails.

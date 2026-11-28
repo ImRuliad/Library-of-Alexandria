@@ -57,7 +57,7 @@ sources:
   - https://developers.cloudflare.com/r2/api/s3/conditional-operations/
   - https://www.tigrisdata.com/docs/concepts/architecture/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -468,7 +468,7 @@ The common thread: "S3-compatible" now has to include strong consistency and `If
 Open problems worth tracking:
 - **Single-key contention.** Conditional writes serialize everything through one key. Table formats and SlateDB-style engines hit a ceiling on commits per second per table; the usual answers are batching commits, sharding manifests, or a sequencer service ([[Partitioning]], [[Distributed Transactions]]).
 - **Semantic drift between "S3-compatible" stores.** Status codes for conditional conflicts (`409` vs `412` vs `404`), listing consistency, and support for conditional deletes still differ. Ozone only plans conditional deletes for 2.3, and R2 marks destination conditions on `CopyObject` as beta. Code that's correct on S3 can be unsafe elsewhere; this is a natural target for [[Deterministic Simulation Testing]] and Jepsen-style checking.
-- **Tail latency and slow disks.** Spreading data over millions of drives evens out heat but means every large read touches many devices, and the slowest one sets the latency ([[Gray and Fail-Slow Failures]], [[Reliability Patterns]] for hedging and retries).
+- **Tail latency and slow disks.** Spreading data over millions of drives evens out heat but means every large read touches many devices, and the slowest one sets the latency ([[Gray and Fail-Slow Failures]], [[Tail Latency and Hedging]] for hedging, [[Reliability Patterns]] for retries).
 - **Correlated failures and repair.** Coding math assumes independent losses; firmware bugs, bad batches and zone events aren't independent. Fast, prioritized repair is the real defense ([[Anti-Entropy and Repair]], [[Failure Models]]).
 - **Corruption.** Immutable data is still subject to bit flips; the bit error rate of about one in $10^{15}$ "occurs in practice" at S3 scale ([Warfield, 2023](https://allthingsdistributed.com/2023/07/building-and-operating-a-pretty-big-storage-system.html)). End-to-end checksums, now ten algorithms in S3, push verification to the client ([[Silent Data Corruption]]).
 - **Two views of one namespace.** S3 Files and S3 Tables put file and table semantics over object storage with asynchronous synchronization. What a reader sees when the views disagree is a [[Consistency Models|consistency]] question the launch material doesn't fully answer.

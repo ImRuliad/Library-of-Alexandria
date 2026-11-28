@@ -45,7 +45,7 @@ sources:
   - https://www.usenix.org/conference/fast26/presentation/cheng
   - https://www.usenix.org/conference/osdi26/presentation/cai
 created: 2026-11-27
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -476,4 +476,4 @@ Open problems:
 - [[2. Design Overview]] — GFS's three-replica design that erasure coding replaced for cold data.
 - [[4. Master Operation]] — GFS re-replication, the repair loop coding makes more expensive.
 - [[End-to-End Data Integrity]] — Planned: checksums and scrubbing across the stack.
-- [[Tail Latency and Hedging]] — Planned: reading extra fragments to cut the tail of degraded reads.
+- [[Tail Latency and Hedging]] — Reading extra fragments to cut the tail of degraded reads.

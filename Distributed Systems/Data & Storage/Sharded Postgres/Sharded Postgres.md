@@ -35,7 +35,7 @@ sources:
   - https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/
   - https://openai.com/index/scaling-postgresql/
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -392,7 +392,7 @@ Open problems:
 - [[Coordination Services]] — Where shard maps live.
 - [[Logs and Streaming]] — The WAL streams that resharding copies from.
 - [[Disaggregated Systems]] — Aurora-style shared storage under each shard.
-- [[Tail Latency and Hedging]] — Planned: why scatter-gather queries get slow.
+- [[Tail Latency and Hedging]] — Why scatter-gather queries get slow.
 - [[Secondary Indexes]] — Local vs global indexes when lookups miss the shard key.
 - [[Cluster Metadata and Routing]] — how routers learn the shard map.
 - [[Change Data Capture]] — The WAL-based catch-up stream used in resharding.

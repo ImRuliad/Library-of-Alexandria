@@ -441,7 +441,7 @@ Open problems:
 - [[LLM Serving]] — Batched serving, the newest queueing frontier.
 - [[Deterministic Simulation Testing]] — Simulation where closed forms run out.
 - [[Failure Models]] — The timing assumptions that timeouts rely on.
-- [[Tail Latency and Hedging]] — Planned: fan-out, tails and hedged requests.
+- [[Tail Latency and Hedging]] — Fan-out, tails and hedged requests.
 - [[Fair LLM Serving]] — Planned: fairness in batched LLM queues.
 - [[Fault Injection and Chaos Engineering]] — Planned: testing under overload in production.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: cells as bounded queues you can evacuate.

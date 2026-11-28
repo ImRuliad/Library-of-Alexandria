@@ -39,7 +39,7 @@ sources:
   - https://docs.aws.amazon.com/pdfs/whitepapers/latest/advanced-multi-az-resilience-patterns/advanced-multi-az-resilience-patterns.pdf
   - https://www.usenix.org/conference/srecon24americas/presentation/li
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -317,7 +317,7 @@ Removing outliers before fitting matters: DBSCAN alone caught 63.83% of slow ent
 
 *You can tolerate slowness inside the request (send it twice), inside the protocol (don't wait for the slowest), or outside it (remove the slow part, turning a gray failure into an ordinary crash).*
 
-**Hedged and tied requests.** Send the request to one replica; if it hasn't answered after a short delay, send it to a second and use whichever answers first. In a BigTable benchmark reading 1,000 keys spread over 100 servers, hedging after 10 ms cut p99.9 latency "from 1,800ms to 74ms while sending just 2% more requests"; deferring the hedge until the p95 latency bounds extra load to about 5% ([Dean and Barroso](https://pdos.csail.mit.edu/6.824/papers/tail-dean.pdf)). *Tied* requests go to two servers at once with each told about the other, so the first to start work cancels the copy; with a 1 ms delay this cut p99.9 latency 38% on an idle cluster at under 1% extra disk use.
+**Hedged and tied requests.** Send the request to one replica; if it hasn't answered after a short delay, send it to a second and use whichever answers first. [[Tail Latency and Hedging]] covers delay choice, load thresholds and safety rules in depth. In a BigTable benchmark reading 1,000 keys spread over 100 servers, hedging after 10 ms cut p99.9 latency "from 1,800ms to 74ms while sending just 2% more requests"; deferring the hedge until the p95 latency bounds extra load to about 5% ([Dean and Barroso](https://pdos.csail.mit.edu/6.824/papers/tail-dean.pdf)). *Tied* requests go to two servers at once with each told about the other, so the first to start work cancels the copy; with a 1 ms delay this cut p99.9 latency 38% on an idle cluster at under 1% extra disk use.
 
 $$
 P(\text{hedged sub-request slow}) \approx p^{2} \quad\Rightarrow\quad P(\text{request slow}) = 1 - (1 - p^{2})^{n}
@@ -485,3 +485,4 @@ Open problems worth tracking:
 - [[Time and Clocks]] — Timeouts and the limits of what silence can tell you.
 - [[Hot Keys and Cache Stampedes]] — How a slow or lost cache becomes a database overload that sustains itself.
 - [[Erasure Coding]] — Slow or missing fragments turn reads into degraded reads that decode from $k$ others.
+- [[Tail Latency and Hedging]] — Fan-out math, hedged and tied requests, and when redundancy backfires.

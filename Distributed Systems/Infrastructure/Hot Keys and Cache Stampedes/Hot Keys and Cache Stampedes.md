@@ -378,6 +378,6 @@ Open problems:
 - [[Replication]] — Read replicas as a hot-read defense, and their lag.
 - [[GPU Cluster Infrastructure]] — Where KV prefix caches now show stampede-style collapse.
 - [[Deterministic Simulation Testing]] — Testing cache-loss recovery before production does.
-- [[Tail Latency and Hedging]] — Planned: hedged requests and the tail cost of waiting on one fetch.
+- [[Tail Latency and Hedging]] — Hedged requests and the tail cost of waiting on one fetch.
 - [[Queueing Theory for Systems]] — Why load near capacity makes recovery so slow.
 - [[Change Data Capture]] — Binlog-driven cache invalidation like Uber's Flux.

@@ -36,7 +36,7 @@ sources:
   - https://www.mongodb.com/docs/manual/tutorial/maintain-uniqueness-in-sharded-clusters/
   - https://docs.citusdata.com/en/v12.0/faq/faq.html
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -433,7 +433,7 @@ Open problems:
 - [[Isolation Testing]] — Finding index/table divergence under faults.
 - [[Deterministic Simulation Testing]] — Exploring the failure timings that orphan or lose index entries.
 - [[Object Storage]] — Where immutable-file layouts make classic indexes hard.
-- [[Tail Latency and Hedging]] — Planned: the math behind scatter-gather slowness.
+- [[Tail Latency and Hedging]] — The math behind scatter-gather slowness.
 - [[Hot Keys and Cache Stampedes]] — Low-cardinality index values as hot keys, and how to salt or cache them.
 - [[Change Data Capture]] — Deriving indexes and views from a change stream instead of the write path.
 - [[Deterministic Transactions]] — Cheaper multi-partition writes, and OLLP for index-dependent transactions.

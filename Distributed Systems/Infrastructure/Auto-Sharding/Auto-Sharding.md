@@ -22,7 +22,7 @@ sources:
   - https://www.uber.com/blog/introducing-shard-manager/
   - https://www.elastic.co/search-labs/blog/datastream-autosharding-serverless
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -349,7 +349,7 @@ The same idea now hides inside managed systems. Elasticsearch Serverless (Decemb
 
 - **Strong guarantees in open source.** Dicer ships affinity only and lists stronger ownership as future work; until then, anything that needs "exactly one writer" must add its own [[Leases and Fencing|fencing]].
 - **State transfer.** Moving the *warm state*, not just the key, is what makes a rebalance cheap. Dicer's is still under test; Shard Manager leaves it to each app's `add_shard`.
-- **Reaction time.** Minutes to react (Slicer's median 480 s) is fine for drift, too slow for spikes; the gap is filled by shedding and caching ([[Reliability Patterns]]) and hedging (planned [[Tail Latency and Hedging]]).
+- **Reaction time.** Minutes to react (Slicer's median 480 s) is fine for drift, too slow for spikes; the gap is filled by shedding and caching ([[Reliability Patterns]]) and hedging ([[Tail Latency and Hedging]]).
 - **Two controllers on the same machines.** The sharder and the autoscaler or cluster scheduler both move things; without the kind of negotiation Shard Manager does with Twine, they can fight ([[Cluster Scheduling]]).
 - **Slow, not dead, servers.** Load signals can make a [[Gray and Fail-Slow Failures|fail-slow]] server look lightly loaded (it answers fewer requests), so the sharder may send it more.
 - **The control plane as a shared dependency.** A bad assignment pushed to every client is a fleet-wide outage; Slicer keeps a Backup Distributor that reads assignments straight from storage for this reason ([Adya et al.](https://cs.ubc.ca/~andy/538w-2016/papers/osdi16-adya.pdf)). Testing these paths is a good fit for [[Deterministic Simulation Testing]] and [[Formal Methods in Practice]].
@@ -397,4 +397,4 @@ The same idea now hides inside managed systems. Elasticsearch Serverless (Decemb
 - [[Hot Keys and Cache Stampedes]] — Salting, leases and coalescing for keys no split can fix.
 - [[Reconciliation and Control Loops]] — The desired-vs-actual loop Helix uses, and how such loops go wrong.
 - [[Cluster Metadata and Routing]] — how shard maps reach clients.
-- [[Tail Latency and Hedging]] — Planned: handling slow owners at request time.
+- [[Tail Latency and Hedging]] — Handling slow owners at request time.

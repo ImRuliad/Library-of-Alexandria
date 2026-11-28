@@ -275,3 +275,4 @@ Open problems:
 - [[Message Queues]] — at-least-once delivery, idempotent consumers, dead-letter queues and backlog recovery
 - [[Resource Fairness]] — fair queuing and shuffle sharding decide whose requests wait or get shed under overload
 - [[Queueing Theory for Systems]] — the math behind goodput collapse, load shedding signals and metastable tipping points
+- [[Tail Latency and Hedging]] — hedged requests are retries that fire on slowness; they need the same budgets and idempotency
