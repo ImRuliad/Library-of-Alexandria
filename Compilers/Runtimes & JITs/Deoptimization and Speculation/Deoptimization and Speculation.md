@@ -433,3 +433,4 @@ Duboscq et al. measured Graal's deopt metadata at **1.7× to 1.9× the size of t
 - [[Sampling Profilers and Safepoint Bias]] — Profilers reuse the same per-pc scope records to name sampled frames.
 - [[Tiering Policies and Warm-up]] — Retry thresholds and delayed tier-up for code that keeps deoptimizing.
 - [[Inline Caches and Code Patching]] — Where the type feedback behind speculation is recorded.
+- [[Partial Evaluation and Self-Specializing Interpreters]] — Truffle assumptions and RPython quasi-immutable fields: speculation the interpreter writer declares.

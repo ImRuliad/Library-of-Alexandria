@@ -367,7 +367,7 @@ The 2013 Graal IR paper describes the IR as "a superposition of two directed gra
 
 Scheduling happens just before code emission, when every node is assigned to a block. Webb, Utting and Hayes describe the same IR as a "sea-of-nodes" graph where side-effect-free expressions form acyclic data-flow subgraphs and nodes with possible side effects sit in the control-flow graph ([arXiv 2107.01815](https://arxiv.org/pdf/2107.01815)).
 
-**Truffle** comes from the same Oracle Labs group (Würthinger, Duboscq, Simon and Stadler are authors on both lines of work): a language is defined by writing an AST interpreter, and "compiled code is derived automatically using partial evaluation (the first Futamura projection)" ([Würthinger et al., PLDI 2017](https://pldi17.sigplan.org/event/pldi-2017-papers-practical-partial-evaluation-for-high-performance-dynamic-language-runtimes)). The page I read does not spell out that the partially evaluated code is a Graal IR graph, so treat that link as widely stated but unconfirmed here. See [[JIT Compilation]] and [[Escape Analysis]].
+**Truffle** comes from the same Oracle Labs group (Würthinger, Duboscq, Simon and Stadler are authors on both lines of work): a language is defined by writing an AST interpreter, and "compiled code is derived automatically using partial evaluation (the first Futamura projection)" ([Würthinger et al., PLDI 2017](https://pldi17.sigplan.org/event/pldi-2017-papers-practical-partial-evaluation-for-high-performance-dynamic-language-runtimes)). The page I read does not spell out that the partially evaluated code is a Graal IR graph, so treat that link as widely stated but unconfirmed here. See [[JIT Compilation]], [[Escape Analysis]] and [[Partial Evaluation and Self-Specializing Interpreters]].
 
 ### V8 TurboFan
 
@@ -524,3 +524,4 @@ Open problems:
 - [[Verified Compilers]] — Formal semantics of Graal's sea-of-nodes IR.
 - [[Compiler Testing and Fuzzing]] — Graph-invariant checkers like C2's catch malformed IR early.
 - [[Lexing and Parsing]] — Sea of nodes is built directly by the parser with peepholes applied.
+- [[Partial Evaluation and Self-Specializing Interpreters]] — How Truffle turns an AST interpreter into Graal IR by partial evaluation.

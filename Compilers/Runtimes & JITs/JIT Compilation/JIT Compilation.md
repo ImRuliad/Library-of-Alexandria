@@ -332,7 +332,7 @@ The key rule: the resume point must be *before* any side effect the optimized co
 
 A trace is recorded by running the interpreter in a logging mode for one loop iteration; since it is a single path, optimizations like redundant-guard removal and allocation removal are simple forward passes. Hot side exits grow their own traces, forming *trace trees* ([Gal et al., PLDI 2009](https://www.cs.williams.edu/~freund/cs434/gal-trace.pdf)).
 
-**Meta-tracing.** PyPy's insight was to trace the *interpreter*, not the user program. You write an interpreter for your language in RPython (a restricted, statically analyzable Python), add a few hints marking the dispatch loop, and the RPython toolchain generates a tracing JIT for your language ([Bolz et al., ICOOOLPS 2009](https://fg-sr.gi.de/fileadmin/FG/SR/Abstracts/2009/Bolz.pdf)). Truffle/Graal does the analogous thing for method JITs via *partial evaluation* of AST interpreters. Both turn "write an interpreter" into "get a JIT".
+**Meta-tracing.** PyPy's insight was to trace the *interpreter*, not the user program. You write an interpreter for your language in RPython (a restricted, statically analyzable Python), add a few hints marking the dispatch loop, and the RPython toolchain generates a tracing JIT for your language ([Bolz et al., ICOOOLPS 2009](https://fg-sr.gi.de/fileadmin/FG/SR/Abstracts/2009/Bolz.pdf)). Truffle/Graal does the analogous thing for method JITs via *[[Partial Evaluation and Self-Specializing Interpreters|partial evaluation]]* of AST interpreters. Both turn "write an interpreter" into "get a JIT".
 
 Tracing lost in JavaScript (TraceMonkey was removed from Firefox in favor of method JITs) because web code is branchy and type-unstable, but it remains the design behind two of the fastest dynamic-language runtimes, LuaJIT and PyPy.
 
@@ -478,3 +478,4 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[Sampling Profilers and Safepoint Bias]] — Attributing samples to JIT code: safepoint bias, AsyncGetCallTrace, JFR, perf maps and jitdump.
 - [[Tiering Policies and Warm-up]] — How each engine sets its tier-up thresholds, and how warm-up is measured and skipped.
 - [[Inline Caches and Code Patching]] — IC state machines in HotSpot, JSC, SpiderMonkey, V8 and CPython; patchpoints, i-cache maintenance and W^X.
+- [[Partial Evaluation and Self-Specializing Interpreters]] — Futamura projections, Truffle partial evaluation and PyPy meta-tracing: getting a JIT from an interpreter.

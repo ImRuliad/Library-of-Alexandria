@@ -541,7 +541,7 @@ quadrantChart
 - [[Compiler Benchmarking Methodology]] — Planned: measurement practice beyond warm-up, from SPEC run rules to noise control.
 - [[AOT Caches and Training Runs]] — Planned: the Leyden cache, ReadyToRun and Baseline Profiles in depth.
 - [[Persistent Compiler Caches]] — Planned: caching compiler output across runs, the build-system cousin of AOT caches.
-- [[Partial Evaluation and Self-Specializing Interpreters]] — Planned: Truffle's compilation thresholds for partially evaluated code.
+- [[Partial Evaluation and Self-Specializing Interpreters]] — Truffle's compilation thresholds for partially evaluated code.
 - [[WebAssembly]] — Liftoff and dynamic tiering, a lower-speculation tiered pipeline.
 - [[ML-Guided Optimization]] — Learned heuristics, a candidate for replacing hand-tuned thresholds.
 - [[Compiler Testing and Fuzzing]] — Fuzzing modes that lower thresholds to reach rare tiers.

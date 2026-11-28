@@ -461,7 +461,7 @@ The `dc` and `ic` operations are seen by other cores, but the `isb` is not broad
 - [[Tiering Policies and Warm-up]] — V8 waits for IC feedback to settle before tiering up; W^X costs land in warm-up.
 - [[Profile-Guided Optimization]] — Type feedback as online PGO; indirect-call promotion as the AOT cousin of an inline cache.
 - [[LLVM]] — Where `llvm.experimental.patchpoint` lives.
-- [[Partial Evaluation and Self-Specializing Interpreters]] — Planned: quickening and self-specialization taken to their limit.
+- [[Partial Evaluation and Self-Specializing Interpreters]] — Self-specializing interpreters taken to their limit: Truffle, PyPy, weval and Deegen.
 - [[Software Fault Isolation]] — Memory protection keys and isolation of JIT code.
 - [[WebAssembly]] — A target with no runtime code generation, which pushes ICs into interpreters.
 - [[Microarchitectural Performance Models]] — Why an extra predicted load often costs nothing.

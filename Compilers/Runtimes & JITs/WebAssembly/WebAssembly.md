@@ -498,3 +498,4 @@ For a compiler, the component model adds a new linking layer above [[Linking and
 - [[Safepoints and Stack Maps]] — Cranelift's user stack maps behind Wasmtime's GC.
 - [[Tiering Policies and Warm-up]] — The tier-up policies that dynamic tiering borrows from JavaScript engines.
 - [[Irreducible Control Flow]] — Multi-entry loops, and the Relooper, stackifier and dispatch-block fixes producers use.
+- [[Partial Evaluation and Self-Specializing Interpreters]] — weval specializes interpreters compiled to Wasm ahead of time, for platforms without runtime codegen.

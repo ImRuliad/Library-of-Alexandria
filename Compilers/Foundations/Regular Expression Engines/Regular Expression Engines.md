@@ -492,4 +492,4 @@ Barrière and Pit-Claudel (PLDI 2024) found that JavaScript's semantics for null
 - [[Verified Compilers]] — .NET's derivative engine is the first industrial matcher with a formal correctness proof.
 - [[Program Synthesis]] — FlashFill-style string synthesis targets regex-like token languages.
 - [[Software Fault Isolation]] — Regex JITs compile untrusted input to machine code, the same threat model SFI addresses.
-- [[Partial Evaluation and Self-Specializing Interpreters]] — A compiled regex is the interpreter specialized to one pattern (planned note).
+- [[Partial Evaluation and Self-Specializing Interpreters]] — A compiled regex is the interpreter specialized to one pattern.

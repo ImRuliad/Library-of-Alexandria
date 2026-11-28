@@ -526,4 +526,4 @@ Open problems:
 - [[SSA Form]] — The first-order IR that closure-converted code is lowered into.
 - [[Compiler Pipeline]] — Where closure conversion sits between the functional middle end and the back end.
 - [[Reference Counting and Reuse]] — Perceus-style RC for closure environments in Lean and Koka; closures sit outside reuse analysis.
-- [[Partial Evaluation and Self-Specializing Interpreters]] — Planned: lambda dropping was built for partial-evaluator output.
+- [[Partial Evaluation and Self-Specializing Interpreters]] — Lambda dropping was built for partial-evaluator output.
