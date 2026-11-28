@@ -46,7 +46,7 @@ sources:
   - https://sebastianraschka.com/llm-architecture-gallery/models/kimi-k3/
   - https://sebastianraschka.com/llm-architecture-gallery/active-parameter-ratio/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -339,7 +339,7 @@ Decode (generating one token at a time) is memory-bandwidth bound: each step mus
 - **At batch size 1, MoE is a big win.** Only the active weights are read: about 37 GB per token for DeepSeek-V3 at FP8 instead of 671 GB.
 - **At realistic batch sizes, the win shrinks.** Different tokens pick different experts, so a batch touches most of them. With $E = 256$ and $k = 8$, a batch of $B$ tokens touches on average $256\,(1 - (1 - 8/256)^B)$ experts per layer: about 57 at $B=8$, 163 at $B=32$, and 222 (87%) at $B=64$ (my arithmetic, assuming uniform routing). Meanwhile each expert sees only $Bk/E = B/32$ tokens, so its matrix multiply is starved.
 
-The consequence is that MoE serving wants **very large batches spread over many devices**, so each expert gets enough tokens to be efficient and the total weight memory is split many ways. DeepSeek served V3 with a minimum decode unit of 40 nodes (320 GPUs) using EP320, one expert per GPU, with 64 GPUs holding redundant and shared experts; prefill used 4 nodes with EP32 and 32 redundant experts ([DeepSeek-AI](https://arxiv.org/abs/2412.19437)). Redundant copies of hot experts are the inference-time version of load balancing. More on batching, disaggregation and schedulers in [[LLM Serving]].
+The consequence is that MoE serving wants **very large batches spread over many devices**, so each expert gets enough tokens to be efficient and the total weight memory is split many ways. DeepSeek served V3 with a minimum decode unit of 40 nodes (320 GPUs) using EP320, one expert per GPU, with 64 GPUs holding redundant and shared experts; prefill used 4 nodes with EP32 and 32 redundant experts ([DeepSeek-AI](https://arxiv.org/abs/2412.19437)). Redundant copies of hot experts are the inference-time version of load balancing. More on batching, disaggregation and schedulers in [[LLM Serving]]; the serving-side mechanics of EP (kernels, EPLB, attention-FFN disaggregation) are in [[Expert Parallelism and MoE Serving]].
 
 At the other extreme, **expert offloading** runs big MoEs on small machines: keep the always-active weights (attention, dense and shared FFNs) and the KV cache on the GPU, and put routed experts in CPU RAM, since only a few are read per token. llama.cpp exposes this as `--cpu-moe` or `--n-cpu-moe N` ([Hugging Face community guide, Jan 2026](https://huggingface.co/blog/Doctor-Shotgun/llamacpp-moe-offload-guide)). It works for single-user decode; prompt processing still has to move expert weights over PCIe, which the same guide estimates at about 10 seconds per batch for 300 GB of CPU-side weights over PCIe 4.0 x16.
 
@@ -476,3 +476,5 @@ The pattern: returns from sparsity are real but diminishing (1.69x, then 1.39x, 
 - [[Multi-Token Prediction]] — Most MoEs now train an MTP module (often itself an MoE block) as an auxiliary loss and built-in drafter.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why decode is memory-bound and why experts need large batches.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Inference cost model that MoE changes.
+- [[Expert Parallelism and MoE Serving]] — How MoE models are served: DP attention plus wide EP, all-to-all kernels, redundant experts.
+- [[Prefill-Decode Disaggregation]] — Separate prefill and decode pools, each with its own EP width.

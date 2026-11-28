@@ -29,7 +29,7 @@ sources:
   - https://lecompute.fr/en/runtimes/kv-cache-objet-central-serving/
   - https://platform.claude.com/en/docs/build-with-claude/prompt-caching
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -240,7 +240,7 @@ Every term in the size formula, plus the token count, has a family of techniques
 | Fewer cached layers ($L$) | Layers with a growing cache | [[Hybrid Attention]] (linear or recurrent layers keep a fixed-size state), cross-layer sharing | Weaker exact recall in the replaced layers |
 | Fewer cached tokens | Length | Sliding window, sinks (StreamingLLM), eviction (H2O), [[Sparse Attention]] and token merging (DeepSeek-V4 CSA/HCA) | Information outside the kept set is gone or only approximately reachable |
 
-Two more moves don't shrink the cache but change where it lives: **offloading** (park cold blocks in CPU memory, SSD or object storage) and **disaggregation** (compute it on prefill machines, ship it to decode machines).
+Two more moves don't shrink the cache but change where it lives: **offloading** (park cold blocks in CPU memory, SSD or object storage) and **disaggregation** (compute it on prefill machines, ship it to decode machines; see [[Prefill-Decode Disaggregation]]).
 
 #### **Paging and Prefix Sharing**
 Early servers reserved one contiguous slab per request, sized for the maximum possible length. Because answers are usually much shorter than the maximum, most of that slab sat empty, and gaps between slabs could not be reused. Kwon et al. measured only 20.4% to 38.2% of cache memory holding real tokens ([PagedAttention](https://arxiv.org/abs/2309.06180)).
@@ -356,3 +356,4 @@ Open problems:
 - [[Long Context]] — Whether a model actually uses the context its cache can hold.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Prefill vs generation and the KV cache, from How to Scale Your Model.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why decode is memory-bound: arithmetic intensity against the chip's roofline.
+- [[Prefill-Decode Disaggregation]] — Shipping the cache from prefill to decode machines; its per-token size sets the transfer cost.

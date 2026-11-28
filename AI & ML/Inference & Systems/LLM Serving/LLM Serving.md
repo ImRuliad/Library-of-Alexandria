@@ -32,7 +32,7 @@ sources:
   - https://epoch.ai/publications/the-plunging-price-of-thought
   - https://lecompute.fr/en/runtimes/kv-cache-objet-central-serving/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -260,7 +260,7 @@ sequenceDiagram
     D->>S: Offload finished blocks for reuse
 ```
 
-The price is the transfer: a long prompt's cache can be gigabytes, so disaggregation needs fast interconnect and a transfer library (NVIDIA's NIXL is used by vLLM, SGLang, TensorRT-LLM and llm-d per [NVIDIA](https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/); SGLang also supports Mooncake and AMD's MoRI per [LMSYS](https://www.lmsys.org/blog/2026-10-24-dsv41-deepinfer)). It pays off most when prompts are long and latency targets are tight; on a single small node, chunked prefill is often enough.
+The price is the transfer: a long prompt's cache can be gigabytes, so disaggregation needs fast interconnect and a transfer library (NVIDIA's NIXL is used by vLLM, SGLang, TensorRT-LLM and llm-d per [NVIDIA](https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/); SGLang also supports Mooncake and AMD's MoRI per [LMSYS](https://www.lmsys.org/blog/2026-10-24-dsv41-deepinfer)). It pays off most when prompts are long and latency targets are tight; on a single small node, chunked prefill is often enough. Pool sizing, transfer costs and when it hurts are in [[Prefill-Decode Disaggregation]].
 
 #### **Wide Expert Parallelism for MoE**
 DeepSeek-V3 activates 8 of 256 experts per layer, so a batch of 64 requests gives each expert about 2 tokens: decode would read every expert's weights to do almost no work. DeepSeek's fix is to spread experts across many GPUs (expert parallelism, EP) while replicating attention (data parallelism, DP), so that the global batch is huge but each GPU holds and reads only a few experts ([DeepSeek, Feb 2025](https://github.com/deepseek-ai/open-infra-index/blob/main/202502OpenSourceWeek/day_6_one_more_thing_deepseekV3R1_inference_system_overview.md)):
@@ -272,7 +272,7 @@ DeepSeek-V3 activates 8 of 256 experts per layer, so a batch of 64 requests give
 
 Three problems come with it. **Communication**: every MoE layer needs an all-to-all dispatch and combine, hidden by splitting the batch into two micro-batches that alternate compute and communication. **Expert imbalance**: some experts are hot, so an expert-parallel load balancer (EPLB) places redundant copies of them. In vLLM's 2026 runs, EPLB raised balancedness (mean over max load) from 0.35 to 0.94 ([vLLM](https://vllm.ai/blog/2026-10-23-deepseek-v41-flash-pd-wide-ep)). **DP imbalance**: one rank with longer prompts stalls all the others at every layer, so prefill and decode each need their own load balancer.
 
-Wide EP has diminishing returns. Going from 4 to 32 GPUs per decode instance cut vLLM's MoE time per step from 13.4 to 6.0 ms, but the remaining work stayed around 10 ms ([vLLM](https://vllm.ai/blog/2026-10-23-deepseek-v41-flash-pd-wide-ep)). Large NVLink domains (GB200/GB300 NVL72) make the all-to-all cheap enough that "large scale up domains ... absolutely dominate in total throughput per GPU" in SemiAnalysis's tests ([InferenceX v2, Feb 2026](https://inferencex.semianalysis.com/blog/inferencex-v2-nvidia-blackwell-vs-amd-vs-hopper)). The parallelism layouts themselves are covered in [[Mixture of Experts]].
+Wide EP has diminishing returns. Going from 4 to 32 GPUs per decode instance cut vLLM's MoE time per step from 13.4 to 6.0 ms, but the remaining work stayed around 10 ms ([vLLM](https://vllm.ai/blog/2026-10-23-deepseek-v41-flash-pd-wide-ep)). Large NVLink domains (GB200/GB300 NVL72) make the all-to-all cheap enough that "large scale up domains ... absolutely dominate in total throughput per GPU" in SemiAnalysis's tests ([InferenceX v2, Feb 2026](https://inferencex.semianalysis.com/blog/inferencex-v2-nvidia-blackwell-vs-amd-vs-hopper)). The parallelism layouts themselves are covered in [[Mixture of Experts]], and the kernels, balancers and attention-FFN disaggregation in [[Expert Parallelism and MoE Serving]].
 
 #### **Speculative Decoding in the Scheduler**
 [[Speculative Decoding]] has a draft model or extra heads propose several tokens that the target model verifies in one pass, so one weight read yields more than one token per request. In a server it interacts with batching: at large batch the step is already efficient, so verifying extra tokens costs real compute, and engines tune draft length by load. It is now standard in production MoE serving. DeepSeek-V4.1-Flash ships a draft model (DSpark); in SGLang's benchmark of DeepSeek's decode setup, 3 draft tokens per step gave 3.25 accepted tokens per step ([LMSYS, Oct 2026](https://www.lmsys.org/blog/2026-10-24-dsv41-deepinfer)). The draft has its own experts, so EPLB must balance both models ([vLLM](https://vllm.ai/blog/2026-10-23-deepseek-v41-flash-pd-wide-ep)).
@@ -390,3 +390,5 @@ Open problems:
 - [[Top-k and Sampling Kernels]] — The GPU kernels behind the sampling step: top-k, top-p, min-p without sorting.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Prefill vs decode costs and batching math, from How to Scale Your Model.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why decode is memory-bound: arithmetic intensity against the chip's roofline.
+- [[Expert Parallelism and MoE Serving]] — Wide EP in depth: tokens per expert, all-to-all kernels, EPLB and attention-FFN disaggregation.
+- [[Prefill-Decode Disaggregation]] — Separate prefill and decode pools: sizing, KV transfer cost and when it pays.

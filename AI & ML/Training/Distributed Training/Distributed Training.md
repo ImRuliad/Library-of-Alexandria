@@ -42,7 +42,7 @@ sources:
   - https://newsletter.semianalysis.com/p/100000-h100-clusters-power-network
   - https://epoch.ai/topics/data-centers
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -486,3 +486,4 @@ DiLoCo (Nov 2023) lets each worker group run many local AdamW steps and synchron
 - [[FlashAttention]] — Avoids storing attention scores, the biggest activation term.
 - [[Attention]] — Why sequence splitting is hard: every query needs every key.
 - [[Multi-GPU Communication - NVLink and NCCL]] — How NCCL implements the collectives these strategies use.
+- [[Expert Parallelism and MoE Serving]] — Expert parallelism at inference: DP attention plus wide EP, decode all-to-all kernels and load balancing.

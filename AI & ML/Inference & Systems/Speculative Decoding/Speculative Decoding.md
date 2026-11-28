@@ -42,7 +42,7 @@ sources:
   - https://jax-ml.github.io/scaling-book/inference/
   - https://inferencex.semianalysis.com/compare-spec-decode/glm-5-2-b300-fp4-mtp-vs-none
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -381,7 +381,7 @@ Three responses, all in production engines by late 2026:
 - **Verify adaptively per request.** DSpark's `compact` mode verifies only each request's predicted-survivable window; the gain is small at batch 1 and grows as throughput plateaus, more so on low-acceptance workloads ([LMSYS, Jul 2026](https://www.lmsys.org/blog/2026-07-06-dspark-sglang)). vLLM's adaptive verification sizes the budget from per-request confidence with "one configuration covering batch sizes 1 to 256" (Aug 2026), and an Oct 2026 variant fits the acceptance estimate online from the drafter's own logits ([vLLM blog](https://vllm.ai/blog/tags/speculative-decoding)).
 - **[[Long Context|Long context]] changes the bottleneck back.** At long sequence lengths the per-request [[KV Cache]] dominates memory traffic even at large batch, so decode stays memory-bound and speculation helps throughput again. MagicDec used a sparse-KV draft to get up to 2.51x on Llama3.1-8B at batch sizes 32 to 256 ([Sadhukhan et al., 2024](https://arxiv.org/abs/2408.11049)).
 
-See [[LLM Serving]] for how this interacts with continuous batching and prefill/decode disaggregation.
+See [[LLM Serving]] for how this interacts with continuous batching, and [[Prefill-Decode Disaggregation]] for split prefill and decode pools.
 
 #### **Reported Speedups**
 

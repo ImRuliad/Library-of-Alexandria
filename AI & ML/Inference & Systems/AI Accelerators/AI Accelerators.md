@@ -55,7 +55,7 @@ sources:
   - https://epoch.ai/data-insights/ai-chip-supply-chain-constraints
   - https://newsletter.semianalysis.com/p/the-great-ai-silicon-shortage
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -173,7 +173,7 @@ A model too big or too slow for one chip is split across many (tensor, pipeline,
 
 Sources: [Vera Rubin NVL72](https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72.md), [TPU7x docs](https://docs.cloud.google.com/tpu/docs/tpu7x), [AWS Trn3](https://aws.amazon.com/ec2/instance-types/trn3/).
 
-The order-of-magnitude gap (3.6 vs 0.4 TB/s on Rubin) is why the most communication-heavy parallelism, tensor and expert parallelism for [[Mixture of Experts]], is kept inside one scale-up domain. GPUs build that domain with switches, which approximate all-to-all connections; TPUs use nearest-neighbor links in a 3D torus, which is cheaper to scale but needs more hops between distant chips ([Scaling Book, TPUs](https://jax-ml.github.io/scaling-book/tpus)).
+The order-of-magnitude gap (3.6 vs 0.4 TB/s on Rubin) is why the most communication-heavy parallelism, tensor and expert parallelism for [[Mixture of Experts]], is kept inside one scale-up domain ([[Expert Parallelism and MoE Serving]] works through the numbers). GPUs build that domain with switches, which approximate all-to-all connections; TPUs use nearest-neighbor links in a 3D torus, which is cheaper to scale but needs more hops between distant chips ([Scaling Book, TPUs](https://jax-ml.github.io/scaling-book/tpus)).
 
 ## ***How We Got Here***
 ---
@@ -413,3 +413,4 @@ Open questions: how far FP4 (and below) can go for pretraining without loss; whe
 - [[Scaling Laws]] — The compute trend these chips supply, and the $6ND$ and $2N$ FLOP counts used here.
 - [[Low-Precision Training]] — How FP8 and NVFP4 training recipes turn these chips' low-precision peaks into real speedups.
 - [[Blackwell Architecture]] — NVIDIA's Blackwell generation in depth.
+- [[Expert Parallelism and MoE Serving]] — Why MoE serving wants large NVLink domains: the per-layer all-to-all.
