@@ -431,3 +431,4 @@ Open problems worth tracking:
 - [[Fault Injection and Chaos Engineering]] — Testing that remediation behaves under real faults.
 - [[Object Storage]] — Disk fleets where scrubbing and replacement run continuously.
 - [[Erasure Coding]] — Redundancy that buys time between a disk failing and its replacement.
+- [[End-to-End Data Integrity]] — Checksums and scrubbing that catch what screening misses in stored data.

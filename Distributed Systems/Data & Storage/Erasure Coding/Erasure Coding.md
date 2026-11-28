@@ -117,7 +117,7 @@ No code wins all four. The rest of this note is about which knob each design tur
 
 A communication channel corrupts symbols without saying which ones; the decoder must find *and* fix them. A storage system knows which disk or server is gone, so the decoder only has to fill in known gaps. A code with minimum distance $d$ can fix $d - 1$ erasures but only $\lfloor (d-1)/2 \rfloor$ unknown errors, so storage gets twice the protection for the same parity.
 
-This relies on detection. A disk that returns wrong data instead of no data is an error, not an erasure, and coding does nothing for it unless each fragment carries a checksum that turns "wrong" into "missing". That's why every coded store checksums fragments end to end and scrubs them ([[Silent Data Corruption]], [[Anti-Entropy and Repair]]).
+This relies on detection. A disk that returns wrong data instead of no data is an error, not an erasure, and coding does nothing for it unless each fragment carries a checksum that turns "wrong" into "missing". That's why every coded store checksums fragments end to end and scrubs them ([[Silent Data Corruption]], [[Anti-Entropy and Repair]], [[End-to-End Data Integrity]]).
 
 ### XOR Parity
 
@@ -475,6 +475,6 @@ Open problems:
 - [[Write-Ahead Logging]] — Data that needs durable flushes and so stays replicated, not striped.
 - [[2. Design Overview]] — GFS's three-replica design that erasure coding replaced for cold data.
 - [[4. Master Operation]] — GFS re-replication, the repair loop coding makes more expensive.
-- [[End-to-End Data Integrity]] — Planned: checksums and scrubbing across the stack.
+- [[End-to-End Data Integrity]] — Checksums and scrubbing across the stack, the detection step before decoding.
 - [[Tail Latency and Hedging]] — Reading extra fragments to cut the tail of degraded reads.
 - [[Algorithm-Based Fault Tolerance]] — The same parity idea applied to a computation, kept valid through arithmetic.

@@ -547,3 +547,4 @@ Open problems worth tracking:
 - [[Stream Processing]] — Checkpoints and, since Flink 2.0, primary operator state kept in object storage.
 - [[Databases on Object Storage]] — Engines whose only durable state is in an object store: commit protocols, batching, caching and GC.
 - [[Erasure Coding]] — Reed-Solomon, LRCs, regenerating codes, wide stripes and repair in depth.
+- [[End-to-End Data Integrity]] — Client-to-bucket checksums, CRC64NVME and scrubbing in context of the end-to-end argument.

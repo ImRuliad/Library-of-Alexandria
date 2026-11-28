@@ -213,6 +213,8 @@ timeline
 
 *Store a checksum away from the data, verify it on every read, and periodically read everything. That turns silent storage corruption into a detected error you can repair from another copy.*
 
+The design side (the end-to-end argument, checksums in parent pointers, T10 PI and how ZFS, Btrfs, HDFS, Ceph and S3 scrub) is in [[End-to-End Data Integrity]]; this section keeps the field data.
+
 The NetApp studies are the reason storage systems checksum everything:
 - **Checksum mismatches** (the drive returned the wrong bytes): 0.66% of nearline disks and 0.06% of enterprise disks developed at least one in their first 17 months. Mismatches cluster: given one on a disk, the chance of more is about 0.6, and one nearline system had 92 disks with mismatches ([Bairavasundaram et al., FAST 2008](https://www.cs.utoronto.ca/~bianca/papers/fast08.pdf)).
 - **Where they are found:** scrubbing found about 49% of mismatches on nearline disks and 73% on enterprise disks; about 8% were found only during RAID reconstruction ([[Erasure Coding]]), which is the worst time, because the redundancy needed to repair them is already being used.
@@ -506,3 +508,4 @@ Open problems worth tracking:
 - [[Erasure Coding]] — Checksums turn corrupt fragments into erasures that parity can rebuild.
 - [[Algorithm-Based Fault Tolerance]] — Checksummed computation in depth, from 1984 processor arrays to GPU training.
 - [[Fleet Health and Hardware Screening]] — The wider screening and quarantine lifecycle: burn-in, health checks, lemon nodes, remediation.
+- [[End-to-End Data Integrity]] — The end-to-end argument, checksum placement and scrubbing designs behind the storage defenses here.
