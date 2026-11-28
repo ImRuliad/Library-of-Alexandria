@@ -364,7 +364,7 @@ Their Rust rewriter (`DataManagementLab/ParquetRewriter`) tries every valid enco
 ### ORC, CSV and JSON
 
 - **ORC** splits files into **stripes** of typed **streams**. libcudf filters stripes by statistics, decompresses stripe data, builds null masks and string dictionaries, then decodes RLE row groups ([DeepWiki](https://deepwiki.com/rapidsai/cudf/4-io-system)). The structure is similar to Parquet with different names.
-- **CSV and JSON** have no metadata, so the hard part is finding record and field boundaries in parallel when quotes and escapes change meaning. ParPaRaw splits input into small chunks; each thread runs the parser's DFA from every possible start state and records where each ends in a state-transition vector. Those vectors compose associatively, so a prefix scan gives every chunk its true start state without a sequential pre-pass ([Stehle and Jacobsen, PVLDB 13, 2020](https://arxiv.org/pdf/1905.13415)). This is the same trick as GPU regex matching ([[GPU String Processing]]).
+- **CSV and JSON** have no metadata, so the hard part is finding record and field boundaries in parallel when quotes and escapes change meaning. ParPaRaw splits input into small chunks; each thread runs the parser's DFA from every possible start state and records where each ends in a state-transition vector. Those vectors compose associatively, so a prefix scan gives every chunk its true start state without a sequential pre-pass ([Stehle and Jacobsen, PVLDB 13, 2020](https://arxiv.org/pdf/1905.13415)). This is the same enumerate-then-scan trick used for parallel automata ([[GPU Regex and Automata Matching]]).
 
 ## ***Where It Is Now***
 
@@ -452,3 +452,4 @@ Numbers worth knowing:
 - [[Roofline Model and Arithmetic Intensity]] — I/O-bound vs decode-bound, the same ceiling argument.
 - [[Query Compilation and JIT on GPUs]] — JIT filters in the reader.
 - [[Blackwell Architecture]] — Home of the hardware decompression engine.
+- [[GPU Regex and Automata Matching]] — The automata side of the DFA-plus-scan parsing trick.

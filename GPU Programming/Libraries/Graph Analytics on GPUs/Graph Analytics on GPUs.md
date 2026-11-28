@@ -37,7 +37,7 @@ sources:
   - https://arxiv.org/abs/2512.21967v1
   - https://arxiv.org/abs/2606.05081
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -397,3 +397,4 @@ The current record shows where the frontier is: NVIDIA's No. 1 Graph500 BFS (31s
 - [[Multi-GPU Communication - NVLink and NCCL]] — Frontier exchange in multi-GPU analytics.
 - [[GPUDirect RDMA and Storage]] — GPU-initiated networking behind the Graph500 record.
 - [[GEMM Autotuning and Kernel Selection]] — Choosing a schedule per input is the same selection problem.
+- [[GPU Regex and Automata Matching]] — NFA simulation as frontier traversal with worklists.

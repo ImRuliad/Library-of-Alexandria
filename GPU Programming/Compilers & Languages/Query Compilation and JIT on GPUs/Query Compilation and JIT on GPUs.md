@@ -419,5 +419,6 @@ The 2026 releases also replaced Jitify with cuDF's own **RTCX** runtime-compilat
 - [[FFT on GPUs]] — cuFFT's runtime-linked callbacks.
 - [[GEMM Autotuning and Kernel Selection]] — Choosing among precompiled kernels, the alternative to generating one.
 - [[Distributed GPU Shuffles]] — The pipeline breakers between GPUs.
+- [[GPU Regex and Automata Matching]] — Regex engines, and why rewriting a regex as JIT string ops won.
 - [[JIT Compilation]], [[LLVM]], [[MLIR]], [[Linking and LTO]], [[Tiering Policies and Warm-up]], [[GPU Kernel Compilers]], [[LLM-Written Kernels]] — The general compiler background in the Compilers area.
 - [[Distributed SQL]] — The CPU-side query engines whose plans get compiled.
