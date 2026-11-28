@@ -40,7 +40,7 @@ sources:
   - https://docs.nvidia.com/cuvs/user-guide/api-guides/other-ap-is/k-selection
   - https://www.nvidia.com/en-us/data-center/h100/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -90,7 +90,7 @@ Typical shapes, all from 2025 to 2026 workloads:
 |---|---|---|---|---|
 | LLM sampling | vocabulary, about 128K to 262K | top-k usually small (20 to 100), top-p set size varies | one per running request | vLLM, SGLang, TensorRT-LLM, every decode step |
 | Sparse attention selection (DSA) | cached tokens, 8K to 128K+ | 2048 | one per query per layer | indexer top-k in DeepSeek-V3.2-style models |
-| Nearest-neighbor search | candidate distances, 10K to millions | 10 to 1000 | one per query | Faiss, cuVS `select_k` |
+| [[Approximate Nearest Neighbor Search on GPUs|Nearest-neighbor search]] | candidate distances, 10K to millions | 10 to 1000 | one per query | Faiss, cuVS `select_k` |
 | MoE routing | number of experts, 64 to 512 | 1 to 8 | one per token | router kernels ([[Mixture of Experts]]) |
 | Gradient sparsification, BatchTopK SAEs | millions to billions | 0.1% to a few % of n | one or a few | training loops ([Prof-K](https://arxiv.org/pdf/2608.12573)) |
 
@@ -378,7 +378,7 @@ In plain words: sorting moves about 8x more data than selecting, before counting
 |---|---|---|
 | LLM sampling ([[LLM Serving]]) | 1 row per request, vocab 128K to 262K | FlashInfer rejection sampling; sort-based fallback; exponential-race draw |
 | Sparse attention selection ([[Sparse Attention]]) | 1 row per query per layer, k = 2048 | per-row radix (TRT-LLM, vLLM), GVR in decode |
-| Nearest-neighbor search | 1 row per query, k up to 1000 | WarpSelect / BlockSelect, cuVS `select_k` |
+| [[Approximate Nearest Neighbor Search on GPUs|Nearest-neighbor search]] | 1 row per query, k up to 1000 | WarpSelect / BlockSelect, cuVS `select_k` |
 | MoE routing ([[Mixture of Experts]]) | 1 row per token, 64 to 512 experts, k ≤ 8 | rows small enough for a per-warp register selection inside the router kernel |
 | Speculative decoding verification ([[Speculative Decoding]]) | accept or resample per drafted token | FlashInfer `chain_speculative_sampling` |
 | Training-time sparsity | one huge row or a few | Prof-K; device-wide radix top-k |
@@ -468,5 +468,6 @@ Open problems:
 - [[Sparse Attention]] — DeepSeek Sparse Attention's indexer selects the top 2048 tokens per query.
 - [[Speculative Decoding]] — Verification is rejection sampling too.
 - [[Mixture of Experts]] — Router top-k over experts.
+- [[Approximate Nearest Neighbor Search on GPUs]] — Every ANN index ends with a per-query top-k over candidate distances.
 - [[Forward Progress and Inter-Block Synchronization]] — Why multi-block barriers need co-residency and are gated on SM count.
 - [[Random Number Generation on GPUs]] — Philox, seeds and offsets behind the random draws a sampler makes.

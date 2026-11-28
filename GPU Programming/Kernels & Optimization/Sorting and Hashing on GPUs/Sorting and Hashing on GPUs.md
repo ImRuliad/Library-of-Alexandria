@@ -51,7 +51,7 @@ sources:
   - https://github.com/nvidia/cccl
   - https://insidehpc.com/2022/03/omnisci-rebrands-as-heavy-ai/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -374,7 +374,7 @@ Static tables are built once with a known size. When keys arrive and leave over 
 | **Group-by** | Hash, or sort | libcudf's hash fast path inserts row indices into a `cuco::static_set` (linear probing, 2N slots) with CAS to elect one representative per key, aggregates in a 128-slot shared-memory set per block, and falls back to a global-memory kernel when a block sees more than 128 distinct keys ([libcudf deep dive, May 2026](https://jazracherif.github.io/database/gpu/nvidia/rapids/libcudf/2026/05/13/libcudf-technical-deep-dive.html)). Sort-based group-by sorts by key, then does a segmented reduction. |
 | **Deduplication** | Hash | `cudf::distinct` keeps keys and row indices in a `static_set`; on an H100 it runs at 10 to 15 billion items/s for high-cardinality data and up to about 40 billion items/s when the table fits in L2; `keep="first"` slows below 32 distinct keys from atomic contention ([NVIDIA, Nov 2024](https://developer.nvidia.com/blog/supercharging-deduplication-in-pandas-using-rapids-cudf/)). |
 | **MoE token routing** | One-digit counting sort | Megatron-Core's inference permute counts tokens per expert, takes an (optionally aligned) prefix sum of the counts to get each expert's start offset, scatters each (token, top-k slot) pair into its expert's region, and later un-permutes with fp32 atomic adds; offsets are padded to 128 for MXFP8 grouped GEMMs ([Megatron-Core](https://docs.nvidia.com/megatron-core/developer-guide/latest/apidocs/core/core.inference.moe.permute.html)). This is exactly one radix pass whose "digit" is the expert id. See [[Mixture of Experts]]. |
-| **Top-k / sampling** | Radix select | Top-k logits for LLM sampling, nearest-neighbor candidates; `cub::DeviceTopK` and the batched variant. See [[Top-k and Sampling Kernels]]. |
+| **Top-k / sampling** | Radix select | Top-k logits for LLM sampling, nearest-neighbor candidates ([[Approximate Nearest Neighbor Search on GPUs]]); `cub::DeviceTopK` and the batched variant. See [[Top-k and Sampling Kernels]]. |
 | **Spatial structures** | Sort | Sort particles or primitives by cell id or Morton code, then find cell boundaries with a scan; the base step of grid neighbor search and BVH builds. |
 
 For databases more broadly, Wu, Koutsoukos and Alonso (PACMMOD, Feb 2025) found random accesses take up to 75% of GPU join and group-by runtime and reported 19.4× and 1.7× speedups from optimizing existing hash-based and sort-based group-by, plus a partition-based group-by for high cardinalities ([arXiv 2312.00720](https://arxiv.org/abs/2312.00720v2)). Crystal's tile-based GPU implementation ran the Star Schema Benchmark about 25× faster than its CPU counterpart and about 16× faster than OmniSci (renamed HEAVY.AI in March 2022, its engine now HeavyDB; [insideHPC](https://insidehpc.com/2022/03/omnisci-rebrands-as-heavy-ai/)), and sorted $2^{28}$ entries in 27.08 ms against 464 ms on an 8-core CPU, a 17.1× gain close to the 16.2× bandwidth ratio ([Shanbhag et al.](https://arxiv.org/pdf/2003.01178)).
