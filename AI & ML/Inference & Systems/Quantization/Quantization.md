@@ -392,7 +392,7 @@ QAT came back in 2025 for a specific reason: reasoning models. Moonshot says "th
 
 #### **Training in Low Precision**
 
-Low-precision training runs the big matmuls of the forward and backward pass in FP8 or FP4, keeping master weights, optimizer state and sensitive layers in higher precision (see [[Optimizers]] and [[Distributed Training]]).
+Low-precision training runs the big matmuls of the forward and backward pass in FP8 or FP4, keeping master weights, optimizer state and sensitive layers in higher precision (full treatment in [[Low-Precision Training]]; see also [[Optimizers]] and [[Distributed Training]]).
 
 **FP8 (DeepSeek-V3, Dec 2024).** The recipe that made FP8 frontier-viable ([DeepSeek-AI](https://arxiv.org/abs/2412.19437)):
 - E4M3 for *all* tensors, rather than E5M2 for gradients, made possible by fine-grained scales: 1×128 tiles for activations (per token per 128 channels), 128×128 blocks for weights.
@@ -526,6 +526,7 @@ vLLM's quantization page in late 2026 lists FP8 (per-tensor, per-channel, per-bl
 - [[Distributed Training]] — FP8 and FP4 training also shrink communication and memory per GPU.
 - [[Optimizers]] — Master weights and optimizer state that stay in high precision.
 - [[LLM Serving]] — How quantized models are batched and served.
+- [[Low-Precision Training]] — Training-time FP8 and FP4 recipes in depth: scaling, rounding, exempt layers, and 2026 production runs.
 - [[Distillation]] — The other main way to make a model cheaper to serve.
 - [[Reasoning Models]] — Long outputs make PTQ errors compound, motivating QAT.
 - [[Low-Precision Formats - FP8, FP4 and MX|Low-Precision Formats: FP8, FP4 and MX]] — The GPU side: bit layouts, block-scaled tensor-core instructions and hardware support.

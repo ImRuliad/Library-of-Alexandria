@@ -385,7 +385,7 @@ Rack-scale systems raise the stakes: SemiAnalysis notes a whole GB200 NVL72 can 
 
 #### **Low-Precision Training and Communication**
 
-Lower precision cuts both compute and the bytes on the wire (see [[Quantization]]):
+Lower precision cuts both compute and the bytes on the wire (see [[Low-Precision Training]] and [[Quantization]]):
 
 - **FP8 is production:** DeepSeek-V3 used tile-wise FP8 (1x128 tiles for activations, 128x128 blocks for weights, promoted to FP32 accumulation every 128 elements) with loss within 0.25% of BF16. MoE dispatch went in FP8 while combine stayed in BF16 ([DeepSeek-V3](https://arxiv.org/abs/2412.19437)). Llama 4 Behemoth was pretrained in FP8 ([Meta](https://ai.meta.com/blog/llama-4-multimodal-intelligence/)).
 - **4-bit is arriving:** NVIDIA trained a 12B model on 10T tokens in NVFP4, "the longest publicly documented training run in 4-bit precision", matching an FP8 baseline using random Hadamard transforms, 2D scaling, stochastic rounding and a few higher-precision layers (Sep 2025) ([NVIDIA](https://arxiv.org/abs/2509.25149v1)). Megatron Core lists FP8 and NVFP4 training for MoE (Mar 2026) ([Yan et al.](https://arxiv.org/abs/2603.07685)).
@@ -478,6 +478,7 @@ DiLoCo (Nov 2023) lets each worker group run many local AdamW steps and synchron
 - [[Mixture of Experts]] — Adds expert parallelism and makes all-to-all the bottleneck collective.
 - [[Optimizers]] — Adam's two moments are 8 of the 16 bytes per parameter; DiLoCo is an inner/outer optimizer scheme.
 - [[Quantization]] — FP8 and NVFP4 training and low-precision communication.
+- [[Low-Precision Training]] — The FP8 and FP4 pretraining recipes, including low-bit MoE dispatch and combine.
 - [[Scaling Laws]] — The compute budgets that make all of this necessary.
 - [[AI Accelerators]] — NVLink domains, NVL72, Trainium UltraServers and TPU pods set the bandwidth hierarchy.
 - [[2 - How To Think About TPUs (NOT DONE)|2 - How To Think About TPUs (NOT DONE)]] — The TPU torus view of sharding and collectives.

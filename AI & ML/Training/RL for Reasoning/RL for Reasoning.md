@@ -511,5 +511,6 @@ Open problems:
 - [[LLM Serving]] — The inference engines that generate RL rollouts and dominate RL wall-clock time.
 - [[Distributed Training]] — Trainer-side parallelism and weight sync between trainer and generator pools.
 - [[Quantization]] — FP8 rollouts and BF16 vs FP16 numerics behind the training-inference mismatch.
+- [[Low-Precision Training]] — Training and sampling in the same FP8 or FP4 numerics to shrink that mismatch.
 - [[KV Cache]] — Long rollouts at 32K to 128K tokens make generation memory-bound.
 - [[Transformer]] — The policy network being optimized.

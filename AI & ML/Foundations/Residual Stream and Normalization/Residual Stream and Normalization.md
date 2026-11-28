@@ -416,7 +416,7 @@ Ten years after ResNet, the unit-weight sum $x + F(x)$ is no longer taken for gr
 | mHC / HC | Richer depth connectivity, better benchmarks | 4x residual state and memory traffic; Sinkhorn per layer; harder pipeline parallelism | Does it scale past $n = 4$ (xHC says yes, with sparsity)? |
 | Attention Residuals | Layers choose what to read from depth | Stored per-block states cross pipeline stages; custom serving paths | How it combines with [[Looped Transformers]] and [[Hybrid Attention]] stacks |
 
-- **Massive activations are both a feature and a bug.** They implement attention sinks and biases, yet make [[Quantization]] and low-precision training harder. Whether to remove them (with gated attention or sink logits) or accommodate them is still debated; see [[Attention Sinks and Gated Attention]].
+- **Massive activations are both a feature and a bug.** They implement attention sinks and biases, yet make [[Quantization]] and [[Low-Precision Training|low-precision training]] harder. Whether to remove them (with gated attention or sink logits) or accommodate them is still debated; see [[Attention Sinks and Gated Attention]].
 - **Interpretability depends on the stream.** The clean "read, add, persist" picture of [Elhage et al.](https://transformer-circuits.pub/2021/framework/index.html) assumes one linear stream. With four mixed streams or attention over depth, circuits analysis has to be redone.
 - **Diagnosis is hard.** Whether deep layers are "wasted" depends on the measure: the curse-of-depth view and the effective-depth view read similar evidence differently ([Gahtan et al., 2026](https://arxiv.org/abs/2609.31098)).
 

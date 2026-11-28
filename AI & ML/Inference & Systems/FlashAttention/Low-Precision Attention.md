@@ -74,7 +74,7 @@ updated: 2026-11-26
 ---
 *At long context, attention's own matrix multiplies become the largest single cost of a forward pass, and the rest of the model has already moved to FP8 or FP4. Leaving attention in BF16 leaves half or more of the tensor cores' throughput unused exactly where the FLOPs are.*
 
-[[Quantization]] moved weights and the big linear layers to FP8 and then to 4-bit formats, but low-precision training recipes usually kept attention in BF16 (DeepSeek-V3's FP8 recipe did, as covered in that note). That made sense at 4K tokens, where attention is a small share of the work. It stops making sense at 128K tokens and beyond, where the $n \times n$ score computation dominates (see [[#Why Attention FLOPs Grow With Context|the numbers below]]).
+[[Quantization]] moved weights and the big linear layers to FP8 and then to 4-bit formats, but [[Low-Precision Training|low-precision training]] recipes usually kept attention in BF16 (DeepSeek-V3's FP8 recipe did, as covered in that note). That made sense at 4K tokens, where attention is a small share of the work. It stops making sense at 128K tokens and beyond, where the $n \times n$ score computation dominates (see [[#Why Attention FLOPs Grow With Context|the numbers below]]).
 
 The hardware has also changed the trade. On Hopper, FP8 tensor cores are rated at 1978 TFLOPS against 989 for FP16 ([Tri Dao, Jul 2024](https://tridao.me/blog/2024/flash3/)). On an RTX 5090, FP4 matmul runs at about 1600 TOPS against about 200 for FP16 ([Zhang et al., 2025](https://arxiv.org/abs/2505.11594)). The question is how to capture that speed without wrecking accuracy in an operation whose softmax amplifies small score errors exponentially, and without breaking the causal mask that training depends on.
 
@@ -364,4 +364,5 @@ Open problems:
 - [[Long Context]] — Where attention FLOPs dominate and low precision pays most.
 - [[LLM Serving]] — How serving stacks expose FP8 attention as a flag.
 - [[Sparse Attention]] — The other way to cut attention cost; DeepSeek-V3.2 combines both.
+- [[Low-Precision Training]] — The FP8 and FP4 recipes for the linear layers around attention.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why a faster matmul shifts the bottleneck to the softmax.

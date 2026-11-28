@@ -511,6 +511,7 @@ The pattern: matrix-aware optimizers (Muon, SOAP, Shampoo) are genuinely better 
 - [[Scaling Laws]] — Learning-rate schedules decided the Kaplan vs Chinchilla disagreement; WSD makes scaling-law sweeps cheaper.
 - [[Residual Stream and Normalization]] — Norms, logit control and weight decay are the other half of training stability.
 - [[Quantization]] — 8-bit optimizer states and low-precision training share the same block-wise quantization ideas.
+- [[Low-Precision Training]] — FP32 master weights, FP8 and FP4 Adam moments, and Newton-Schulz in NVFP4.
 - [[Transformer]] — The weight matrices Muon orthogonalizes, and the embeddings and norms left on AdamW.
 - [[Mixture of Experts]] — Kimi K2, GLM-4.5 and DeepSeek-V3 are MoE models; expert weights and routers add their own optimizer questions.
 - [[Attention]] — QK-Clip exists because Muon let attention logits grow too large.
