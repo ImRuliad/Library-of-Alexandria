@@ -351,3 +351,4 @@ Open problems:
 - [[Sparse Attention]] — Compressed sparse attention makes the attention side so cheap that AFD's pool ratios become extreme.
 - [[Quantization]] — FP8 and FP4 experts and FP8 dispatch cut both weight reads and all-to-all bytes.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why tokens per expert decides whether decode is memory- or compute-bound.
+- [[Pruning]] — Expert pruning shrinks the weights each EP group must hold; active compute stays the same.

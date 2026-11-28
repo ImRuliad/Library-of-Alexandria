@@ -160,7 +160,7 @@ flowchart TB
 #### **Number Formats and Sparsity Footnotes**
 
 - **Each halving of bits roughly doubles peak FLOPs and halves bytes moved.** H100 added FP8 through its Transformer Engine, which picks FP8 or 16-bit math layer by layer ([NVIDIA, 2022](https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/)). Blackwell added FP4 (NVFP4); AMD's MI355X and Trainium3 support MXFP4; TPU 8t added native FP4, which Google says "doubles MXU throughput" ([Google Cloud, Apr 2026](https://cloud.google.com/blog/products/compute/tpu-8t-and-tpu-8i-technical-deep-dive)). See [[Quantization]] and [[Low-Precision Attention]].
-- **The sparsity footnote.** Since Ampere, NVIDIA (and AMD) quote "with sparsity" figures for 2:4 structured sparsity, where two of every four weights are zero; it doubles tensor-core throughput only if the model is actually pruned that way ([NVIDIA, May 2020](https://developer.nvidia.com/blog/nvidia-ampere-architecture-in-depth)). The H100 page lists 1,979 TFLOPS BF16 "with sparsity", i.e. 989 dense ([NVIDIA](https://www.nvidia.com/en-us/data-center/h100.html)). Always compare dense to dense; this note does.
+- **The sparsity footnote.** Since Ampere, NVIDIA (and AMD) quote "with sparsity" figures for 2:4 structured sparsity, where two of every four weights are zero; it doubles tensor-core throughput only if the model is actually [[Pruning|pruned]] that way ([NVIDIA, May 2020](https://developer.nvidia.com/blog/nvidia-ampere-architecture-in-depth)). The H100 page lists 1,979 TFLOPS BF16 "with sparsity", i.e. 989 dense ([NVIDIA](https://www.nvidia.com/en-us/data-center/h100.html)). Always compare dense to dense; this note does.
 
 #### **Scale-Up and Scale-Out Networks**
 
@@ -414,3 +414,4 @@ Open questions: how far FP4 (and below) can go for pretraining without loss; whe
 - [[Low-Precision Training]] — How FP8 and NVFP4 training recipes turn these chips' low-precision peaks into real speedups.
 - [[Blackwell Architecture]] — NVIDIA's Blackwell generation in depth.
 - [[Expert Parallelism and MoE Serving]] — Why MoE serving wants large NVLink domains: the per-layer all-to-all.
+- [[Pruning]] — How models are pruned to the 2:4 pattern, and why it now often loses to FP8 and FP4.

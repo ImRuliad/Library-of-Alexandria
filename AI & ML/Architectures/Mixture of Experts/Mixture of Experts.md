@@ -478,3 +478,4 @@ The pattern: returns from sparsity are real but diminishing (1.69x, then 1.39x, 
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Inference cost model that MoE changes.
 - [[Expert Parallelism and MoE Serving]] — How MoE models are served: DP attention plus wide EP, all-to-all kernels, redundant experts.
 - [[Prefill-Decode Disaggregation]] — Separate prefill and decode pools, each with its own EP width.
+- [[Pruning]] — Expert pruning (REAP) removes rarely useful experts to cut MoE memory.
