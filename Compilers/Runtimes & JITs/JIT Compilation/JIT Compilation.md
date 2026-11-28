@@ -476,3 +476,4 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[Safepoints and Stack Maps]] — The polls and per-pc maps every optimizing tier emits.
 - [[On-Stack Replacement]] — Back-edge counters, OSR entry at loop headers, and how each engine moves the frame.
 - [[Sampling Profilers and Safepoint Bias]] — Attributing samples to JIT code: safepoint bias, AsyncGetCallTrace, JFR, perf maps and jitdump.
+- [[Tiering Policies and Warm-up]] — How each engine sets its tier-up thresholds, and how warm-up is measured and skipped.

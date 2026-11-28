@@ -526,3 +526,4 @@ go build ./cmd/server                   # -pgo=auto finds default.pgo
 - [[Virtual Memory and Paging]] — Page faults that startup function ordering reduces.
 - [[Compiler Testing and Fuzzing]] — Profile-dependent miscompiles and reproducibility.
 - [[Sampling Profilers and Safepoint Bias]] — How sampled profiles go wrong in JIT runtimes, and how `perf` names JIT code.
+- [[Tiering Policies and Warm-up]] — When JITs collect profiles, and AOT caches that ship them from a training run.

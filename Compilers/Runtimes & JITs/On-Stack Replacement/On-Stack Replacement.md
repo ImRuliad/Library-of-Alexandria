@@ -446,6 +446,7 @@ quadrantChart
 *OSR sits between tiering policy, deoptimization metadata and loop structure; these are the notes it leans on.*
 
 - [[JIT Compilation]] — Tiers and call counters, the policy OSR fills the gap in.
+- [[Tiering Policies and Warm-up]] — The back-edge thresholds that trigger OSR, and the rest of the tier-up policy.
 - [[Deoptimization and Speculation]] — OSR exit, frame states and Deoptless.
 - [[Safepoints and Stack Maps]] — The same per-point frame descriptions, read in the other direction.
 - [[Loop Optimizations]] — Back-edges, natural loops, and why an extra loop entry weakens LICM and friends.

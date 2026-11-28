@@ -451,5 +451,5 @@ V8 does the same for Ignition: `--interpreted-frames-native-stack` creates "copi
 - [[LLVM]] — LLVM-based JITs can publish perf symbols through a perf JIT event listener.
 - [[Code Cache Management]] — Planned: freed and reused JIT code breaks naive perf maps.
 - [[Stack Unwinding and Exception Tables]] — Planned: frame pointers vs unwind tables, which native profilers need.
-- [[Tiering Policies and Warm-up]] — Planned: profiling a program whose compiled code is still changing.
+- [[Tiering Policies and Warm-up]] — Profiling a program whose compiled code is still changing.
 - [[Green Threads and Virtual Threads]] — Planned: sampling threads that are not mounted on a CPU.

@@ -431,3 +431,4 @@ Duboscq et al. measured Graal's deopt metadata at **1.7× to 1.9× the size of t
 - [[Safepoints and Stack Maps]] — The same per-safepoint records hold GC maps and deopt frame states.
 - [[On-Stack Replacement]] — The upward direction: entering optimized code mid-loop, deopt run in reverse.
 - [[Sampling Profilers and Safepoint Bias]] — Profilers reuse the same per-pc scope records to name sampled frames.
+- [[Tiering Policies and Warm-up]] — Retry thresholds and delayed tier-up for code that keeps deoptimizing.
