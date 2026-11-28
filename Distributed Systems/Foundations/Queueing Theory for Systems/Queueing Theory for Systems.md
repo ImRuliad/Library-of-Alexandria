@@ -12,6 +12,7 @@ sources:
   - https://people.cs.umass.edu/~emery/classes/cmpsci691st/readings/OS/Littles-Law-50-Years-Later.pdf
   - https://www.informs.org/Explore/History-of-O.R.-Excellence/O.R.-Methodologies/Queueing-Models
   - https://www.informs.org/Explore/History-of-O.R.-Excellence/Biographical-Profiles/Erlang-Agner-Krarup
+  - https://en.wikipedia.org/wiki/Agner_Krarup_Erlang
   - https://projecteuclid.org/euclid.aoms/1177728975
   - https://en.wikipedia.org/wiki/Pollaczek%E2%80%93Khinchine_formula
   - https://en.wikipedia.org/wiki/Kingman%27s_formula
@@ -232,7 +233,7 @@ timeline
     2025-2026 : Markov models of metastability, queueing models of LLM serving
 ```
 
-- **Telephony (1909 to 1917).** Agner Krarup Erlang joined the Copenhagen Telephone Company in 1908, published "The theory of probability and telephone conversations" in 1909 and gave his loss and waiting-time formulas in 1917; telephone companies including the British Post Office soon used them ([INFORMS, Erlang](https://www.informs.org/Explore/History-of-O.R.-Excellence/Biographical-Profiles/Erlang-Agner-Krarup); [INFORMS, Queueing Models](https://www.informs.org/Explore/History-of-O.R.-Excellence/O.R.-Methodologies/Queueing-Models)). The unit of offered load, the erlang, is named after him ([Wikipedia](https://en.wikipedia.org/wiki/Agner_Krarup_Erlang)).
+- **Telephony (1909 to 1917).** Agner Krarup Erlang joined the Copenhagen Telephone Company in 1908, published "The Theory of Probabilities and Telephone Conversations" in 1909 and gave his loss and waiting-time formulas in 1917; telephone companies including the British Post Office soon used them ([INFORMS, Erlang](https://www.informs.org/Explore/History-of-O.R.-Excellence/Biographical-Profiles/Erlang-Agner-Krarup); [INFORMS, Queueing Models](https://www.informs.org/Explore/History-of-O.R.-Excellence/O.R.-Methodologies/Queueing-Models)). In 1946 the CCITT named the international unit of telephone traffic, the unit of offered load used below, the erlang ([Wikipedia](https://en.wikipedia.org/wiki/Agner_Krarup_Erlang)).
 - **Mathematical foundations (1930s to 1960s).** Pollaczek and Khinchine handled arbitrary service times; Kendall gave the notation; Jackson (1957) showed networks of queues could be analyzed node by node; Little (1961) proved $L = \lambda W$ ([INFORMS](https://www.informs.org/Explore/History-of-O.R.-Excellence/O.R.-Methodologies/Queueing-Models)).
 - **Computers and networks (1970s).** Kleinrock's two-volume *Queueing Systems* (1975 to 1976) made queueing central to data communications and the Internet ([INFORMS](https://www.informs.org/Explore/History-of-O.R.-Excellence/O.R.-Methodologies/Queueing-Models)).
 - **Back into computer science (2000s to 2010s).** Harchol-Balter's 2013 book set out to "bring queueing theory decisively back to computer science" ([book page](https://www.cs.cmu.edu/~harchol/PerformanceModeling/book.html)), and the practical results (two choices, open vs closed, CoDel) spread through engineering posts more than textbooks.
