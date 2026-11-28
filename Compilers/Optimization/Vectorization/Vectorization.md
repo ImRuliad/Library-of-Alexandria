@@ -42,7 +42,7 @@ sources:
   - https://llvm.org/pubs/2012-05-13-InPar-ispc.html
   - https://www-inf.telecom-sudparis.eu/COURS/CSC5001/Supports/Cours/OpenMP/OpenMP-4.0-C.pdf
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -438,7 +438,7 @@ The TSVC2 study found indirect accesses defeated GCC and Clang on all 8 such loo
 
 *GCC merged its vectorizers into one SLP-based design and keeps extending early-break, masked and uncounted loops.*
 
-- **GCC 15** (2025): only the loop-aware SLP vectorizer remains, unifying the old loop and SLP paths; leaner early-break loops; alignment peeling with early breaks for NEON and fixed-size SVE; masked peeling for fixed-size SVE, which helped HPC loops such as GROMACS; `std::find` and `std::find_if` vectorize through early-break support ([Arm, GCC 15](https://developer.arm.com/community/arm-community-blogs/b/tools-software-ides-blog/posts/gcc-15-continuously-improving)).
+- **GCC 15** (2025): only the loop-aware SLP vectorizer remains, unifying the old loop and SLP paths; leaner early-break loops; alignment peeling with early breaks for NEON and fixed-size SVE; masked peeling for fixed-size SVE, which helped HPC loops such as GROMACS; `std::find` and `std::find_if` vectorize through early-break support (library search routines go much further; see [[SIMD Text Search]]) ([Arm, GCC 15](https://developer.arm.com/community/arm-community-blogs/b/tools-software-ides-blog/posts/gcc-15-continuously-improving)).
 - **GCC 16** (16.1, April 2026): "The vectorizer now supports vectorizing uncounted loops", peeling for alignment in vector-length-agnostic loops using masking, mutual peeling for alignment, more flexible reduction detection, better early-break code, and on x86 "Auto-vectorization will now try to use a masked vector epilog when AVX512 support is enabled". AArch64 gains `-mautovec-preference` to choose the ISA used for auto-vectorization ([GCC 16 changes](https://gcc.gnu.org/gcc-16/changes.html)).
 
 ### Hardware, AVX10 and SVE in Practice
@@ -512,3 +512,4 @@ The TSVC2 study found indirect accesses defeated GCC and Clang on all 8 such loo
 - [[Translation Validation]] — Checking each compiler run instead of proving the compiler.
 - [[Bounds Check Elimination]] — In-loop range checks block vectorization; removing them is often what lets a loop vectorize.
 - [[Floating-Point Semantics]] — Why float reductions need reassociation permission, and what fast-math and FMA contraction change.
+- [[SIMD Text Search]] — Hand-written SIMD search loops (memchr, Teddy, FDR) that early-exit vectorization still cannot produce.

@@ -40,7 +40,7 @@ sources:
   - https://raw.githubusercontent.com/PCRE2Project/pcre2/master/NEWS
   - https://openwall.com/lists/oss-security/2026/09/04/7
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -337,7 +337,7 @@ The authors claim the first industrial regex matcher with a formal correctness p
 
 *Most regexes contain literal text; finding that text with SIMD and only then running the real engine is often ten times faster than any automaton.*
 
-Gallant notes the gap between literal search and general regex search is often "at least one order of magnitude" ([Gallant](https://burntsushi.net/regex-internals/)). So engines extract literals from the pattern and search for them first:
+Gallant notes the gap between literal search and general regex search is often "at least one order of magnitude" ([Gallant](https://burntsushi.net/regex-internals/)). So engines extract literals from the pattern and search for them first (the routines themselves are in [[SIMD Text Search]]):
 
 | Literal set | Algorithm | Notes |
 |---|---|---|
@@ -488,6 +488,7 @@ Barrière and Pit-Claudel (PLDI 2024) found that JavaScript's semantics for null
 - [[Compiler Pipeline]] — The parse, lower, optimize, emit structure regex engines reuse.
 - [[Classic Optimizations]] — Literal extraction and byte-class compression are regex-specific analogs of constant propagation and strength reduction.
 - [[Vectorization]] — SIMD literal search (Teddy, FDR) is where most regex throughput comes from.
+- [[SIMD Text Search]] — How memchr, memmem, Two-Way, Teddy, FDR and the shufti/truffle accelerators actually work.
 - [[Compiler Testing and Fuzzing]] — Differential testing across regex engines found bugs in .NET, V8 and Rust.
 - [[Verified Compilers]] — .NET's derivative engine is the first industrial matcher with a formal correctness proof.
 - [[Program Synthesis]] — FlashFill-style string synthesis targets regex-like token languages.
