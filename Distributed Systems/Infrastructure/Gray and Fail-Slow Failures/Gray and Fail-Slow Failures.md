@@ -403,7 +403,7 @@ CSnake (EuroSys 2026) finds these loops by injecting faults, including delays th
 
 ### Industry Practice
 
-- **Monitor from the customer's side, per fault domain.** AWS's guidance (July 2023, now marked historical but still the clearest write-up) is to alarm per Availability Zone, test whether errors are skewed across zones with a chi-squared test, and evacuate a zone with zonal shift as the preferred response ([AWS whitepaper](https://docs.aws.amazon.com/pdfs/whitepapers/latest/advanced-multi-az-resilience-patterns/advanced-multi-az-resilience-patterns.pdf)). *Worked example from it:* 100 errors over four zones, expected 25 each, observed 20, 20, 25 and 35, gives $\chi^2 = 6$ with 3 degrees of freedom, not significant at 5%, so no zone is blamed.
+- **Monitor from the customer's side, per fault domain.** AWS's guidance (July 2023, now marked historical but still the clearest write-up) is to alarm per Availability Zone, test whether errors are skewed across zones with a chi-squared test, and evacuate a zone with [[Zonal Isolation and Cell-Based Architecture#Evacuating a Zone|zonal shift]] as the preferred response ([AWS whitepaper](https://docs.aws.amazon.com/pdfs/whitepapers/latest/advanced-multi-az-resilience-patterns/advanced-multi-az-resilience-patterns.pdf)). *Worked example from it:* 100 errors over four zones, expected 25 each, observed 20, 20, 25 and 35, gives $\chi^2 = 6$ with 3 degrees of freedom, not significant at 5%, so no zone is blamed.
 - **Azure** still teaches differential observability as the organizing idea; Ze Li (Azure) and Ryan Huang presented its production use at SREcon24 Americas (March 2024) ([USENIX](https://www.usenix.org/conference/srecon24americas/presentation/li)).
 - **Detection by peers, eviction by default.** Across IASO, Perseus, ByteRobust and Guard, the deployed pattern is the same: compare against peers or a fitted model, require persistence, then quarantine or evict, often over-evicting to recover quickly.
 
@@ -487,3 +487,4 @@ Open problems worth tracking:
 - [[Erasure Coding]] — Slow or missing fragments turn reads into degraded reads that decode from $k$ others.
 - [[Tail Latency and Hedging]] — Fan-out math, hedged and tied requests, and when redundancy backfires.
 - [[Fault Injection and Chaos Engineering]] — Injecting slow and partial faults on purpose, from Xinda to AWS FIS gray-failure scenarios.
+- [[Zonal Isolation and Cell-Based Architecture]] — Siloing services by zone so a gray-failing AZ can be drained; zonal shift and autoshift.

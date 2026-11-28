@@ -181,7 +181,7 @@ stateDiagram-v2
 
 A breaker counts failures; past a threshold it **opens** and fails calls immediately without touching the struggling supplier, then after a timeout lets one trial call through ([Fowler](https://www.martinfowler.com/bliki/CircuitBreaker.html)).
 
-Brooker's warning: breakers assume the whole dependency is either up or down. In a [[Partitioning|sharded]] or cell-based service, one shard may be overloaded while the rest are fine. A breaker that trips for everything hurts users of healthy shards; one that does not trip adds nothing. Breakers can turn partial failures into total ones. Fixes like per-shard breakers or server-provided overload signals work but add coupling or complexity ([Brooker](https://brooker.co.za/blog/2022/02/16/circuit-breakers.html)).
+Brooker's warning: breakers assume the whole dependency is either up or down. In a [[Partitioning|sharded]] or [[Zonal Isolation and Cell-Based Architecture|cell-based]] service, one shard may be overloaded while the rest are fine. A breaker that trips for everything hurts users of healthy shards; one that does not trip adds nothing. Breakers can turn partial failures into total ones. Fixes like per-shard breakers or server-provided overload signals work but add coupling or complexity ([Brooker](https://brooker.co.za/blog/2022/02/16/circuit-breakers.html)).
 
 ### Metastable Failures
 
@@ -277,3 +277,4 @@ Open problems:
 - [[Queueing Theory for Systems]] — the math behind goodput collapse, load shedding signals and metastable tipping points
 - [[Tail Latency and Hedging]] — hedged requests are retries that fire on slowness; they need the same budgets and idempotency
 - [[Fault Injection and Chaos Engineering]] — experiments that exercise timeouts, fallbacks and recovery on purpose; ChAP found mismatched timeouts
+- [[Zonal Isolation and Cell-Based Architecture]] — bulkheads at zone and cell grain, static stability, and draining a sick zone

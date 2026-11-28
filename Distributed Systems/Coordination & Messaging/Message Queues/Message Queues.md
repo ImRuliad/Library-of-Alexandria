@@ -469,5 +469,5 @@ On the producer side, the mirror problem (writing to the database and the queue 
 - [[Tail Latency and Hedging]] — How queueing delay shows up in tail latency.
 - [[Resource Fairness]] — Fair queuing, shuffle sharding and fair sharing between tenants.
 - [[Diskless Streaming]] — Logs built on object storage.
-- [[Zonal Isolation and Cell-Based Architecture]] — Planned: per-cell queues as an isolation boundary.
+- [[Zonal Isolation and Cell-Based Architecture]] — Per-cell queues as an isolation boundary.
 - [[MVCC and Version Garbage Collection]] — Dead tuples, the xmin horizon and why long transactions starve a Postgres queue.

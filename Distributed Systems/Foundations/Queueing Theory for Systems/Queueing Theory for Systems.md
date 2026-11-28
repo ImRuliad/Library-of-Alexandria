@@ -444,4 +444,4 @@ Open problems:
 - [[Tail Latency and Hedging]] — Fan-out, tails and hedged requests.
 - [[Fair LLM Serving]] — Planned: fairness in batched LLM queues.
 - [[Fault Injection and Chaos Engineering]] — Testing under overload, and why cascading failures need load plus a trigger.
-- [[Zonal Isolation and Cell-Based Architecture]] — Planned: cells as bounded queues you can evacuate.
+- [[Zonal Isolation and Cell-Based Architecture]] — Cells as bounded queues you can evacuate; headroom for losing a zone.

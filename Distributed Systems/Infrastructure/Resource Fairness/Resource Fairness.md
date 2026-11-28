@@ -397,7 +397,7 @@ $$
 
 *In words:* the number of distinct shards of size $k$ from $n$ workers; the fraction of tenants that share *every* worker with a given one is about $1/\binom{n}{k}$. *Example:* $n = 8, k = 2$ gives 28; $n = 2048, k = 4$ gives $\approx 7.3 \times 10^{11}$.
 
-Kubernetes APF uses the same trick for queues inside one process, and SQS fair queues apply tenant-aware delivery to a shared queue ([[Message Queues#Amazon SQS|Message Queues]]). The planned [[Zonal Isolation and Cell-Based Architecture]] note covers cells, the coarse-grained version.
+Kubernetes APF uses the same trick for queues inside one process, and SQS fair queues apply tenant-aware delivery to a shared queue ([[Message Queues#Amazon SQS|Message Queues]]). The [[Zonal Isolation and Cell-Based Architecture]] note covers cells, the coarse-grained version.
 
 ### GPU Clusters, Fairness Over Outcomes
 
@@ -538,7 +538,7 @@ Open problems worth tracking:
 - [[Coordination Services]] — etcd behind the Kubernetes API server that APF protects.
 - [[Disaggregated LSMs and Compaction Offload]] — Shared compaction pools that must rank many tenants' jobs.
 - [[Partitioning]] — Pisces and shuffle sharding both start from how data and tenants map to nodes.
-- [[Zonal Isolation and Cell-Based Architecture]] — Planned: cells, the coarse version of shuffle sharding.
+- [[Zonal Isolation and Cell-Based Architecture]] — Cells, the coarse version of shuffle sharding.
 - [[Queueing Theory for Systems]] — Why fair queuing still lets latency grow with load, and why shared pools beat split ones.
 - [[CPU Scheduling]] — EEVDF and CFS, the same virtual-time fairness inside one kernel.
 - [[Containers, Namespaces and cgroups]] — `cpu.weight` and `io.weight`, proportional shares on one machine.

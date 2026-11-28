@@ -396,7 +396,7 @@ The left end finds bugs cheaply and reproducibly but only within its fault model
 
 ### Managed Cloud Services
 
-- **AWS FIS** has grown from instance and network actions into a library of fault-domain scenarios: Cross-Region Connectivity and AZ Availability: Power Interruption (Nov 2023), DynamoDB global-table replication pause (Apr 2024), Lambda invocation faults (Oct 2024), safety levers (Sep 2024), ARC zonal autoshift in the AZ power scenario (Mar 2025), EBS I/O latency (Sep 2025), gray-failure slowdown scenarios with partial-flow targeting (Nov 2025), Direct Connect BGP disruption (Dec 2025), and non-root ECS sidecars (Sep 2026) ([AWS doc history](https://docs.aws.amazon.com/fis/latest/userguide/doc-history.html)). In January 2026 it added pausing replication for DynamoDB global tables with multi-Region strong consistency ([AWS](https://aws.amazon.com/about-aws/whats-new/2026/01/amazon-dynamodb-global-tables-with-mrsc-fis/)).
+- **AWS FIS** has grown from instance and network actions into a library of fault-domain scenarios: Cross-Region Connectivity and AZ Availability: Power Interruption (Nov 2023), DynamoDB global-table replication pause (Apr 2024), Lambda invocation faults (Oct 2024), safety levers (Sep 2024), ARC [[Zonal Isolation and Cell-Based Architecture#Evacuating a Zone|zonal autoshift]] in the AZ power scenario (Mar 2025), EBS I/O latency (Sep 2025), gray-failure slowdown scenarios with partial-flow targeting (Nov 2025), Direct Connect BGP disruption (Dec 2025), and non-root ECS sidecars (Sep 2026) ([AWS doc history](https://docs.aws.amazon.com/fis/latest/userguide/doc-history.html)). In January 2026 it added pausing replication for DynamoDB global tables with multi-Region strong consistency ([AWS](https://aws.amazon.com/about-aws/whats-new/2026/01/amazon-dynamodb-global-tables-with-mrsc-fis/)).
 - **Generated tests.** Since August 2026, AWS Resilience Hub recommends pre-configured tests from a service's architecture and resilience policy, covering AZ impairment, Regional impairment and dependency failure, runs them through FIS and reports pass or fail against the recovery objectives ([AWS](https://aws.amazon.com/about-aws/whats-new/2026/08/aws-resilience-hub/)). Fault injection is becoming a compliance-style check rather than a bespoke experiment.
 - **Azure Chaos Studio** has been GA since November 2023 with agent-based and service-direct faults and templates for scenarios like an AZ going down ([InfoQ](https://www.infoq.com/news/2023/11/azure-chaos-studio-ga/)).
 
@@ -504,7 +504,7 @@ The left end finds bugs cheaply and reproducibly but only within its fault model
 - [[GPU Cluster Infrastructure]] — Cross-layer faults in AI clusters.
 - [[Distributed Training]] — Where one faulty GPU or link stalls a whole job.
 - [[AI-Assisted Protocol Design]] — Agents in the systems testing loop.
-- [[Zonal Isolation and Cell-Based Architecture]] — Planned: zonal shift and cells, the response chaos drills rehearse.
+- [[Zonal Isolation and Cell-Based Architecture]] — Zonal shift, autoshift practice runs and cells, the response chaos drills rehearse.
 - [[Safe Configuration Rollout]] — Planned: staged config changes, the other half of failing small.
 - [[Crash Consistency]] — Planned: fsync semantics and crash-consistency testing.
 - [[Load Testing and Benchmarking]] — Planned: realistic load, which cascading-failure tests need.
