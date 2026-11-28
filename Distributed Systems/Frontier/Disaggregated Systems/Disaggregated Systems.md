@@ -323,7 +323,7 @@ PolarDB's recovery result shows a benefit beyond utilization: when memory is a s
 | 3.1 / 3.2 | Nov 2023 / Dec 2024 | Incremental releases |
 | 4.0 | Nov 18, 2025 | 128 GT/s (double 3.x), bundled ports, native x2 width, up to four retimers, memory RAS improvements; backward compatible to 1.0 ([CXL Consortium, Nov 2025](https://www.businesswire.com/news/home/20251118275848/en/CXL-Consortium-Releases-the-Compute-Express-Link-4.0-Specification-Increasing-Speed-and-Bandwidth)) |
 
-Pooling and sharing are different: pooling gives each host its own slice of a shared device (no coherence across hosts needed); sharing lets hosts read and write the same bytes, which needs coherence across hosts and is much harder.
+Pooling and sharing are different: pooling gives each host its own slice of a shared device (no coherence across hosts needed); sharing lets hosts read and write the same bytes, which needs coherence across hosts and is much harder. Pod topologies, the small hardware-coherent region, software coherence and partial failure are covered in [[CXL Memory Pooling and Sharing]].
 
 **Pond (Microsoft, ASPLOS 2023)** asked how much pooling Azure would really save ([Li et al.](https://arxiv.org/pdf/2203.00241)):
 - Pooling across 8 to 16 sockets captures most of the benefit, and adds 70 to 90 ns over same-NUMA-node DRAM.
@@ -480,6 +480,7 @@ Open problems worth tracking:
 - [[Gray and Fail-Slow Failures]] — Slow shared storage or memory slows every attached node.
 - [[Silent Data Corruption]] — More tiers, more places for pages and logs to diverge.
 - [[Cluster Scheduling]] — Placing compute next to its cached data.
+- [[CXL Memory Pooling and Sharing]] — Multi-host CXL: pod topologies (Octopus), coherence limits, partial failure, databases on a CXL pod.
 - [[Overcommit and Vertical Autoscaling]] — The other answer to stranded and idle memory: oversell it, offload it, or shrink the request (Coach, TMO).
 - [[GPU Cluster Infrastructure]] — Prefill/decode pools and KV cache transfer fabrics.
 - [[KV Cache]] — The "page" of LLM serving, moved between prefill and decode pools.

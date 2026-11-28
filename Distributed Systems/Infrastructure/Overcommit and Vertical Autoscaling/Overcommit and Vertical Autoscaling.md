@@ -373,7 +373,7 @@ Open problems worth tracking:
 - **Who sees what.** The VPA can't see a JVM's heap needs, Azure can't see inside a VM, and the scheduler can't see stalls. Pressure metrics like PSI are the best shared signal so far, but no scheduler in this note places work by them.
 - **Interacting controllers.** VPA, HPA, the cluster autoscaler and the scheduler's preemption all react to the same overload. Without coordination they can oscillate or evict each other's work, a general hazard covered in [[Reconciliation and Control Loops]] and [[Queueing Theory for Systems]].
 - **Resize when the node is full.** 1.37's preemption only looks at the pod's current node; moving the pod to a bigger node, or packing to leave headroom for future resizes, is still up to the user or a custom controller.
-- **Memory tiers.** CXL-attached memory gives a third option between "in RAM" and "swapped" ([[Disaggregated Systems]], [[CXL and Memory Tiering]]); how a scheduler should account for slower memory in a request is unsettled.
+- **Memory tiers.** CXL-attached memory gives a third option between "in RAM" and "swapped" ([[Disaggregated Systems]], [[CXL and Memory Tiering]], [[CXL Memory Pooling and Sharing]]); how a scheduler should account for slower memory in a request is unsettled.
 - **Accelerators.** Everything here is about CPU and memory. GPU sharing and its isolation are a different set of mechanisms; see [[GPU Cluster Infrastructure]] and [[Gang and Topology-Aware Scheduling]].
 - **Tail latency from interference.** Even with enough resources on paper, colocated work fights over caches, memory bandwidth and the network; Heracles handles this per server, but most clusters don't, and the symptoms look like [[Tail Latency and Hedging]] problems.
 
@@ -428,3 +428,4 @@ Open problems worth tracking:
 - [[Virtual Memory and Paging]] — Linux's own memory overcommit modes.
 - [[Virtualization and Hypervisors]] — Ballooning and page sharing in context.
 - [[CXL and Memory Tiering]] — Slower, cheaper memory tiers below RAM.
+- [[CXL Memory Pooling and Sharing]] — Pooling memory across hosts, Pond's 1 GB slices and Octopus pods.

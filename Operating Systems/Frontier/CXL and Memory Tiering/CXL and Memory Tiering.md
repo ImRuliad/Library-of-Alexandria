@@ -265,3 +265,4 @@ A **pool** is a CXL device (or switch-attached set) whose capacity is carved amo
 - [[Containers, Namespaces and cgroups]] — cpusets and memcg, where per-tier limits are being added.
 - [[Locks and Synchronization]] — Why lock-heavy code suffers when its data sits on a slow node.
 - [[Virtualization and Hypervisors]] — Pond's zNUMA nodes and pool memory for VMs.
+- [[CXL Memory Pooling and Sharing]] — Multi-host pools and shared CXL memory: topologies, coherence and partial failure (Distributed Systems).
