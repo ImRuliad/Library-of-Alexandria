@@ -57,7 +57,7 @@ sources:
   - https://www.vldb.org/pvldb/vol19/p3786-zablotchi.pdf
   - https://en.wikipedia.org/wiki/Log-structured_merge-tree
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -536,3 +536,4 @@ Open problems worth tracking:
 - [[Write-Ahead Logging]] — The log behind the memtable, group commit, and Tidehunter's WAL-as-storage design.
 - [[MVCC and Version Garbage Collection]] — GC windows, protected timestamps and GC in compaction filters.
 - [[Databases on Object Storage]] — SlateDB, turbopuffer and Lakebase compared: commit points, caches and GC on object storage.
+- [[Multi-Tenant Storage QoS]] — Charging tenants for the flush and compaction IO their writes cause (Libra), and CockroachDB's write tokens from L0 health.

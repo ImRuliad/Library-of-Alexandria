@@ -53,7 +53,7 @@ sources:
   - https://www.databricks.com/blog/open-sourcing-dicer-databricks-auto-sharder
   - https://arxiv.org/pdf/2512.23434
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -558,3 +558,4 @@ Open problems worth tracking:
 - [[Sharded Postgres]] — Citus, Aurora Limitless, Neki, PgDog and Multigres: routers in front of unmodified Postgres shards.
 - [[Secondary Indexes]] — Local vs global indexes, transactional and asynchronous maintenance, uniqueness and online index builds.
 - [[Cluster Metadata and Routing]] — How routers learn the current map, epochs that catch stale caches, and staged ownership changes.
+- [[Multi-Tenant Storage QoS]] — Token buckets and admission control for tenants sharing storage, DynamoDB alongside Ceph, CockroachDB and TiDB.

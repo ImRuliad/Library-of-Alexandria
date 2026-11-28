@@ -389,3 +389,4 @@ $$
 - [[Message Queues]] — SQS fair queues, the same noisy-tenant problem with message groups as tenants.
 - [[GPU Cluster Infrastructure]] — The shared accelerators underneath.
 - [[Cluster Scheduling]] — Fairness at the level of whole GPU jobs rather than tokens.
+- [[Multi-Tenant Storage QoS]] — The same reservations, limits and cost models for shared disks and SSDs.

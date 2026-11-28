@@ -42,7 +42,7 @@ sources:
   - https://arxiv.org/abs/2407.00079
   - https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -488,3 +488,4 @@ Open problems worth tracking:
 - [[Stream Processing]] — Flink 2.0's disaggregated state (ForSt): remote primary state with a local cache.
 - [[Diskless Streaming]] — Kafka-style logs split into stateless brokers, object storage and a metadata coordinator.
 - [[Write-Ahead Logging]] — The log these designs make into the database: Aurora, Socrates, Neon, AlloyDB and DSQL's journal.
+- [[Multi-Tenant Storage QoS]] — Isolating tenants on shared remote flash: ReFlex and Gimbal.

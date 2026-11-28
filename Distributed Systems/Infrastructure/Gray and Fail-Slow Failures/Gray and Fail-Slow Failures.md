@@ -488,3 +488,4 @@ Open problems worth tracking:
 - [[Tail Latency and Hedging]] — Fan-out math, hedged and tied requests, and when redundancy backfires.
 - [[Fault Injection and Chaos Engineering]] — Injecting slow and partial faults on purpose, from Xinda to AWS FIS gray-failure scenarios.
 - [[Zonal Isolation and Cell-Based Architecture]] — Siloing services by zone so a gray-failing AZ can be drained; zonal shift and autoshift.
+- [[Multi-Tenant Storage QoS]] — Schedulers that keep a noisy neighbor's IO from making a healthy device look slow.
