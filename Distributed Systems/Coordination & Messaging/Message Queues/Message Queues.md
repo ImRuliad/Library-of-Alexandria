@@ -39,7 +39,7 @@ sources:
   - https://encore.dev/articles/postgres-job-queue-skip-locked
   - https://dbos.dev/blog/making-postgres-queues-scale
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -465,7 +465,7 @@ On the producer side, the mirror problem (writing to the database and the queue 
 - [[Distributed Transactions]] — Sagas built from queues and outboxes.
 - [[Isolation Testing]] — Jepsen-style testing that found NATS's durability gaps.
 - [[Object Storage]] — Where logs, and perhaps queues, are moving.
-- [[Queueing Theory for Systems]] — Planned: Little's law, Erlang-C and admission control in depth.
+- [[Queueing Theory for Systems]] — Little's law, Erlang C and admission control in depth.
 - [[Tail Latency and Hedging]] — Planned: how queueing delay shows up in tail latency.
 - [[Resource Fairness]] — Fair queuing, shuffle sharding and fair sharing between tenants.
 - [[Diskless Streaming]] — Logs built on object storage.

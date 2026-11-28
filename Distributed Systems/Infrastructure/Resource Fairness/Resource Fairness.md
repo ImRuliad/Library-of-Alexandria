@@ -39,7 +39,7 @@ sources:
   - https://arxiv.org/html/2609.18112
   - https://docs.aws.amazon.com/en_gb/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fair-queues.html
 created: 2026-11-27
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -539,7 +539,7 @@ Open problems worth tracking:
 - [[Disaggregated LSMs and Compaction Offload]] — Shared compaction pools that must rank many tenants' jobs.
 - [[Partitioning]] — Pisces and shuffle sharding both start from how data and tenants map to nodes.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: cells, the coarse version of shuffle sharding.
-- [[Queueing Theory for Systems]] — Planned: why fair queuing still lets latency grow with load.
+- [[Queueing Theory for Systems]] — Why fair queuing still lets latency grow with load, and why shared pools beat split ones.
 - [[CPU Scheduling]] — EEVDF and CFS, the same virtual-time fairness inside one kernel.
 - [[Containers, Namespaces and cgroups]] — `cpu.weight` and `io.weight`, proportional shares on one machine.
 - [[Block Layer and IO Schedulers]] — Per-device I/O scheduling under mClock-style policies.

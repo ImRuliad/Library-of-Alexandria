@@ -33,7 +33,7 @@ sources:
   - https://aws.amazon.com/message/101925
   - https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -401,7 +401,7 @@ The lesson both write-ups point toward: the fast, global propagation that makes 
 
 - **Bounding router staleness.** Cassandra waits for "a majority of participants" before the next epoch, but a partitioned coordinator may still hold an old epoch; the final "stop writing" step depends on knowing nobody can still read from the old owner. Proving that for arbitrary routers (client libraries in other teams' processes) is hard. [[Formal Methods in Practice]] and [[Deterministic Simulation Testing]] are where such protocols get checked.
 - **Staged rollout of the map itself.** Routing data is usually pushed globally because consistency demands one answer. The 2025 outages argue for cells and canaries even for metadata, which conflicts with having a single current map. See the planned [[Zonal Isolation and Cell-Based Architecture]].
-- **Cold-start load.** Constant work solves it at a price; prefetching and hints reduce it. Choosing per system remains guesswork, and the planned [[Queueing Theory for Systems]] note is where the numbers belong.
+- **Cold-start load.** Constant work solves it at a price; prefetching and hints reduce it. Choosing per system remains guesswork; [[Queueing Theory for Systems]] has the math (Little's Law, Erlang C, recovery at spare capacity) for sizing it.
 - **Metadata as a scaling ceiling.** KRaft moved Kafka from tens of thousands to millions of partitions; the next limits are snapshot size and how long a new broker takes to load state. [[Diskless Streaming]] designs add a new routing question: which coordinator assigns offsets for data in [[Object Storage]].
 - **Control loops over the map.** Placement services are reconcilers: desired map vs actual. How they avoid oscillation and fight with each other (PD scheduling vs an operator's manual move) belongs to [[Reconciliation and Control Loops]].
 
@@ -462,5 +462,5 @@ The lesson both write-ups point toward: the fast, global propagation that makes 
 - [[Object Storage]] — Where diskless designs move data, adding new routing questions.
 - [[Reconciliation and Control Loops]] — Placement services as reconcilers; level triggering and controllers that fight.
 - [[Zonal Isolation and Cell-Based Architecture]] — Planned: staging metadata changes by cell.
-- [[Queueing Theory for Systems]] — Planned: sizing metadata tiers for cold starts.
+- [[Queueing Theory for Systems]] — The math for sizing metadata tiers for cold starts.
 - [[Diskless Streaming]] — Offset-assigning coordinators over object storage.

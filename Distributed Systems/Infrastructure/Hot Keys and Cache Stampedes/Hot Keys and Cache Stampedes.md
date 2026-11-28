@@ -33,7 +33,7 @@ sources:
   - https://arxiv.org/pdf/2611.13412
   - https://cse.hkust.edu.hk/~raywong/comp5331/References/EfficientComputationOfFrequentAndTop-kElementsInDataStreams.pdf
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -379,5 +379,5 @@ Open problems:
 - [[GPU Cluster Infrastructure]] — Where KV prefix caches now show stampede-style collapse.
 - [[Deterministic Simulation Testing]] — Testing cache-loss recovery before production does.
 - [[Tail Latency and Hedging]] — Planned: hedged requests and the tail cost of waiting on one fetch.
-- [[Queueing Theory for Systems]] — Planned: why load near capacity makes recovery so slow.
+- [[Queueing Theory for Systems]] — Why load near capacity makes recovery so slow.
 - [[Change Data Capture]] — Binlog-driven cache invalidation like Uber's Flux.

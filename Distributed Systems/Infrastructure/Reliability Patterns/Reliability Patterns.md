@@ -17,7 +17,7 @@ sources:
   - https://arxiv.org/pdf/2606.00942
   - https://aws.amazon.com/message/101925
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -274,3 +274,4 @@ Open problems:
 - [[Cluster Metadata and Routing]] — constant-work metadata refresh (DynamoDB MemDS) and the 2025 outages caused by bad routing and policy metadata
 - [[Message Queues]] — at-least-once delivery, idempotent consumers, dead-letter queues and backlog recovery
 - [[Resource Fairness]] — fair queuing and shuffle sharding decide whose requests wait or get shed under overload
+- [[Queueing Theory for Systems]] — the math behind goodput collapse, load shedding signals and metastable tipping points
