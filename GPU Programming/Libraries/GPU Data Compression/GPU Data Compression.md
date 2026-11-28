@@ -474,7 +474,7 @@ Part of [[Device-Side Math Libraries (MathDx)]]: block- and warp-level LZ4 and A
 - [[Blackwell Architecture]] — The chip that added the Decompression Engine.
 - [[Coherent CPU-GPU Superchips]] — NVLink-C2C, where the DE decompresses host data in transit.
 - [[Multi-GPU Communication - NVLink and NCCL]] — The collectives ZipCCL and UCCL-Zip compress.
-- [[Distributed GPU Shuffles]] — Planned: compressed exchanges in distributed query engines.
+- [[Distributed GPU Shuffles]] — Compressed exchanges in distributed query engines (Theseus compresses batches before sending).
 - [[Kernel Fusion]] — Why decode-inside-the-consumer beats a separate decompress kernel.
 - [[Warp Divergence and Warp-Level Primitives]] — Ballot and popcount, the core of interleaved ANS decoding.
 - [[Parallel Reduction and Scan]] — Prefix sums for token offsets and output positions.

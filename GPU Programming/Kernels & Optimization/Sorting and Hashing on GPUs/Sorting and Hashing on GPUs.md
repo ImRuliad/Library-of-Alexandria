@@ -480,3 +480,4 @@ Open problems:
 - [[GPU Databases and Dataframes]] — The engines (cuDF, Polars GPU, Spark, Presto, Sirius) built on these joins and group-bys.
 - [[Forward Progress and Inter-Block Synchronization]] — The progress assumption under Onesweep's chained look-back.
 - [[GPU String Processing]] — Sorting and grouping on string keys: dictionary codes and prefix extraction.
+- [[Distributed GPU Shuffles]] — Hash and radix partitioning across GPUs before a distributed join.

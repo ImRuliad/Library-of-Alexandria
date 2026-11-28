@@ -41,7 +41,7 @@ sources:
   - https://nvidianews.nvidia.com/news/nvidia-accelerates-apache-spark-worlds-leading-data-analytics-platform
   - https://www.globenewswire.com/fr/news-release/2024/03/18/2848009/0/en/Voltron-Data-Advances-Theseus-Making-It-the-First-Petabyte-Scale-Query-Engine-for-Large-Scale-Data-Processing.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -306,7 +306,7 @@ A GPU has tens to a couple hundred GB; tables are often terabytes. The engines d
 - **Chunked streaming with spill.** Polars' streaming backend (cudf-polars 26.06, built on **RapidsMPF**) splits data into chunks that flow through the plan as actors linked by bounded channels; chunks not being processed spill to host memory under pressure, so one GPU handles datasets many times its VRAM ([Polars, Aug 2026](https://pola.rs/posts/gpu-streaming-backend)).
 - **Asynchronous executors.** Theseus runs separate compute, memory (spill GPU → host → storage), pre-loading and networking executors so transfers overlap compute; network compression, page-locked host buffers and GPUDirect RDMA together halved a TPC-H SF30K run from 1024.8 s to 528.5 s on 24 A100s ([Aramburú et al.](https://arxiv.org/html/2508.05029v1)).
 - **Managed memory as a safety net.** GPU Presto finished TPC-H-like Q21 at SF1K on a GH200 only by switching to CUDA managed memory ([[Unified Memory]]), bringing the full set to 148.9 s ([NVIDIA, Oct 2025](https://developer.nvidia.com/blog/accelerating-large-scale-data-analytics-with-gpu-native-velox-and-nvidia-cudf)).
-- **Multi-GPU shuffles.** Joins and high-cardinality group-bys need an all-to-all shuffle so equal keys meet on one GPU. RapidsMPF runs it as a streaming collective over UCX or MPI ([Polars](https://pola.rs/posts/gpu-streaming-backend)); Velox's UCX exchange uses NVLink within a node and RoCE or InfiniBand across nodes, giving more than 6× over Presto's HTTP exchange on a DGX A100 ([NVIDIA](https://developer.nvidia.com/blog/accelerating-large-scale-data-analytics-with-gpu-native-velox-and-nvidia-cudf)); Sirius builds its exchange on NCCL ([[Multi-GPU Communication - NVLink and NCCL]]). In distributed Sirius TPC-H Q3, the shuffle was the bottleneck ([Yogatama et al.](https://arxiv.org/html/2508.04701v3)).
+- **Multi-GPU shuffles.** Joins and high-cardinality group-bys need an all-to-all shuffle so equal keys meet on one GPU ([[Distributed GPU Shuffles]]). RapidsMPF runs it as a streaming collective over UCX or MPI ([Polars](https://pola.rs/posts/gpu-streaming-backend)); Velox's UCX exchange uses NVLink within a node and RoCE or InfiniBand across nodes, giving more than 6× over Presto's HTTP exchange on a DGX A100 ([NVIDIA](https://developer.nvidia.com/blog/accelerating-large-scale-data-analytics-with-gpu-native-velox-and-nvidia-cudf)); Sirius builds its exchange on NCCL ([[Multi-GPU Communication - NVLink and NCCL]]). In distributed Sirius TPC-H Q3, the shuffle was the bottleneck ([Yogatama et al.](https://arxiv.org/html/2508.04701v3)).
 
 ### Using It From Python
 
@@ -405,6 +405,7 @@ Results come back as GPU-resident columns; other GPU libraries ([[Numba and CuPy
 - [[Unified Memory]] — Managed memory as an overflow path for big queries.
 - [[GPUDirect RDMA and Storage]] — KvikIO and GDS for reading Parquet straight to the GPU.
 - [[Multi-GPU Communication - NVLink and NCCL]] — The shuffles and exchanges in distributed engines.
+- [[Distributed GPU Shuffles]] — How those shuffles work: UCX and NCCL exchanges, RapidsMPF streaming collectives, skew.
 - [[Numba and CuPy]] — Zero-copy interop with the Python GPU stack.
 - [[Top-k and Sampling Kernels]] — ORDER BY … LIMIT is a top-k.
 - [[GEMM Autotuning and Kernel Selection]] — The kernel-selection idea that adaptive query engines borrow.

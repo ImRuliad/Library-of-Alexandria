@@ -41,7 +41,7 @@ sources:
   - https://nvidianews.nvidia.com/news/nvidia-bluefield-4-powers-new-class-of-ai-native-storage-infrastructure-for-the-next-frontier-of-ai
   - https://developer.nvidia.com/blog/enhancing-distributed-inference-performance-with-the-nvidia-inference-transfer-library
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -302,3 +302,4 @@ The two devices "must share the same upstream PCI Express root complex", and bec
 - [[Page Cache and Memory Reclaim]] — What `O_DIRECT` and GDS bypass.
 - [[Coherent CPU-GPU Superchips]] — Grace platforms, where host memory is coherent but NICs and NVMe stay on PCIe.
 - [[GPU Data Compression]] — Shrinking checkpoints, columns and KV cache before they cross storage and network links.
+- [[Distributed GPU Shuffles]] — Query-engine exchanges (Spark RAPIDS, GPU Presto) that ride on GPUDirect RDMA across nodes.

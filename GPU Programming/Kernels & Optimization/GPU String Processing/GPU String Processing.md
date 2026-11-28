@@ -473,7 +473,7 @@ versus about 21 if every warp had uniform work, roughly 8× slower than the band
 - [[GPU Data Compression]] — Codecs that string columns pass through on load.
 - [[GPU Parquet and File Decoding]] — Dictionary and delta string pages decoded on the GPU (planned).
 - [[Query Compilation and JIT on GPUs]] — NVRTC, compile cost and kernel caches (planned).
-- [[Distributed GPU Shuffles]] — Moving string columns between GPUs for joins (planned).
+- [[Distributed GPU Shuffles]] — Moving string columns between GPUs for joins.
 - [[Numba and CuPy]] — Writing custom string kernels from Python.
 - [[ROCm and HIP]] — hipDF and string processing on AMD GPUs.
 - [[Coherent CPU-GPU Superchips]] — GH200, the hardware behind the JIT, Sirius and Eiger results.

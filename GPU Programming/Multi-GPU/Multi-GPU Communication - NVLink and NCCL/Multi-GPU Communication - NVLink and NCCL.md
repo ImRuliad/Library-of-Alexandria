@@ -37,7 +37,7 @@ sources:
   - https://arxiv.org/abs/2510.20171v4
   - https://arxiv.org/html/2504.09014v3
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -340,3 +340,4 @@ ncclCommDestroy(comm);
 - [[GPU Fault Tolerance in Production]] — NVLink Xids, NCCL timeouts and recovering jobs when a GPU fails.
 - [[Coherent CPU-GPU Superchips]] — The CPU-GPU NVLink-C2C link inside each GH200 and GB200 node.
 - [[GPU Data Compression]] — Lossless compression of collective traffic (DietGPU, ZipCCL, UCCL-Zip) and when it loses to NVLink.
+- [[Distributed GPU Shuffles]] — Variable-size all-to-all for database joins and group-bys, over NCCL send/recv groups or UCX.
