@@ -50,7 +50,7 @@ sources:
   - https://sebastianraschka.com/llm-architecture-gallery/models/nemotron-3-ultra-550b-a55b/
   - https://newsletter.semianalysis.com/p/kimi-k3-the-manos-the-mythos-the
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -359,7 +359,7 @@ The pattern: at matched training, a well-designed 3:1 hybrid matches or beats fu
 
 - **Kernels.** [flash-linear-attention](https://github.com/fla-org/flash-linear-attention) (Songlin Yang, Yu Zhang and contributors) is the reference Triton library for GLA, DeltaNet, Gated DeltaNet, KDA, Mamba2/3, RWKV7 and more; Gated DeltaNet was integrated into Qwen3-Next (Sep 2025), KDA added in Oct 2025, context parallelism for KDA and GDN in Mar 2026.
 - **vLLM.** V1 made hybrids first-class in Nov 2025: one memory pool for KV blocks and recurrent state, with attention block sizes raised until a page holds a whole Mamba state (672-token blocks for Nemotron-Nano-12B-v2) ([vLLM team](https://pytorch.org/blog/hybrid-models-as-first-class-citizens-in-vllm/)). The hybrid KV cache manager caches the recurrent state at block boundaries for prefix reuse, supports exactly one full-attention group plus one other type, and still calls itself early-stage ([vLLM docs](https://docs.vllm.ai/en/latest/design/hybrid_kv_cache_manager/)). See [[PagedAttention]].
-- **The prefix-caching catch.** A recurrent state exists only at the position it was saved, so reusing a prefix needs a checkpoint there. Saving one per token would make memory grow with length again, so Kimi K3 in vLLM checkpoints KDA state about every 32K tokens plus at prompt boundaries; in practice the state "do[es] not consume a constant amount of KV cache memory" ([SemiAnalysis, Aug 2026](https://newsletter.semianalysis.com/p/kimi-k3-the-manos-the-mythos-the)).
+- **The prefix-caching catch** (in depth: [[Prefix Caching for Hybrid Models]]). A recurrent state exists only at the position it was saved, so reusing a prefix needs a checkpoint there. Saving one per token would make memory grow with length again, so Kimi K3 in vLLM checkpoints KDA state about every 32K tokens plus at prompt boundaries; in practice the state "do[es] not consume a constant amount of KV cache memory" ([SemiAnalysis, Aug 2026](https://newsletter.semianalysis.com/p/kimi-k3-the-manos-the-mythos-the)).
 - **SGLang.** The Unified Radix Cache (Aug 2026) puts full-attention KV, sliding-window KV and recurrent-state checkpoints in one radix tree; with session-aware eviction, Qwen3.5-397B-A17B's device hit ratio rose from about 5% to 34% at batch 32 ([LMSYS](https://www.lmsys.org/blog/2026-08-11-unified-radix-cache)). For Qwen3.8, "ReplaySSM" handles [[Speculative Decoding]] by replaying the accepted tokens through the recurrence instead of snapshotting state at every draft position ([LMSYS](https://www.lmsys.org/blog/2026-08-12-qwen3-8-day0-support)). That directly answers one of MiniMax's 2025 objections.
 
 #### **The Design Space Is Still Moving**
@@ -379,7 +379,7 @@ The pattern: at matched training, a well-designed 3:1 hybrid matches or beats fu
 | Which ratio | 3:1 is the industry default, NVIDIA runs 4:1 to 5:1, MiniMax-01 ran 7:1; studies suggest recall degrades past about 3:1 to 6:1 ([Wang et al.](https://arxiv.org/abs/2507.06457)). Head-level mixing may beat layer-level ([HydraHead](https://arxiv.org/html/2606.20097)). |
 | Fixed at pretraining | Retrieval patterns form early, so a weak hybrid is hard to fix with continued training ([MiniMax](https://www.minimax.io/news/why-did-m2-end-up-as-a-full-attention-model)). |
 | Numerical precision | Recurrent state is sensitive to low precision, which matters for RL and for FP8/FP4 serving (see [[Quantization]]). |
-| Prefix caching | State exists only at checkpoints; frequent checkpoints cost memory, rare ones cost recomputation ([SemiAnalysis](https://newsletter.semianalysis.com/p/kimi-k3-the-manos-the-mythos-the)). |
+| Prefix caching | State exists only at checkpoints; frequent checkpoints cost memory, rare ones cost recomputation ([SemiAnalysis](https://newsletter.semianalysis.com/p/kimi-k3-the-manos-the-mythos-the)). See [[Prefix Caching for Hybrid Models]]. |
 | Speculative decoding | Rejected draft tokens must be rolled out of the state; solved in SGLang by replay ([LMSYS](https://www.lmsys.org/blog/2026-08-12-qwen3-8-day0-support)), still engine-specific. |
 | Engine support | vLLM's manager handles one full group plus one other type; models mixing three types need newer designs ([vLLM docs](https://docs.vllm.ai/en/latest/design/hybrid_kv_cache_manager/); [LMSYS](https://www.lmsys.org/blog/2026-08-11-unified-radix-cache)). |
 | Short-context benefit is small | Below a few thousand tokens the cache is small anyway; the win is at long context and large batch. |
@@ -434,4 +434,5 @@ The pattern: at matched training, a well-designed 3:1 hybrid matches or beats fu
 - [[Speculative Decoding]] — Harder with a recurrent state that must roll back rejected tokens.
 - [[Quantization]] — Recurrent state is more precision-sensitive than KV entries.
 - [[LLM Serving]] — Prefix caching, disaggregation and batching for hybrid models.
+- [[Prefix Caching for Hybrid Models]] — Where to checkpoint recurrent state and what to evict so prefixes can be reused.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — The memory-bound decode cost model that makes cache size decisive.

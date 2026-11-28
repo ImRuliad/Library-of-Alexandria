@@ -44,7 +44,7 @@ sources:
   - https://vllm.ai/blog/hybrid-ssm-disagg
   - https://magazine.sebastianraschka.com/p/llm-research-papers-2026-part1
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -385,7 +385,7 @@ A handful of attention layers is enough to restore exact lookup, because retriev
 
 - **Kernels:** the reference implementations live in the state-spaces/mamba repository: the fused selective-scan CUDA kernel from Mamba-1, the chunked SSD kernels for Mamba-2 and, since March 2026, Mamba-3's kernels ([Lahoti et al., 2026](https://arxiv.org/abs/2603.15569)). vLLM runs Mamba and linear-attention layers with Triton kernels, whose CPU launch overhead hurt low-latency decode until full CUDA graphs were added for decode batches ([vLLM team, Nov 2025](https://pytorch.org/blog/hybrid-models-as-first-class-citizens-in-vllm/)).
 - **vLLM (Nov 2025):** hybrids became first-class in V1 with one allocator for both KV blocks and Mamba state. Each sequence's Mamba state is one large fixed page updated in place, so attention block sizes are grown until pages match (672-token attention blocks for Nemotron-Nano-12B-v2). With full CUDA graphs, granite-4.0-h-tiny gained up to 91% throughput over the older V0 engine ([vLLM team](https://pytorch.org/blog/hybrid-models-as-first-class-citizens-in-vllm/)). In April 2026 vLLM extended prefill/decode disaggregation so a decode server can pull both KV blocks and Mamba state over RDMA, benchmarked on Nemotron 3 Super ([vLLM, Apr 2026](https://vllm.ai/blog/hybrid-ssm-disagg)). See [[PagedAttention]] and [[LLM Serving]].
-- **SGLang (Dec 2025):** separate Mamba and KV pools with an elastic split, and **MambaRadixCache** for prefix caching. The hard part is that SSM state updates in place, so it cannot be rolled back to represent a shorter prefix, and is orders of magnitude bigger than one token's KV; SGLang checkpoints states at tree nodes. The same in-place update breaks [[Speculative Decoding]], since rejected draft tokens cannot be undone; SGLang gives each draft token its own state slot ([SGLang team](https://pytorch.org/blog/hybrid-models-meet-sglang-more-than-full-attention/)).
+- **SGLang (Dec 2025):** separate Mamba and KV pools with an elastic split, and **MambaRadixCache** for prefix caching. The hard part is that SSM state updates in place, so it cannot be rolled back to represent a shorter prefix, and is orders of magnitude bigger than one token's KV; SGLang checkpoints states at tree nodes (see [[Prefix Caching for Hybrid Models]]). The same in-place update breaks [[Speculative Decoding]], since rejected draft tokens cannot be undone; SGLang gives each draft token its own state slot ([SGLang team](https://pytorch.org/blog/hybrid-models-meet-sglang-more-than-full-attention/)).
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -454,6 +454,7 @@ A handful of attention layers is enough to restore exact lookup, because retriev
 - [[FlashAttention]] — The IO-aware kernel style Mamba's fused scan borrows.
 - [[PagedAttention]] — The block allocator vLLM had to extend for fixed-size Mamba state.
 - [[LLM Serving]] — Prefix caching, disaggregation and batching with recurrent state.
+- [[Prefix Caching for Hybrid Models]] — Checkpoint placement and eviction for Mamba state in prefix caches.
 - [[Speculative Decoding]] — Harder with SSMs because in-place state updates cannot be rolled back.
 - [[Positional Encoding]] — Hybrids like Granite 4.0 drop it because SSM layers already encode order.
 - [[Sparse Attention]] — The other route to cheaper long-context attention.

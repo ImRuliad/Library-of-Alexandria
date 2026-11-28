@@ -229,7 +229,7 @@ Sarathi-Serve splits each prompt into near-equal chunks and gives every step a f
 The budget is the main knob. A small budget keeps every step short (low ITL) but stretches prompts across more steps (higher TTFT); a large budget does the reverse. Chunking also makes pipeline parallelism work better, because uniform steps leave fewer pipeline bubbles, which is where Sarathi-Serve's 5.6x on Falcon-180B came from.
 
 #### **Prefix Caching and Cache-Aware Routing**
-Much of a prompt has been seen before: the system prompt, tool definitions, the earlier turns of a chat, an agent's growing transcript. Prefix caching keeps finished requests' cache blocks and skips prefill for the longest matching prefix (vLLM hashes blocks; SGLang keeps a radix tree; details in [[PagedAttention#Prefix Caching on Top of Paging|PagedAttention]] and [[KV Cache#Paging and Prefix Sharing|KV Cache]]). By 2026 it is on by default in vLLM, SGLang, TensorRT-LLM and Dynamo ([LeCompute, Aug 2026](https://lecompute.fr/en/runtimes/kv-cache-objet-central-serving/)).
+Much of a prompt has been seen before: the system prompt, tool definitions, the earlier turns of a chat, an agent's growing transcript. Prefix caching keeps finished requests' cache blocks and skips prefill for the longest matching prefix (vLLM hashes blocks; SGLang keeps a radix tree; details in [[PagedAttention#Prefix Caching on Top of Paging|PagedAttention]] and [[KV Cache#Paging and Prefix Sharing|KV Cache]]). Hybrid models need recurrent-state checkpoints on top of this; see [[Prefix Caching for Hybrid Models]]. By 2026 it is on by default in vLLM, SGLang, TensorRT-LLM and Dynamo ([LeCompute, Aug 2026](https://lecompute.fr/en/runtimes/kv-cache-objet-central-serving/)).
 
 Two things make it work at fleet scale:
 - **Tiers.** Hot blocks stay in HBM, colder ones move to CPU memory, local SSD or shared storage and are fetched back on a hit. LMCache does this across vLLM and SGLang and reports up to 15x throughput on multi-round QA and document analysis; it also found that context truncation, common in industry, can cut the prefix hit ratio by half ([Liu et al., 2025](https://arxiv.org/abs/2510.09665)). DeepSeek reported that 56.3% of its 608B daily input tokens hit an on-disk KV cache ([DeepSeek, Feb 2025](https://github.com/deepseek-ai/open-infra-index/blob/main/202502OpenSourceWeek/day_6_one_more_thing_deepseekV3R1_inference_system_overview.md)).
@@ -386,6 +386,7 @@ Open problems:
 - [[Long Context]] — Long prompts make prefill and cache size dominate cost.
 - [[Sparse Attention]] — Compressed sparse attention shrinks the cache and the attention work per decode step.
 - [[Hybrid Attention]] — Fixed-size recurrent state removes the growing cache from most layers but complicates prefix caching.
+- [[Prefix Caching for Hybrid Models]] — How engines checkpoint recurrent state so hybrid prefixes can be reused.
 - [[FlashAttention]] — The fused attention kernels that serving engines run for prefill and paged decode.
 - [[Top-k and Sampling Kernels]] — The GPU kernels behind the sampling step: top-k, top-p, min-p without sorting.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Prefill vs decode costs and batching math, from How to Scale Your Model.

@@ -22,7 +22,7 @@ sources:
   - https://docs.sglang.io/docs/advanced_features/hicache_design
   - https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -275,7 +275,7 @@ PagedAttention assumed every layer stores the same amount per token. 2025-26 mod
     - A 3:1 or 1:1 repeating pattern splits cleanly into equal groups. Gemma-3-27B (52 sliding-window, 10 full layers) needs padding: groups of 10 layers, with 8 unused layer slots.
     - Sliding-window groups free blocks that fall out of the window, and their prefix-cache rule differs: a hit only needs the last window of tokens cached, so the lookup scans right to left.
     - For state-space layers, the attention block size is raised until one attention page is at least as big as one state-space state, which can push blocks above 400 tokens. The docs call this an open issue.
-    - Prefix caching supports at most two layer types, one of which must be full attention.
+    - Prefix caching supports at most two layer types, one of which must be full attention. Where and how often to save recurrent state for prefix reuse is covered in [[Prefix Caching for Hybrid Models]].
 - **The design question is still open.** An October 2026 study in a modified vLLM compared shared paging against separate native pools for attention and recurrent state; which wins depended on memory budget, load and how long recurrent checkpoints are kept ([Kang, 2026](https://arxiv.org/abs/2610.15755)).
 
 #### **Pages Got Bigger and Contiguous Across Layers**
@@ -344,6 +344,7 @@ Open problems:
 - [[Attention]] — The operation the paged kernel computes; paging changes only where its inputs live.
 - [[Hybrid Attention]] — Mixed layer types that forced the hybrid KV cache manager.
 - [[State Space Models]] — Fixed-size recurrent state that does not fit uniform KV pages.
+- [[Prefix Caching for Hybrid Models]] — Checkpointing recurrent state so prefix caching works for hybrid models.
 - [[Sparse Attention]] — Reads only some cached blocks, which pairs naturally with paging and offload.
 - [[Speculative Decoding]] — Draft tokens that are written to the cache and may be rolled back.
 - [[Quantization]] — Smaller cache formats change how many tokens fit in a block.

@@ -357,3 +357,4 @@ Open problems:
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Prefill vs generation and the KV cache, from How to Scale Your Model.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why decode is memory-bound: arithmetic intensity against the chip's roofline.
 - [[Prefill-Decode Disaggregation]] — Shipping the cache from prefill to decode machines; its per-token size sets the transfer cost.
+- [[Prefix Caching for Hybrid Models]] — Why recurrent layers make prefix reuse a question of state checkpoints, and how engines place and evict them.
