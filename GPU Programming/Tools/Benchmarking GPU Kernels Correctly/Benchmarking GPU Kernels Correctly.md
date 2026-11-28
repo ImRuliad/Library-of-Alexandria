@@ -29,7 +29,7 @@ sources:
   - https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/
   - https://www.nvidia.com/en-us/data-center/h100/
 created: 2026-11-27
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -436,6 +436,6 @@ None of these is exotic, and single rows already move results by double digits: 
 - [[GPU Fault Tolerance in Production]] — DCGM and clock-event monitoring that also flags throttling.
 - [[GPU Power, Thermals and Power Smoothing]] — DVFS and power capping behind clock drift (planned).
 - [[Analytical GPU Performance Models]] — Predicting instead of timing.
-- [[Deterministic and Batch-Invariant Kernels]] — What "correct" means when results may vary run to run (planned).
+- [[Deterministic and Batch-Invariant Kernels]] — What "correct" means when results may vary run to run.
 - [[Green Contexts and SM Partitioning]] — Benchmarking with only part of the GPU (planned).
 - [[LLM-Written Kernels]] — Kernel-generating agents, whose results depend on hardened harnesses.

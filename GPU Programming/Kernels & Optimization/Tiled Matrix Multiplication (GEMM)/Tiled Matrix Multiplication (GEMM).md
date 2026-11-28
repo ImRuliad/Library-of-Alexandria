@@ -34,7 +34,7 @@ sources:
   - https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra-the-chip-powering-the-ai-factory-era
   - https://triton-lang.org/main/getting-started/tutorials/03-matrix-multiplication.html
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -366,3 +366,4 @@ Open problems:
 - [[GEMM Autotuning and Kernel Selection]] — How libraries and compilers pick tile sizes per shape.
 - [[Grouped GEMM and Ragged Batches]] — Many differently sized GEMMs in one launch, for MoE experts.
 - [[Analytical GPU Performance Models]] — Predicting a tile config's time from tiles, waves and bandwidth.
+- [[Deterministic and Batch-Invariant Kernels]] — Fixing each tile's K-loop order so results don't change with batch size.

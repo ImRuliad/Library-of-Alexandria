@@ -360,3 +360,4 @@ Open problems:
 - [[Long Context]] — FlashAttention made long context affordable; whether models use it well is a separate question.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — The compute-bound vs memory-bound picture behind the whole idea.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Prefill and decode costs that attention kernels serve.
+- [[Deterministic and Batch-Invariant Kernels]] — Deterministic backward and fixed-size split-KV for reproducible attention.

@@ -38,7 +38,7 @@ sources:
   - https://arxiv.org/pdf/2407.00044
   - https://arxiv.org/pdf/2408.11417
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -391,7 +391,7 @@ Open problems and pitfalls:
 - **Deadlock from assumed co-residency.** Any block that *waits* on another (Stream-K flags, turnstile reductions, global barriers) assumes the other block is running. CUDA guarantees co-residency only for a cooperative launch ([[Cooperative Groups]]); otherwise, if another kernel or MPS client takes SMs, a waiting block can hold an SM that the block it waits for needs. Pure static or atomic-counter schedulers without inter-block waits are safe; dependent schedules are not, unless sized conservatively ([[CUDA Memory Model and Atomics]]).
 - **Concurrent kernels and MPS.** A persistent kernel sized for the whole GPU fights with kernels on other streams or other [[MIG and MPS - Sharing a GPU|MPS]] clients: it cannot shrink, and it cannot be preempted between tiles. NVIDIA's guide lists exactly this, "no preemption and no load balancing", as the cost of fixed block counts; CLC is the hardware answer, but only on Blackwell ([CUDA Programming Guide](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/cluster-launch-control.html); [[Streams, Events and Async Execution]]).
 - **Fix-up cost.** Stream-K's partials cost global-memory writes and reads plus waiting, and the more blocks share a tile, the more they stall. That is why the hybrid limits each block to at most two partial tiles and why heuristics fall back to data-parallel when the tail is at least half full.
-- **Determinism.** Split-K and Stream-K change the order in which a tile's K slices are summed, which can change results with shape, grid size or GPU. Turnstile reduction makes a given configuration reproducible; atomic reduction does not. Batch-invariant inference needs a fixed reduction order, which limits these decompositions ([[Parallel Reduction and Scan]]).
+- **Determinism.** Split-K and Stream-K change the order in which a tile's K slices are summed, which can change results with shape, grid size or GPU. Turnstile reduction makes a given configuration reproducible; atomic reduction does not. Batch-invariant inference needs a fixed reduction order, which limits these decompositions ([[Parallel Reduction and Scan]], [[Deterministic and Batch-Invariant Kernels]]).
 - **Debugging.** A missed flag or a wrong counter reset hangs or corrupts silently; profilers show one long kernel instead of per-tile blocks ([[Debugging with compute-sanitizer and cuda-gdb]], [[Profiling with Nsight Compute and Nsight Systems]]).
 - **Portability.** Schedulers are tied to SM counts, cluster shapes and arch features (CLC on SM100+, cooperative kernels on SM90). AMD GPUs need their own tuning ([[ROCm and HIP]]).
 
@@ -444,3 +444,4 @@ Open problems and pitfalls:
 - [[GEMM Autotuning and Kernel Selection]] — Choosing the decomposition, tile and cluster per shape by model or measurement.
 - [[Work Stealing and Dynamic Load Balancing]] — The general picture: static vs dynamic balancing, queues, stealing and plan-then-run schedules.
 - [[Forward Progress and Inter-Block Synchronization]] — Why waits between persistent blocks assume co-residency, and the safe patterns.
+- [[Deterministic and Batch-Invariant Kernels]] — Why batch-invariant matmul gives up split-K and Stream-K, and what that costs.

@@ -42,7 +42,7 @@ sources:
   - https://os.itec.kit.edu/65_4068.php
   - https://docs.pytorch.org/docs/main/notes/randomness.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -453,3 +453,4 @@ Open problems:
 - [[Locks and Synchronization]] — CPU locks, ticket locks and memory barriers in operating systems.
 - [[Forward Progress and Inter-Block Synchronization]] — The scheduling half: whether the writer you wait on ever runs.
 - [[Coherent CPU-GPU Superchips]] — Where system-scope atomics and release/acquire cross a real CPU-GPU link.
+- [[Deterministic and Batch-Invariant Kernels]] — Replacing float atomics with fixed trees or reproducible accumulators.

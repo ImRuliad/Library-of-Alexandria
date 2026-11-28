@@ -471,3 +471,4 @@ Open problems:
 - [[Approximate Nearest Neighbor Search on GPUs]] — Every ANN index ends with a per-query top-k over candidate distances.
 - [[Forward Progress and Inter-Block Synchronization]] — Why multi-block barriers need co-residency and are gated on SM count.
 - [[Random Number Generation on GPUs]] — Philox, seeds and offsets behind the random draws a sampler makes.
+- [[Deterministic and Batch-Invariant Kernels]] — The wider determinism picture: batch-invariant logits, seeded sampling and library contracts.

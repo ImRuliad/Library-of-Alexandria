@@ -36,7 +36,7 @@ sources:
   - https://dblp1.uni-trier.de/rec/journals/jacm/BlumofeL99.html
   - https://www.wikipedia.org/wiki/LPT_algorithm
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -449,7 +449,7 @@ The pattern across all four: dynamic queues pay off when task times are data-dep
 - [[ROCm and HIP]] — Where software queues remain the portable option.
 - [[Forward Progress and Inter-Block Synchronization]] — Why spin-waiting queues can deadlock, and the ticket, cooperative-launch and fallback fixes.
 - [[Grouped GEMM and Ragged Batches]] — Balancing MoE expert GEMMs.
-- [[Deterministic and Batch-Invariant Kernels]] — Reproducibility under dynamic schedules (planned).
+- [[Deterministic and Batch-Invariant Kernels]] — Reproducibility under dynamic schedules.
 - [[Green Contexts and SM Partitioning]] — Reserving SMs, the opposite of stealing them (planned).
 - [[FlashAttention]] — Longest-first dynamic scheduling for causal attention.
 - [[LLM Serving]] — Variable-length batches that plan-then-run schedulers balance.

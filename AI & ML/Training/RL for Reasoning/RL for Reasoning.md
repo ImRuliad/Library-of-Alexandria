@@ -514,3 +514,4 @@ Open problems:
 - [[Low-Precision Training]] — Training and sampling in the same FP8 or FP4 numerics to shrink that mismatch.
 - [[KV Cache]] — Long rollouts at 32K to 128K tokens make generation memory-bound.
 - [[Transformer]] — The policy network being optimized.
+- [[Deterministic and Batch-Invariant Kernels]] — Bitwise-identical sampler and trainer kernels, the kernel-level fix for the training-inference mismatch.

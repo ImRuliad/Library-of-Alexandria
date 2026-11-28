@@ -41,7 +41,7 @@ sources:
   - https://arxiv.org/abs/1805.02867
   - https://www.nvidia.com/en-us/data-center/h100/
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -374,7 +374,7 @@ The catch is the spin in step 3: it is only safe if the hardware guarantees that
 
 Floating-point addition isn't associative: $(0.1 + 10^{20}) - 10^{20} = 0$, while $0.1 + (10^{20} - 10^{20}) = 0.1$. Any change in tree shape or atomic order can change the low bits of a sum.
 
-- **The LLM inference case.** Thinking Machines Lab (Sep 2025) showed that the main source of run-to-run differences in LLM serving is not atomics (the forward pass uses none) but *batch size changing the reduction order* inside RMSNorm, split-K matmuls and attention. Their fix is *batch-invariant* kernels: "the reduction order for each element must be fixed regardless of the batch-size". With them, 1,000 temperature-0 completions from Qwen3-235B were identical (80 distinct outputs before), at a cost of 26 s → 42 s for their test with the improved attention kernel ([Thinking Machines](https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/)).
+- **The LLM inference case.** Thinking Machines Lab (Sep 2025) showed that the main source of run-to-run differences in LLM serving is not atomics (the forward pass uses none) but *batch size changing the reduction order* inside RMSNorm, split-K matmuls and attention. Their fix is *batch-invariant* kernels ([[Deterministic and Batch-Invariant Kernels]]): "the reduction order for each element must be fixed regardless of the batch-size". With them, 1,000 temperature-0 completions from Qwen3-235B were identical (80 distinct outputs before), at a cost of 26 s → 42 s for their test with the improved attention kernel ([Thinking Machines](https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/)).
 - **CCCL determinism levels (CCCL 3.1, described Mar 2026).** `cub::DeviceReduce` now takes a requirement: `not_guaranteed` (atomics, single kernel, fastest), `run_to_run` (the default: a fixed tree, two kernels, same answer every run on the same GPU) and `gpu_to_gpu` (a reproducible floating-point accumulator, the same bits on any GPU, "increasing execution time by 20% to 30% for large problem sizes"), benchmarked on H200 ([NVIDIA blog](https://developer.nvidia.com/blog/controlling-floating-point-determinism-in-nvidia-cccl); [CCCL v3.1.0](https://github.com/NVIDIA/cccl/releases/tag/v3.1.0)). CUB's scan docs still warn that results "are not deterministic for pseudo-associative operators (e.g., addition of floating-point types)" ([CUB DeviceScan](https://nvidia.github.io/cccl/cub/api/structcub_1_1DeviceScan.html)).
 - **Frameworks.** PyTorch's `torch.use_deterministic_algorithms(True)` swaps in deterministic versions of ops like `index_add`, `scatter_add_` and float `cumsum` on CUDA, raises errors on ops like `histc`, and warns that "this setting alone is not always enough to make an application reproducible" ([PyTorch](https://docs.pytorch.org/docs/stable/generated/torch.use_deterministic_algorithms.md)).
 
@@ -463,3 +463,4 @@ Open problems:
 - [[CUDA Memory Model and Atomics]] — Fences, scopes and atomics behind single-pass reductions and scans.
 - [[Top-k and Sampling Kernels]] — Radix select's histograms and inverse-transform sampling's block scans.
 - [[Forward Progress and Inter-Block Synchronization]] — Why decoupled look-back needs forward progress, ticket IDs vs blockIdx, and fallbacks.
+- [[Deterministic and Batch-Invariant Kernels]] — Run-to-run, GPU-to-GPU and batch-invariant reductions in full, with LLM serving's fixes and costs.

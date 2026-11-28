@@ -459,3 +459,4 @@ In PyTorch, `torch.use_deterministic_algorithms(True)` makes PyTorch use determi
 - [[Device-Side Math Libraries (MathDx)]] — cuBLASDx and cuSolverDx: BLAS and solvers called inside your own kernel.
 - [[Batched Small-Matrix Linear Algebra]] — cuBLAS and cuSOLVER batched factorizations, and the MAGMA and cuSolverDx alternatives.
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — cuSOLVER's IRS solvers, which run their LU on low-precision cuBLAS GEMMs and refine in FP64.
+- [[Deterministic and Batch-Invariant Kernels]] — The reproducibility guarantees above in context, plus batch invariance and zero-workspace cuBLASLt.

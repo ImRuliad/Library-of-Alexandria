@@ -35,7 +35,7 @@ sources:
   - https://lists.llvm.org/pipermail/mlir-commits/2025-October/138807.html
   - https://arxiv.org/pdf/2610.27313
 created: 2026-11-27
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -395,4 +395,4 @@ Across machines, the guarantee is only as strong as the layout. cuRAND's `LEGACY
 - [[ROCm and HIP]] — rocRAND and hipRAND on AMD.
 - [[Warp Specialization]] — Keeping RNG off the critical path in specialized kernels.
 - [[Streams, Events and Async Execution]] — Overlapping RNG with GEMMs on separate streams.
-- [[Deterministic and Batch-Invariant Kernels]] — Run-to-run and GPU-to-GPU determinism (planned).
+- [[Deterministic and Batch-Invariant Kernels]] — Run-to-run and GPU-to-GPU determinism.

@@ -416,5 +416,5 @@ The common pattern is the same as for MoE: replace a padded dense tensor with pa
 - [[LLM Serving]] — Ragged decode batches and paged KV.
 - [[FlashAttention]] — Variable-length attention with `cu_seqlens`.
 - [[Batched Small-Matrix Linear Algebra]] — Variable-size batched factorizations (MAGMA vbatched) and per-thread vs per-block solvers.
-- [[Deterministic and Batch-Invariant Kernels]] — Reproducible ragged reductions (planned).
+- [[Deterministic and Batch-Invariant Kernels]] — Reproducible ragged reductions.
 - [[GPU-Initiated Communication with NVSHMEM]] — Device-side dispatch for fused MoE kernels (planned).

@@ -45,7 +45,7 @@ sources:
   - https://rocm.docs.amd.com/projects/hipBLASLt/en/latest/how-to/how-to-use-hipblaslt-offline-tuning.html
   - https://pypi.org/project/rocm-origami/
 created: 2026-11-26
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 ## Table Of Contents
@@ -482,3 +482,4 @@ The Helion numbers (11 kernels × 3 shapes on B200): LFBO benchmarked about 546 
 - [[LLM-Written Kernels]] — LLMs writing kernels, not only tuning them.
 - [[Benchmarking GPU Kernels Correctly]] — The full method behind an autotuner's stopwatch.
 - [[Analytical GPU Performance Models]] — How the models that prune the search work, and where they miss.
+- [[Deterministic and Batch-Invariant Kernels]] — How shape-dependent kernel selection breaks batch invariance, and pinning it.
