@@ -472,5 +472,6 @@ The pattern: returns from sparsity are real but diminishing (1.69x, then 1.39x, 
 - [[Sparse Attention]] — The attention-side sparsity that DeepSeek-V4, GLM-5 and MiniMax M3 pair with expert sparsity.
 - [[AI Accelerators]] — Rack-scale NVLink systems designed around MoE all-to-all traffic.
 - [[Speculative Decoding]] — Used on top of wide-EP MoE serving to emit several tokens per step.
+- [[Multi-Token Prediction]] — Most MoEs now train an MTP module (often itself an MoE block) as an auxiliary loss and built-in drafter.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why decode is memory-bound and why experts need large batches.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Inference cost model that MoE changes.

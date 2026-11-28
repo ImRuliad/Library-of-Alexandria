@@ -373,7 +373,7 @@ The October 2026 scaling study (East China Normal and Fudan, 200M to 3B) gives t
 
 #### **MTP Heads and Cheaper Softmax**
 
-- **Multi-token prediction (MTP).** Extra heads predict tokens 2, 3, and so on ahead from the same trunk. In DeepSeek-V3 the MTP module shares the main embedding and output head ([DeepSeek-V3 report](https://arxiv.org/abs/2412.19437)), and DeepSeek-V4 keeps an MTP depth of 1 with loss weight 0.3, dropped to 0.1 during learning-rate decay ([DeepSeek-V4 report](https://huggingface.co/papers/2606.19348.md)). The heads double as drafters for [[Speculative Decoding]], which covers acceptance rates and speedups.
+- **[[Multi-Token Prediction|Multi-token prediction]] (MTP).** Extra heads predict tokens 2, 3, and so on ahead from the same trunk. In DeepSeek-V3 the MTP module shares the main embedding and output head ([DeepSeek-V3 report](https://arxiv.org/abs/2412.19437)), and DeepSeek-V4 keeps an MTP depth of 1 with loss weight 0.3, dropped to 0.1 during learning-rate decay ([DeepSeek-V4 report](https://huggingface.co/papers/2606.19348.md)). The heads double as drafters for [[Speculative Decoding]], which covers acceptance rates and speedups.
 - **Shrinking the vocabulary projection.** Gemma 4's MTP drafter for E2B and E4B replaces the full $d \times 262{,}000$ output projection with a top-k over token clusters, a $d \times 4096$ product, "while preserving a similar acceptance rate" ([Gemma 4 report](https://arxiv.org/html/2607.02770v1)). With 262K-entry vocabularies on small models, the softmax is now worth optimizing on its own.
 
 ## ***Trade-offs & Open Problems***

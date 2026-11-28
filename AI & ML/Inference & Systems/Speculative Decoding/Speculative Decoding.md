@@ -326,7 +326,7 @@ Trees raise the accepted length but spend more verify tokens per step, so they h
 | Separate small model | Same-family smaller LM | None or distillation | General; costs memory and $c$ | T5-small for T5-XXL; Chinchilla draft |
 | Extra heads | $k$ heads on the target's last hidden state | Heads only | Cheap, no second model | Medusa |
 | Feature-level drafter | One small layer fed target hidden states | Drafter only | High acceptance, low $c$ | EAGLE, EAGLE-2, EAGLE-3, EAGLE 3.1 |
-| Built-in MTP layers | Extra prediction modules trained with the model | Part of pretraining | Closely matched to target, free with the checkpoint | DeepSeek-V3/V4, Qwen3-Next, GLM-4.5, MiMo |
+| Built-in MTP layers | Extra prediction modules trained with the model (see [[Multi-Token Prediction]]) | Part of pretraining | Closely matched to target, free with the checkpoint | DeepSeek-V3/V4, Qwen3-Next, GLM-4.5, MiMo |
 | Self-speculative | Early exit or skipped layers of the target | Optional (LayerSkip) | No extra memory | Draft & Verify, LayerSkip |
 | Retrieval / n-gram | Copy from prompt, history or a suffix tree | None | Huge wins on repetitive text (code edits, RAG, agents) | Prompt lookup, SuffixDecoding |
 | Jacobi / lookahead | Target refines parallel guesses inside its own pass | None | No draft at all | Lookahead decoding |
@@ -463,4 +463,5 @@ Open problems:
 - [[Reasoning Models]] — Long reasoning outputs are where per-token latency savings add up most.
 - [[RL for Reasoning]] — Rollout generation is a large, changing-policy decode workload for speculation.
 - [[Quantization]] — Low-precision targets and drafters are routinely combined with speculation in serving.
+- [[Multi-Token Prediction]] — The training objective behind built-in MTP drafters: designs, quality gains, and why DeepSeek-V4.1-Flash dropped it for DSpark.
 - [[Attention Sinks and Gated Attention]] — EAGLE 3.1 traces EAGLE-3's deep-draft failures to attention drifting off sink tokens.

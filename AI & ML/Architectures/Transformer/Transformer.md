@@ -295,7 +295,7 @@ Sebastian Raschka, comparing dozens of open models from GPT-2 through 2026, conc
 | Positions | Sinusoidal, added once | RoPE in attention; some layers NoPE (none); partial RoPE | Better length handling (see [[Positional Encoding]]) |
 | Attention | Full multi-head | GQA, MLA, sliding window, sparse, or linear hybrids | KV cache and long-context cost (see [[Attention]]) |
 | FFN | ReLU, dense | SwiGLU, usually [[Mixture of Experts]] | More capacity per FLOP ([Shazeer](https://arxiv.org/abs/2002.05202)) |
-| Output | One next token | Often multi-token prediction heads | Better training signal, faster decoding (see [[Speculative Decoding]]) |
+| Output | One next token | Often [[Multi-Token Prediction\|multi-token prediction]] heads | Better training signal, faster decoding (see [[Speculative Decoding]]) |
 
 *Sources: [Raschka, The Big LLM Architecture Comparison (updated Apr 2026)](https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison), [Raschka, Jan to Feb 2026 models](https://magazine.sebastianraschka.com/p/a-dream-of-spring-for-open-weight), [Gemma 4 notes](https://sebastianraschka.com/blog/2026/gemma-4-release-notes.html).*
 
@@ -406,6 +406,7 @@ Open problems worth tracking:
 - [[Scaling Laws]] — Why bigger Transformers became predictably better, and the $6ND$ compute rule.
 - [[Hybrid Attention]] — Models that keep the Transformer skeleton but swap most attention layers for linear-time ones.
 - [[State Space Models]] — The main non-attention alternative for sequence mixing.
+- [[Multi-Token Prediction]] — Extra output heads that predict several tokens ahead, for a richer training signal and a built-in drafter.
 - [[Distributed Training]] — How Transformers are split across thousands of chips.
 - [[7 - All About Transformer Inference (NOT DONE)|7 - All About Transformer Inference (NOT DONE)]] — Prefill vs generation for a Transformer, from How to Scale Your Model.
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — Why Transformer decoding is memory-bound.
