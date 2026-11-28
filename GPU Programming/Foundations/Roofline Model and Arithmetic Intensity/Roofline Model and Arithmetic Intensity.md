@@ -249,3 +249,4 @@ Open problems:
 - [[1 - All About Rooflines (NOT DONE)|1 - All About Rooflines (NOT DONE)]] — The scaling book's chapter, in the vault.
 - [[Benchmarking GPU Kernels Correctly]] — Roofline floors as a sanity check on measured times.
 - [[Analytical GPU Performance Models]] — Models that refine the roofline bound into a predicted time.
+- [[Krylov Solvers on GPUs]] — A worked roofline for conjugate gradient, and why HPCG scores about 1% of HPL.

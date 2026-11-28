@@ -464,3 +464,4 @@ Open problems:
 - [[Top-k and Sampling Kernels]] — Radix select's histograms and inverse-transform sampling's block scans.
 - [[Forward Progress and Inter-Block Synchronization]] — Why decoupled look-back needs forward progress, ticket IDs vs blockIdx, and fallbacks.
 - [[Deterministic and Batch-Invariant Kernels]] — Run-to-run, GPU-to-GPU and batch-invariant reductions in full, with LLM serving's fixes and costs.
+- [[Krylov Solvers on GPUs]] — Dot products as the global synchronization in every CG and GMRES iteration, and how pipelining hides them.

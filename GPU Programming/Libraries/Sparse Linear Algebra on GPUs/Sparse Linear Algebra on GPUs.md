@@ -147,7 +147,7 @@ Three things to read off the table:
 
 | Operation | Definition | Typical use | Bound by |
 |---|---|---|---|
-| **SpMV** | $y = \alpha A x + \beta y$, $A$ sparse | Krylov solvers (CG, GMRES), PageRank, power iteration | Bandwidth |
+| **SpMV** | $y = \alpha A x + \beta y$, $A$ sparse | [[Krylov Solvers on GPUs\|Krylov solvers]] (CG, GMRES), PageRank, power iteration | Bandwidth |
 | **SpMM** | $C = \alpha A B + \beta C$, $A$ sparse, $B$ dense (many columns) | GNN aggregation, block Krylov, pruned-weight layers | Bandwidth, rising toward compute as $B$ widens (each nonzero reused $n$ times) |
 | **SpGEMM** | $C = A B$, both sparse, output sparse | Algebraic multigrid setup, graph algorithms (triangle counting, BFS frontiers; see [[Graph Analytics on GPUs]]) | Memory and output-size management |
 | **SDDMM** | $C = (A B^\top) \odot S$: compute dense dot products only where $S$ is nonzero | GNN edge scores, attention with a sparse mask | Like SpMM |
@@ -460,3 +460,4 @@ Net: in late 2026, [[Quantization]] and [[Low-Precision Formats - FP8, FP4 and M
 - [[Mixed-Precision Iterative Refinement and HPL-MxP]] — GMRES as the refinement engine for dense mixed-precision solves.
 - [[Batched Small-Matrix Linear Algebra]] — Batched dense factorizations for frontal matrices and block preconditioners, and cuDSS batches.
 - [[Dense LU and Cholesky Factorization on GPUs]] — The dense LU and Cholesky kernels that sparse direct solvers apply to frontal matrices.
+- [[Krylov Solvers on GPUs]] — CG, GMRES and their preconditioners: the iterative solvers built on SpMV and SpTRSV.

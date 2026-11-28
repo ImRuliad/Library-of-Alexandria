@@ -327,3 +327,4 @@ Open problems:
 - [[Speculative Decoding]] — Variable-length steps that complicate graph capture.
 - [[Distributed Training]] — Graphs reduce CPU jitter that turns into stragglers across ranks.
 - [[Benchmarking GPU Kernels Correctly]] — Timing graph replay to remove launch overhead, and why a flush can't sit inside the graph.
+- [[Krylov Solvers on GPUs]] — A device-resident CG loop captured as a graph, as in the conjugateGradientCudaGraphs sample.

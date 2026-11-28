@@ -350,3 +350,4 @@ Open problems:
 - [[Device-Side Math Libraries (MathDx)]] — Library FFTs, GEMMs and solvers you call inside a fused kernel.
 - [[Instruction Cache and Code Size on GPUs]] — The code-size cost of fusing many operators into one kernel.
 - [[Random Number Generation on GPUs]] — Counter-based RNG generated inside the consumer kernel, and dropout masks recomputed instead of stored.
+- [[Krylov Solvers on GPUs]] — Fusing vector updates with reductions in conjugate gradient, from six-plus kernels per iteration to two.

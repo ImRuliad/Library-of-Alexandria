@@ -393,7 +393,7 @@ Open problems:
 - [[Streams, Events and Async Execution]] — Overlapping panel copies with trailing updates.
 - [[Multi-GPU Communication - NVLink and NCCL]] — The collectives under cuSOLVERMp and HPL.
 - [[Sparse Linear Algebra on GPUs]] — Sparse direct solvers, which factor dense frontal matrices with these same kernels.
-- [[Krylov Solvers on GPUs]] — The iterative alternative when a dense factorization is too big (planned).
+- [[Krylov Solvers on GPUs]] — The iterative alternative when a dense factorization is too big.
 - [[Deterministic and Batch-Invariant Kernels]] — Why deterministic getrf and potrf matter.
 - [[Blackwell Architecture]] — The GPUs whose FP64 split shapes the emulation story.
 - [[ROCm and HIP]] — rocSOLVER, hipSOLVER and MAGMA's HIP build on AMD.

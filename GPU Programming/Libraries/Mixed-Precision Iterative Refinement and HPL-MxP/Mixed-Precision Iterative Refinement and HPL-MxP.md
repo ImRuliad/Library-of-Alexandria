@@ -249,7 +249,7 @@ Plain reading: the FP16 answer alone is ten orders of magnitude too inaccurate t
 
 Carson and Higham name three precisions: $u_f$ for the factorization, $u$ for storing $x$ (working precision), and $u_r$ for residuals, with $u_r \le u \le u_f$ ([Carson and Higham 2018](https://eprints.maths.manchester.ac.uk/2629/1/cahi18.pdf)). Classical refinement only converges when $\kappa(A)\,u_f$ is well below 1, which for FP16 means $\kappa_\infty(A)$ up to about $10^4$.
 
-**GMRES-IR** keeps the same outer loop but solves the correction equation differently. Instead of $d = \hat{U}^{-1}\hat{L}^{-1} r$, it runs GMRES (a Krylov method; see [[Sparse Linear Algebra on GPUs]] for Krylov solvers) on the *preconditioned* system
+**GMRES-IR** keeps the same outer loop but solves the correction equation differently. Instead of $d = \hat{U}^{-1}\hat{L}^{-1} r$, it runs GMRES (a Krylov method; see [[Krylov Solvers on GPUs]]) on the *preconditioned* system
 
 $$\tilde{A}\,d = \hat{U}^{-1}\hat{L}^{-1} r, \qquad \tilde{A} = \hat{U}^{-1}\hat{L}^{-1} A$$
 
@@ -479,7 +479,8 @@ The two compose: the FP64 residuals and the GMRES steps in refinement are themse
 - [[Device-Side Math Libraries (MathDx)]] — cuSolverDx for small and batched factorizations inside your own kernels.
 - [[Batched Small-Matrix Linear Algebra]] — Millions of small factorizations at once, the opposite end from HPL-MxP.
 - [[Tiled Matrix Multiplication (GEMM)]] — The trailing-matrix update that is most of the LU's work.
-- [[Sparse Linear Algebra on GPUs]] — Krylov solvers like GMRES, and the sparse codes refinement does not reach.
+- [[Sparse Linear Algebra on GPUs]] — The sparse kernels and solvers that dense refinement does not reach.
+- [[Krylov Solvers on GPUs]] — GMRES and CG on GPUs, including GMRES-IR and mixed-precision preconditioners for sparse systems.
 - [[Roofline Model and Arithmetic Intensity]] — Why the $O(n^3)$ factorization is compute-bound and the $O(n^2)$ refinement is bandwidth-bound.
 - [[ROCm and HIP]] — What hipSOLVER does and does not map from cuSOLVER's IRS family.
 - [[Blackwell Architecture]] — The FP64-poor, 16-bit-rich GPUs that HPL-MxP flatters most.
