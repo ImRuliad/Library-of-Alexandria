@@ -435,7 +435,7 @@ The policy interacts with these caches in two ways:
 
 **Android Baseline and Cloud Profiles.** Apps ship a list of hot code that ART compiles ahead of time at install, which Google says improves "code execution speed by about 30% from the first launch". Google Play adds Cloud Profiles aggregated from real users, which "take several hours to days after an update to be distributed" ([Android Developers](https://developer.android.com/baseline-profiles)). Without either, code is interpreted, JIT-compiled, or compiled to an `odex` file in the background when the device is idle.
 
-The common catch: a training run must look like production. See [[Profile-Guided Optimization]] for the same problem in static compilers.
+The common catch: a training run must look like production (more in [[AOT Caches and Training Runs]]). See [[Profile-Guided Optimization]] for the same problem in static compilers.
 
 ## ***Where It Is Now***
 ---
@@ -539,6 +539,7 @@ quadrantChart
 - [[Code Cache Management]] — Planned: the code memory that higher tiers and OSR consume.
 - [[Inline Caches and Code Patching]] — Planned: the feedback whose stability gates tier-up.
 - [[Compiler Benchmarking Methodology]] — Planned: measurement practice beyond warm-up, from SPEC run rules to noise control.
+- [[AOT Caches and Training Runs]] — Planned: the Leyden cache, ReadyToRun and Baseline Profiles in depth.
 - [[Persistent Compiler Caches]] — Planned: caching compiler output across runs, the build-system cousin of AOT caches.
 - [[Partial Evaluation and Self-Specializing Interpreters]] — Planned: Truffle's compilation thresholds for partially evaluated code.
 - [[WebAssembly]] — Liftoff and dynamic tiering, a lower-speculation tiered pipeline.
