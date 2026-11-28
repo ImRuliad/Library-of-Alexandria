@@ -350,6 +350,7 @@ The same machinery appears outside databases. Expert parallelism in [[Mixture of
 - [[GPU Databases and Dataframes]] — The engines (cuDF, Polars, Presto, Spark, Theseus) whose joins and group-bys need shuffles.
 - [[Multi-GPU Communication - NVLink and NCCL]] — The all-to-all collective, NVSwitch, and NCCL's send/recv and device APIs.
 - [[GPUDirect RDMA and Storage]] — How shuffle data reaches the NIC without host copies, and when it does not help.
+- [[GPU Parquet and File Decoding]] — The scan that feeds the shuffle, often the larger share of query time.
 - [[Sorting and Hashing on GPUs]] — Hash partitioning, radix partitioning and the local join after the shuffle.
 - [[Parallel Reduction and Scan]] — The histogram and prefix sum inside every partition kernel.
 - [[GPU String Processing]] — Packing and moving variable-length string columns.

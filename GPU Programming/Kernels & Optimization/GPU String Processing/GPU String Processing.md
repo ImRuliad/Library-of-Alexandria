@@ -471,7 +471,7 @@ versus about 21 if every warp had uniform work, roughly 8× slower than the band
 - [[Roofline Model and Arithmetic Intensity]] — String scans are memory-bound; offsets overhead is real cost.
 - [[GPU Architecture Basics]] — Warps and SIMT, the root of the divergence problem.
 - [[GPU Data Compression]] — Codecs that string columns pass through on load.
-- [[GPU Parquet and File Decoding]] — Dictionary and delta string pages decoded on the GPU (planned).
+- [[GPU Parquet and File Decoding]] — Dictionary and delta string pages decoded on the GPU, and how page layout sets decode parallelism.
 - [[Query Compilation and JIT on GPUs]] — NVRTC, compile cost and kernel caches (planned).
 - [[Distributed GPU Shuffles]] — Moving string columns between GPUs for joins.
 - [[Numba and CuPy]] — Writing custom string kernels from Python.

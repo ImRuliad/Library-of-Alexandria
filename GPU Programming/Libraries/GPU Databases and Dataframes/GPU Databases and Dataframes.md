@@ -414,3 +414,4 @@ Results come back as GPU-resident columns; other GPU libraries ([[Numba and CuPy
 - [[Distributed SQL]] — The CPU-side design of distributed query engines.
 - [[Hot Keys and Cache Stampedes]] — Skew, the same problem on a cluster.
 - [[GPU String Processing]] — String layouts, thread vs warp per string, regex and JIT transforms, dictionary encoding.
+- [[GPU Parquet and File Decoding]] — How the scan itself works: libcudf's page decoding, chunked and hybrid-scan readers, GPU-friendly file layout.

@@ -378,7 +378,7 @@ Part of [[Device-Side Math Libraries (MathDx)]]: block- and warp-level LZ4 and A
 | **Training checkpoints** | BF16 weights, gradients, FP32 optimizer state | ~1.14 to 1.18× full checkpoint; ~1.47× BF16 weights | Must beat storage bandwidth | NVIDIA gANS in ~30 lines of Python, H200 and Blackwell ([blog](https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/)) |
 | **Model weights in HBM** | BF16 exponents | ~68 to 70% size | Decode per layer, every forward pass | DFloat11: Llama 3.1 405B losslessly on one 8×80 GB node ([DFloat11](https://arxiv.org/html/2504.11651v3)) |
 | **Weights fused into GEMM** | Per-tile ANS substreams | ~10 to 12 bits per BF16 weight | Decode must hide under tensor-core math | Tan et al., Jun 2026: Mixtral-176B on 4 A100s 241 → 391 tokens/s via bigger batches ([arXiv 2606.15789](https://arxiv.org/pdf/2606.15789)) |
-| **Columns** | Parquet/ORC pages: Snappy, Zstd, LZ4, Gzip | Data-dependent | Overlap I/O with decode | libcudf readers via nvCOMP ([cuDF I/O](https://docs.nvidia.com/cudf/26.10/cudf/io/io/)); planned [[GPU Parquet and File Decoding]] |
+| **Columns** | Parquet/ORC pages: Snappy, Zstd, LZ4, Gzip | Data-dependent | Overlap I/O with decode | libcudf readers via nvCOMP ([cuDF I/O](https://docs.nvidia.com/cudf/26.10/cudf/io/io/)); see [[GPU Parquet and File Decoding]] |
 | **Collectives** | BF16 activations, gradients, params on the wire | ~1.33× (ZipCCL); bf16 ~64% size (UCCL-Zip) | Fusing into NCCL kernels | ZipCCL up to 1.18× end to end ([arXiv 2604.27844](https://arxiv.org/pdf/2604.27844)) |
 | **KV cache transfer** | Quantized KV (lossy step) + lossless backend | nvCOMP ANS 8.85 to 9.17× after quantization | Codec time vs network time | [Wu et al., Nov 2026](https://arxiv.org/pdf/2611.04382); UCCL-Zip 30.1% lower vLLM KV transfer latency |
 
@@ -470,7 +470,7 @@ Part of [[Device-Side Math Libraries (MathDx)]]: block- and warp-level LZ4 and A
 - [[Device-Side Math Libraries (MathDx)]] — nvCOMPDx alongside cuBLASDx, cuFFTDx, cuSolverDx and cuRANDDx.
 - [[GPUDirect RDMA and Storage]] — The storage and network paths compressed data travels on.
 - [[GPU Databases and Dataframes]] — Compressed Parquet/ORC columns decoded by libcudf through nvCOMP.
-- [[GPU Parquet and File Decoding]] — Planned: on-GPU page decoding and decompression in detail.
+- [[GPU Parquet and File Decoding]] — The libcudf reader pipeline, and when to skip compressing Parquet pages.
 - [[Blackwell Architecture]] — The chip that added the Decompression Engine.
 - [[Coherent CPU-GPU Superchips]] — NVLink-C2C, where the DE decompresses host data in transit.
 - [[Multi-GPU Communication - NVLink and NCCL]] — The collectives ZipCCL and UCCL-Zip compress.

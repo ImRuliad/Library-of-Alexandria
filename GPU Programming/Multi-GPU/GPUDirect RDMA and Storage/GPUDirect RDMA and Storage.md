@@ -303,3 +303,4 @@ The two devices "must share the same upstream PCI Express root complex", and bec
 - [[Coherent CPU-GPU Superchips]] — Grace platforms, where host memory is coherent but NICs and NVMe stay on PCIe.
 - [[GPU Data Compression]] — Shrinking checkpoints, columns and KV cache before they cross storage and network links.
 - [[Distributed GPU Shuffles]] — Query-engine exchanges (Spark RAPIDS, GPU Presto) that ride on GPUDirect RDMA across nodes.
+- [[GPU Parquet and File Decoding]] — A main GDS user in analytics: cuDF Parquet scans, and why they need MiB-scale row groups.
