@@ -447,7 +447,7 @@ quadrantChart
 - [[Garbage Collection]] — The main client: roots, moving collectors, precise vs conservative scanning.
 - [[Deoptimization and Speculation]] — Frame states recorded at the same safepoints as GC maps.
 - [[JIT Compilation]] — Tiers that each need maps (or uniformly tagged frames).
-- [[On-Stack Replacement]] — Planned: entering and leaving optimized code at loop headers, using the same frame descriptions.
+- [[On-Stack Replacement]] — Entering and leaving optimized code at loop headers, using the same frame descriptions.
 - [[Register Allocation]] — Decides where each live reference sits at each safepoint.
 - [[Dataflow Analysis]] — Liveness decides which references a map lists.
 - [[SSA Form]] — Why statepoints give relocated pointers new names.

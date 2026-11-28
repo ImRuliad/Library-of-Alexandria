@@ -55,7 +55,7 @@ sources:
   - https://llvm.org/docs/doxygen/GuardWidening_8cpp_source.html
   - https://llvm.org/docs/doxygen/LoopPredication_8cpp_source.html
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -519,4 +519,4 @@ Wasmtime's default 4 GiB reservation plus a 32 MiB guard "allows eliminating alm
 - [[Dependent and Refinement Types]] — Types that prove indices in range so no check is emitted.
 - [[Translation Validation]] — Checking that an optimizer's removal of a check was sound.
 - [[Monomorphization]] — Planned: specialization that exposes constant lengths to the prover.
-- [[On-Stack Replacement]] — Planned: entering an optimized, check-free loop mid-execution.
+- [[On-Stack Replacement]] — Entering an optimized, check-free loop mid-execution.

@@ -62,7 +62,7 @@ sources:
   - https://daringfireball.net/2024/06/apple_disables_webkits_jit_in_lockdown_mode
   - https://developer.apple.com/tutorials/data/documentation/browserenginekit/protecting-code-compiled-just-in-time.md
 created: 2026-11-26
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 ## Table Of Contents
@@ -191,7 +191,7 @@ timeline
 
 - **Smalltalk-80 (1984).** Deutsch and Schiffman translated bytecode to native code on first use, cached the result, and invented the *inline cache*: each send site remembers the last receiver class and jumps straight to its method ([Deutsch and Schiffman, POPL 1984](https://www.cs.tufts.edu/~nr/cs257/archive/peter-deutsch/efficient-smalltalk.pdf)).
 - **Self (1989 to 1994).** Chambers, Ungar and Hölzle added *maps* (today's hidden classes), *customization* (compile a copy of a method per receiver type), *polymorphic inline caches* ([Hölzle, Chambers and Ungar, ECOOP 1991](https://bibliography.selflanguage.org/pics.html)), *dynamic deoptimization* for debugging optimized code ([PLDI 1992](https://bibliography.selflanguage.org/dynamic-deoptimization.html)), and type feedback. Nearly every idea in a modern JIT appears here.
-- **HotSpot (1999).** Built from the Strongtalk/Self lineage, it brought adaptive optimization, deoptimization and on-stack replacement to Java, with the C1 (client) and C2 (server) compilers.
+- **HotSpot (1999).** Built from the Strongtalk/Self lineage, it brought adaptive optimization, deoptimization and [[On-Stack Replacement|on-stack replacement]] to Java, with the C1 (client) and C2 (server) compilers.
 - **Tracing (2000 to 2012).** HP's Dynamo re-optimized *native* code by recording hot traces ([Bala, Duesterwald and Banerjia, PLDI 2000](https://www.cse.iitm.ac.in/~krishna/courses/2022/odd-cs6013/BalaDusterwaldBanerjiaPLDI2000.pdf)). TraceMonkey applied trace trees to JavaScript in Firefox 3.5 ([Gal et al., PLDI 2009](https://www.cs.williams.edu/~freund/cs434/gal-trace.pdf)); LuaJIT 2 and PyPy made tracing work well; Mozilla later dropped tracing for method JITs.
 - **The browser race (2008 onward).** V8 launched with Chrome in 2008 with hidden classes and inline caches from day one. Each engine grew more tiers: JSC went to four tiers with FTL in 2014 ([WebKit, 2014](https://webkit.org/blog/3362/introducing-the-webkit-ftl-jit/)) and replaced LLVM inside FTL with its own B3 in 2016 ([Pizlo, 2016](https://webkit.org/blog/5852/introducing-the-b3-jit-compiler/)); V8 added Sparkplug in 2021 ([V8, 2021](https://v8.dev/blog/sparkplug)) and Maglev in 2023 ([V8, 2023](https://v8.dev/blog/maglev)).
 
@@ -313,7 +313,7 @@ sequenceDiagram
 
 The key rule: the resume point must be *before* any side effect the optimized code has not already performed, or *after* all those it has, never halfway. Engines resume at the start of the bytecode whose guard failed, which is safe because guards are placed before effects.
 
-**On-stack replacement** goes both ways:
+**On-stack replacement** goes both ways ([[On-Stack Replacement]] covers entry in depth):
 
 - **OSR entry (up).** A function called once but containing a long loop never hits its call counter. The interpreter counts *back-edges*; when the loop is hot, the JIT compiles a version with an extra entry at the loop header, copies the live interpreter values into it, and jumps in mid-loop. HotSpot, V8 and .NET (since .NET 7) all do this.
 - **OSR exit (down)** is deoptimization itself: leaving optimized code in the middle of a function.
@@ -474,3 +474,4 @@ Because LLVM did the instruction selection and register allocation ahead of time
 - [[Regular Expression Engines]] — Irregexp and PCRE2 JIT compile one pattern to native code.
 - [[Bounds Check Elimination]] — Range check elimination and loop predication in HotSpot, V8, JavaScriptCore and .NET.
 - [[Safepoints and Stack Maps]] — The polls and per-pc maps every optimizing tier emits.
+- [[On-Stack Replacement]] — Back-edge counters, OSR entry at loop headers, and how each engine moves the frame.
