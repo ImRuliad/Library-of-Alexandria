@@ -11,6 +11,7 @@ status: complete
 sources:
   - https://pdos.csail.mit.edu/6.824/papers/tail-dean.pdf
   - https://research.google/pubs/pub62/
+  - https://storage.googleapis.com/gweb-research2023-media/pubtools/4449.pdf
   - https://www.usenix.org/legacy/event/osdi08/tech/full_papers/zaharia/zaharia_html/
   - https://www.usenix.org/conference/nsdi13/technical-sessions/presentation/ananthanarayanan
   - https://arxiv.org/pdf/1306.3707
@@ -70,7 +71,7 @@ updated: 2026-11-28
 - **You can't eliminate variability, so tolerate it.** Dean and Barroso's thesis: just as fault-tolerant systems are built from unreliable parts, large services need "tail-tolerant" techniques that "reduce latency hiccups regardless of root cause".
 - **Hedged requests.** Send to one replica, and if it hasn't answered by roughly its p95, send a second copy and take whichever returns first. Google cut a BigTable p99.9 from 1,800 ms to 74 ms for 2% more requests.
 - **Tied requests.** Enqueue on two servers at once, each knowing about the other, and let the first one to *start* cancel the twin. This removes queueing delay at under 1% extra disk load.
-- **Redundancy is only free at low load.** Duplicating every request helps mean latency only below roughly 25–50% utilization (exactly 1/3 for exponential service with independent queues) ([Vulimiri et al., 2013](https://arxiv.org/pdf/1306.3707)). Above that, the copies become the queue (the bounds are the authors' conjecture; 1/3 is proved).
+- **Redundancy is only free at low load.** Duplicating every request helps mean latency only below roughly 25–50% utilization (exactly 1/3 for exponential service with independent queues) ([Vulimiri et al., 2013](https://arxiv.org/pdf/1306.3707)). Above that, the copies become the queue (1/3 is derived under an independence approximation; the 25–50% range is the authors' conjecture).
 - **Choose better, not just more.** Adaptive replica selection (C3, up to 3x better p99.9 in Cassandra) and probing load balancers (Google's Prequal, about 2x lower tail latency at YouTube) attack the tail without duplicating work.
 - **Now (Nov 2026):** Hedging is a standard knob in gRPC (Java), Envoy, Cassandra and its drivers, and is used on managed stores like DynamoDB for about 30% lower p99. The frontier has moved to adaptive delays and hedge budgets, microsecond-scale tails, and LLM serving, where output lengths vary so much that the tail is the main problem.
 
@@ -193,7 +194,7 @@ timeline
 
 | Year | Milestone | What it added |
 |---|---|---|
-| 2004 | **MapReduce backup tasks** ([Dean and Ghemawat, OSDI](https://research.google/pubs/pub62/)) | Near the end of a job, run spare copies of still-running tasks and take whichever finishes. Disabling it made a large sort take 44% longer. |
+| 2004 | **MapReduce backup tasks** ([Dean and Ghemawat, OSDI](https://research.google/pubs/pub62/)) | Near the end of a job, run spare copies of still-running tasks and take whichever finishes. Disabling it made a large sort take 44% longer (891 s to 1,283 s). |
 | 2008 | **LATE** ([Zaharia et al., OSDI](https://www.usenix.org/legacy/event/osdi08/tech/full_papers/zaharia/zaharia_html/)) | Speculate the task with the longest estimated time left, cap speculation at 10% of slots, avoid slow nodes. Up to 2x faster jobs on 200 EC2 VMs. |
 | 2013 | **The Tail at Scale** ([Dean and Barroso, CACM](https://pdos.csail.mit.edu/6.824/papers/tail-dean.pdf)) | Brought the idea to interactive serving: fan-out math, hedged and tied requests, micro-partitions, probation, good-enough and canary requests. |
 | 2013 | **Dolly** ([Ananthanarayanan et al., NSDI](https://www.usenix.org/conference/nsdi13/technical-sessions/presentation/ananthanarayanan)) | Clone small jobs up front rather than waiting to spot stragglers; 34–46% faster small jobs for about 5% extra resources. |
@@ -350,7 +351,7 @@ From [Dean and Barroso](https://pdos.csail.mit.edu/6.824/papers/tail-dean.pdf):
 
 *In batch processing the "request" is a job of many tasks, and the job finishes when its last task does. The same redundancy ideas apply, with different costs.*
 
-- **Backup tasks.** MapReduce runs spare copies of the last in-progress tasks near the end of a job and takes whichever finishes; without them a large sort took 44% longer ([Dean and Ghemawat, 2004](https://research.google/pubs/pub62/)).
+- **Backup tasks.** MapReduce runs spare copies of the last in-progress tasks near the end of a job and takes whichever finishes; the mechanism is tuned to cost "no more than a few percent" extra resources, and without it a large sort took 1,283 s instead of 891 s, 44% longer ([Dean and Ghemawat, OSDI 2004](https://storage.googleapis.com/gweb-research2023-media/pubtools/4449.pdf)).
 - **LATE.** Hadoop's original rule speculated any task 20% behind average progress, which in heterogeneous clusters launched far too many copies (80% of reducers in one 900-node EC2 run). LATE instead estimates each task's time left as $(1 - \text{progress}) / \text{progress rate}$, speculates the one finishing furthest in the future, caps speculation at 10% of slots and avoids slow nodes ([Zaharia et al., OSDI 2008](https://www.usenix.org/legacy/event/osdi08/tech/full_papers/zaharia/zaharia_html/)).
 - **Clones.** Dolly observed that small jobs, which are most jobs but a small share of resources, still had stragglers averaging 8x slower than the median task. Cloning them up front for about 5% extra resources made them 34–46% faster ([NSDI 2013](https://www.usenix.org/conference/nsdi13/technical-sessions/presentation/ananthanarayanan)).
 
@@ -438,10 +439,10 @@ Open problems:
 
 **Foundational papers**
 - Jeffrey Dean and Luiz André Barroso, [The Tail at Scale](https://pdos.csail.mit.edu/6.824/papers/tail-dean.pdf), *Communications of the ACM*, 2013.
-- Jeffrey Dean and Sanjay Ghemawat, [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/), OSDI 2004.
+- Jeffrey Dean and Sanjay Ghemawat, [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/), OSDI 2004 ([PDF](https://storage.googleapis.com/gweb-research2023-media/pubtools/4449.pdf)).
 - Matei Zaharia et al., [Improving MapReduce Performance in Heterogeneous Environments](https://www.usenix.org/legacy/event/osdi08/tech/full_papers/zaharia/zaharia_html/), OSDI 2008.
 - Ganesh Ananthanarayanan et al., [Effective Straggler Mitigation: Attack of the Clones](https://www.usenix.org/conference/nsdi13/technical-sessions/presentation/ananthanarayanan), NSDI 2013.
-- Ashish Vulimiri et al., [Low Latency via Redundancy](https://arxiv.org/pdf/1306.3707), 2013 (CoNEXT 2013).
+- Ashish Vulimiri et al., [Low Latency via Redundancy](https://arxiv.org/pdf/1306.3707), CoNEXT 2013.
 - Luiz Barroso, Mike Marty, David Patterson, Parthasarathy Ranganathan, [Attack of the Killer Microseconds](https://cacm.acm.org/research/attack-of-the-killer-microseconds), *CACM*, 2017.
 
 **Replica selection and load balancing**
