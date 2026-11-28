@@ -26,6 +26,7 @@ sources:
   - https://sosp19.rcs.uwaterloo.ca/slides/lu.pdf
   - https://rohan.padhye.org/files/filibuster-socc21.pdf
   - https://www.usenix.org/conference/nsdi24/presentation/wu-haoze
+  - https://web.eecs.umich.edu/~ryanph/paper/legolas-nsdi24-preprint.pdf
   - https://www.microsoft.com/en-us/research/?p=1068138
   - https://www.vldb.org/pvldb/vol17/p3017-ramos.pdf
   - https://jepsen.io/analyses/nats-2.12.1
@@ -43,7 +44,9 @@ sources:
   - https://chaos-mesh.org/docs/basic-features
   - https://www.cncf.io/blog/2026/08/06/litmuschaos-q1-q2-2026-update-community-contributions-and-project-progress/
   - https://github.com/SHopify/toxiproxy
+  - https://arxiv.org/abs/2501.11107
   - https://arxiv.org/html/2511.07865v1
+  - https://web.eecs.umich.edu/~ryanph/paper/anduril-sosp24.pdf
   - https://infoq.com/news/2026/10/gremlin-foresight-ai
   - https://www.newswire.ca/news-releases/jane-street-leads-antithesis-s-105m-series-a-to-make-deterministic-simulation-testing-the-new-standard-821237228.html
   - https://arxiv.org/html/2509.14931v2
@@ -313,11 +316,11 @@ Random injection samples the fault space; the research line since 2015 tries to 
 | Approach | Signal used to choose faults | Result |
 |---|---|---|
 | **LDFI** (Alvaro et al., SIGMOD 2015; Netflix SoCC 2016) | Lineage of a successful outcome: which alternative computations could produce it. A Boolean formula over those alternatives gives the fault sets that could break every path; each is tested and pruned. At Netflix, traces stood in for lineage. | App Boot's ~$2^{100}$ space covered in just under 200 experiments; 11 new critical failures ([SoCC 2016](https://par.nsf.gov/servlets/purl/10053503)) |
-| **Filibuster** (Meiklejohn et al., SoCC 2021) | Existing passing functional tests. Each remote call in a test gets a scheduled run that injects a `Timeout`, `ConnectionError` or plausible HTTP error there, explored recursively. Dynamic reduction uses service boundaries to skip redundant combinations. | Found every bug in a 12-app corpus recreating Audible, Expedia, Mailchimp and Netflix chaos experiments; Netflix example ran 4,670 of 18,653 tests after reduction ([paper](https://rohan.padhye.org/files/filibuster-socc21.pdf)) |
+| **Filibuster** (Meiklejohn et al., SoCC 2021) | Existing passing functional tests. Each remote call in a test gets a scheduled run that injects a `Timeout`, `ConnectionError` or plausible HTTP error there, explored recursively. Dynamic reduction uses service boundaries to skip redundant combinations. | Found every bug in a 12-app corpus, four of which recreate industry chaos experiments at Audible, Expedia, Mailchimp and Netflix; Netflix example ran 4,670 of 18,653 tests after reduction ([paper](https://rohan.padhye.org/files/filibuster-socc21.pdf)) |
 | **CrashTuner** (Lu et al., SOSP 2019) | "Meta-info" variables (node, container, server IDs) found from logs and types. Crash a node just before a read or just after a write of one. | 21 new crash-recovery bugs in YARN, HDFS, HBase, ZooKeeper and Cassandra; one bug per ~50 runs vs ~5,000 for random crashes ([slides](https://sosp19.rcs.uwaterloo.ca/slides/lu.pdf)) |
 | **NEAT** (Alquraan et al., OSDI 2018) | Partition shapes from a failure study: complete, partial and simplex partitions, especially isolating one node. | 32 failures in 7 systems ([OSDI 2018](https://www.usenix.org/conference/osdi18/presentation/alquraan)) |
-| **Legolas** (Wu et al., NSDI 2024) | Abstract states inferred from code, so injection is spread across distinct program states rather than wall-clock times. | 20 new partial-failure bugs in six extensively tested systems ([NSDI 2024](https://www.usenix.org/conference/nsdi24/presentation/wu-haoze)) |
-| **Anduril** (Pan et al., SOSP 2024) | Feedback from a failure symptom: search for the root-cause fault and the right moment to inject it. | Reproduced all 22 real fault-induced failures from five systems, median 8 minutes ([MSR](https://www.microsoft.com/en-us/research/?p=1068138)) |
+| **Legolas** (Wu, Pan, Huang, NSDI 2024) | Abstract states inferred statically from each thread's control flow (a branch on a state variable guarding a significant action); injection points are grouped by state and chances spread round-robin across states rather than across wall-clock time. | 20 new partial-failure bugs in ZooKeeper, HDFS, Kafka, HBase, Cassandra and Flink. In the same setup a random policy found 3, CrashTuner 4, FATE 1, and the off-the-shelf injectors CharybdeFS, tcconfig and byte-monkey none ([NSDI 2024](https://www.usenix.org/conference/nsdi24/presentation/wu-haoze), [preprint](https://web.eecs.umich.edu/~ryanph/paper/legolas-nsdi24-preprint.pdf)) |
+| **Anduril** (Pan et al., SOSP 2024) | Feedback from a failure log. Log messages seen only in the failure are symptoms; static causal analysis ranks fault sites by distance to them; each run that fails to reproduce lowers the priority of symptoms it did produce, and fault occurrences are ranked by how many log messages separate them from the symptom, which picks the moment ([paper](https://web.eecs.umich.edu/~ryanph/paper/anduril-sosp24.pdf)). | Reproduced all 22 real fault-induced failures from five systems, median 8 minutes in ZooKeeper, HDFS, HBase, Kafka and Cassandra ([MSR](https://www.microsoft.com/en-us/research/?p=1068138)) |
 | **CSnake** (Qian, Tan, Zhang, EuroSys 2026) | Causal stitching: single-fault runs from different workloads, each compared to a fault-free profile, are linked into fault-propagation chains that loop back on themselves. | 15 bugs causing self-sustaining cascading failures in HDFS, HBase, Ozone and Flink; 5 confirmed, 2 fixed ([arXiv](https://arxiv.org/pdf/2509.26529)) |
 
 The common move: instead of "inject fault X at a random time", ask "which (fault, location, moment) could plausibly break this?", using program structure as the guide. These tools mostly run before production, on small clusters, which Yuan's 98%-on-3-nodes finding says is enough for most bugs.
@@ -405,7 +408,7 @@ The left end finds bugs cheaply and reproducibly but only within its fault model
 
 ### Agents Planning Experiments
 
-- **ChaosEater (Nov 2025)** runs the whole loop with LLM agents on Kubernetes: define steady state, plan Chaos Mesh faults, analyze, reconfigure manifests, repeat. A cycle cost $0.2 to $0.8 and took 11 to 25 minutes; it fixed Nginx in 5 of 5 runs and SockShop in 4 of 5. The authors limit it to development environments "due to security concerns" ([arXiv](https://arxiv.org/html/2511.07865v1)).
+- **ChaosEater (preprint Jan 2025, follow-up Nov 2025)** runs the whole loop with LLM agents on Kubernetes: define steady state, plan Chaos Mesh faults, analyze, reconfigure manifests, repeat. A cycle cost $0.2 to $0.8 and took 11 to 25 minutes; it fixed Nginx in 5 of 5 runs and SockShop in 4 of 5. The authors limit it to development environments "due to security concerns" ([arXiv](https://arxiv.org/html/2511.07865v1)).
 - **Gremlin Foresight AI (Oct 2026)** uses four agents (analyst, tester, operator, program manager) to recommend, run and re-run tests, drawing on Gremlin's "Failure Atlas" of past experiments; nothing runs or is applied without engineer approval. Gremlin has published no accuracy or false-positive figures ([InfoQ](https://infoq.com/news/2026/10/gremlin-foresight-ai)).
 - **Planning for AI infrastructure (Jul 2026).** Meta's ADA-ST models fault propagation across hardware, firmware, management and orchestration layers as a graph and picks cross-layer scenarios to cover it. In its analysis, 49% of one platform's 72,550 repair tickets involved cross-layer propagation, and static new-platform test plans covered only 20.6 to 25.0% of modeled propagation edges. Most results are analytical or replayed against tickets; only four scenarios ran on real hardware ([Kulkarni et al.](https://arxiv.org/pdf/2607.16161)). See [[GPU Cluster Infrastructure]].
 
@@ -458,7 +461,7 @@ The left end finds bugs cheaply and reproducibly but only within its fault model
 - Jie Lu et al., [CrashTuner](https://sosp19.rcs.uwaterloo.ca/slides/lu.pdf), SOSP 2019 (slides).
 - Christopher Meiklejohn et al., [Service-Level Fault Injection Testing](https://rohan.padhye.org/files/filibuster-socc21.pdf), SoCC 2021 (Filibuster).
 - Haoze Wu et al., [Efficient Exposure of Partial Failure Bugs in Distributed Systems with Inferred Abstract States](https://www.usenix.org/conference/nsdi24/presentation/wu-haoze), NSDI 2024 (Legolas).
-- [Efficient Reproduction of Fault-Induced Failures in Distributed Systems with Feedback-Driven Fault Injection](https://www.microsoft.com/en-us/research/?p=1068138), SOSP 2024 (Anduril).
+- Jia Pan, Haoze Wu, Tanakorn Leesatapornwongsa, Suman Nath, Peng Huang, [Efficient Reproduction of Fault-Induced Failures in Distributed Systems with Feedback-Driven Fault Injection](https://web.eecs.umich.edu/~ryanph/paper/anduril-sosp24.pdf), SOSP 2024 (Anduril; [MSR page](https://www.microsoft.com/en-us/research/?p=1068138)).
 - Maria Ramos et al., [When Amnesia Strikes: Understanding and Reproducing Data Loss Bugs with Fault Injection](https://www.vldb.org/pvldb/vol17/p3017-ramos.pdf), VLDB 2024 (LazyFS).
 - Shangshu Qian, Lin Tan, Yongle Zhang, [CSnake: Detecting Self-Sustaining Cascading Failure via Causal Stitching of Fault Propagations](https://arxiv.org/pdf/2509.26529), EuroSys 2026.
 - Jiawei Tyler Gu et al., [Who Watches the Watchers? On the Reliability of Softwarizing Cloud Application Management](https://www.usenix.org/system/files/nsdi26-gu.pdf), NSDI 2026 (OAT).
@@ -471,7 +474,7 @@ The left end finds bugs cheaply and reproducibly but only within its fault model
 - Shopify, [Toxiproxy](https://github.com/SHopify/toxiproxy).
 
 **Frontier (2025 to 2026)**
-- [ChaosEater / LLM-Powered Fully Automated Chaos Engineering](https://arxiv.org/html/2511.07865v1), arXiv, Nov 2025.
+- Daisuke Kikuta, Hiroki Ikeuchi, Kengo Tajiri, [ChaosEater: Fully Automating Chaos Engineering with Large Language Models](https://arxiv.org/abs/2501.11107), arXiv, Jan 2025; follow-up [LLM-Powered Fully Automated Chaos Engineering](https://arxiv.org/html/2511.07865v1), Nov 2025.
 - InfoQ, [Gremlin Foresight AI](https://infoq.com/news/2026/10/gremlin-foresight-ai), Oct 2026.
 - Saurabh Kulkarni et al., [Adaptive Fault Injection Planning for Multi-Layer Self-Healing AI Infrastructure](https://arxiv.org/pdf/2607.16161), arXiv, Jul 2026.
 - [Jane Street Leads Antithesis's $105M Series A](https://www.newswire.ca/news-releases/jane-street-leads-antithesis-s-105m-series-a-to-make-deterministic-simulation-testing-the-new-standard-821237228.html), Dec 2025.
