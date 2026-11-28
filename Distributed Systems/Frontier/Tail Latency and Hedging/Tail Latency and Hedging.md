@@ -408,7 +408,7 @@ Writes are harder but, as Dean and Barroso note, often more tail-tolerant alread
 - **Tail-aware scheduling.** Li et al. (ICML 2026) argue that length-prediction schedulers that approximate SRPT give little control over p90–p99, and propose prediction-free priority boosting with cache-aware preemption: up to 35–50% lower p99 time-to-last-token than SRPT with perfect length knowledge ([MSR](https://www.microsoft.com/en-us/research/publication/beyond-prediction-tail-aware-scheduling-for-llm-inference/)).
 - **Redundant state instead of redundant requests.** Re-sending a long generation is expensive, so KevlarFlow (Purdue, Jan 2026) replicates each request's KV cache in the background so in-flight requests continue on another node after a failure, improving p99 latency under failure 2.8x for 2–4% runtime overhead ([arXiv](https://arxiv.org/pdf/2601.22438)).
 
-See also [[LLM Serving]] and planned [[Fair LLM Serving]].
+See also [[LLM Serving]] and [[Fair LLM Serving]].
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -495,5 +495,5 @@ Open problems:
 - [[Load Testing and Benchmarking]] — Planned: open-loop load and coordinated omission.
 - [[Probabilistic Sketches]] — Planned: quantile sketches for mergeable percentiles.
 - [[RDMA and Datacenter Transports]] — Planned: microsecond fabrics and their tails.
-- [[Fair LLM Serving]] — Planned: fairness and tails in batched LLM serving.
+- [[Fair LLM Serving]] — Per-token latency bounds for tenants sharing a batched LLM server.
 - [[Fault Injection and Chaos Engineering]] — Injecting slowness to test tail tolerance; FIS gray-failure scenarios and Xinda.

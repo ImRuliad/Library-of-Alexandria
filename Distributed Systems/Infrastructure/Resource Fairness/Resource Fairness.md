@@ -449,7 +449,7 @@ $$
 | **Equinox** (SJTU, 2025) | Token counts ignore latency and GPU efficiency | Score $0.7 \cdot$ user-facing counter $+ 0.3 \cdot$ resource counter, with predicted output length | Up to 60% lower time to first token than VTC, 13% higher Jain's index ([arXiv 2508.16646](https://arxiv.org/pdf/2508.16646)) |
 | **FairInference** (Berkeley, Sep 2026) | Long-run token fairness can still delay any single request arbitrarily | *δ-token fairness*: each token of a well-behaved client finishes within $\delta$ of when it would in isolation, via per-token deadlines, EDF admission and a δ-fair KV-cache eviction policy | Well-behaved client's time to first token 3.2 s vs 28× that under VTC and 66× under plain SGLang ([arXiv 2609.18112](https://arxiv.org/html/2609.18112)) |
 
-FairInference's framing is the cleanest statement of the trade-off in this whole note: $\delta \to \infty$ is today's shared serving, $\delta = 0$ is static partitioning, and the administrator picks a point in between. See [[LLM Serving]] for the batching and scheduling these build on.
+FairInference's framing is the cleanest statement of the trade-off in this whole note: $\delta \to \infty$ is today's shared serving, $\delta = 0$ is static partitioning, and the administrator picks a point in between. See [[LLM Serving]] for the batching and scheduling these build on, and [[Fair LLM Serving]] for each algorithm in depth, fair KV-cache eviction and what production gateways and engines ship.
 
 ## ***Where It Is Now***
 ---
@@ -460,7 +460,7 @@ FairInference's framing is the cleanest statement of the trade-off in this whole
 - **API servers.** APF has been stable since Kubernetes 1.29 and is enabled by default, so a cluster's control plane gets this protection from noisy clients unless an operator turns it off ([docs](https://www.kubernetes.io/docs/concepts/cluster-administration/flow-control/)).
 - **Managed queues.** SQS fair queues (July 2025) treat `MessageGroupId` as a tenant and favor quiet tenants when one has disproportionate in-flight messages ([SQS docs](https://docs.aws.amazon.com/en_gb/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fair-queues.html); [[Message Queues]]).
 - **Storage.** mClock is Ceph's OSD scheduler, with operator-facing profiles rather than raw tags ([Ceph docs](https://docs.ceph.com/en/reef/rados/configuration/mclock-config-ref/)).
-- **LLM serving.** Fair scheduling went from VTC's token counts (2024) to prefix-aware deficits (DLPM, 2025) to latency bounds (FairInference, v1 dated September 16, 2026). FairInference reports that VTC and DLPM can raise a well-behaved client's time to first token by up to an order of magnitude, which is the gap the next generation of serving schedulers will be judged on.
+- **LLM serving.** Fair scheduling went from VTC's token counts (2024) to prefix-aware deficits (DLPM, 2025) to latency bounds (FairInference, v1 dated September 16, 2026). FairInference reports a well-behaved client's time to first token 28× (VTC) and 32× (DLPM) higher than under its own scheduler, and on a WildChat replay a p99 of 171 s under VTC vs 1.15 s ([[Fair LLM Serving]]), which is the gap the next generation of serving schedulers will be judged on.
 
 ## ***Trade-offs & Open Problems***
 ---
@@ -545,3 +545,4 @@ Open problems worth tracking:
 - [[Block Layer and IO Schedulers]] — Per-device I/O scheduling under mClock-style policies.
 - [[LLM Serving]] — Continuous batching, the setting VTC and FairInference schedule.
 - [[KV Cache]] — The memory whose eviction and prefix sharing fair LLM schedulers must account for.
+- [[Fair LLM Serving]] — The LLM-serving deep dive: VTC's bounds, DLPM and D²LPM, Equinox, FairBatching, Justitia, FairInference and gateway flow control.
