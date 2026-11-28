@@ -386,3 +386,4 @@ Open problems:
 - [[GPU Databases and Dataframes]] — Why GH200 is a favorite box for GPU analytics.
 - [[GPU Cluster Infrastructure]] — Superchip nodes in racks and clusters.
 - [[KV Cache]] — The inference memory pressure that drives CPU-memory spill.
+- [[GPU Data Compression]] — Blackwell's Decompression Engine decompresses host data in transit over NVLink-C2C.

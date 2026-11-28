@@ -148,7 +148,7 @@ timeline
     2H 2026 : Rubin : next generation, HBM4, NVLink 6
 ```
 
-- **Launch (GTC, March 18, 2024).** NVIDIA listed six headline technologies: the 208B-transistor two-die chip, a second-generation Transformer Engine with "new micro-tensor scaling support" for FP4, NVLink 5, a RAS engine for "AI-based preventative maintenance", confidential computing, and a Decompression Engine for databases ([NVIDIA](https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing)). It claimed up to 30x LLM-inference performance for NVL72 versus the same number of H100s.
+- **Launch (GTC, March 18, 2024).** NVIDIA listed six headline technologies: the 208B-transistor two-die chip, a second-generation Transformer Engine with "new micro-tensor scaling support" for FP4, NVLink 5, a RAS engine for "AI-based preventative maintenance", confidential computing, and a Decompression Engine for databases (see [[GPU Data Compression]]; [NVIDIA](https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing)). It claimed up to 30x LLM-inference performance for NVL72 versus the same number of H100s.
 - **Software (Jan 2025).** CUDA 12.8 was the first toolkit with Blackwell support, adding cuBLAS block-scaled FP4 and FP8 GEMMs and Nsight Compute views of "Blackwell Hardware Tensor Memory" ([NVIDIA](https://developer.nvidia.com/blog/cuda-toolkit-12-8-delivers-nvidia-blackwell-support/)).
 - **Blackwell Ultra (GTC, March 2025).** Same two-die design, re-balanced: "15 PetaFLOPS dense NVFP4", 288 GB HBM3e, attention exponentials doubled, FP64 mostly removed ([NVIDIA Ultra blog](https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra-the-chip-powering-the-ai-factory-era); [Lockwood](https://glennklockwood.com/garden/processors/b300)).
 - **Compiler targets (May 2025).** CUDA 12.9 added "family-specific" targets: code built for `sm_100f` runs on both CC 10.0 and 10.3 ([NVIDIA](https://developer.nvidia.com/blog/nvidia-blackwell-and-nvidia-cuda-12-9-introduce-family-specific-architecture-features/)).
@@ -323,3 +323,4 @@ Sources: [NVIDIA, May 2025](https://developer.nvidia.com/blog/nvidia-blackwell-a
 - [[AI Accelerators]] — Blackwell against TPUs, MI355X and others.
 - [[GPU Cluster Infrastructure]] — Power, cooling and networking around NVL72.
 - [[Coherent CPU-GPU Superchips]] — Grace, NVLink-C2C and coherence in GB200, GB300 and Vera Rubin.
+- [[GPU Data Compression]] — The Decompression Engine (LZ4, Snappy, Deflate) and how nvCOMP uses it.

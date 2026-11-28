@@ -339,3 +339,4 @@ ncclCommDestroy(comm);
 - [[GPU Architecture Basics]] — SMs, the resource NCCL kernels borrow.
 - [[GPU Fault Tolerance in Production]] — NVLink Xids, NCCL timeouts and recovering jobs when a GPU fails.
 - [[Coherent CPU-GPU Superchips]] — The CPU-GPU NVLink-C2C link inside each GH200 and GB200 node.
+- [[GPU Data Compression]] — Lossless compression of collective traffic (DietGPU, ZipCCL, UCCL-Zip) and when it loses to NVLink.

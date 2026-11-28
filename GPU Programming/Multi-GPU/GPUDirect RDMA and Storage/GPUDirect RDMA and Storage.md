@@ -301,3 +301,4 @@ The two devices "must share the same upstream PCI Express root complex", and bec
 - [[Mixture of Experts]] — Expert-parallel all-to-all, the workload behind DeepEP and GIN.
 - [[Page Cache and Memory Reclaim]] — What `O_DIRECT` and GDS bypass.
 - [[Coherent CPU-GPU Superchips]] — Grace platforms, where host memory is coherent but NICs and NVMe stay on PCIe.
+- [[GPU Data Compression]] — Shrinking checkpoints, columns and KV cache before they cross storage and network links.

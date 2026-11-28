@@ -361,3 +361,4 @@ Open problems:
 - [[Linking and LTO]] — Link-time pruning and the 2 GB code-model limit.
 - [[JIT Compilation]] — Compiling variants at run time instead of shipping them.
 - [[GPU Kernel Compilers]] — Where GPU compilers make unrolling and inlining decisions.
+- [[GPU Data Compression]] — nvCOMP and GPU-side LZ4/Zstd for data, the counterpart to fatbin compression.

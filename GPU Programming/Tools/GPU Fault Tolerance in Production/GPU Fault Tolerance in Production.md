@@ -389,3 +389,4 @@ Open problems: letting multi-GPU jobs survive an uncorrectable memory error with
 - [[Failure Models]] — Fail-stop vs Byzantine, the theory behind containment.
 - [[Distributed Training]] — The parallelism a failure interrupts.
 - [[Cluster Scheduling]] — Cordon, drain and reliability-aware placement.
+- [[GPU Data Compression]] — GPU ANS checkpoint compression that shortens checkpoint stalls.
